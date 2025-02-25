@@ -184,19 +184,20 @@ class Action_Links implements Integration_Interface {
 			return;
 		}
 
-		$rollback = filter_input( INPUT_GET, 'rollback', FILTER_VALIDATE_BOOL );
+		$rollback = filter_input( INPUT_GET, 'rollback', FILTER_VALIDATE_BOOLEAN );
 		if ( ! $rollback ) {
 			return;
 		}
 
 		$rollback_notification = defined( 'ADVADS_VERSION' )
+			/* translators: %s: version number */
 			? sprintf( esc_html__( 'You have successfully rolled back to Advanced Ads %s', 'advanced-ads' ), ADVADS_VERSION )
 			: esc_html__( 'You have successfully rolled back to a previous version of Advanced Ads.', 'advanced-ads' );
 
 		?>
 		<div class="notice notice-success is-dismissible">
 			<p>
-				<?php esc_html_e( $rollback_notification ); ?>
+				<?php echo esc_html( $rollback_notification ); ?>
 			</p>
 		</div>
 		<?php
