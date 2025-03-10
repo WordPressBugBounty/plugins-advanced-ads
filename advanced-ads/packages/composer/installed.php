@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
-        'name' => 'webgilde/advanced-ads',
-        'pretty_version' => '1.42.1',
-        'version' => '1.42.1.0',
+        'name' => 'advanced-ads/advanced-ads',
+        'pretty_version' => '1.48.2',
+        'version' => '1.48.2.0',
         'reference' => null,
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
@@ -10,10 +10,19 @@
         'dev' => false,
     ),
     'versions' => array(
+        'advanced-ads/advanced-ads' => array(
+            'pretty_version' => '1.48.2',
+            'version' => '1.48.2.0',
+            'reference' => null,
+            'type' => 'wordpress-plugin',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'advanced-ads/framework' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '9ceddbff73a7f588e29ab0172314b9a9a349546c',
+            'reference' => '364c1de99e6e0e789857bc20ea97a2cc2970b4e1',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../advanced-ads/framework',
             'aliases' => array(
@@ -22,20 +31,11 @@
             'dev_requirement' => false,
         ),
         'mobiledetect/mobiledetectlib' => array(
-            'pretty_version' => '2.8.45',
-            'version' => '2.8.45.0',
-            'reference' => '96aaebcf4f50d3d2692ab81d2c5132e425bca266',
+            'pretty_version' => '3.74.3',
+            'version' => '3.74.3.0',
+            'reference' => '39582ab62f86b40e4edb698159f895929a29c346',
             'type' => 'library',
             'install_path' => __DIR__ . '/../mobiledetect/mobiledetectlib',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
-        'webgilde/advanced-ads' => array(
-            'pretty_version' => '1.42.1',
-            'version' => '1.42.1.0',
-            'reference' => null,
-            'type' => 'wordpress-plugin',
-            'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

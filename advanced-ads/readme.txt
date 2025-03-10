@@ -1,10 +1,10 @@
 === Advanced Ads – Ad Manager & AdSense ===
 Contributors: webzunft, advancedads
 Tags: ads, adsense, amazon, affiliate, ad manager
-Requires at least: 5.0
-Tested up to: 6.6
-Requires PHP: 7.2
-Stable tag: 1.56.4
+Requires at least: 5.7
+Tested up to: 6.7
+Requires PHP: 7.4
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -169,7 +169,7 @@ Easily integrate affiliate marketing with a comprehensive toolkit.
 
 https://vimeo.com/577170591
 
-= Add-Ons = 
+= Add-Ons =
 
 * all add-ons include priority email support
 * [All Access](https://wpadvancedads.com/add-ons/all-access/?utm_source=wporg&utm_medium=link&utm_campaign=wp-add-ons) – includes all available add-ons
@@ -188,7 +188,7 @@ https://vimeo.com/577170591
 
 * basic features to prevent ads from being removed by AdBlock and other ad blockers
 * prevent ad blockers from breaking sites where plugin scripts are running
-* ad blocker detection: show alternative content to ad block users and improve the monetization of your website [Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-4) 
+* ad blocker detection: show alternative content to ad block users and improve the monetization of your website [Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-4)
 
 Learn more on the [plugin homepage](https://wpadvancedads.com).
 
@@ -209,7 +209,7 @@ Advanced Ads integrates with plenty of other plugins:
 - Elementor - [How to create and implement ads in Elementor](https://wpadvancedads.com/elementor-ads/)
 - GamiPress – [How to target ads on GamiPress websites](https://wpadvancedads.com/manual/gamipress-ads/)
 - Genesis – [Genesis Ads add-on](https://wpadvancedads.com/add-ons/genesis-ads/)
-- [IAB TCF 2.0 consent](https://wpadvancedads.com/manual/tcf-consent-wordpress/) – hide ads until users give their consent. Integrating with any CMP, InMobi, iubenda, Google Funding Choices, cookiebot, etc.
+- [IAB TCF 2.2 consent](https://wpadvancedads.com/manual/tcf-consent-wordpress/) – hide ads until users give their consent. Integrating with any CMP, Quantcast Choices, iubenda, Google Funding Choices, cookiebot, etc.
 - LearnDash - [How to integrate ads into LearnDash](https://wpadvancedads.com/learndash-ads/)
 - MailPoet - [How to integrate Advanced Ads in MailPoet Newsletters](https://wpadvancedads.com/mailpoet-newsletters/)
 - Paid Memberships Pro – [How to manage ads on membership sites running Paid Memberships Pro](https://wpadvancedads.com/paid-memberships-pro/)
@@ -267,7 +267,7 @@ Once you enable one of the Privacy options, Advanced Ads blocks ads that need co
 You can also deliver non-personalized AdSense ads when that is legally allowed in your area.
 
 - [Cookie consent integration](https://wpadvancedads.com/manual/ad-cookie-consent/).
-- [IAB TCF 2.0 integration](https://wpadvancedads.com/manual/tcf-consent-wordpress/).
+- [IAB TCF 2.2 integration](https://wpadvancedads.com/manual/tcf-consent-wordpress/).
 
 Advanced Ads itself does neither save personal information (e.g., an IP address) in your database nor cookies in the visitor’s browser.
 
@@ -356,24 +356,22 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 
 == Changelog ==
 
-= 1.56.4 (March 10, 2025) =
+= 2.0.0 (March 10, 2025) =
 
-- Fix: resolve issue causing placements to disappear after a manual rollback
-
-= 1.56.3 (February 25, 2025) =
-
-- Fix: prevent an 'undefined constant' error in PHP versions prior to PHP 8
-
-= 1.56.2 (February 19, 2025) =
-
-- Fix: resolve an issue occurring when setting an expiration date
-- Fix: update the licence status of premium plugins correctly
-
-= 1.56.1 (November 22, 2024) =
-
-- Fix: prevent some PHP notices with PHP 8.2
-
-= 1.56.0 (November 13, 2024) =
-
-- Improvement: optimize code structure slightly for better performance
-- Improvement: enhance PubGuru one click integration
+- Feature: introduce onboarding wizard
+- Feature: implement plugin importer
+- Feature: overhaul placement structure
+- Feature: add pause, duplicate, and rename functions for placements
+- Feature: enable quick & bulk edit for ads and placements
+- Feature: option to hide ads for specific IP addresses
+- Feature: allow saving of custom filter sets
+- Feature: introduce rollback feature for version control
+- Improvement: expand ad filtering options
+- Improvement: add group type filter
+- Improvement: introduce ‘used by’ column in ad overview
+- Improvement: enable ad label overrides at ad level with basic HTML support
+- Improvement: enhance UI for clarity, better labels, more sortable columns, and reactive screens
+- Improvement: update Advanced Ads Dashboard
+- Improvement: display hints for dependent settings like cache busting or ad blocker disguise
+- Improvement: add quick & bulk edit for disabling ads on posts/pages
+- Improvement: optimize backend performance, load files only as needed
