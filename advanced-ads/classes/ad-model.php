@@ -131,6 +131,16 @@ class Advanced_Ads_Model {
 		if ( ! isset( $this->ad_placements ) ) {
 			$this->ad_placements = get_option( 'advads-ads-placements', [] );
 
+			// If something went wrong with AA 2.0, fetch placements from backup.
+			if ( empty( $this->ad_placements ) || ! is_array( $this->ad_placements ) ) {
+				$placements = get_option( 'advads-ads-placements_backup', [] );
+				if ( is_array( $placements ) && ! empty( $placements ) ) {
+					$this->ad_placements = $placements;
+					update_option( 'advads-ads-placements', $placements );
+					delete_option( 'advads-ads-placements_backup' );
+				}
+			}
+
 			// load default array if not saved yet.
 			if ( ! is_array( $this->ad_placements ) ) {
 				$this->ad_placements = [];
