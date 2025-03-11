@@ -324,7 +324,7 @@ class Ad_Repository {
 	private function read_ad_data( &$ad ): void {
 		$post_meta_values = get_post_meta( $ad->get_id(), self::OPTION_METAKEY, true );
 
-		if ( empty( $post_meta_values ) ) {
+		if ( empty( $post_meta_values ) || ! is_array( $post_meta_values ) ) {
 			$post_meta_values = [];
 		}
 

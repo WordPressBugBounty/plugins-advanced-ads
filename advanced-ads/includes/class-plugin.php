@@ -118,6 +118,7 @@ class Plugin extends Framework\Loader {
 
 		add_action( 'init', [ $this, 'load_textdomain' ] );
 		add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ], -1 );
+		add_action( 'widgets_init', [ $this, 'register_widgets' ] );
 
 		// Load it all.
 		$this->ads->initialize();
@@ -125,6 +126,15 @@ class Plugin extends Framework\Loader {
 		$this->placements->initialize();
 		$this->modules->initialize();
 		$this->load();
+	}
+
+	/**
+	 * Register the Advanced Ads classic Widget
+	 *
+	 * @return void
+	 */
+	public function register_widgets(): void {
+		register_widget( '\AdvancedAds\Widget' );
 	}
 
 	/**

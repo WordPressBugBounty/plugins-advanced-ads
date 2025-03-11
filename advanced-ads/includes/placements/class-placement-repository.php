@@ -358,6 +358,10 @@ class Placement_Repository {
 		$options = get_post_meta( $placement->get_id(), 'options', true );
 		$type    = get_post_meta( $placement->get_id(), 'type', true );
 
+		if ( empty( $options ) || ! is_array( $options ) ) {
+			$options = [];
+		}
+
 		$display_conditions = $options['display'] ?? [];
 		$visitor_conditions = $options['visitors'] ?? [];
 		unset( $options['display'], $options['visitors'] );

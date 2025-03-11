@@ -630,6 +630,17 @@ class Advanced_Ads {
 	}
 
 	/**
+	 * Get the array with ad placements
+	 *
+	 * @deprecated 2.0.0 wp_advads_get_all_placements
+	 *
+	 * @return array $ad_placements
+	 */
+	public static function get_ad_placements_array() {
+		return wp_advads_get_all_placements();
+	}
+
+	/**
 	 * Store whether the loop started in an inner `the_content`.
 	 *
 	 * If so, let us assume that we are in the loop when we are in the outermost `the_content`.
