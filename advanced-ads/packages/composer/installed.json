@@ -7,12 +7,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/advanced-ads/framework.git",
-                "reference": "364c1de99e6e0e789857bc20ea97a2cc2970b4e1"
+                "reference": "bafe2c32b1530cfb18d8b738adb9524f8406b9aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/advanced-ads/framework/zipball/364c1de99e6e0e789857bc20ea97a2cc2970b4e1",
-                "reference": "364c1de99e6e0e789857bc20ea97a2cc2970b4e1",
+                "url": "https://api.github.com/repos/advanced-ads/framework/zipball/bafe2c32b1530cfb18d8b738adb9524f8406b9aa",
+                "reference": "bafe2c32b1530cfb18d8b738adb9524f8406b9aa",
                 "shasum": ""
             },
             "require": {
@@ -22,7 +22,7 @@
                 "phpcompatibility/phpcompatibility-wp": "*",
                 "wp-coding-standards/wpcs": "^3.0.0"
             },
-            "time": "2025-02-28T10:58:24+00:00",
+            "time": "2025-03-10T12:31:18+00:00",
             "default-branch": true,
             "type": "wordpress-plugin",
             "installation-source": "dist",

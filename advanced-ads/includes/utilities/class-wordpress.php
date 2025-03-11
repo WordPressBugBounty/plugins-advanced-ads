@@ -112,9 +112,15 @@ class WordPress {
 	 * @return string
 	 */
 	public static function get_svg( $file, $folder = '/assets/img/' ): string {
-		$file_url = ADVADS_BASE_URL . $folder . $file;
+		$file_path = \untrailingslashit( ADVADS_ABSPATH ) . $folder . $file;
 
-		return file_get_contents( $file_url ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( file_exists( $file_path ) ) {
+			ob_start();
+			include $file_path;
+			return ob_get_clean();
+		}
+
+		return '';
 	}
 
 	/**

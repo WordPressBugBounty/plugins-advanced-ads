@@ -22,7 +22,7 @@
         'advanced-ads/framework' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '364c1de99e6e0e789857bc20ea97a2cc2970b4e1',
+            'reference' => 'bafe2c32b1530cfb18d8b738adb9524f8406b9aa',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../advanced-ads/framework',
             'aliases' => array(

@@ -112,13 +112,13 @@ class Version_Control implements Integration_Interface {
 			return $stored_versions;
 		}
 
-		$info = $this->get_advanced_ads_info();
+		$versions = $this->get_version_from_api();
 
-		if ( is_wp_error( $info ) ) {
-			wp_send_json_error( $info->get_error_message() . '>>' . $info->get_error_message(), $info->get_error_code() );
+		if ( is_wp_error( $versions ) ) {
+			wp_send_json_error( $versions->get_error_message() . '>>' . $versions->get_error_message(), $versions->get_error_code() );
 		}
 
-		$versions = $this->filter_version_number( $info['versions'] );
+		$versions = $this->filter_version_number( $versions );
 		set_transient( self::VERSIONS_TRANSIENT, $versions, 3 * HOUR_IN_SECONDS );
 		wp_send_json_success( $versions, 200 );
 	}
@@ -144,7 +144,7 @@ class Version_Control implements Integration_Interface {
 	 *
 	 * @return array
 	 */
-	private function filter_version_number( $versions ) {
+	public function filter_version_number( $versions ) {
 		$results = [];
 
 		// Remove the "dev" version.
@@ -155,24 +155,27 @@ class Version_Control implements Integration_Interface {
 		usort( $version_numbers, 'version_compare' );
 
 		$version_numbers = array_reverse( $version_numbers );
+		array_shift( $version_numbers );
 
 		$major                 = '';
 		$minor                 = '';
-		$minor_version_changes = -1;
-		$major_version_changes = -1;
+		$minor_version_changes = 0;
+		$major_version_changes = 0;
 
 		foreach ( $version_numbers as $number ) {
-			if ( false !== stripos( $number, 'rc' ) || false !== stripos( $number, 'alpha' ) || false !== stripos( $number, 'beta' ) ) {
-				// keep only production versions.
+			// Skip pre-release versions.
+			if ( preg_match( '/(rc|alpha|beta)/i', $number ) ) {
 				continue;
 			}
+
 			$parts      = explode( '.', $number );
-			$major_part = $parts[0];
-			$minor_part = explode( '-', $parts[1] )[0];
+			$major_part = $parts[1];
+			$minor_part = $parts[2];
 
 			if ( $major !== $major_part ) {
 				$major = $major_part;
 				++$major_version_changes;
+				$minor_version_changes = 0;
 			}
 
 			if ( $minor !== $minor_part ) {
@@ -180,11 +183,11 @@ class Version_Control implements Integration_Interface {
 				++$minor_version_changes;
 			}
 
-			if ( self::MINOR_VERSION_COUNT >= $minor_version_changes || 1 === $major_version_changes ) {
+			if ( $minor_version_changes <= self::MINOR_VERSION_COUNT ) {
 				$results[ $number ] = $versions[ $number ];
 			}
 
-			if ( self::MINOR_VERSION_COUNT > $major_version_changes && 1 === $major_version_changes ) {
+			if ( $major_version_changes >= self::MINOR_VERSION_COUNT ) {
 				break;
 			}
 		}
@@ -200,7 +203,7 @@ class Version_Control implements Integration_Interface {
 	 *
 	 * @return array|\WP_Error
 	 */
-	private function get_advanced_ads_info() {
+	private function get_version_from_api() {
 		$aa_info = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/advanced-ads.json' );
 
 		if ( is_wp_error( $aa_info ) ) {
@@ -210,7 +213,7 @@ class Version_Control implements Integration_Interface {
 		$info = json_decode( wp_remote_retrieve_body( $aa_info ), true );
 
 		if ( $info['versions'] ) {
-			return $info;
+			return $info['versions'];
 		}
 
 		// Likely a change in the WP info API.

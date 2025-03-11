@@ -26,7 +26,9 @@ class Compatibility implements Integration_Interface {
 	 * @return void
 	 */
 	public function hooks(): void {
-		add_action( 'plugin_loaded', [ $this, 'deactivate_plugins' ], 0 );
+		if ( is_admin() ) {
+			add_action( 'plugin_loaded', [ $this, 'deactivate_plugins' ], 0 );
+		}
 		add_filter( 'upgrader_post_install', [ $this, 'upgrader_post_install' ], 10, 3 );
 	}
 
@@ -53,6 +55,11 @@ class Compatibility implements Integration_Interface {
 	 * @return void
 	 */
 	public function deactivate_plugins(): void {
+		// Early bail!!
+		if ( get_option( 'advanced-ads-2-compatibility-flag' ) ) {
+			return;
+		}
+
 		$plugins = WordPress::get_wp_plugins();
 		foreach ( Constants::ADDONS_NON_COMPATIBLE_VERSIONS as $version => $slug ) {
 			$addon = $plugins[ $slug ] ?? null;
