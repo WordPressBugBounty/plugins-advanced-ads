@@ -207,6 +207,7 @@ class Advanced_Ads_Admin_Notices {
 		$plugins = WordPress::get_wp_plugins();
 		$options = $this->options();
 		$queue   = isset( $options['queue'] ) ? $options['queue'] : [];
+		$closed  = isset( $options['closed'] ) ? $options['closed'] : [];
 
 		foreach ( $addons as $version => $slug ) {
 			$addon = $plugins[ $slug ] ?? null;
@@ -214,10 +215,10 @@ class Advanced_Ads_Admin_Notices {
 				continue;
 			}
 
-			$notice = $slug.'_upgrade';
+			$notice = $slug . '_upgrade';
 
 			if ( version_compare( $addon['version'], $version, '<=' ) ) {
-				if ( ! in_array( $notice, $queue, true ) ) {
+				if ( ! in_array( $notice, $queue, true ) && ! array_key_exists( $notice, $closed ) ) {
 					$this->notices[] = $notice;
 				}
 			} else {
@@ -408,9 +409,11 @@ class Advanced_Ads_Admin_Notices {
 			$locate_tempalte = isset( $hash[ $type ] ) ? $hash[ $type ] : '/admin/views/notices/error.php';
 			include ADVADS_ABSPATH . $locate_tempalte;
 
-//			if ( self::MAX_NOTICES === ++$count ) {
-//				break;
-//			}
+			// phpcs:disable
+			// if ( self::MAX_NOTICES === ++$count ) {
+			// 	break;
+			// }
+			// phpcs:enable
 		}
 	}
 

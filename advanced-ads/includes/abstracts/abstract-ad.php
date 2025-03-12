@@ -1019,7 +1019,7 @@ abstract class Ad extends Data {
 					$this->wrapper['class'] = $classes;
 				}
 
-				if ( $this->is_parent_placement() && ! empty( $this->get_parent()->get_prop( 'placement_position' ) ) ) {
+				if ( $this->is_parent_placement() && 'default' !== $this->get_parent()->get_prop( 'placement_position' ) ) {
 					$use_position = true;
 					$position     = $this->get_parent()->get_prop( 'placement_position' );
 				}
@@ -1173,7 +1173,7 @@ abstract class Ad extends Data {
 				$wrapper['style']['margin-left']  = 'auto';
 				$wrapper['style']['margin-right'] = 'auto';
 
-				if ( empty( $this->get_width() ) || $use_position ) {
+				if ( empty( $this->get_width() ) || empty( $this->get_prop( 'add_wrapper_sizes' ) ) || $use_position ) {
 					$wrapper['style']['text-align'] = 'center';
 				}
 				break;

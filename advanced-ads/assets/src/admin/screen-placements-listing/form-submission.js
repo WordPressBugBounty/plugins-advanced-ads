@@ -51,12 +51,31 @@ function submitEditPlacement(form) {
 
 		const dialog = form.closest('dialog');
 		dialog.advadsTermination.resetInitialValues();
-		jQuery(
+		const rowTitle = jQuery(
 			`#post-${response.placement_data.id} .column-name .row-title`
-		).text(response.title);
+		);
+		rowTitle.text(response.title);
 		jQuery(
 			`#post-${response.placement_data.id} .column-ad_group .advads-placement-item-select`
 		).val(response.item);
+
+		if (
+			response.payload.post_status &&
+			'draft' === response.payload.post_status
+		) {
+			const rowParent = rowTitle.parent();
+			if (!rowParent.text().includes(advancedAds.placements.draft)) {
+				rowTitle
+					.parent()
+					.append(
+						jQuery(
+							`<strong>— <span class="post-state">${advancedAds.placements.draft}</span></strong>`
+						)
+					);
+			}
+		} else {
+			rowTitle.siblings().remove();
+		}
 
 		/**
 		 * Allow add-on to update the table without refreshing the page if needed.
@@ -65,6 +84,7 @@ function submitEditPlacement(form) {
 
 		if (response.reload) {
 			// Reload the page if needed.
+			// eslint-disable-next-line no-undef
 			localStorage.setItem(
 				'advadsUpdateMessage',
 				JSON.stringify({
@@ -113,6 +133,7 @@ function submitNewPlacement(form) {
 		disable(form, false);
 		if (response.reload) {
 			// Reload the page if needed.
+			// eslint-disable-next-line no-undef
 			localStorage.setItem(
 				'advadsUpdateMessage',
 				JSON.stringify({

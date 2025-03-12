@@ -275,7 +275,7 @@ class List_Filters implements Integration_Interface {
 		$per_page = $the_query->query_vars['posts_per_page'] ? $the_query->query_vars['posts_per_page'] : 20;
 
 		if ( $per_page < count( $new_posts ) ) {
-			$paged                  = Params::request( 'pages', 1, FILTER_VALIDATE_INT );
+			$paged                  = Params::request( 'paged', 1, FILTER_VALIDATE_INT );
 			$total                  = count( $new_posts );
 			$new_posts              = array_slice( $new_posts, ( $paged - 1 ) * $per_page, $per_page );
 			$the_query->found_posts = $total;

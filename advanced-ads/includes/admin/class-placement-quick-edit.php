@@ -41,7 +41,13 @@ class Placement_Quick_Edit implements Integration_Interface {
 	 * @return void
 	 */
 	public function enqueue_scripts(): void {
-		wp_advads()->json->add( 'placements', [ 'read_nonce' => wp_create_nonce( 'advads-read-placement' ) ] );
+		wp_advads()->json->add(
+			'placements',
+			[
+				'read_nonce' => wp_create_nonce( 'advads-read-placement' ),
+				'draft'      => __( 'Draft', 'advanced-ads' ),
+			]
+		);
 	}
 
 	/**
