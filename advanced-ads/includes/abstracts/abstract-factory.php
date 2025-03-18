@@ -26,6 +26,10 @@ abstract class Factory {
 	 * @return string The classname for the given entity type.
 	 */
 	public function get_classname( $manager, $entity_type, $default_type = 'default' ) {
+		// If the manager is called outside `init` hook, we need to initialize it.
+		if ( 0 === did_action( 'init' ) && ! $manager->has_type( $default_type ) ) {
+			$manager->register_types();
+		}
 
 		$type = $manager->has_type( $entity_type )
 			? $manager->get_type( $entity_type )

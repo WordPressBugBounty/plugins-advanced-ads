@@ -641,6 +641,21 @@ class Advanced_Ads {
 	}
 
 	/**
+	 * Return the Advanced_Ads_Model responsible for loading ads, groups and placements into the frontend
+	 *
+	 * @deprecated 2.0.0 use new entity functions.
+	 *
+	 * @return mixed
+	 */
+	public function get_model() {
+		if ( ! isset( $this->model ) ) {
+			$this->model = new Advanced_Ads_Model();
+		}
+
+		return $this->model;
+	}
+
+	/**
 	 * Store whether the loop started in an inner `the_content`.
 	 *
 	 * If so, let us assume that we are in the loop when we are in the outermost `the_content`.

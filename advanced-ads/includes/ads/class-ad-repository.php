@@ -386,19 +386,8 @@ class Ad_Repository {
 				case 'allow_php':
 				case 'has_weekdays':
 				case 'reserve_space':
-					$value = Formatting::bool_to_string( $value );
-					break;
 				case 'allow_shortcodes':
-					if ( $value ) {
-						$regex = get_shortcode_regex(
-							[
-								'the_ad',
-								'the_ad_group',
-								'the_ad_placement',
-							]
-						);
-						$value = preg_match( '/' . $regex . '/s', $ad->get_content() );
-					}
+					$value = Formatting::bool_to_string( $value );
 					break;
 				case 'description':
 					$value = esc_textarea( $value );

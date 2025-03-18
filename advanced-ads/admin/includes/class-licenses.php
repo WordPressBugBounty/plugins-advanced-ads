@@ -1,4 +1,4 @@
-<?php // phpcs:ignore Wordpress.Files.FileName
+<?php // phpcs:ignoreFile
 /**
  * Handle add-on licenses
  *
@@ -41,9 +41,6 @@ class Advanced_Ads_Admin_Licenses {
 	 * Advanced_Ads_Admin_Licenses constructor.
 	 */
 	private function __construct() {
-		if ( ! wp_doing_ajax() ) {
-			add_action( 'load-plugins.php', [ $this, 'check_plugin_licenses' ] );
-		}
 		add_action( 'plugins_loaded', [ $this, 'wp_plugins_loaded' ] );
 
 		// todo: check if this is loaded late enough and all add-ons are registered already.
@@ -72,58 +69,6 @@ class Advanced_Ads_Admin_Licenses {
 
 		return $instance;
 	}
-
-	/**
-	 * Initiate plugin checks
-	 *
-	 * @since 1.7.12
-	 */
-	public function check_plugin_licenses() {
-		if ( is_multisite() ) {
-			return;
-		}
-
-		// Gather all add-on plugin files.
-		$add_ons = Data::get_addons();
-		foreach ( $add_ons as $_add_on ) {
-
-			// check license status.
-			if ( $this->get_license_status( $_add_on['options_slug'] ) !== 'valid' ) {
-				// register warning.
-				$plugin_file = plugin_basename( $_add_on['path'] );
-				add_action( 'after_plugin_row_' . $plugin_file, [ $this, 'add_plugin_list_license_notice' ], 10, 2 );
-			}
-		}
-	}
-
-	/**
-	 * Add a row below add-ons with an invalid license on the plugin list
-	 *
-	 * @param string $plugin_file Path to the plugin file, relative to the plugins directory.
-	 * @param array  $plugin_data An array of plugin data.
-	 *
-	 * @since 1.7.12
-	 * @todo  make this work on multisite as well
-	 */
-	public function add_plugin_list_license_notice( $plugin_file, $plugin_data ) {
-		static $cols;
-		if ( is_null( $cols ) ) {
-			$cols = count( _get_list_table( 'WP_Plugins_List_Table' )->get_columns() );
-		}
-		printf(
-			'<tr class="advads-plugin-update-tr plugin-update-tr active"><td class="plugin-update colspanchange" colspan="%d"><div class="update-message notice inline notice-warning notice-alt"><p>%s</p></div></td></tr>',
-			esc_attr( $cols ),
-			wp_kses_post(
-				sprintf(
-					/* Translators: 1: add-on name 2: admin URL to license page */
-					__( 'There might be a new version of %1$s. Please <strong>provide a valid license key</strong> in order to receive updates and support <a href="%2$s">on this page</a>.', 'advanced-ads' ),
-					$plugin_data['Title'],
-					admin_url( 'admin.php?page=advanced-ads-settings#top#licenses' )
-				)
-			)
-		);
-	}
-
 
 	/**
 	 * Save license key
@@ -210,9 +155,11 @@ class Advanced_Ads_Admin_Licenses {
 		$license_data = json_decode( wp_remote_retrieve_body( $response ) );
 		// save license status.
 		if ( ! empty( $license_data->license ) ) {
+			$this->clear_license_cache();
 			update_option( $options_slug . '-license-status', $license_data->license, false );
 		}
 		if ( ! empty( $license_data->expires ) ) {
+			$this->clear_license_cache();
 			update_option( $options_slug . '-license-expires', $license_data->expires, false );
 		}
 
@@ -428,7 +375,12 @@ class Advanced_Ads_Admin_Licenses {
 	 * @return string[]
 	 */
 	public function get_licenses() {
-		return get_option( ADVADS_SLUG . '-licenses', [] );
+		$licenses = get_option( ADVADS_SLUG . '-licenses', [] );
+		if ( empty( $licenses ) || ! is_array( $licenses ) ) {
+			$licenses = [];
+		}
+
+		return $licenses;
 	}
 
 	/**
@@ -727,5 +679,17 @@ class Advanced_Ads_Admin_Licenses {
 		);
 
 		return ! is_array( $filtered ) ? [] : $filtered;
+	}
+
+	/**
+	 * Clear the license cache
+	 *
+	 * @param string $slug slug of the add-on.
+	 * @param string $license_key license key.
+	 */
+	private function clear_license_cache() {
+		global $wpdb;
+
+		$wpdb->query( "DELETE FROM $wpdb->options WHERE option_name LIKE 'advads_edd_sl_%'" );
 	}
 }

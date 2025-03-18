@@ -159,8 +159,7 @@ class Plugin extends Framework\Loader {
 	 * @return void
 	 */
 	public function load_textdomain(): void {
-		$locale = get_user_locale();
-		$locale = apply_filters( 'plugin_locale', $locale, 'advanced-ads' );
+		$locale = apply_filters( 'plugin_locale', determine_locale(), 'advanced-ads' );
 
 		unload_textdomain( 'advanced-ads' );
 		if ( false === load_textdomain( 'advanced-ads', WP_LANG_DIR . '/plugins/advanced-ads-' . $locale . '.mo' ) ) {
@@ -292,6 +291,7 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Admin\Misc::class );
 		$this->register_integration( Admin\Post_List::class );
 		$this->register_integration( Admin\Placement\Bulk_Edit::class );
+		$this->register_integration( Admin\Addon_Updater::class );
 
 		if ( ! wp_doing_ajax() ) {
 			$this->register_integration( Admin\List_Filters::class, 'list_filters' );

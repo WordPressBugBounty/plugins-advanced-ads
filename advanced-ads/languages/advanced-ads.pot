@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Advanced Ads 2.0.0\n"
+"Project-Id-Version: Advanced Ads 2.0.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/advanced-ads\n"
 "Last-Translator: Thomas Maier <post@webzunft.de>\n"
 "Language-Team: webgilde <support@wpadvancedads.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-09T02:52:48+00:00\n"
+"POT-Creation-Date: 2025-03-14T10:24:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: advanced-ads\n"
@@ -279,95 +279,90 @@ msgstr ""
 msgid "You sent an invalid request."
 msgstr ""
 
-#. Translators: 1: add-on name 2: admin URL to license page
-#: admin/includes/class-licenses.php:119
-msgid "There might be a new version of %1$s. Please <strong>provide a valid license key</strong> in order to receive updates and support <a href=\"%2$s\">on this page</a>."
-msgstr ""
-
-#: admin/includes/class-licenses.php:141
+#: admin/includes/class-licenses.php:86
 msgid "Error while trying to register the license. Please contact support."
 msgstr ""
 
-#: admin/includes/class-licenses.php:146
+#: admin/includes/class-licenses.php:91
 #: admin/views/setting-license.php:84
 msgid "Please enter a valid license key"
 msgstr ""
 
-#: admin/includes/class-licenses.php:187
-#: admin/includes/class-licenses.php:386
+#: admin/includes/class-licenses.php:132
+#: admin/includes/class-licenses.php:331
 msgid "The license status does not change as long as ADVANCED_ADS_SHOW_LICENSE_RESPONSE is enabled in wp-config.php."
 msgstr ""
 
-#: admin/includes/class-licenses.php:206
+#: admin/includes/class-licenses.php:151
 msgid "License couldn’t be activated. Please try again later."
 msgstr ""
 
-#: admin/includes/class-licenses.php:223
+#: admin/includes/class-licenses.php:168
 msgid "This is the bundle license key."
 msgstr ""
 
-#: admin/includes/class-licenses.php:224
+#: admin/includes/class-licenses.php:169
 msgid "This is not the correct key for this add-on."
 msgstr ""
 
-#: admin/includes/class-licenses.php:225
+#: admin/includes/class-licenses.php:170
 msgid "There are no activations left."
 msgstr ""
 
 #. translators: %1$s is a starting link tag, %2$s is the closing one.
-#: admin/includes/class-licenses.php:229
+#: admin/includes/class-licenses.php:174
 msgid "You can manage activations in %1$syour account%2$s."
 msgstr ""
 
 #. translators: %1$s is a starting link tag, %2$s is the closing one.
-#: admin/includes/class-licenses.php:235
+#: admin/includes/class-licenses.php:180
 msgid "%1$sUpgrade%2$s for more activations."
 msgstr ""
 
 #. translators: %s is a string containing information about the issue.
-#: admin/includes/class-licenses.php:249
+#: admin/includes/class-licenses.php:194
 msgid "License is invalid. Reason: %s"
 msgstr ""
 
 #. translators: %s is a list of server information like IP address. Just keep it as is.
-#: admin/includes/class-licenses.php:289
+#: admin/includes/class-licenses.php:234
 msgid "Your request was blocked by our firewall. Please send us the following information to unblock you: %s."
 msgstr ""
 
-#: admin/includes/class-licenses.php:352
+#: admin/includes/class-licenses.php:297
 msgid "Error while trying to disable the license. Please contact support."
 msgstr ""
 
-#: admin/includes/class-licenses.php:395
-#: admin/includes/class-licenses.php:419
+#: admin/includes/class-licenses.php:340
+#: admin/includes/class-licenses.php:364
 msgid "License couldn’t be deactivated. Please try again later."
 msgstr ""
 
 #. translators: %s plugin update link
-#: admin/includes/class-licenses.php:549
+#: admin/includes/class-licenses.php:499
 msgid "Download failed. <a href=\"%s\">Click here to try another method</a>."
 msgstr ""
 
 #. translators: %s download failed knowledgebase link
-#: admin/includes/class-licenses.php:552
+#: admin/includes/class-licenses.php:502
 msgid "Download failed. <a href=\"%s\" target=\"_blank\">Click here to learn why</a>."
 msgstr ""
 
-#: admin/includes/class-licenses.php:709
+#: admin/includes/class-licenses.php:659
 msgid "License deactivated. Please try again later."
 msgstr ""
 
 #. translators: %s: is a URL.
-#: admin/includes/class-notices.php:461
+#: admin/includes/class-notices.php:464
 msgid "You don’t seem to have an email address. Please use <a href=\"%s\" target=\"_blank\">this form</a> to sign up."
 msgstr ""
 
-#: admin/includes/class-notices.php:482
+#: admin/includes/class-notices.php:485
 msgid "How embarrassing. The email server seems to be down. Please try again later."
 msgstr ""
 
 #. translators: the first %s is an email address, the seconds %s is a URL.
-#: admin/includes/class-notices.php:490
+#: admin/includes/class-notices.php:493
 msgid "Please check your email (%1$s) for the confirmation message. If you didn’t receive one or want to use another email address then please use <a href=\"%2$s\" target=\"_blank\">this form</a> to sign up."
 msgstr ""
 
@@ -529,7 +524,7 @@ msgstr ""
 #: includes/admin/metaboxes/class-ad-layout.php:63
 #: includes/admin/metaboxes/class-ad-types.php:63
 #: includes/ads/types/type-plain.php:230
-#: includes/utilities/class-wordpress.php:423
+#: includes/utilities/class-wordpress.php:429
 #: modules/ads-txt/admin/views/setting-create.php:26
 #: modules/gadsense/admin/views/adsense-ad-parameters.php:142
 #: modules/privacy/admin/views/setting-general.php:43
@@ -1449,7 +1444,7 @@ msgstr ""
 
 #. translators: timezone name
 #: classes/utils.php:290
-#: includes/utilities/class-wordpress.php:182
+#: includes/utilities/class-wordpress.php:188
 msgid "time of %s"
 msgstr ""
 
@@ -1570,6 +1565,7 @@ msgid "expired %s"
 msgstr ""
 
 #: includes/abstracts/abstract-ad.php:834
+#: includes/admin/class-placement-quick-edit.php:48
 #: views/admin/placements/edit-modal/fields/status.php:13
 #: views/admin/placements/quick-edit.php:17
 #: views/admin/tables/placements/column-name.php:17
@@ -1607,7 +1603,7 @@ msgstr ""
 
 #: includes/abstracts/abstract-placement-type.php:63
 #: includes/class-widget.php:128
-#: includes/utilities/class-data.php:265
+#: includes/utilities/class-data.php:295
 #: modules/gutenberg/includes/class-gutenberg.php:136
 #: views/admin/tables/ads/filters.php:75
 msgid "Ad Groups"
@@ -1619,7 +1615,7 @@ msgstr ""
 #: includes/admin/pages/class-ads.php:47
 #: includes/class-entities.php:44
 #: includes/class-widget.php:135
-#: includes/utilities/class-data.php:258
+#: includes/utilities/class-data.php:288
 #: modules/gutenberg/includes/class-gutenberg.php:135
 #: views/admin/tables/groups/edit-form-modal.php:113
 msgid "Ads"
@@ -1923,6 +1919,11 @@ msgstr ""
 msgid "How to download, install, and activate an add-on"
 msgstr ""
 
+#. Translators: 1: add-on name 2: admin URL to license page
+#: includes/admin/class-addon-updater.php:133
+msgid "There might be a new version of %1$s. Please <strong>provide a valid license key</strong> in order to receive updates and support <a href=\"%2$s\">on this page</a>."
+msgstr ""
+
 #: includes/admin/class-admin-menu.php:107
 #: includes/admin/class-admin-menu.php:111
 #: includes/admin/class-settings.php:91
@@ -2049,6 +2050,36 @@ msgstr ""
 
 #: includes/admin/class-authors.php:123
 msgid "Sorry, you're not allowed to assign this user."
+msgstr ""
+
+#. translators: the plugin name.
+#: includes/admin/class-edd-updater.php:342
+msgid "There is a new version of %1$s available."
+msgstr ""
+
+#: includes/admin/class-edd-updater.php:348
+msgid "Contact your network administrator to install the update."
+msgstr ""
+
+#. translators: 1: opening anchor tag, do not translate 2. the new plugin version 3. closing anchor tag, do not translate.
+#: includes/admin/class-edd-updater.php:353
+msgid "%1$sView version %2$s details%3$s."
+msgstr ""
+
+#: includes/admin/class-edd-updater.php:361
+msgid "%1$sView version %2$s details%3$s or %4$supdate now%5$s."
+msgstr ""
+
+#: includes/admin/class-edd-updater.php:372
+msgid "Update now."
+msgstr ""
+
+#: includes/admin/class-edd-updater.php:603
+msgid "You do not have permission to install plugin updates"
+msgstr ""
+
+#: includes/admin/class-edd-updater.php:603
+msgid "Error"
 msgstr ""
 
 #: includes/admin/class-groups-list-table.php:180
@@ -2555,7 +2586,7 @@ msgstr ""
 msgid "Duplicate"
 msgstr ""
 
-#: includes/admin/class-version-control.php:217
+#: includes/admin/class-version-control.php:220
 msgid "Plugin info not found"
 msgstr ""
 
@@ -2881,7 +2912,7 @@ msgstr ""
 
 #: includes/admin/pages/class-placements.php:44
 #: includes/class-widget.php:121
-#: includes/utilities/class-data.php:272
+#: includes/utilities/class-data.php:302
 #: modules/gutenberg/includes/class-gutenberg.php:137
 #: views/admin/tables/ads/column-used.php:34
 msgid "Placements"
@@ -3246,7 +3277,7 @@ msgid "Title:"
 msgstr ""
 
 #: includes/class-widget.php:119
-#: includes/utilities/class-data.php:256
+#: includes/utilities/class-data.php:286
 #: modules/gutenberg/includes/class-gutenberg.php:133
 msgid "--empty--"
 msgstr ""
@@ -3781,7 +3812,7 @@ msgid "custom"
 msgstr ""
 
 #. translators: %1$s is the opening link tag, %2$s is closing link tag
-#: includes/utilities/class-wordpress.php:390
+#: includes/utilities/class-wordpress.php:396
 msgid "This feature is deprecated. Please find the removal schedule %1$shere%2$s"
 msgstr ""
 

@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,12 +52,11 @@ This plugin is the lite version of the Advanced Ads plugin that comes with all t
 
 Choose between different ad types that enable you to:
 
-* insert ads and banners from all ad and affiliate networks (e.g., [Google AdSense](https://wpadvancedads.com/adsense-ads/), [Amazon Affiliate Program Amazon Associates](https://wpadvancedads.com/amazon-affiliate-program-wordpress/), BuySellAds, Google Ad Manager (formerly Google DoubleClick for Publishers, DFP), Ezoic, media.net, [Booking.com](https://wpadvancedads.com/booking-com-ads-wordpress/), Tradedoubler, Awin, GetYourGuide, The Moneytizer, Infolinks...)
+* insert ads and banners from all ad and affiliate networks (e.g., [Google AdSense](https://wpadvancedads.com/adsense-ads/), [Amazon Affiliate Program Amazon Associates](https://wpadvancedads.com/amazon-affiliate-program-wordpress/), BuySellAds, Google Ad Manager, Ezoic, media.net, [Booking.com](https://wpadvancedads.com/booking-com-ads-wordpress/), Tradedoubler, Awin, GetYourGuide, MonetizeMore, The Moneytizer, Infolinks...)
 * dedicated support for all types of Google AdSense ads, including text and display ads, native ads (In-article, In-feed, Multiplex ads), Auto ads, and Auto ads for AMP
 * display images and image banners
 * create content-rich ads with the WordPress TinyMCE editor
-* insert contextual Amazon Native Shopping Ads
-* inject HTML, CSS, Javascript, or PHP code
+* inject HTML, CSS, JavaScript, or PHP code
 * use shortcodes within ads (to also deliver advertisements from another ad plugin like Ad Inserter, AdRotate, Quick AdSense, AdSanity, Ads for WP, or the Google AdSense plugin WP QUADS)
 
 = Display Ads for WordPress =
@@ -67,7 +66,7 @@ Choose between different ad types that enable you to:
 * use shortcodes to place ads manually
 * show ads in the sidebar and in widgets
 * disable all ads on specific pages
-* display a customizable ad label, e.g., “Advertisements” above each banner ad
+* display a customizable ad label, e.g., “Advertisements”, above each banner ad
 * display multiple ads in ad grids ([Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-5))
 
 = Display Conditions =
@@ -86,11 +85,12 @@ Show ads based on content. [List of all display conditions](https://wpadvancedad
 
 = Visitor Conditions =
 
-Serve ads by conditions based on the visitor. [List of all visitor conditions](https://wpadvancedads.com/manual/visitor-conditions/)
+Serve ads based on conditions related to the visitor. [List of all visitor conditions](https://wpadvancedads.com/manual/visitor-conditions/)
 
 * display or hide a banner by device: mobile, tablet, or desktop
 * display or hide a banner by role and for logged-in visitors
-* advanced visitor conditions: geolocation, previously visited URL (referrer), user capability, browser language, browser, and browser width included in [Advanced Ads Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-2)
+* advanced visitor conditions: geolocation, previously visited URL (referrer), user capability, browser language, ad blocker, IP address, browser, and browser width included in [Advanced Ads Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-2)
+* ads by time of the day ([Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-4))
 * frequency capping ([Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-6))
 
 > **Fantastic plugin and outstanding support**
@@ -135,9 +135,10 @@ Amazing features of the most powerful and easy Google AdSense plugin.
 * option to remove the Google AdSense background color
 * ads.txt generated with the correct AdSense information automatically
 * works along with Google Site Kit or can replace it if you want to [control your ad placements](https://wpadvancedads.com/place-adsense-ad-unit-manually/)
-* place Google AdSense In-feed ads [free In-feed add-on](https://wordpress.org/plugins/advanced-ads-adsense-in-feed/)
-* assistant for exact sizes of responsive Google AdSense ads [AMP Ads add-on](https://wpadvancedads.com/add-ons/amp-ads/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-amp-ads-2)
-* convert Google AdSense ads into AMP ads automatically [AMP Ads add-on](https://wpadvancedads.com/add-ons/amp-ads/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-amp-ads-3)
+* place Google AdSense In-feed ads ([free In-feed add-on](https://wordpress.org/plugins/advanced-ads-adsense-in-feed/))
+* fallback ads for unfilled AdSense ad blocks ([Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-9)
+* assistant for exact sizes of responsive Google AdSense ads ([AMP Ads add-on](https://wpadvancedads.com/add-ons/amp-ads/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-amp-ads-2))
+* convert Google AdSense ads into AMP ads automatically ([AMP Ads add-on](https://wpadvancedads.com/add-ons/amp-ads/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-amp-ads-3))
 
 https://vimeo.com/577120971
 
@@ -176,7 +177,7 @@ https://vimeo.com/577170591
 * [Advanced Ads Pro](https://wpadvancedads.com/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-add-ons) – powerful tools for ad optimizations: cache-busting, more placements, [lazy loading](https://wpadvancedads.com/lazy-load-ads/?utm_source=wporg&utm_medium=link&utm_campaign=features), ad blocker module, ad refresh, [click fraud protection](https://wpadvancedads.com/manual/click-fraud-protection/?utm_source=wporg&utm_medium=link&utm_campaign=features), [geo targeting](https://wpadvancedads.com/add-ons/geo-targeting/?utm_source=wporg&utm_medium=link&utm_campaign=features), [parallax ads](https://wpadvancedads.com/parallax-ads/?utm_source=wporg&utm_medium=link&utm_campaign=features) and many more
 * [Tracking](https://wpadvancedads.com/add-ons/tracking/?utm_source=wporg&utm_medium=link&utm_campaign=wp-add-ons) – track ad impressions and ad clicks with local methods or Google Analytics
 * [AMP Ads](https://wpadvancedads.com/add-ons/amp-ads/?utm_source=wporg&utm_medium=link&utm_campaign=wp-add-ons) – make your ads compatible with AMP and convert Google AdSense ads automatically
-* [Google Ad Manager Integration](https://wpadvancedads.com/add-ons/google-ad-manager/?utm_source=wporg&utm_medium=link&utm_campaign=wp-add-ons) – a quick and error-free way to load ad units from your Google Ad Manager (formerly Google DoubleClick for Publishers, DFP) account without touching any ad codes
+* [Google Ad Manager Integration](https://wpadvancedads.com/add-ons/google-ad-manager/?utm_source=wporg&utm_medium=link&utm_campaign=wp-add-ons) – a quick and error-free way to load ad units from your Google Ad Manager account without touching any ad codes
 * [Sticky Ads](https://wpadvancedads.com/add-ons/sticky-ads/?utm_source=wporg&utm_medium=link&utm_campaign=wp-add-ons) – increase click rates with fixed, sticky, and anchor ads
 * [Fixed Widget for WordPress](https://wordpress.org/plugins/q2w3-fixed-widget/) – turn sidebar widgets into performant fixed sticky ads
 * [PopUp and Layer Ads](https://wpadvancedads.com/add-ons/popup-and-layer-ads/?utm_source=wporg&utm_medium=link&utm_campaign=wp-add-ons) – display ads and other content in layers, popups, and interstitials
@@ -186,11 +187,14 @@ https://vimeo.com/577170591
 
 = Ad Blocker =
 
-* basic features to prevent ads from being removed by AdBlock and other ad blockers
+* basic features to prevent ads from being removed by ad blockers
 * prevent ad blockers from breaking sites where plugin scripts are running
-* ad blocker detection: show alternative content to ad block users and improve the monetization of your website [Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-4)
-
-Learn more on the [plugin homepage](https://wpadvancedads.com).
+* dedicated visitor condition to target ads to users with activated ad blocker
+* show alternative content to ad block users and improve the monetization of your website ([Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-4))
+* ad blocker fallback ads ([Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-4))
+* show an overlay to ad blocker users ([Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-4))
+* redirect ad blocker users ([Pro](https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=wporg&utm_medium=link&utm_campaign=wp-features-pro-4))
+* learn more in our [ad blocker tutorial](https://wpadvancedads.com/manual/ad-blockers/?utm_source=wporg&utm_medium=link&utm_campaign=wp-ad-blocker).
 
 Thank you for motivating us with your [positive review](https://wordpress.org/support/plugin/advanced-ads/reviews/?rate=5#new-post).
 
@@ -355,6 +359,15 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.4 (March 18, 2025) =
+
+- Improvement: add update functionality to ensure receipt of premium updates
+- Fix: resolve a fatal error caused by an invalid license
+- Fix: prevent ad expiry from changing during save when timezone is not UTC
+- Fix: prevent unknown placement types from breaking the page
+- Fix: ensure "Execute Shortcodes" function is savable again
+- Fix: restore PeepSo placement compatibility for Advanced Ads 2.0
 
 = 2.0.3 (March 12, 2025) =
 

@@ -18,7 +18,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Data.
  */
-abstract class Data {
+abstract class Data implements \ArrayAccess {
 
 	/**
 	 * ID for this object.
@@ -374,5 +374,66 @@ abstract class Data {
 		}
 
 		$this->data[ $prop ] = null;
+	}
+
+	// ArrayAccess API -------------------.
+
+	/**
+	 * Sets the value at the specified offset.
+	 *
+	 * @param mixed $offset The offset to set the value at.
+	 * @param mixed $value The value to set.
+	 *
+	 * @return void
+	 */
+	public function offsetSet( $offset, $value ): void {
+		$this->set_prop( $offset, $value );
+	}
+
+	/**
+	 * Checks if the given offset exists.
+	 *
+	 * @param mixed $offset The offset to check for existence.
+	 *
+	 * @return bool True if the offset exists, false otherwise.
+	 */
+	public function offsetExists( $offset ): bool {
+		$func = 'get_' . $offset;
+		if ( method_exists( $this, $func ) ) {
+			return null !== $this->$func();
+		}
+
+		return false;
+	}
+
+	/**
+	 * Unsets the property at the specified offset.
+	 *
+	 * @param mixed $offset The offset to unset.
+	 *
+	 * @return void
+	 */
+	public function offsetUnset( $offset ): void {
+		$this->unset_prop( $offset );
+	}
+
+	/**
+	 * Retrieve the value at the specified offset.
+	 *
+	 * This method attempts to call a getter method based on the offset name.
+	 * If a method named 'get_{offset}' exists, it will be called and its return value will be returned.
+	 * If no such method exists, null will be returned.
+	 *
+	 * @param string $offset The offset to retrieve.
+	 *
+	 * @return mixed The value at the specified offset, or null if the method does not exist.
+	 */
+	public function offsetGet( $offset ) {
+		$func = 'get_' . $offset;
+		if ( method_exists( $this, $func ) ) {
+			return $this->$func();
+		}
+
+		return null;
 	}
 }

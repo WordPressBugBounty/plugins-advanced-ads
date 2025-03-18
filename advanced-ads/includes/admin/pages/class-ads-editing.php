@@ -9,10 +9,11 @@
 
 namespace AdvancedAds\Admin\Pages;
 
-use Advanced_Ads_Utils;
 use AdvancedAds\Constants;
-use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Utilities\WordPress;
+use DateTimeImmutable;
+use DateTimeZone;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -156,22 +157,9 @@ class Ads_Editing extends Ads {
 		$ad = wp_advads_get_ad( $post->ID );
 
 		// Get time set for ad or current timestamp (both GMT).
-		$utc_ts    = 0 !== $ad->get_expiry_date() ? $ad->get_expiry_date() : current_time( 'timestamp' ); // phpcs:ignore
-		$utc_time  = date_create( '@' . $utc_ts );
-		$tz_option = get_option( 'timezone_string' );
-		$exp_time  = clone $utc_time;
-
-		if ( $tz_option ) {
-			$exp_time->setTimezone( Advanced_Ads_Utils::get_wp_timezone() );
-		} else {
-			$tz_name       = Advanced_Ads_Utils::get_timezone_name();
-			$tz_offset     = substr( $tz_name, 3 );
-			$off_time      = date_create( $utc_time->format( 'Y-m-d\TH:i:s' ) . $tz_offset );
-			$offset_in_sec = date_offset_get( $off_time );
-			$exp_time      = date_create( '@' . ( $utc_ts + $offset_in_sec ) );
-		}
-
-		list( $curr_year, $curr_month, $curr_day, $curr_hour, $curr_minute ) = explode( '-', $exp_time->format( 'Y-m-d-H-i' ) );
+		$utc_ts   = $ad->get_expiry_date() ?: current_time( 'timestamp', true ); // phpcs:ignore
+		$utc_time = new DateTimeImmutable( '@' . $utc_ts, new DateTimeZone( 'UTC' ) );
+		[ $curr_year, $curr_month, $curr_day, $curr_hour, $curr_minute ] = explode( '-', $utc_time->format( 'Y-m-d-H-i' ) );
 		$enabled = 1 - empty( $ad->get_expiry_date() );
 
 		include ADVADS_ABSPATH . 'views/admin/ads/submitbox-meta.php';

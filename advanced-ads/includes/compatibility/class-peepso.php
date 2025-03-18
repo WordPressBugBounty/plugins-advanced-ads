@@ -35,10 +35,29 @@ class Peepso implements Integration_Interface {
 	 */
 	public function hooks(): void {
 		add_filter( 'advanced-ads-ad-types', [ $this, 'ad_type' ], 100 );
+		add_filter( 'advanced-ads-placement-types', [ $this, 'placement_type' ], 25 );
 	}
 
 	/**
-	 * Add AAWP ad type to Advanced Ads.
+	 * Add Peepso placement type to Advanced Ads.
+	 *
+	 * @param array $types placement types.
+	 *
+	 * @return array
+	 */
+	public function placement_type( $types ): array {
+		$types['peepso_stream'] = [
+			'title'       => __( 'PeepSo Stream', 'peepso-advanced-ads' ),
+			'description' => __( 'Display this ad in PeepSo Stream', 'advanced-ads' ),
+			'image'       => ADVADS_BASE_URL . 'assets/img/placement-types/peepso-stream-placement.png',
+			'is_premium'  => false,
+		];
+
+		return $types;
+	}
+
+	/**
+	 * Add Peepso ad type to Advanced Ads.
 	 *
 	 * @param array $types ad types.
 	 *
