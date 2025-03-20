@@ -56,7 +56,7 @@ class Misc implements Integration_Interface {
 				. '&nbsp;<a href="https://wpadvancedads.com/manual/user-capabilities/?utm_source=advanced-ads&utm_medium=link&utm_campaign=wrong-user-role#You_dont_have_access_to_ads" target="_blank">' . __( 'Get help', 'advanced-ads' ) . '</a>';
 		}
 
-		return $translated_text;
+		return (string) $translated_text;
 	}
 
 	/**

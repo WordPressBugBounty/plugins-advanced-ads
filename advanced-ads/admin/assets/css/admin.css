@@ -238,6 +238,7 @@ select + .advads-conditions-single { display: inline-flex; flex-wrap: wrap; alig
 .post-type-advanced_ads #advanced-ad-output-position img { border: 1px solid #ddd; padding: 2px; }
 .post-type-advanced_ads #advanced-ad-output-margin input[type="number"] { width: 4.5em; }
 .post-type-advanced_ads #advanced-ad-output-margin label + label { margin-left: 1em; }
+#advanced-ads-ad-parameters { overflow: visible; }
 
 @media screen and (max-width: 782px) {
 	.advads-conditions-table .advads-conditions-single.advads-buttonset label {

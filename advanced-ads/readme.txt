@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -359,6 +359,16 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.5 (March 20, 2025) =
+
+- Fix: prevent false unsaved changes notifications for ads
+- Fix: prevent errors with certain custom placement types
+- Fix: hide discarded notification on the Advanced Ads dashboard
+- Fix: prevent an error on the Advanced Ads dashboard
+- Fix: correct ad expiry date inconsistencies
+- Fix: prevent fatal error on Gutenberg editor
+- Fix: restore execute shortcode feature
 
 = 2.0.4 (March 18, 2025) =
 

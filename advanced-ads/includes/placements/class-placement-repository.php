@@ -268,7 +268,10 @@ class Placement_Repository {
 		if ( null === $placements ) {
 			$placements = [];
 			foreach ( $this->get_placements_dropdown() as $id => $placement ) {
-				$placements[ $id ] = wp_advads_get_placement( $id );
+				$placement_object = wp_advads_get_placement( $id );
+				if ( false !== $placement_object ) {
+					$placements[ $id ] = $placement_object;
+				}
 			}
 		}
 
@@ -286,7 +289,10 @@ class Placement_Repository {
 		if ( null === $placements ) {
 			$placements = [];
 			foreach ( $this->get_published_ids() as $id ) {
-				$placements[ $id ] = wp_advads_get_placement( $id );
+				$placement_object = wp_advads_get_placement( $id );
+				if ( false !== $placement_object ) {
+					$placements[ $id ] = $placement_object;
+				}
 			}
 		}
 

@@ -695,6 +695,8 @@ jQuery(document).ready(function ($) {
 		return termination;
 	})();
 
+	advancedAds.termination = advadsTermination;
+
 	/**
 	 * Image ad uploader
 	 */

@@ -1,8 +1,9 @@
 <?php // phpcs:ignoreFile
 
-use AdvancedAds\Utilities\WordPress;
-use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Framework\Utilities\Arr;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
 
 /**
  * Container class for Ad Health notice handling
@@ -146,7 +147,7 @@ class Advanced_Ads_Ad_Health_Notices {
 		$options = $this->options();
 
 		// load notices from "notices".
-		$this->notices = isset( $options['notices'] ) ? $options['notices'] : [];
+		$this->notices = $options['notices'] ?? [];
 
 		/**
 		 * Cleanup notices
@@ -313,10 +314,11 @@ class Advanced_Ads_Ad_Health_Notices {
 			$notice_key     .= $atts['append_key'];
 		}
 
-		$notice_key = esc_attr( $notice_key );
+		$options    = $this->options();
+		$notice_key = sanitize_key( $notice_key );
 
 		// load notices from "queue".
-		$notices = isset( $options['notices'] ) ? $options['notices'] : [];
+		$notices = $options['notices'] ?? [];
 
 		// check if notice_key was already saved, this prevents the same notice from showing up in different forms.
 		if ( isset( $notices[ $notice_key ] ) ) {
@@ -356,8 +358,7 @@ class Advanced_Ads_Ad_Health_Notices {
 
 		$this->last_saved_notice_key = $notice_key;
 
-		$options['notices'] = $notices;
-		$this->update_changes( $options );
+		$this->update_notices( $notices );
 	}
 
 	/**
@@ -402,9 +403,7 @@ class Advanced_Ads_Ad_Health_Notices {
 		}
 
 		// update db.
-		$options['notices'] = $notices;
-
-		$this->update_changes( $options );
+		$this->update_notices( $notices );
 	}
 
 	/**
@@ -430,10 +429,10 @@ class Advanced_Ads_Ad_Health_Notices {
 
 		if ( isset( $notice_array['hide'] ) && false === $notice_array['hide'] ) {
 			// remove item.
-			self::get_instance()->remove( $notice_key );
+			$this->remove( $notice_key );
 		} else {
 			// hide item.
-			self::get_instance()->ignore( $notice_key );
+			$this->ignore( $notice_key );
 		}
 
 	}
@@ -462,7 +461,7 @@ class Advanced_Ads_Ad_Health_Notices {
 
 		unset( $options['notices'][ $notice_key ] );
 
-		$this->update_changes( $options );
+		$this->update_notices( $options['notices'] );
 	}
 
 	/**
@@ -487,36 +486,52 @@ class Advanced_Ads_Ad_Health_Notices {
 		}
 
 		// update db.
-		$options['ignore'] = $ignored;
-
-		$this->update_changes( $options );
+		$this->update_ignore( $ignored );
 	}
 
 	/**
 	 * Clear all "ignore" messages
 	 */
 	public function unignore() {
-		$options = $this->options();
-
-		// Empty ignore value.
-		$options['ignore'] = [];
-		$this->update_changes( $options );
+		$this->update_ignore();
 	}
 
 	/**
-	 * Update if there is any change
+	 * Update ignored notices if there is any change
 	 *
-	 * @param array $options New options.
+	 * @param string[] $ignore_list list of ignored keys.
 	 *
 	 * @return void
 	 */
-	public function update_changes( $options ): void {
-		$options_before = $this->options();
+	public function update_ignore( $ignore_list = [] ) {
+		$options = $this->options();
+		$before  = Arr::get( $options, 'ignore', [] );
 
-		if ( $options_before !== $options ) {
-			$this->update_options( $options );
-			$this->load_notices();
+		if ( $ignore_list === $before ) {
+			return;
 		}
+
+		$options['ignore'] = $ignore_list;
+		$this->update_options( $options );
+	}
+
+	/**
+	 * Update notices list if there is any change
+	 *
+	 * @param array $notices New options.
+	 *
+	 * @return void
+	 */
+	public function update_notices( $notices ): void {
+		$options = $this->options();
+
+		if ( Arr::get( $options, 'notices', [] ) === $notices ) {
+			return;
+		}
+
+		$options['notices'] = $notices;
+		$this->update_options( $options );
+		$this->load_notices();
 	}
 
 	/**
@@ -664,21 +679,18 @@ class Advanced_Ads_Ad_Health_Notices {
 	 * also updates ignored array, if needed
 	 */
 	public function get_valid_ignored() {
-		$options        = $this->options();
-		$options_before = $options;
-
-		$ignore_before = isset( $options['ignore'] ) ? $options['ignore'] : [];
+		$options       = $this->options();
+		$ignore_before = $options['ignore'] ?? [];
 
 		// get keys from notices.
 		$notice_keys = array_keys( $this->notices );
 
 		// get the errors that are in ignore AND notices and reset the keys.
-		$ignore            = array_values( array_intersect( $ignore_before, $notice_keys ) );
-		$options['ignore'] = $ignore;
+		$ignore = array_values( array_intersect( $ignore_before, $notice_keys ) );
 
 		// only update if changed.
-		if ( $options_before !== $options ) {
-			$this->update_options( $options );
+		if ( $ignore !== $ignore_before ) {
+			$this->update_ignore( $ignore );
 		}
 
 		return $ignore;

@@ -9,21 +9,22 @@
 
 namespace AdvancedAds\Abstracts;
 
-use DateTimeZone;
 use Advanced_Ads;
-use Advanced_Ads_Utils;
 use Advanced_Ads_Inline_Css;
+use Advanced_Ads_Utils;
 use Advanced_Ads_Visitor_Conditions;
-use AdvancedAds\Traits;
+use AdvancedAds\Compatibility\Compatibility;
 use AdvancedAds\Constants;
+use AdvancedAds\Framework\Utilities\Arr;
+use AdvancedAds\Framework\Utilities\Formatting;
+use AdvancedAds\Framework\Utilities\Str;
 use AdvancedAds\Frontend\Stats;
 use AdvancedAds\Interfaces\Ad_Type;
-use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Traits;
 use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Arr;
-use AdvancedAds\Framework\Utilities\Str;
-use AdvancedAds\Compatibility\Compatibility;
-use AdvancedAds\Framework\Utilities\Formatting;
+use AdvancedAds\Utilities\WordPress;
+use DateInterval;
+use DateTime;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -847,11 +848,11 @@ abstract class Ad extends Data {
 	 * @return string
 	 */
 	public function get_ad_schedule_html(): string {
-		list(
+		[
 			'post_start' => $post_start,
 			'status_type' => $status_type,
 			'status_strings' => $status_strings
-		) = $this->get_ad_schedule_details();
+		] = $this->get_ad_schedule_details();
 
 		if ( empty( $status_strings ) ) {
 			return '';
@@ -898,8 +899,10 @@ abstract class Ad extends Data {
 			return 0;
 		}
 
-		$expiration_date->setTimezone( new DateTimeZone( 'UTC' ) );
-		$gm_date                                = $expiration_date->format( 'Y-m-d-H-i' );
+		$wp_time = new DateTime( 'now', wp_timezone() );
+		$expiration_date->sub( new DateInterval( 'PT' . $wp_time->getOffset() . 'S' ) );
+		$gm_date = $expiration_date->format( 'Y-m-d-H-i' );
+
 		[ $year, $month, $day, $hour, $minute ] = explode( '-', $gm_date );
 
 		return gmmktime( $hour, $minute, 0, $month, $day, $year );
@@ -917,7 +920,7 @@ abstract class Ad extends Data {
 		$ad_args['shortcode_ad_id'] = $this->get_id();
 		$output                     = preg_replace(
 			'/\[(the_ad_group|the_ad_placement|the_ad) /',
-			'[$1 ad_args="' . rawurlencode( wp_json_encode( $ad_args ) ) . '"',
+			'[$1 ad_args="' . rawurlencode( wp_json_encode( $ad_args ) ) . '" ',
 			$output
 		);
 

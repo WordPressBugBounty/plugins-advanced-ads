@@ -11,6 +11,8 @@ function loadAdTypeParameter(adType) {
 	parametersBox.html(Constants.spinnerHTML);
 	tinyMceWrapper.hide();
 
+	let firstLoad = true;
+
 	jQuery
 		.ajax({
 			type: 'POST',
@@ -27,6 +29,12 @@ function loadAdTypeParameter(adType) {
 				parametersBox.html(data).trigger('paramloaded');
 				// eslint-disable-next-line no-undef
 				advads_maybe_textarea_to_tinymce(adType);
+				if (firstLoad) {
+					firstLoad = false;
+					setTimeout(() => {
+						advancedAds.termination.resetInitialValues();
+					}, 500);
+				}
 			}
 		})
 		.fail((MLHttpRequest, textStatus, errorThrown) => {

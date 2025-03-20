@@ -428,6 +428,7 @@ abstract class Data implements \ArrayAccess {
 	 *
 	 * @return mixed The value at the specified offset, or null if the method does not exist.
 	 */
+	#[\ReturnTypeWillChange]
 	public function offsetGet( $offset ) {
 		$func = 'get_' . $offset;
 		if ( method_exists( $this, $func ) ) {
