@@ -10,7 +10,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Advanced Ads
- * Version:           2.0.5
+ * Version:           2.0.6
  * Description:       Manage and optimize your ads in WordPress
  * Plugin URI:        https://wpadvancedads.com
  * Author:            Advanced Ads
@@ -37,7 +37,7 @@ if ( defined( 'ADVADS_FILE' ) ) {
 }
 
 define( 'ADVADS_FILE', __FILE__ );
-define( 'ADVADS_VERSION', '2.0.5' );
+define( 'ADVADS_VERSION', '2.0.6' );
 
 // Load the autoloader.
 require_once __DIR__ . '/includes/class-autoloader.php';

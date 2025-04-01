@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Advanced Ads 2.0.3\n"
+"Project-Id-Version: Advanced Ads 2.0.6\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/advanced-ads\n"
 "Last-Translator: Thomas Maier <post@webzunft.de>\n"
 "Language-Team: webgilde <support@wpadvancedads.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-14T10:24:09+00:00\n"
+"POT-Creation-Date: 2025-04-01T14:53:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: advanced-ads\n"
@@ -289,7 +289,7 @@ msgid "Please enter a valid license key"
 msgstr ""
 
 #: admin/includes/class-licenses.php:132
-#: admin/includes/class-licenses.php:331
+#: admin/includes/class-licenses.php:333
 msgid "The license status does not change as long as ADVANCED_ADS_SHOW_LICENSE_RESPONSE is enabled in wp-config.php."
 msgstr ""
 
@@ -297,58 +297,58 @@ msgstr ""
 msgid "License couldn’t be activated. Please try again later."
 msgstr ""
 
-#: admin/includes/class-licenses.php:168
+#: admin/includes/class-licenses.php:170
 msgid "This is the bundle license key."
 msgstr ""
 
-#: admin/includes/class-licenses.php:169
+#: admin/includes/class-licenses.php:171
 msgid "This is not the correct key for this add-on."
 msgstr ""
 
-#: admin/includes/class-licenses.php:170
+#: admin/includes/class-licenses.php:172
 msgid "There are no activations left."
 msgstr ""
 
 #. translators: %1$s is a starting link tag, %2$s is the closing one.
-#: admin/includes/class-licenses.php:174
+#: admin/includes/class-licenses.php:176
 msgid "You can manage activations in %1$syour account%2$s."
 msgstr ""
 
 #. translators: %1$s is a starting link tag, %2$s is the closing one.
-#: admin/includes/class-licenses.php:180
+#: admin/includes/class-licenses.php:182
 msgid "%1$sUpgrade%2$s for more activations."
 msgstr ""
 
 #. translators: %s is a string containing information about the issue.
-#: admin/includes/class-licenses.php:194
+#: admin/includes/class-licenses.php:196
 msgid "License is invalid. Reason: %s"
 msgstr ""
 
 #. translators: %s is a list of server information like IP address. Just keep it as is.
-#: admin/includes/class-licenses.php:234
+#: admin/includes/class-licenses.php:236
 msgid "Your request was blocked by our firewall. Please send us the following information to unblock you: %s."
 msgstr ""
 
-#: admin/includes/class-licenses.php:297
+#: admin/includes/class-licenses.php:299
 msgid "Error while trying to disable the license. Please contact support."
 msgstr ""
 
-#: admin/includes/class-licenses.php:340
-#: admin/includes/class-licenses.php:364
+#: admin/includes/class-licenses.php:342
+#: admin/includes/class-licenses.php:366
 msgid "License couldn’t be deactivated. Please try again later."
 msgstr ""
 
 #. translators: %s plugin update link
-#: admin/includes/class-licenses.php:499
+#: admin/includes/class-licenses.php:501
 msgid "Download failed. <a href=\"%s\">Click here to try another method</a>."
 msgstr ""
 
 #. translators: %s download failed knowledgebase link
-#: admin/includes/class-licenses.php:502
+#: admin/includes/class-licenses.php:504
 msgid "Download failed. <a href=\"%s\" target=\"_blank\">Click here to learn why</a>."
 msgstr ""
 
-#: admin/includes/class-licenses.php:659
+#: admin/includes/class-licenses.php:661
 msgid "License deactivated. Please try again later."
 msgstr ""
 
@@ -682,119 +682,119 @@ msgstr ""
 msgid "--not selected--"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:17
+#: admin/views/placement-injection-top.php:18
 msgid "Congratulations! Your ad is now visible in the frontend."
 msgstr ""
 
-#: admin/views/placement-injection-top.php:19
+#: admin/views/placement-injection-top.php:20
 msgid "Take a look at your ad"
 msgstr ""
 
 #. translators: %s is a URL.
-#: admin/views/placement-injection-top.php:26
+#: admin/views/placement-injection-top.php:27
 msgid "Ad not showing up? Take a look <a href=\"%s\" target=\"_blank\">here</a>"
 msgstr ""
 
 #. translators: %1$s is the opening link tag, %2$s is closing link tag.
-#: admin/views/placement-injection-top.php:42
+#: admin/views/placement-injection-top.php:43
 msgid "Adjust the placement options? Take a look  %1$shere.%2$s"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:50
+#: admin/views/placement-injection-top.php:51
 msgid "Where do you want to display the ad?"
 msgstr ""
 
 #. translators: %s is a URL.
-#: admin/views/placement-injection-top.php:61
+#: admin/views/placement-injection-top.php:62
 #: modules/gadsense/admin/admin.php:238
 msgid "The AdSense verification and Auto ads code is already activated in the <a href=\"%s\">AdSense settings</a>."
 msgstr ""
 
-#: admin/views/placement-injection-top.php:73
+#: admin/views/placement-injection-top.php:74
 #: modules/gadsense/admin/admin.php:241
 msgid "No need to add the code manually here, unless you want to include it into certain pages only."
 msgstr ""
 
-#: admin/views/placement-injection-top.php:76
+#: admin/views/placement-injection-top.php:77
 msgid "Click on the button below to add the Auto ads code to the header of your site."
 msgstr ""
 
-#: admin/views/placement-injection-top.php:87
+#: admin/views/placement-injection-top.php:89
 msgid "inject Auto ads"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:93
+#: admin/views/placement-injection-top.php:95
 msgid "New placement"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:94
+#: admin/views/placement-injection-top.php:96
 #: includes/placements/types/class-before-content.php:47
 msgid "Before Content"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:95
+#: admin/views/placement-injection-top.php:97
 #: includes/placements/types/class-content.php:47
 msgid "Content"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:96
+#: admin/views/placement-injection-top.php:98
 #: includes/placements/types/class-after-content.php:47
 msgid "After Content"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:97
+#: admin/views/placement-injection-top.php:99
 msgid "Manage Sidebar"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:98
+#: admin/views/placement-injection-top.php:100
 msgid "PHP or Shortcode"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:99
+#: admin/views/placement-injection-top.php:101
 msgid "Header (Manual)"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:103
-#: admin/views/placement-injection-top.php:107
+#: admin/views/placement-injection-top.php:105
+#: admin/views/placement-injection-top.php:109
 #: admin/views/upgrades/pro-placements.php:32
 msgid "Custom Position"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:103
+#: admin/views/placement-injection-top.php:105
 msgid "Show Pro Places"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:112
+#: admin/views/placement-injection-top.php:114
 msgid "AdSense In-feed"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:118
+#: admin/views/placement-injection-top.php:120
 msgid "Show Sticky Places"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:124
+#: admin/views/placement-injection-top.php:126
 msgid "Show PopUp"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:128
+#: admin/views/placement-injection-top.php:130
 msgid "PopUp & Layer"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:136
+#: admin/views/placement-injection-top.php:138
 msgid "see all…"
 msgstr ""
 
-#: admin/views/placement-injection-top.php:168
+#: admin/views/placement-injection-top.php:170
 msgid "Existing placement"
 msgstr ""
 
 #. translators: %s is some HTML.
-#: admin/views/placement-injection-top.php:180
+#: admin/views/placement-injection-top.php:182
 msgid "Or use the shortcode %s to insert the ad into the content manually."
 msgstr ""
 
 #. translators: %s is a URL.
-#: admin/views/placement-injection-top.php:187
+#: admin/views/placement-injection-top.php:189
 msgid "Learn more about your choices to display an ad in the <a href=\"%s\" target=\"_blank\">manual</a>."
 msgstr ""
 
@@ -1074,7 +1074,7 @@ msgid "repeat the position"
 msgstr ""
 
 #. translators: %1$s is an anchor (link) opening tag, %2$s is the closing tag.
-#: classes/ad-health-notices.php:802
+#: classes/ad-health-notices.php:814
 #: modules/gadsense/includes/class-mapi.php:1680
 msgid "Learn more about AdSense account issues %1$shere%2$s."
 msgstr ""
@@ -1182,7 +1182,7 @@ msgid "Status"
 msgstr ""
 
 #: classes/display-conditions.php:729
-#: includes/abstracts/abstract-ad.php:831
+#: includes/abstracts/abstract-ad.php:832
 #: includes/admin/class-groups-list-table.php:362
 #: views/admin/placements/quick-edit.php:16
 #: views/admin/tables/ads/column-date.php:16
@@ -1550,21 +1550,21 @@ msgid "Check this if you don’t want the following elements to float around the
 msgstr ""
 
 #. translators: %s is a date.
-#: includes/abstracts/abstract-ad.php:805
+#: includes/abstracts/abstract-ad.php:806
 msgid "starts %s"
 msgstr ""
 
 #. translators: %s is a date.
-#: includes/abstracts/abstract-ad.php:819
+#: includes/abstracts/abstract-ad.php:820
 msgid "expires %s"
 msgstr ""
 
 #. translators: %s is a date.
-#: includes/abstracts/abstract-ad.php:825
+#: includes/abstracts/abstract-ad.php:826
 msgid "expired %s"
 msgstr ""
 
-#: includes/abstracts/abstract-ad.php:834
+#: includes/abstracts/abstract-ad.php:835
 #: includes/admin/class-placement-quick-edit.php:48
 #: views/admin/placements/edit-modal/fields/status.php:13
 #: views/admin/placements/quick-edit.php:17
@@ -1572,12 +1572,12 @@ msgstr ""
 msgid "Draft"
 msgstr ""
 
-#: includes/abstracts/abstract-ad.php:837
+#: includes/abstracts/abstract-ad.php:838
 msgid "Trashed"
 msgstr ""
 
 #. translators: %1$s is a placement name, %2$s is the ads name.
-#: includes/abstracts/abstract-ad.php:1213
+#: includes/abstracts/abstract-ad.php:1216
 msgid "Placement name: %1$s; Ads: %2$s"
 msgstr ""
 
@@ -1920,7 +1920,7 @@ msgid "How to download, install, and activate an add-on"
 msgstr ""
 
 #. Translators: 1: add-on name 2: admin URL to license page
-#: includes/admin/class-addon-updater.php:133
+#: includes/admin/class-addon-updater.php:131
 msgid "There might be a new version of %1$s. Please <strong>provide a valid license key</strong> in order to receive updates and support <a href=\"%2$s\">on this page</a>."
 msgstr ""
 
@@ -3282,6 +3282,10 @@ msgstr ""
 msgid "--empty--"
 msgstr ""
 
+#: includes/compatibility/class-peepso.php:52
+msgid "Display this ad in PeepSo Stream"
+msgstr ""
+
 #: includes/frontend/class-debug-ads.php:82
 msgid "The ad is displayed on the page"
 msgstr ""
@@ -3721,11 +3725,11 @@ msgstr ""
 msgid "No placement data provided"
 msgstr ""
 
-#: includes/rest/class-placements.php:139
+#: includes/rest/class-placements.php:140
 msgid "Not authorized update"
 msgstr ""
 
-#: includes/rest/class-placements.php:145
+#: includes/rest/class-placements.php:146
 msgid "Placement not found"
 msgstr ""
 

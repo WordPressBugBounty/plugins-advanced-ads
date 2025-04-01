@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.0.5
+Stable tag: 2.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -360,6 +360,18 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 
 == Changelog ==
 
+= 2.0.6 (April 1, 2025) =
+- Improvement: redirect to placement list after creating a new placement
+- Improvement: remove ad creation message for server type placement
+- Improvement: unify admin notifications
+- Fix: prevent duplicate revision controls
+- Fix: correct order of placement icons
+- Fix: open create placement modal when no placements found
+- Fix: show the search field when "Show filters permanently" is checked
+- Fix: prevent CodeMirror to run on Rich Content ad edit page
+- Fix: prevent 'undefined key' warning in XML feed
+- Fix: use native php get error message function
+
 = 2.0.5 (March 20, 2025) =
 
 - Fix: prevent false unsaved changes notifications for ads
@@ -397,23 +409,3 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 - Fix: correct a fatal error from a function declared multiple times during activation
 - Fix: correct the version numbers in the rollback function dropdown
 - Fix: resolve a PHP warning in the backend when file_get_contents is disabled
-
-= 2.0.0 (March 10, 2025) =
-
-- Feature: introduce onboarding wizard
-- Feature: implement plugin importer
-- Feature: overhaul placement structure
-- Feature: add pause, duplicate, and rename functions for placements
-- Feature: enable quick & bulk edit for ads and placements
-- Feature: option to hide ads for specific IP addresses
-- Feature: allow saving of custom filter sets
-- Feature: introduce rollback feature for version control
-- Improvement: expand ad filtering options
-- Improvement: add group type filter
-- Improvement: introduce ‘used by’ column in ad overview
-- Improvement: enable ad label overrides at ad level with basic HTML support
-- Improvement: enhance UI for clarity, better labels, more sortable columns, and reactive screens
-- Improvement: update Advanced Ads Dashboard
-- Improvement: display hints for dependent settings like cache busting or ad blocker disguise
-- Improvement: add quick & bulk edit for disabling ads on posts/pages
-- Improvement: optimize backend performance, load files only as needed

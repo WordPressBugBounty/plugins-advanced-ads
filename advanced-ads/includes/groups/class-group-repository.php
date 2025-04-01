@@ -221,7 +221,7 @@ class Group_Repository {
 
 		if ( empty( $meta_values ) ) {
 			$meta_values = $this->migrate_values( $group );
-			$type        = $type !== $meta_values['type'] ? $meta_values['type'] : $type;
+			$type        = $meta_values['type'] ?? $type;
 		}
 
 		if ( 'ordered' === $type || 'default' === $type ) {
