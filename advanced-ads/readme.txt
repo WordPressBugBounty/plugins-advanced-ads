@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.0.6
+Stable tag: 2.0.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -360,6 +360,11 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 
 == Changelog ==
 
+= 2.0.7 (April 9, 2025) =
+- Improvement: optimize MailPoet compatibility
+- Fix: force array return in post_updated_messages
+- Fix: quick edit for ads ignores tracking options and overwrites content
+
 = 2.0.6 (April 1, 2025) =
 - Improvement: redirect to placement list after creating a new placement
 - Improvement: remove ad creation message for server type placement
@@ -397,15 +402,3 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 - Improvement: prevent plugin upgrade notice reappearing if already dismissed
 - Fix: ensure ad centers when selected
 - Fix: restore pagination functionality on ad list page
-
-= 2.0.2 (March 11, 2025) =
-
-- Fix: restore the classic Advanced Ads widget
-- Fix: resolve placement page issue with PHP > 8.0
-
-= 2.0.1 (March 11, 2025) =
-
-- Improvement: reduce high CPU usage in the frontend
-- Fix: correct a fatal error from a function declared multiple times during activation
-- Fix: correct the version numbers in the rollback function dropdown
-- Fix: resolve a PHP warning in the backend when file_get_contents is disabled

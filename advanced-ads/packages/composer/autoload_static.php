@@ -234,7 +234,6 @@ class ComposerStaticInit_AdvancedAds
         'AdvancedAds\\Rest\\OnBoarding' => __DIR__ . '/../..' . '/includes/rest/class-onboarding.php',
         'AdvancedAds\\Rest\\Page_Quick_Edit' => __DIR__ . '/../..' . '/includes/rest/class-page-quick-edit.php',
         'AdvancedAds\\Rest\\Placements' => __DIR__ . '/../..' . '/includes/rest/class-placements.php',
-        'AdvancedAds\\Rest\\Quick_Edit' => __DIR__ . '/../..' . '/includes/rest/class-quick-edit.php',
         'AdvancedAds\\Rest\\Utilities' => __DIR__ . '/../..' . '/includes/rest/class-utilities.php',
         'AdvancedAds\\Shortcodes' => __DIR__ . '/../..' . '/includes/class-shortcodes.php',
         'AdvancedAds\\Traits\\Entity' => __DIR__ . '/../..' . '/includes/traits/class-entity.php',

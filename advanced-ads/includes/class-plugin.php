@@ -305,7 +305,6 @@ class Plugin extends Framework\Loader {
 	 */
 	private function includes_rest(): void {
 		$this->register_route( Rest\Groups::class );
-		$this->register_route( Rest\Quick_Edit::class );
 		$this->register_route( Rest\Page_Quick_Edit::class );
 		$this->register_route( Rest\Placements::class );
 		$this->register_route( Rest\OnBoarding::class );

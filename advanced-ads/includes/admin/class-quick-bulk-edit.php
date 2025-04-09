@@ -31,6 +31,22 @@ class Quick_Bulk_Edit {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'save_post', [ $this, 'save_quick_edits' ], 100 );
 		add_action( 'save_post', [ $this, 'save_bulk_edit' ], 100 );
+		add_action( 'advanced-ads-ad-render-column-ad_type', [ $this, 'print_ad_json' ] );
+	}
+
+	/**
+	 * Print ad JSON for debugging
+	 *
+	 * @param Ad $ad the ad being saved.
+	 *
+	 * @return void
+	 */
+	public function print_ad_json( $ad ): void {
+		?>
+		<script type="text/javascript">
+			var ad_json_<?php echo esc_attr( $ad->get_id() ); ?> = <?php echo wp_json_encode( $this->get_json_data( $ad ) ); ?>;
+		</script>
+		<?php
 	}
 
 	/**
@@ -310,5 +326,50 @@ class Quick_Bulk_Edit {
 		<?php $timezone = wp_timezone_string(); ?>
 		<span><?php echo esc_html( strlen( $timezone ) !== strlen( str_replace( [ '+', '-' ], '', $timezone ) ) ? "UTC$timezone" : $timezone ); ?></span>
 		<?php
+	}
+
+	/**
+	 * Get ad data for json output
+	 *
+	 * @param Ad $ad Ad instance.
+	 *
+	 * @return array
+	 */
+	private function get_json_data( $ad ): array {
+		$expiry = $ad->get_expiry_date();
+
+		if ( $expiry ) {
+			$expiry_date = array_combine(
+				[ 'year', 'month', 'day', 'hour', 'minutes' ],
+				explode( '-', wp_date( 'Y-m-d-H-i', $expiry ) )
+			);
+		}
+
+		$ad_data = [
+			'debug_mode' => $ad->is_debug_mode(),
+			'expiry'     => $expiry
+				? [
+					'expires'     => true,
+					'expiry_date' => $expiry_date,
+				]
+				: [
+					'expires' => false,
+				],
+			'ad_label'   => $ad->get_prop( 'ad_label' ),
+		];
+
+		if ( isset( Advanced_Ads_Privacy::get_instance()->options()['enabled'] ) ) {
+			$ad_data['ignore_privacy'] = isset( $ad->get_data()['privacy']['ignore-consent'] );
+		}
+
+		/**
+		 * Allow add-ons to add more ad data fields.
+		 *
+		 * @param array $ad_data the fields to be sent back to the browser.
+		 * @param       $ad      Ad the ad being currently edited.
+		 */
+		$ad_data = apply_filters( 'advanced-ads-quick-edit-ad-data', $ad_data, $ad );
+
+		return $ad_data;
 	}
 }

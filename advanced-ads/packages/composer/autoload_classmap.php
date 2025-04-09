@@ -207,7 +207,6 @@ return array(
     'AdvancedAds\\Rest\\OnBoarding' => $baseDir . '/includes/rest/class-onboarding.php',
     'AdvancedAds\\Rest\\Page_Quick_Edit' => $baseDir . '/includes/rest/class-page-quick-edit.php',
     'AdvancedAds\\Rest\\Placements' => $baseDir . '/includes/rest/class-placements.php',
-    'AdvancedAds\\Rest\\Quick_Edit' => $baseDir . '/includes/rest/class-quick-edit.php',
     'AdvancedAds\\Rest\\Utilities' => $baseDir . '/includes/rest/class-utilities.php',
     'AdvancedAds\\Shortcodes' => $baseDir . '/includes/class-shortcodes.php',
     'AdvancedAds\\Traits\\Entity' => $baseDir . '/includes/traits/class-entity.php',
