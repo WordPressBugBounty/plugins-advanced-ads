@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.0.7
+Stable tag: 2.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -359,6 +359,12 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.8 (April 28, 2025) =
+
+- Improvement: type safety in `add_body_class` to prevent issues from third-party filters
+- Improvement: improve the ad and group relation both way
+- Fix: expiry date not updating for ads that already had one set
 
 = 2.0.7 (April 9, 2025) =
 - Improvement: optimize MailPoet compatibility

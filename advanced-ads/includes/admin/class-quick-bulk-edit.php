@@ -195,7 +195,7 @@ class Quick_Bulk_Edit {
 		$minutes = absint( 'get' === $method ? Params::get( 'minute' ) : Params::post( 'minute' ) );
 
 		try {
-			$date = new DateTime( 'now', wp_timezone() );
+			$date = new DateTime( 'now', new \DateTimeZone( 'UTC' ) );
 			$date->setDate( $year, $month, $day );
 			$date->setTime( $hours, $minutes );
 
@@ -275,7 +275,7 @@ class Quick_Bulk_Edit {
 	 */
 	public static function print_date_time_inputs( $timestamp = 0, $prefix = '', $seconds = false ) {
 		try {
-			$initial_date = (bool) $timestamp ? new \DateTimeImmutable( "@$timestamp", wp_timezone() ) : current_datetime();
+			$initial_date = (bool) $timestamp ? new \DateTimeImmutable( "@$timestamp", new \DateTimeZone( 'UTC' ) ) : current_datetime();
 		} catch ( Exception $e ) {
 			$initial_date = current_datetime();
 		}
@@ -340,8 +340,8 @@ class Quick_Bulk_Edit {
 
 		if ( $expiry ) {
 			$expiry_date = array_combine(
-				[ 'year', 'month', 'day', 'hour', 'minutes' ],
-				explode( '-', wp_date( 'Y-m-d-H-i', $expiry ) )
+				[ 'year', 'month', 'day', 'hour', 'minute' ],
+				explode( '-', wp_date( 'Y-m-d-H-i', $expiry, new \DateTimeZone( 'UTC' ) ) )
 			);
 		}
 

@@ -117,6 +117,13 @@ class Constants {
 	 */
 	const AD_META_EXPIRATION_TIME = 'advanced_ads_expiration_time';
 
+	/**
+	 * Ad metakey for group ids.
+	 *
+	 * @var string
+	 */
+	const AD_META_GROUP_IDS = 'advanced_ads_ad_group_ids';
+
 	/* User Meta Keys ------------------- */
 
 	/**

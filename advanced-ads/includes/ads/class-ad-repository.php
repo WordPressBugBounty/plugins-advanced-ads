@@ -66,6 +66,7 @@ class Ad_Repository {
 			$ad->set_id( $id );
 
 			$this->update_post_meta( $ad );
+			$this->update_post_term( $ad );
 			$this->update_version( $ad );
 
 			$ad->apply_changes();
@@ -163,6 +164,7 @@ class Ad_Repository {
 		}
 
 		$this->update_post_meta( $ad );
+		$this->update_post_term( $ad );
 
 		$ad->apply_changes();
 	}
@@ -415,6 +417,17 @@ class Ad_Repository {
 		unset( $meta_values['has_weekdays'] );
 
 		update_post_meta( $ad->get_id(), self::OPTION_METAKEY, $meta_values );
+	}
+
+	/**
+	 * Update ad groups.
+	 *
+	 * @param Ad $ad Ad object.
+	 *
+	 * @return void
+	 */
+	private function update_post_term( &$ad ): void {
+		( new Ad_Group_Relation() )->relate( $ad );
 	}
 
 	/**

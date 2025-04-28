@@ -13,18 +13,16 @@ use Advanced_Ads;
 use Advanced_Ads_Inline_Css;
 use Advanced_Ads_Utils;
 use Advanced_Ads_Visitor_Conditions;
-use AdvancedAds\Compatibility\Compatibility;
+use AdvancedAds\Traits;
 use AdvancedAds\Constants;
-use AdvancedAds\Framework\Utilities\Arr;
-use AdvancedAds\Framework\Utilities\Formatting;
-use AdvancedAds\Framework\Utilities\Str;
 use AdvancedAds\Frontend\Stats;
 use AdvancedAds\Interfaces\Ad_Type;
-use AdvancedAds\Traits;
-use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\WordPress;
-use DateInterval;
-use DateTime;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Framework\Utilities\Arr;
+use AdvancedAds\Framework\Utilities\Str;
+use AdvancedAds\Compatibility\Compatibility;
+use AdvancedAds\Framework\Utilities\Formatting;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -788,10 +786,10 @@ abstract class Ad extends Data {
 	 * @return array
 	 */
 	public function get_ad_schedule_details(): array {
-		$expiry_date_format = get_option( 'date_format' ) . ', ' . get_option( 'time_format' );
 		$status_strings     = [];
-		$post_start         = get_post_time( 'U', true, $this->get_id() );
 		$html_classes       = 'advads-filter-timing';
+		$post_start         = get_post_time( 'U', true, $this->get_id() );
+		$expiry_date_format = get_option( 'date_format' ) . ', ' . get_option( 'time_format' );
 
 		$status_type = get_post_status( $this->get_id() ) ?? 'published';
 		if ( 'publish' === $status_type ) {
@@ -809,7 +807,7 @@ abstract class Ad extends Data {
 		if ( $this->get_expiry_date() ) {
 			$expiry      = $this->get_expiry_date();
 			$expiry_date = date_create( '@' . $expiry );
-			$expiry_date->setTimezone( WordPress::get_timezone() );
+			$expiry_date->setTimezone( new \DateTimeZone( 'UTC' ) );
 			$html_classes .= ' advads-filter-any-exp-date';
 
 			$tz = ' ( ' . WordPress::get_timezone_name() . ' )';
@@ -899,8 +897,7 @@ abstract class Ad extends Data {
 			return 0;
 		}
 
-		$wp_time = new DateTime( 'now', wp_timezone() );
-		$expiration_date->sub( new DateInterval( 'PT' . $wp_time->getOffset() . 'S' ) );
+		$expiration_date->setTimezone( new \DateTimeZone( 'UTC' ) );
 		$gm_date = $expiration_date->format( 'Y-m-d-H-i' );
 
 		[ $year, $month, $day, $hour, $minute ] = explode( '-', $gm_date );

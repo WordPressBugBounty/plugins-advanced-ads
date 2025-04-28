@@ -246,7 +246,9 @@ class Admin_Menu implements Integration_Interface {
 	 *
 	 * @return string
 	 */
-	public function add_body_class( string $classes ): string {
+	public function add_body_class( $classes ): string {
+		// Ensure $classes is always a string due to 3rd party plugins interfering with the filter.
+		$classes    = is_string( $classes ) ? $classes : '';
 		$screen_ids = $this->get_screen_ids();
 		$wp_screen  = get_current_screen();
 
