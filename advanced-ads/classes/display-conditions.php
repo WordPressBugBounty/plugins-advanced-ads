@@ -201,11 +201,16 @@ class Advanced_Ads_Display_Conditions {
 	 * Controls frontend checks for conditions
 	 *
 	 * @param array $options options of the condition.
-	 * @param mixed $ad false or Ad object.
+	 * @param Ad    $ad Ad object.
 	 *
 	 * @return bool false, if ad can’t be delivered
 	 */
-	public static function frontend_check( $options = [], $ad = false ) {
+	public static function frontend_check( $options = [], $ad ) {
+		// Early bail!!
+		if ( ! $ad ) {
+			return true;
+		}
+
 		$display_conditions = self::get_instance()->conditions;
 
 		if ( is_array( $options ) && isset( $options['type'] ) && isset( $display_conditions[ $options['type'] ]['check'] ) ) {
@@ -935,8 +940,7 @@ class Advanced_Ads_Display_Conditions {
 		} else {
 			$operator = 'is';
 		}
-
-		$post      = $ad->get_prop( 'ad_args.post' );
+		$post      = $ad->get_prop( 'ad_args.post' ) ?? null;
 		$post_type = $post['post_type'] ?? false;
 
 		if ( ! self::can_display_ids( $post_type, $options['value'], $operator ) ) {

@@ -120,12 +120,30 @@ class Conditional {
 	}
 
 	/**
+	 * Check if ads are disabled.
+	 *
+	 * @return bool
+	 */
+	public static function is_ad_disabled(): bool {
+		return defined( 'ADVADS_ADS_DISABLED' ) && ADVADS_ADS_DISABLED;
+	}
+
+	/**
 	 * Check if any add-on is activated
 	 *
 	 * @return bool true if there is any add-on activated
 	 */
-	public static function is_any_addon_activated() {
+	public static function is_any_addon_activated(): bool {
 		return has_action( 'advanced-ads-loaded' );
+	}
+
+	/**
+	 * Check if the current page is an AMP page.
+	 *
+	 * @return bool
+	 */
+	public static function is_amp(): bool {
+		return function_exists( 'advads_is_amp' ) && advads_is_amp();
 	}
 
 	/**
@@ -135,7 +153,7 @@ class Conditional {
 	 */
 	public static function is_ua_bot(): bool {
 		// show ads on AMP version also for bots in order to allow Google (and maybe others) to cache the page.
-		if ( advads_is_amp() ) {
+		if ( self::is_amp() ) {
 			return false;
 		}
 
