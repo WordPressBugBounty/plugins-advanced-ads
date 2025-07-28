@@ -85,6 +85,8 @@ class Scripts implements Integration_Interface {
 		if ( ! empty( $frontend_picker ) ) {
 			wp_enqueue_script( ADVADS_SLUG . '-frontend-picker' );
 		}
+
+		wp_advads()->registry->enqueue_script( 'find-adblocker' );
 	}
 
 	/**

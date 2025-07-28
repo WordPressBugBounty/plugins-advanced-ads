@@ -1,8 +1,8 @@
 <?php // phpcs:ignore WordPress.Files.FileName
 
 use AdvancedAds\Abstracts\Ad;
-use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Framework\Utilities\Params;
 
 /**
  * Display Conditions under which to (not) show an ad
@@ -11,7 +11,7 @@ use AdvancedAds\Utilities\WordPress;
  */
 class Advanced_Ads_Display_Conditions {
 	/**
-	 * Conditonis
+	 * Conditions
 	 *
 	 * Registered display conditions.
 	 *
@@ -940,6 +940,7 @@ class Advanced_Ads_Display_Conditions {
 		} else {
 			$operator = 'is';
 		}
+
 		$post      = $ad->get_prop( 'ad_args.post' ) ?? null;
 		$post_type = $post['post_type'] ?? false;
 
@@ -1101,14 +1102,13 @@ class Advanced_Ads_Display_Conditions {
 	 * @return bool true if can be displayed
 	 */
 	public static function check_post_ids( $options, Ad $ad ) {
+		$operator = 'is';
 		if ( isset( $options['operator'] ) && 'is_not' === $options['operator'] ) {
 			$operator = 'is_not';
-		} else {
-			$operator = 'is';
 		}
 
-		$post    = $ad->get_prop( 'ad_args.post' );
-		$post_id = $post['id'];
+		$post    = $ad->get_prop( 'ad_args.post' ) ?? null;
+		$post_id = $post['id'] ?? 0;
 
 		// fixes page id on BuddyPress pages.
 		if ( 0 === $post_id && class_exists( 'BuddyPress' ) && function_exists( 'bp_current_component' ) ) {
@@ -1124,7 +1124,7 @@ class Advanced_Ads_Display_Conditions {
 		 * since WooCommerce changes the post ID of the static page selected to be the product overview page, we need to get the original page id from the WC options
 		 */
 		if ( function_exists( 'is_shop' ) && is_shop() && isset( $options['value'] ) && is_array( $options['value'] ) ) {
-			$post_id = get_option( 'woocommerce_shop_page_id' );
+			$post_id = wc_get_page_id( 'shop' );
 
 			return self::can_display_ids( $post_id, $options['value'], $operator );
 		}

@@ -21,6 +21,7 @@ use Advanced_Ads_Ad_Health_Notices;
 use Advanced_Ads_Display_Conditions;
 use Advanced_Ads_Visitor_Conditions;
 use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Framework\Utilities\Arr;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 
@@ -717,8 +718,20 @@ class AJAX implements Integration_Interface {
 			$placement = wp_advads_get_placement( $placement_id );
 
 			if ( $placement ) {
-				$placement->set_item( 'ad_' . $ad_id );
-				$placement->save();
+				$current_item = $placement->get_item();
+				// Check if current item is a group and new item is an ad.
+				if ( is_string( $current_item ) && strpos( $current_item, 'group_' ) === 0 ) {
+					$group = wp_advads_get_group( (int) str_replace( 'group_', '', $current_item ) );
+					if ( $group ) {
+						$ad_weights           = $group->get_ad_weights();
+						$ad_weights[ $ad_id ] = Constants::GROUP_AD_DEFAULT_WEIGHT;
+						$group->set_ad_weights( $ad_weights );
+						$group->save();
+					}
+				} else {
+					$placement->set_item( 'ad_' . $ad_id );
+					$placement->save();
+				}
 				echo esc_attr( $placement_id );
 			}
 
@@ -738,18 +751,16 @@ class AJAX implements Integration_Interface {
 		];
 
 		// set content specific options.
-		$options = Params::request( 'options', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 		if ( $new_placement->is_type( 'post_content' ) ) {
-			$index             = ! empty( $options['index'] ) ? absint( $options['index'] ) : 1;
+			$options           = Params::request( 'options', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+			$index             = (int) Arr::get( $options, 'index', 1 );
 			$props['position'] = 'after';
 			$props['index']    = $index;
 			$props['tag']      = 'p';
 		}
 
 		$new_placement->set_props( $props );
-		$p_id = $new_placement->save();
-
-		echo $p_id; // phpcs:ignore
+		echo $new_placement->save();; // phpcs:ignore
 	}
 
 	/**

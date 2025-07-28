@@ -263,7 +263,10 @@ class WordPress {
 			if ( isset( $condition['operator'] ) && in_array( $condition['operator'], [ 'match', 'match_not' ], true ) ) {
 				continue;
 			}
-
+			// skip paginated_post from value check.
+			if ( isset( $condition['type'] ) && 'paginated_post' === $condition['type'] ) {
+				continue;
+			}
 			if ( empty( $condition['value'] ) ) {
 				unset( $conditions[ $index ] );
 			}
