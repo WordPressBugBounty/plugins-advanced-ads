@@ -205,7 +205,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool false, if ad can’t be delivered
 	 */
-	public static function frontend_check( $options = [], $ad ) {
+	public static function frontend_check( $options = [], $ad = false ) {
 		// Early bail!!
 		if ( ! $ad ) {
 			return true;

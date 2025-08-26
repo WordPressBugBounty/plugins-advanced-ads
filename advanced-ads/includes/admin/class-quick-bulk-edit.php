@@ -14,6 +14,7 @@ use Exception;
 use Advanced_Ads_Privacy;
 use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Ad;
+use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Framework\Utilities\Params;
 
 /**
@@ -181,9 +182,9 @@ class Quick_Bulk_Edit {
 	}
 
 	/**
-	 * Get UNIx timestamp from the date time inputs values
+	 * Get Unix timestamp from the date time inputs values
 	 *
-	 * @param string $method method used for the form - `post` og `get`.
+	 * @param string $method method used for the form - `post` or `get`.
 	 *
 	 * @return int
 	 */
@@ -195,11 +196,10 @@ class Quick_Bulk_Edit {
 		$minutes = absint( 'get' === $method ? Params::get( 'minute' ) : Params::post( 'minute' ) );
 
 		try {
-			$date = new DateTime( 'now', new \DateTimeZone( 'UTC' ) );
-			$date->setDate( $year, $month, $day );
-			$date->setTime( $hours, $minutes );
+			$local_dt = new \DateTimeImmutable( 'now', WordPress::get_timezone() );
+			$local_dt = $local_dt->setDate( $year, $month, $day )->setTime( $hours, $minutes );
 
-			return (int) $date->format( 'U' );
+			return $local_dt->getTimestamp();
 		} catch ( Exception $e ) {
 			return 0;
 		}
@@ -310,7 +310,7 @@ class Quick_Bulk_Edit {
 		@
 		<label>
 			<span class="screen-reader-text"><?php esc_html_e( 'Hour', 'advanced-ads' ); ?></span>
-			<input type="number" name="<?php echo esc_attr( $prefix ); ?>hour" min="0" max="23" value="<?php echo esc_attr( $initial_date->format( 'h' ) ); ?>"/>
+			<input type="number" name="<?php echo esc_attr( $prefix ); ?>hour" min="0" max="23" value="<?php echo esc_attr( $initial_date->format( 'H' ) ); ?>"/>
 		</label>:
 		<label>
 			<span class="screen-reader-text"><?php esc_html_e( 'Minute', 'advanced-ads' ); ?></span>
@@ -341,7 +341,7 @@ class Quick_Bulk_Edit {
 		if ( $expiry ) {
 			$expiry_date = array_combine(
 				[ 'year', 'month', 'day', 'hour', 'minute' ],
-				explode( '-', wp_date( 'Y-m-d-H-i', $expiry, new \DateTimeZone( 'UTC' ) ) )
+				explode( '-', wp_date( 'Y-m-d-H-i', $expiry ) )
 			);
 		}
 

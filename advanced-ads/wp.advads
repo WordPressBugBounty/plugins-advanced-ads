@@ -2,7 +2,7 @@
   "wp": {
     "name": "Advanced Ads",
     "description": "Manage and optimize your ads in WordPress",
-    "version": "2.0.10",
+    "version": "2.0.11",
     "requireWP": "5.7",
     "requirePHP": "7.4",
     "textDomain": "advanced-ads",

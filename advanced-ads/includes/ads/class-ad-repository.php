@@ -119,18 +119,16 @@ class Ad_Repository {
 
 		// Only update the post when the post data changes.
 		if ( array_intersect( [ 'title', 'status', 'content' ], array_keys( $changes ) ) ) {
-			$post_data = [
+			$is_text_ad = $ad->is_type( [ 'plain', 'content' ] );
+			$post_data  = [
 				'post_title'   => $ad->get_title( 'edit' ),
 				'post_status'  => $ad->get_status( 'edit' ) ? $ad->get_status( 'edit' ) : 'publish',
 				'post_type'    => Constants::POST_TYPE_AD,
 				'post_content' => apply_filters(
-					// TODO: useless filter.
 					'advanced-ads-pre-ad-save-' . $ad->get_type(),
-					wp_unslash(
-						apply_filters(
-							'content_save_pre',
-							$ad->get_content( 'edit' )
-						)
+					apply_filters(
+						'content_save_pre',
+						$is_text_ad ? $ad->get_content( 'edit' ) : wp_unslash( $ad->get_content( 'edit' ) )
 					)
 				),
 			];
@@ -140,10 +138,12 @@ class Ad_Repository {
 			 * to update data, since wp_update_post spawns more calls to the
 			 * save_post action.
 			 *
-			 * This ensures hooks are fired by either WP itself (admin screen save),
-			 * or an update purely from CRUD.
+			 * This ensures hooks are fired by either WP itself (admin screen save), or an update purely from CRUD.
+			 *
+			 * Use direct DB update for user-input ads to preserve literal content.
+			 * Use wp_update_post for other ad types to maintain WordPress security standards.
 			 */
-			if ( doing_action( 'save_post' ) ) {
+			if ( doing_action( 'save_post' ) || $is_text_ad ) {
 				$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->posts, $post_data, [ 'ID' => $ad->get_id() ] );
 				clean_post_cache( $ad->get_id() );
 			} else {
