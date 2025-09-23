@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 2.0.11
+Stable tag: 2.0.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -359,6 +359,12 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.12 (September 23, 2025) =
+
+- Improvement: prevent quotation marks in ad codes being escaped with ACF enabled
+- Fix: groups now correctly inject ads in header placements
+- Fix: remove placements from WPML translation options
 
 = 2.0.11 (August 27, 2025) =
 

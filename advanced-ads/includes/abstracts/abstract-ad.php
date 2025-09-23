@@ -616,7 +616,16 @@ abstract class Ad extends Data {
 	 * @return bool
 	 */
 	public function is_head_placement(): bool {
-		return null !== $this->get_parent() && $this->get_parent()->is_type( 'header' );
+		if ( null !== $this->get_parent() && $this->get_parent()->is_type( 'header' ) ) {
+			return true;
+		}
+
+		// group as head placement.
+		if ( 'header' === $this->get_prop( 'group_placement_context' ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**

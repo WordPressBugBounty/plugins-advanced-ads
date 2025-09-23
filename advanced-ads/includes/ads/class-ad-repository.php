@@ -126,10 +126,9 @@ class Ad_Repository {
 				'post_type'    => Constants::POST_TYPE_AD,
 				'post_content' => apply_filters(
 					'advanced-ads-pre-ad-save-' . $ad->get_type(),
-					apply_filters(
-						'content_save_pre',
-						$is_text_ad ? $ad->get_content( 'edit' ) : wp_unslash( $ad->get_content( 'edit' ) )
-					)
+					$is_text_ad
+						? wp_unslash( $ad->get_content( 'edit' ) )
+						: apply_filters( 'content_save_pre', wp_unslash( $ad->get_content( 'edit' ) ) )
 				),
 			];
 
