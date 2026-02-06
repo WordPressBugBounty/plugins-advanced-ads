@@ -11,22 +11,22 @@ class ComposerStaticInit_AdvancedAds
     );
 
     public static $prefixLengthsPsr4 = array (
-        'D' => 
+        'D' =>
         array (
             'Detection\\' => 10,
         ),
-        'A' => 
+        'A' =>
         array (
             'Advanced_Ads\\' => 13,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Detection\\' => 
+        'Detection\\' =>
         array (
             0 => __DIR__ . '/..' . '/mobiledetect/mobiledetectlib/src',
         ),
-        'Advanced_Ads\\' => 
+        'Advanced_Ads\\' =>
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),
@@ -190,6 +190,7 @@ class ComposerStaticInit_AdvancedAds
         'AdvancedAds\\Installation\\Uninstall' => __DIR__ . '/../..' . '/includes/installation/class-uninstall.php',
         'AdvancedAds\\Interfaces\\Ad_Interface' => __DIR__ . '/../..' . '/includes/interfaces/interface-ad.php',
         'AdvancedAds\\Interfaces\\Ad_Type' => __DIR__ . '/../..' . '/includes/interfaces/interface-ad-type.php',
+        'AdvancedAds\\Interfaces\\Entity_Interface' => __DIR__ . '/../..' . '/includes/interfaces/interface-entity.php',
         'AdvancedAds\\Interfaces\\Group_Interface' => __DIR__ . '/../..' . '/includes/interfaces/interface-group.php',
         'AdvancedAds\\Interfaces\\Group_Type' => __DIR__ . '/../..' . '/includes/interfaces/interface-group-type.php',
         'AdvancedAds\\Interfaces\\Importer' => __DIR__ . '/../..' . '/includes/interfaces/interface-importer.php',

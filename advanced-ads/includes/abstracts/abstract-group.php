@@ -17,13 +17,14 @@ use AdvancedAds\Constants;
 use AdvancedAds\Frontend\Stats;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Interfaces\Group_Type;
+use AdvancedAds\Interfaces\Entity_Interface;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Group.
  */
-class Group extends Data {
+class Group extends Data implements Entity_Interface {
 
 	use Traits\Entity;
 	use Traits\Wrapper;
@@ -296,14 +297,14 @@ class Group extends Data {
 	/* Additional methods ------------------- */
 
 	/**
-	 * Prepares the output for the group.
+	 * Prepare frontend output.
 	 *
-	 * @return string The prepared output.
+	 * @return string
 	 */
-	public function prepare_output(): string {
+	public function generate_html(): string {
 		$ordered_ad_ids = $this->get_ordered_ad_ids();
+		$override       = apply_filters( 'advanced-ads-ad-select-override-by-group', false, $this, $ordered_ad_ids, $this->get_data() );
 
-		$override = apply_filters( 'advanced-ads-ad-select-override-by-group', false, $this, $ordered_ad_ids, $this->get_data() );
 		if ( false !== $override ) {
 			return $override;
 		}
@@ -312,22 +313,96 @@ class Group extends Data {
 			return '';
 		}
 
-		$ad_args       = $this->get_prop( 'ad_args' );
-		$ad_output     = $this->prepare_ad_output( $ordered_ad_ids );
-		$global_output = $ad_args['global_output'] ?? true;
-
-		// Maintain Stats.
-		if ( $global_output && $ad_output ) {
-			Stats::get()->add_entity( 'group', $this->get_id(), $this->get_title() );
-		}
-
+		$ad_output = $this->prepare_ad_output( $ordered_ad_ids );
 		$ad_output = apply_filters( 'advanced-ads-group-output-array', $ad_output, $this );
+
 		if ( [] === $ad_output || ! is_array( $ad_output ) ) {
 			return '';
 		}
 
-		$output_string = implode( '', $ad_output );
-		$wrapper       = ! $this->is_head_placement() ? $this->create_wrapper() : [];
+		return implode( '', $ad_output );
+	}
+
+	/**
+	 * Get the wrapper attributes.
+	 *
+	 * @return array
+	 */
+	public function get_wrapper_attributes(): array {
+		if ( null !== $this->wrapper ) {
+			return $this->wrapper;
+		}
+
+		$attrs   = [];
+		$ad_args = $this->get_prop( 'ad_args' );
+
+		// Default top level to true if not set.
+		if ( ! isset( $ad_args['is_top_level'] ) ) {
+			$ad_args['is_top_level'] = true;
+		}
+
+		if ( $ad_args['is_top_level'] ) {
+			// Add placement class.
+			if ( ! empty( $ad_args['output']['class'] ) && is_array( $ad_args['output']['class'] ) ) {
+				$attrs['class'] = array_map( 'sanitize_html_class', $ad_args['output']['class'] );
+			}
+
+			// Ad Health Tool highlight.
+			if ( Conditional::user_can( 'advanced_ads_edit_ads' ) ) {
+				$attrs['class'][] = wp_advads()->get_frontend_prefix() . 'highlight-wrapper';
+			}
+
+			// Add custom wrapper attributes from placement.
+			if ( isset( $ad_args['output']['wrapper_attrs'] ) && is_array( $ad_args['output']['wrapper_attrs'] ) ) {
+				foreach ( $ad_args['output']['wrapper_attrs'] as $key => $value ) {
+					$attrs[ sanitize_key( $key ) ] = $value;
+				}
+			}
+
+			// Position logic.
+			$this->get_wrapper_styles( $attrs, $ad_args['placement_position'] ?? '' );
+		}
+
+		$attrs = apply_filters_deprecated(
+			'advanced-ads-output-wrapper-options-group',
+			[ $attrs, $this ],
+			'2.0.0',
+			'advanced-ads-wrapper-attributes-group'
+		);
+
+		$attrs = (array) apply_filters( 'advanced-ads-wrapper-attributes-group', $attrs, $this );
+
+		// Ensure an ID exists if there is a label or attributes.
+		if ( ( ! empty( $attrs ) || $this->get_label() ) && ! isset( $attrs['id'] ) ) {
+			$attrs['id'] = wp_advads()->get_frontend_prefix() . wp_rand();
+		}
+
+		$this->wrapper = $attrs;
+
+		return $this->wrapper;
+	}
+
+	/**
+	 * Prepares the output for the group.
+	 *
+	 * @return string The prepared output.
+	 */
+	public function prepare_output(): string {
+		$output_string = $this->generate_html();
+
+		if ( empty( $output_string ) ) {
+			return '';
+		}
+
+		$ad_args       = $this->get_prop( 'ad_args' );
+		$global_output = $ad_args['global_output'] ?? true;
+
+		// Maintain Stats.
+		if ( $global_output ) {
+			Stats::get()->add_entity( 'group', $this->get_id(), $this->get_title() );
+		}
+
+		$wrapper = ! $this->is_head_placement() ? $this->get_wrapper_attributes() : [];
 
 		// Adds inline css to the wrapper.
 		if ( ! empty( $ad_args['inline-css'] ) && ! isset( $ad_args['is_top_level'] ) ) {
@@ -337,13 +412,14 @@ class Group extends Data {
 
 		if ( ! $this->is_head_placement() && [] !== $wrapper ) {
 			$output_string = '<div' . Advanced_Ads_Utils::build_html_attributes( $wrapper ) . '>'
-			. $this->get_label()
-			. apply_filters( 'advanced-ads-output-wrapper-before-content-group', '', $this )
-			. $output_string
-			. apply_filters( 'advanced-ads-output-wrapper-after-content-group', '', $this )
-			. '</div>';
+				. $this->get_label()
+				. apply_filters( 'advanced-ads-output-wrapper-before-content-group', '', $this )
+				. $output_string
+				. apply_filters( 'advanced-ads-output-wrapper-after-content-group', '', $this )
+				. '</div>';
 		}
 
+		// Clearfix.
 		if ( ! empty( $ad_args['is_top_level'] ) && ! empty( $ad_args['placement_clearfix'] ) ) {
 			$output_string .= '<br style="clear: both; display: block; float: none;"/>';
 		}
@@ -684,60 +760,13 @@ class Group extends Data {
 	/**
 	 * Creates a wrapper array for the group.
 	 *
+	 * @deprecated 2.0.0 use get_wrapper_attributes() instead.
+	 *
 	 * @return array
 	 */
 	public function create_wrapper(): array {
-		// Early bail!!
-		if ( null !== $this->wrapper ) {
-			return $this->wrapper;
-		}
+		_deprecated_function( __FUNCTION__, '2.0.0', 'get_wrapper_attributes' );
 
-		$this->wrapper = [];
-		$ad_args       = $this->get_prop( 'ad_args' );
-		if ( ! isset( $ad_args['is_top_level'] ) ) {
-			$ad_args['is_top_level'] = true;
-		}
-
-		if ( $ad_args['is_top_level'] ) {
-			// Add placement class.
-			if ( ! empty( $ad_args['output']['class'] ) && is_array( $ad_args['output']['class'] ) ) {
-				$this->wrapper['class'] = $ad_args['output']['class'];
-			}
-
-			// Ad Health Tool add class wrapper.
-			if ( Conditional::user_can( 'advanced_ads_edit_ads' ) ) {
-				$frontend_prefix          = wp_advads()->get_frontend_prefix();
-				$this->wrapper['class'][] = $frontend_prefix . 'highlight-wrapper';
-			}
-
-			if ( isset( $ad_args['output']['wrapper_attrs'] ) && is_array( $ad_args['output']['wrapper_attrs'] ) ) {
-				foreach ( $ad_args['output']['wrapper_attrs'] as $key => $value ) {
-					$this->wrapper[ $key ] = $value;
-				}
-			}
-
-			if ( ! empty( $ad_args['placement_position'] ) ) {
-				switch ( $ad_args['placement_position'] ) {
-					case 'left':
-						$this->wrapper['style']['float'] = 'left';
-						break;
-					case 'right':
-						$this->wrapper['style']['float'] = 'right';
-						break;
-					case 'center':
-						// We don't know whether the 'reserve_space' option exists and width is set.
-						$this->wrapper['style']['text-align'] = 'center';
-						break;
-				}
-			}
-		}
-
-		$this->wrapper = (array) apply_filters( 'advanced-ads-output-wrapper-options-group', $this->wrapper, $this );
-
-		if ( ( [] !== $this->wrapper || $this->get_label() ) && ! isset( $this->wrapper['id'] ) ) {
-			$this->wrapper['id'] = wp_advads()->get_frontend_prefix() . wp_rand();
-		}
-
-		return $this->wrapper;
+		return $this->get_wrapper_attributes();
 	}
 }

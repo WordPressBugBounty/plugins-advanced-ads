@@ -229,7 +229,6 @@ class Google_Sheet extends Importer implements Interface_Importer {
 		$history_key = $this->get_id() . '_' . wp_rand() . '_' . count( $ads );
 
 		foreach ( $ads as $data ) {
-
 			if ( ! isset( $data['enabled'] ) ) {
 				continue;
 			}

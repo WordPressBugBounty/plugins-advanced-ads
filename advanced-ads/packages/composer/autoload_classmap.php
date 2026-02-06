@@ -163,6 +163,7 @@ return array(
     'AdvancedAds\\Installation\\Uninstall' => $baseDir . '/includes/installation/class-uninstall.php',
     'AdvancedAds\\Interfaces\\Ad_Interface' => $baseDir . '/includes/interfaces/interface-ad.php',
     'AdvancedAds\\Interfaces\\Ad_Type' => $baseDir . '/includes/interfaces/interface-ad-type.php',
+    'AdvancedAds\\Interfaces\\Entity_Interface' => $baseDir . '/includes/interfaces/interface-entity.php',
     'AdvancedAds\\Interfaces\\Group_Interface' => $baseDir . '/includes/interfaces/interface-group.php',
     'AdvancedAds\\Interfaces\\Group_Type' => $baseDir . '/includes/interfaces/interface-group-type.php',
     'AdvancedAds\\Interfaces\\Importer' => $baseDir . '/includes/interfaces/interface-importer.php',

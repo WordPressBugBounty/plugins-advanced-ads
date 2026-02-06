@@ -267,6 +267,20 @@ class WordPress {
 			if ( isset( $condition['type'] ) && 'paginated_post' === $condition['type'] ) {
 				continue;
 			}
+
+			// VC - IP address trim each line and drop empties.
+			if (
+				isset( $condition['type'], $condition['value'] )
+				&& 'ip_address' === $condition['type']
+				&& is_string( $condition['value'] )
+			) {
+				$condition['value']   = implode(
+					"\n",
+					array_filter( array_map( 'trim', preg_split( '/\r?\n/', $condition['value'] ) ) )
+				);
+				$conditions[ $index ] = $condition;
+			}
+
 			if ( empty( $condition['value'] ) ) {
 				unset( $conditions[ $index ] );
 			}

@@ -16,11 +16,10 @@ use Advanced_Ads_Visitor_Conditions;
 use AdvancedAds\Traits;
 use AdvancedAds\Constants;
 use AdvancedAds\Frontend\Stats;
-use AdvancedAds\Interfaces\Ad_Type;
 use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Arr;
 use AdvancedAds\Framework\Utilities\Str;
+use AdvancedAds\Interfaces\Entity_Interface;
 use AdvancedAds\Compatibility\Compatibility;
 use AdvancedAds\Framework\Utilities\Formatting;
 
@@ -29,7 +28,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Ad.
  */
-abstract class Ad extends Data {
+abstract class Ad extends Data implements Entity_Interface {
 
 	use Traits\Entity;
 	use Traits\Wrapper;
@@ -170,17 +169,6 @@ abstract class Ad extends Data {
 	}
 
 	/**
-	 * Get the weekdays.
-	 *
-	 * @param string $context What the value is for. Valid values are view and edit.
-	 *
-	 * @return array
-	 */
-	public function get_weekdays( $context = 'view' ): array {
-		return $this->get_prop( 'weekdays', $context );
-	}
-
-	/**
 	 * Get the width of the ad in pixels.
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
@@ -263,7 +251,7 @@ abstract class Ad extends Data {
 	}
 
 	/**
-	 * Get the wrapper classes for the ad.
+	 * Get the weight of the ad.
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
@@ -631,10 +619,14 @@ abstract class Ad extends Data {
 	/**
 	 * Check if the ad is a top-level ad.
 	 *
+	 * @deprecated 2.0.0 use is_parent_placement() instead.
+	 *
 	 * @return bool
 	 */
 	public function is_top_level(): bool {
-		return ! $this->get_parent() || is_a_placement( $this->get_parent() );
+		_deprecated_function( __FUNCTION__, '2.0.0', 'is_parent_placement' );
+
+		return $this->is_parent_placement();
 	}
 
 	/**
@@ -702,33 +694,110 @@ abstract class Ad extends Data {
 	/* Additional Methods ------------------- */
 
 	/**
+	 * Prepare frontend output.
+	 *
+	 * @return string
+	 */
+	public function generate_html(): string {
+		$output = $this->prepare_frontend_output();
+
+		// Filter to manipulate the output before the wrapper is added.
+		if ( $output && ! $this->is_head_placement() ) {
+			$output = apply_filters( 'advanced-ads-output-inside-wrapper', $output, $this );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Get the wrapper attributes.
+	 *
+	 * @return array
+	 */
+	public function get_wrapper_attributes(): array {
+		// Early bail!!
+		if ( null !== $this->wrapper ) {
+			return $this->wrapper;
+		}
+
+		$attrs       = [];
+		$attrs['id'] = $this->create_wrapper_id();
+		if ( Str::is_non_empty( $this->get_wrapper_class() ) ) {
+			$classes = explode( ' ', $this->get_wrapper_class() );
+
+			foreach ( $classes as $_class ) {
+				$attrs['class'][] = sanitize_html_class( $_class );
+			}
+		}
+
+		if ( ! $this->is_head_placement() ) {
+			$position     = $this->get_position();
+			$use_position = false;
+
+			if ( $this->is_parent_placement() ) {
+				$classes = $this->get_prop( 'ad_args.output.class' );
+				if ( $classes && is_array( $classes ) ) {
+					$attrs['class'] = array_merge( (array) ( $attrs['class'] ?? [] ), $classes );
+				}
+
+				if ( $this->is_parent_placement() && 'default' !== $this->get_parent()->get_prop( 'placement_position' ) ) {
+					$use_position = true;
+					$position     = $this->get_parent()->get_prop( 'placement_position' );
+				}
+			}
+
+			$this->get_wrapper_styles( $attrs, $position, $use_position );
+		}
+
+		// Edit Bar tooltip.
+		if ( ! defined( 'ADVANCED_ADS_DISABLE_EDIT_BAR' ) && Conditional::user_can( 'advanced_ads_edit_ads' ) && $this->is_parent_placement() ) {
+			$attrs['data-title'][] = $this->get_tooltip_title();
+		}
+
+		// Health Tool highlight.
+		if ( Conditional::user_can( 'advanced_ads_edit_ads' ) && ! $this->is_parent_group() ) {
+			$attrs['class'][] = wp_advads()->get_frontend_prefix() . 'highlight-wrapper';
+		}
+
+		$attrs = apply_filters_deprecated(
+			'advanced-ads-output-wrapper-attributes',
+			[ $attrs, $this ],
+			'2.0.0',
+			'advanced-ads-wrapper-attributes-ad'
+		);
+
+		$this->wrapper = apply_filters( 'advanced-ads-wrapper-attributes-ad', $attrs, $this );
+
+		return $this->wrapper;
+	}
+
+	/**
 	 * Prepares the output for the group.
 	 *
 	 * @return string The prepared output.
 	 */
 	public function prepare_output(): string {
-		$ad_args = $this->get_prop( 'ad_args' ) ?? [];
-		$output  = $this->prepare_frontend_output();
+		$output = $this->generate_html();
 
 		// Don’t deliver anything, if main ad content is empty.
 		if ( empty( $output ) ) {
 			return '';
 		}
 
+		$ad_args        = $this->get_prop( 'ad_args' );
 		$output_options = $this->get_prop( 'output_options' ) ?? [];
 		$global_output  = $output_options['global_output'] ?? ! isset( $ad_args['global_output'] ) || $ad_args['global_output'];
+
 		$this->set_prop_temp( 'global_output', $global_output );
 
 		$output_options['global_output'] = $global_output;
 
 		if ( ! $this->is_head_placement() ) {
-			// Filter to manipulate the output before the wrapper is added.
-			$output = apply_filters( 'advanced-ads-output-inside-wrapper', $output, $this );
 			$output = $this->add_wrapper( $output, $global_output );
 
 			// Add a clearfix, if set.
 			if (
-				( $this->is_top_level() && ! empty( $ad_args['placement_clearfix'] ) )
+				( $this->is_parent_placement() && ! empty( $this->get_parent()->get_prop( 'placement_clearfix' ) ) )
 				|| $this->get_clearfix()
 			) {
 				$output .= '<br style="clear: both; display: block; float: none;"/>';
@@ -933,23 +1002,32 @@ abstract class Ad extends Data {
 	 * @return string $wrapper ad within the wrapper
 	 */
 	private function add_wrapper( $ad_content = '', $global_output = false ): string {
-		$ad_args         = $this->get_prop( 'ad_args' ) ?? [];
-		$label           = $this->get_label();
-		$wrapper         = $this->create_wrapper();
-		$wrapper_options = apply_filters( 'advanced-ads-output-wrapper-options', $wrapper, $this );
+		$ad_args = $this->get_prop( 'ad_args' );
+		$label   = $this->get_label();
+		$attrs   = $this->get_wrapper_attributes();
 
+		$attrs = apply_filters_deprecated(
+			'advanced-ads-output-wrapper-options',
+			[ $attrs, $this ],
+			'2.0.0',
+			'advanced-ads-wrapper-attributes-ad'
+		);
+
+		$attrs = apply_filters( 'advanced-ads-wrapper-attributes-ad', $attrs, $this );
 		// Create another wrapper so that the label does not reduce the height of the ad wrapper.
-		if ( $label && ! empty( $wrapper_options['style']['height'] ) ) {
-			$height = [ 'style' => [ 'height' => $wrapper_options['style']['height'] ] ];
-			unset( $wrapper_options['style']['height'] );
-			$ad_content = '<div' . Advanced_Ads_Utils::build_html_attributes( $height ) . '>' . $ad_content . '</div>';
+		if ( $label && ! empty( $attrs['style']['height'] ) ) {
+			$height_attrs = [ 'style' => [ 'height' => $attrs['style']['height'] ] ];
+			unset( $attrs['style']['height'] );
+			$ad_content = '<div' . Advanced_Ads_Utils::build_html_attributes( $height_attrs ) . '>' . $ad_content . '</div>';
 		}
 
 		// Adds inline css to the wrapper.
-		if ( ! empty( $ad_args['inline-css'] ) && $this->is_top_level() ) {
-			$wrapper_options = ( new Advanced_Ads_Inline_Css() )->add_css( $wrapper_options, $ad_args['inline-css'], $global_output );
+		if ( ! empty( $ad_args['inline-css'] ) && $this->is_parent_placement() ) {
+			$attrs = ( new Advanced_Ads_Inline_Css() )->add_css( $attrs, $ad_args['inline-css'], $global_output );
 		}
 
+		// Edit Bar logic.
+		$edit_bar = '';
 		if (
 			! defined( 'ADVANCED_ADS_DISABLE_EDIT_BAR' ) &&
 			Conditional::user_can( 'advanced_ads_edit_ads' ) &&
@@ -957,35 +1035,15 @@ abstract class Ad extends Data {
 		) {
 			ob_start();
 			include ADVADS_ABSPATH . 'public/views/ad-edit-bar.php';
-			$ad_content                      = trim( ob_get_clean() ) . $ad_content;
-			$wrapper_options['data-title'][] = $this->get_tooltip_title();
-		}
-
-		// Ad Health Tool add class and attribute in to ads and group.
-		if ( Conditional::user_can( 'advanced_ads_edit_ads' ) ) {
-			// Add the 'highlight-wrapper' class to the ad wrapper.
-			if ( ! $this->is_parent_group() ) {
-				$wrapper_options['class'][] = wp_advads()->get_frontend_prefix() . 'highlight-wrapper';
-			}
-		}
-
-		if (
-			Str::is_empty( $this->get_wrapper_id() ) &&
-			( [] === $wrapper_options || ! Arr::accessible( $wrapper_options ) )
-		) {
-			return $label . $ad_content;
-		}
-
-		// Create unique id if not yet given.
-		if ( empty( $wrapper_options['id'] ) ) {
-			$wrapper_options['id'] = $this->create_wrapper_id();
+			$edit_bar = trim( ob_get_clean() );
 		}
 
 		$wrapper_element = ! empty( $this->get_prop( 'inline_wrapper_element' ) ) ? 'span' : 'div';
 
 		// Build the box.
-		$wrapper  = '<' . $wrapper_element . Advanced_Ads_Utils::build_html_attributes( $wrapper_options ) . '>';
+		$wrapper  = '<' . $wrapper_element . Advanced_Ads_Utils::build_html_attributes( $attrs ) . '>';
 		$wrapper .= $label;
+		$wrapper .= $edit_bar;
 		$wrapper .= apply_filters( 'advanced-ads-output-wrapper-before-content', '', $this );
 		$wrapper .= $ad_content;
 		$wrapper .= apply_filters( 'advanced-ads-output-wrapper-after-content', '', $this );
@@ -997,50 +1055,14 @@ abstract class Ad extends Data {
 	/**
 	 * Creates a wrapper array for the group.
 	 *
+	 * @deprecated 2.0.0 use get_wrapper_attributes() instead.
+	 *
 	 * @return array
 	 */
 	public function create_wrapper(): array {
-		// Early bail!!
-		if ( null !== $this->wrapper ) {
-			return $this->wrapper;
-		}
+		_deprecated_function( __FUNCTION__, '2.0.0', 'get_wrapper_attributes' );
 
-		$this->wrapper = [];
-
-		if ( ! $this->is_head_placement() ) {
-			$position     = $this->get_position();
-			$use_position = false;
-
-			if ( $this->is_top_level() ) {
-				$classes = $this->get_prop( 'ad_args.output.class' );
-				if ( $classes && is_array( $classes ) ) {
-					$this->wrapper['class'] = $classes;
-				}
-
-				if ( $this->is_parent_placement() && 'default' !== $this->get_parent()->get_prop( 'placement_position' ) ) {
-					$use_position = true;
-					$position     = $this->get_parent()->get_prop( 'placement_position' );
-				}
-			}
-
-			$this->get_wrapper_styles( $this->wrapper, $position, $use_position );
-
-			// Add manual classes.
-			if ( Str::is_non_empty( $this->get_wrapper_class() ) ) {
-				$classes = explode( ' ', $this->get_wrapper_class() );
-
-				foreach ( $classes as $_class ) {
-					$this->wrapper['class'][] = sanitize_html_class( $_class );
-				}
-			}
-
-			$this->wrapper = apply_filters( 'advanced-ads-set-wrapper', $this->wrapper, $this );
-			if ( is_array( $this->wrapper ) && [] !== $this->wrapper && ! isset( $this->wrapper['id'] ) ) {
-				$this->wrapper['id'] = $this->create_wrapper_id();
-			}
-		}
-
-		return $this->wrapper;
+		return $this->get_wrapper_attributes();
 	}
 
 	/**
@@ -1054,7 +1076,7 @@ abstract class Ad extends Data {
 			$state   = $ad_args['ad_label'] ?? 'default';
 			$label   = Advanced_Ads::get_instance()->get_label( $this, $state );
 
-			$this->label = $this->is_top_level() && $label ? $label : '';
+			$this->label = $this->is_parent_placement() && $label ? $label : '';
 		}
 
 		return $this->label;
@@ -1134,65 +1156,6 @@ abstract class Ad extends Data {
 		}
 
 		return wp_advads()->get_frontend_prefix() . wp_rand();
-	}
-
-	/**
-	 * Sets the wrapper styles based on the given position.
-	 *
-	 * @param array  $wrapper  The wrapper array to store the styles.
-	 * @param string $position The position of the ad.
-	 * @param bool   $use_position Whether to use the position or not.
-	 *
-	 * @return void
-	 */
-	private function get_wrapper_styles( &$wrapper, $position, $use_position ): void {
-		// Always keep margin before handling position.
-		$margin = $this->get_margin();
-		foreach ( $margin as $key => $value ) {
-			if ( ! empty( $value ) ) {
-				$wrapper['style'][ 'margin-' . $key ] = $value . 'px';
-			}
-		}
-
-		switch ( $position ) {
-			case 'left':
-			case 'left_float':
-			case 'left_nofloat':
-				$wrapper['style']['float'] = 'left';
-				break;
-			case 'right':
-			case 'right_float':
-			case 'right_nofloat':
-				$wrapper['style']['float'] = 'right';
-				break;
-			case 'center':
-			case 'center_nofloat':
-			case 'center_float':
-				$wrapper['style']['margin-left']  = 'auto';
-				$wrapper['style']['margin-right'] = 'auto';
-
-				if ( empty( $this->get_width() ) || empty( $this->get_prop( 'add_wrapper_sizes' ) ) || $use_position ) {
-					$wrapper['style']['text-align'] = 'center';
-				}
-				break;
-			case 'clearfix':
-				$wrapper['style']['clear'] = 'both';
-				break;
-		}
-
-		if ( $this->is_space_reserved() ) {
-			if ( ! empty( $this->get_width() ) ) {
-				$wrapper['style']['width'] = $this->get_width() . 'px';
-			}
-
-			if ( ! empty( $this->get_height() ) ) {
-				$wrapper['style']['height'] = $this->get_height() . 'px';
-			}
-		}
-
-		if ( ! empty( $this->get_clearfix() ) ) {
-			$wrapper['style']['clear'] = 'both';
-		}
 	}
 
 	/**

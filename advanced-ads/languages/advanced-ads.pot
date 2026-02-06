@@ -1,15 +1,15 @@
-# Copyright (C) 2025 Advanced Ads
+# Copyright (C) 2026 Advanced Ads
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Advanced Ads 2.0.11\n"
+"Project-Id-Version: Advanced Ads 2.0.16\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/advanced-ads\n"
-"Last-Translator: Thomas Maier <post@webzunft.de>\n"
-"Language-Team: webgilde <support@wpadvancedads.com>\n"
+"Last-Translator: Shakeeb Ahmed <me@shakeebahmed.com>\n"
+"Language-Team: Advanced Ads <support@wpadvancedads.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-23T12:04:42+00:00\n"
+"POT-Creation-Date: 2026-02-03T16:26:10+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: advanced-ads\n"
@@ -390,17 +390,17 @@ msgid "License deactivated. Please try again later."
 msgstr ""
 
 #. translators: %s: is a URL.
-#: admin/includes/class-notices.php:464
+#: admin/includes/class-notices.php:467
 #, php-format
 msgid "You don’t seem to have an email address. Please use <a href=\"%s\" target=\"_blank\">this form</a> to sign up."
 msgstr ""
 
-#: admin/includes/class-notices.php:485
+#: admin/includes/class-notices.php:488
 msgid "How embarrassing. The email server seems to be down. Please try again later."
 msgstr ""
 
 #. translators: the first %s is an email address, the seconds %s is a URL.
-#: admin/includes/class-notices.php:493
+#: admin/includes/class-notices.php:496
 #, php-format
 msgid "Please check your email (%1$s) for the confirmation message. If you didn’t receive one or want to use another email address then please use <a href=\"%2$s\" target=\"_blank\">this form</a> to sign up."
 msgstr ""
@@ -481,26 +481,33 @@ msgstr ""
 
 #. translators: %1$s is the markup for the discount value, %2$s starts a button link, %3$s closes the button link.
 #: admin/includes/notices.php:92
+#: admin/includes/notices.php:104
 #, php-format
 msgid "Save %1$s on all products with our Black Friday / Cyber Monday offer! %2$sGet this deal%3$s"
 msgstr ""
 
 #. translators: %s: URL to the Advanced Ads onboarding wizard.
-#: admin/includes/notices.php:104
+#: admin/includes/notices.php:116
 #, php-format
 msgid "Quickly set up Advanced Ads and monetize your website with just a few clicks. <a class=\"button button-primary\" href=\"%s\">Launch the wizard</a>"
 msgstr ""
 
 #. translators: %1$s: URL to the plugin file, %2$s: URL to the guide
-#: admin/includes/notices.php:119
+#: admin/includes/notices.php:131
 #, php-format
 msgid "Your automatically deactivated version of <strong>%1$s needs to be updated manually</strong>. Please <a href=\"%2$s\" target=\"_blank\">download the newest plugin file</a> and follow our guide on <a href=\"%3$s\" target=\"_blank\">How to install an add-on</a>."
 msgstr ""
 
 #. translators: %1$s: URL to the plugin file, %2$s: URL to the guide
-#: admin/includes/notices.php:140
+#: admin/includes/notices.php:152
 #, php-format
 msgid "Your version of <strong>%1$s</strong> is incompatible with <strong>Advanced Ads %2$s</strong> and has been deactivated. Please update the plugin to the latest version."
+msgstr ""
+
+#. translators: %s: Plugin name
+#: admin/includes/notices.php:206
+#, php-format
+msgid "The <strong>%s</strong> plugin is active. Running it alongside <strong>Advanced Ads</strong> may lead to ad placement or display issues."
 msgstr ""
 
 #: admin/views/ad-conditions-string-operators.php:17
@@ -568,7 +575,7 @@ msgstr ""
 #: includes/admin/metaboxes/class-ad-layout.php:63
 #: includes/admin/metaboxes/class-ad-types.php:63
 #: includes/ads/types/type-plain.php:230
-#: includes/utilities/class-wordpress.php:432
+#: includes/utilities/class-wordpress.php:446
 #: modules/ads-txt/admin/views/setting-create.php:26
 #: modules/gadsense/admin/views/adsense-ad-parameters.php:142
 #: modules/privacy/admin/views/setting-general.php:43
@@ -605,15 +612,15 @@ msgstr ""
 msgid "is not"
 msgstr ""
 
-#: admin/views/conditions/conditions-form.php:10
+#: admin/views/conditions/conditions-form.php:20
 msgid "New condition"
 msgstr ""
 
-#: admin/views/conditions/conditions-form.php:15
+#: admin/views/conditions/conditions-form.php:25
 msgid "-- choose a condition --"
 msgstr ""
 
-#: admin/views/conditions/conditions-form.php:24
+#: admin/views/conditions/conditions-form.php:34
 msgid "Add-On features"
 msgstr ""
 
@@ -915,16 +922,16 @@ msgstr ""
 msgid "Create your first ad"
 msgstr ""
 
-#: admin/views/post-list-filter-dropdown.php:10
+#: admin/views/post-list-filter-dropdown.php:15
 msgid "All ad states"
 msgstr ""
 
-#: admin/views/post-list-filter-dropdown.php:13
+#: admin/views/post-list-filter-dropdown.php:18
 #: includes/admin/class-post-list.php:165
 msgid "All ads disabled"
 msgstr ""
 
-#: admin/views/post-list-filter-dropdown.php:20
+#: admin/views/post-list-filter-dropdown.php:25
 #: includes/admin/class-post-list.php:169
 msgid "Ads in content disabled"
 msgstr ""
@@ -1241,15 +1248,15 @@ msgid "Status"
 msgstr ""
 
 #: classes/display-conditions.php:734
-#: includes/abstracts/abstract-ad.php:836
-#: includes/admin/class-groups-list-table.php:362
+#: includes/abstracts/abstract-ad.php:905
+#: includes/admin/class-groups-list-table.php:259
 #: views/admin/placements/quick-edit.php:16
 #: views/admin/tables/ads/column-date.php:16
 msgid "Published"
 msgstr ""
 
 #: classes/display-conditions.php:736
-#: includes/admin/class-groups-list-table.php:362
+#: includes/admin/class-groups-list-table.php:259
 #: views/admin/tables/ads/column-date.php:18
 msgid "Last Modified"
 msgstr ""
@@ -1616,24 +1623,24 @@ msgid "Check this if you don’t want the following elements to float around the
 msgstr ""
 
 #. translators: %s is a date.
-#: includes/abstracts/abstract-ad.php:813
+#: includes/abstracts/abstract-ad.php:882
 #, php-format
 msgid "starts %s"
 msgstr ""
 
 #. translators: %s is a date.
-#: includes/abstracts/abstract-ad.php:825
+#: includes/abstracts/abstract-ad.php:894
 #, php-format
 msgid "expires %s"
 msgstr ""
 
 #. translators: %s is a date.
-#: includes/abstracts/abstract-ad.php:831
+#: includes/abstracts/abstract-ad.php:900
 #, php-format
 msgid "expired %s"
 msgstr ""
 
-#: includes/abstracts/abstract-ad.php:837
+#: includes/abstracts/abstract-ad.php:906
 #: includes/admin/class-placement-quick-edit.php:48
 #: views/admin/placements/edit-modal/fields/status.php:13
 #: views/admin/placements/quick-edit.php:17
@@ -1641,12 +1648,12 @@ msgstr ""
 msgid "Draft"
 msgstr ""
 
-#: includes/abstracts/abstract-ad.php:838
+#: includes/abstracts/abstract-ad.php:907
 msgid "Trashed"
 msgstr ""
 
 #. translators: %1$s is a placement name, %2$s is the ads name.
-#: includes/abstracts/abstract-ad.php:1211
+#: includes/abstracts/abstract-ad.php:1174
 #, php-format
 msgid "Placement name: %1$s; Ads: %2$s"
 msgstr ""
@@ -1655,19 +1662,19 @@ msgstr ""
 msgid "Showing search results for"
 msgstr ""
 
-#: includes/abstracts/abstract-group.php:470
+#: includes/abstracts/abstract-group.php:546
 #: includes/admin/class-addon-box.php:732
 msgid "Get this add-on"
 msgstr ""
 
-#: includes/abstracts/abstract-group.php:473
+#: includes/abstracts/abstract-group.php:549
 #: includes/admin/class-addon-box.php:449
 #: includes/admin/class-addon-box.php:671
 msgid "Activate now"
 msgstr ""
 
 #. translators: %1$s is an URL, %2$s is a URL text
-#: includes/abstracts/abstract-group.php:479
+#: includes/abstracts/abstract-group.php:555
 #, php-format
 msgid "It seems that a caching plugin is activated. Your ads might not rotate properly. The cache busting in Advanced Ads Pro will solve that. <a href=\"%1$s\" target=\"_blank\">%2$s.</a>"
 msgstr ""
@@ -1681,7 +1688,7 @@ msgid "Ad Groups"
 msgstr ""
 
 #: includes/abstracts/abstract-placement-type.php:67
-#: includes/admin/class-groups-list-table.php:193
+#: includes/admin/class-groups-list-table.php:137
 #: includes/admin/pages/class-ads.php:46
 #: includes/admin/pages/class-ads.php:47
 #: includes/class-entities.php:44
@@ -1697,7 +1704,7 @@ msgid "draft"
 msgstr ""
 
 #. translators: 1: Entity type 2: Item type 3: Placement title
-#: includes/abstracts/abstract-placement.php:291
+#: includes/abstracts/abstract-placement.php:314
 #, php-format
 msgid "%1$s type \"%2$s\" not allowed for placement type \"%3$s\""
 msgstr ""
@@ -1720,7 +1727,7 @@ msgid "Thank the developer with a &#9733;&#9733;&#9733;&#9733;&#9733; review on 
 msgstr ""
 
 #: includes/admin/class-ad-list-table.php:77
-#: includes/admin/class-groups-list-table.php:190
+#: includes/admin/class-groups-list-table.php:134
 #: includes/admin/class-placement-list-table.php:84
 #: modules/gadsense/admin/views/adsense-ad-parameters.php:127
 #: views/admin/tables/groups/edit-form-modal.php:78
@@ -1755,7 +1762,7 @@ msgid "AdSense ID"
 msgstr ""
 
 #: includes/admin/class-ad-list-table.php:87
-#: includes/admin/class-groups-list-table.php:194
+#: includes/admin/class-groups-list-table.php:138
 msgid "Date"
 msgstr ""
 
@@ -1993,7 +2000,7 @@ msgid "How to download, install, and activate an add-on"
 msgstr ""
 
 #. Translators: 1: add-on name 2: admin URL to license page
-#: includes/admin/class-addon-updater.php:132
+#: includes/admin/class-addon-updater.php:136
 #, php-format
 msgid "There might be a new version of %1$s. Please <strong>provide a valid license key</strong> in order to receive updates and support <a href=\"%2$s\">on this page</a>."
 msgstr ""
@@ -2017,9 +2024,17 @@ msgstr ""
 #. translators: %s is a URL.
 #: includes/admin/class-ajax.php:125
 #: includes/admin/class-ajax.php:278
-#: includes/admin/class-ajax.php:602
+#: includes/admin/class-ajax.php:609
 #, php-format
 msgid "An error occurred. Please use <a href=\"%s\" target=\"_blank\">this form</a> to sign up."
+msgstr ""
+
+#: includes/admin/class-ajax.php:308
+msgid "The method is not allowed to render."
+msgstr ""
+
+#: includes/admin/class-ajax.php:962
+msgid "Not Authorized"
 msgstr ""
 
 #: includes/admin/class-assets.php:132
@@ -2078,7 +2093,7 @@ msgid "Permanently delete this placement?"
 msgstr ""
 
 #: includes/admin/class-assets.php:148
-#: includes/admin/class-groups-list-table.php:453
+#: includes/admin/class-groups-list-table.php:358
 #: includes/admin/class-placement-list-table.php:364
 #: modules/one-click/admin/class-admin.php:55
 msgid "Close"
@@ -2164,28 +2179,28 @@ msgstr ""
 msgid "Error"
 msgstr ""
 
-#: includes/admin/class-groups-list-table.php:180
+#: includes/admin/class-groups-list-table.php:124
 #: includes/class-entities.php:201
 msgid "No Ad Group found"
 msgstr ""
 
-#: includes/admin/class-groups-list-table.php:191
+#: includes/admin/class-groups-list-table.php:135
 msgctxt "term name"
 msgid "Name"
 msgstr ""
 
-#: includes/admin/class-groups-list-table.php:192
+#: includes/admin/class-groups-list-table.php:136
 msgid "Details"
 msgstr ""
 
 #. translators: %s is the group type string
-#: includes/admin/class-groups-list-table.php:288
+#: includes/admin/class-groups-list-table.php:185
 #, php-format
 msgid "The originally selected group type “%s” is not enabled."
 msgstr ""
 
-#: includes/admin/class-groups-list-table.php:388
-#: includes/admin/class-groups-list-table.php:430
+#: includes/admin/class-groups-list-table.php:285
+#: includes/admin/class-groups-list-table.php:335
 #: includes/class-entities.php:48
 #: includes/class-entities.php:128
 #: includes/importers/class-xml-importer.php:340
@@ -2193,16 +2208,16 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: includes/admin/class-groups-list-table.php:396
+#: includes/admin/class-groups-list-table.php:293
 #: includes/admin/class-placement-list-table.php:204
 msgid "Show Usage"
 msgstr ""
 
-#: includes/admin/class-groups-list-table.php:406
+#: includes/admin/class-groups-list-table.php:310
 msgid "Delete"
 msgstr ""
 
-#: includes/admin/class-groups-list-table.php:451
+#: includes/admin/class-groups-list-table.php:356
 #: includes/admin/class-placement-list-table.php:362
 #: includes/admin/metaboxes/class-ad-usage.php:43
 msgid "Usage"
@@ -3478,7 +3493,7 @@ msgstr ""
 #. translators: 1: counts 2: Importer title
 #: includes/importers/class-ad-inserter.php:117
 #: includes/importers/class-api-ads.php:212
-#: includes/importers/class-google-sheet.php:281
+#: includes/importers/class-google-sheet.php:280
 #: includes/importers/class-wp-quads.php:151
 #, php-format
 msgid "%1$d ads migrated from %2$s"
@@ -3950,7 +3965,7 @@ msgid "custom"
 msgstr ""
 
 #. translators: %1$s is the opening link tag, %2$s is closing link tag
-#: includes/utilities/class-wordpress.php:399
+#: includes/utilities/class-wordpress.php:413
 #, php-format
 msgid "This feature is deprecated. Please find the removal schedule %1$shere%2$s"
 msgstr ""
@@ -4416,7 +4431,7 @@ msgstr ""
 msgid "Clearfix"
 msgstr ""
 
-#: modules/gadsense/admin/views/adsense-ad-parameters.php:191
+#: modules/gadsense/admin/views/adsense-ad-parameters.php:192
 msgid "Enable this if responsive ads cover something on your site."
 msgstr ""
 
@@ -5813,7 +5828,7 @@ msgstr ""
 msgid "Number of ads that are visible at the same time"
 msgstr ""
 
-#: views/admin/tables/groups/filters.php:30
+#: views/admin/tables/groups/filters.php:29
 msgid "all group types"
 msgstr ""
 

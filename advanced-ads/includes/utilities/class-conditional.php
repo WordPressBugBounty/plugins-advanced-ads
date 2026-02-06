@@ -120,6 +120,21 @@ class Conditional {
 	}
 
 	/**
+	 * Is entity allowed
+	 *
+	 * @param string $entity Entity to check.
+	 *
+	 * @return boolean
+	 */
+	public static function is_entity_allowed( $entity ): bool {
+		if ( empty( $entity ) || ! in_array( $entity, [ 'ad', 'group', 'placement' ], true ) ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Check if ads are disabled.
 	 *
 	 * @return bool

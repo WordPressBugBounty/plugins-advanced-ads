@@ -99,6 +99,10 @@ class Addon_Updater implements Integration_Interface {
 
 		$add_ons = Data::get_addons();
 		foreach ( $add_ons as $_add_on ) {
+			if ( 'slider-ads' === $_add_on['id'] ) {
+				continue;
+			}
+
 			if ( $this->manager->get_license_status( $_add_on['options_slug'] ) !== 'valid' ) {
 				$plugin_file = plugin_basename( $_add_on['path'] );
 				add_action( 'after_plugin_row_' . $plugin_file, [ $this, 'add_plugin_list_license_notice' ], 10, 2 );
@@ -145,7 +149,7 @@ class Addon_Updater implements Integration_Interface {
 	public function add_license_fields(): void {
 		$add_ons = Data::get_addons();
 		foreach ( $add_ons as $data ) {
-			if ( 'responsive' === $data['id'] ) {
+			if ( 'responsive' === $data['id'] || 'slider-ads' === $data['id'] ) {
 				continue;
 			}
 

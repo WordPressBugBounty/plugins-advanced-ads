@@ -357,14 +357,14 @@ class Advanced_Ads_Admin_Notices {
 			return;
 		}
 
-		// register Black Friday 2023 deals.
-		if ( time() > 1700654400 &&
-			time() <= 1701172800 && Conditional::is_screen_advanced_ads() ) {
+		// register Black Friday 2025 deals.
+		if ( time() > 1764025200 &&
+			time() <= 1764630000 ) {
 			$options = $this->options();
 			$closed  = isset( $options['closed'] ) ? $options['closed'] : [];
 
-			if ( ! isset( $closed['bfcm23'] ) ) {
-				$this->notices[] = 'bfcm23';
+			if ( ! isset( $closed['bfcm25'] ) ) {
+				$this->notices[] = 'bfcm25';
 			}
 		}
 
@@ -373,6 +373,9 @@ class Advanced_Ads_Admin_Notices {
 		}
 
 		include_once ADVADS_ABSPATH . '/admin/includes/notices.php';
+
+		// Register Conflict Plugins notice
+		$this->register_plugin_conflict_notices($plugin_conflicts);
 
 		// Iterate through notices.
 		$count = 0;
@@ -554,4 +557,34 @@ class Advanced_Ads_Admin_Notices {
 		$text   = $notice['text'];
 		include ADVADS_ABSPATH . '/admin/views/notices/inline.php';
 	}
+
+
+
+	/**
+	 * Register plugin conflict notices already defined in notices.php
+	 */
+	public function register_plugin_conflict_notices($plugin_conflicts) {
+
+		// Early Bail !
+		if (empty($plugin_conflicts)) {
+			return;
+		}
+
+		$options = $this->options();
+		$queue   = $options['queue'] ?? [];
+		$closed  = $options['closed'] ?? [];
+
+
+		foreach($plugin_conflicts as $slug => $name){
+			$noticeId = str_replace(' ', '_', strtolower($name));
+			$notice_id = sanitize_title( $noticeId ) . '_active';
+			if ( ! is_plugin_active( $slug ) ) {
+				continue;
+			}
+			if ( ! in_array( $notice_id, $queue, true ) && ! isset( $closed[ $notice_id ] ) ) {
+				$this->notices[] = $notice_id;
+			}
+		}
+	}
+
 }

@@ -2,8 +2,13 @@
 /**
  * Filter for the ad visibility on post and page list pages.
  *
- * @var string $viewability selected ad viewability by which posts are filtered.
+ * @since   2.0
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ *
+ * @var string $viewability Selected ad viewability by which posts are filtered.
  */
+
 ?>
 <select name="ad-viewability">
 	<option value="">

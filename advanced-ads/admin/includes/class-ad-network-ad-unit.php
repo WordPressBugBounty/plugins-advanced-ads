@@ -62,6 +62,13 @@ class Advanced_Ads_Ad_Network_Ad_Unit {
 	public $active;
 
 	/**
+	 * The ad code (e.g. AdSense ad code)
+	 *
+	 * @var string
+	 */
+	public $code;
+
+	/**
 	 * Advanced_Ads_Ad_Network_Ad_Unit constructor.
 	 *
 	 * @param string $raw raw ad data.

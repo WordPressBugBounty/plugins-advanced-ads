@@ -186,8 +186,9 @@ if ( $pub_id_errors ) : ?>
 	<div class="clearfix-before" <?php if ( ! $is_responsive ) {
 		echo 'style="display: none;"';
 	} ?>>
-		<input type="checkbox" name="advanced_ad[output][clearfix_before]" value="1" <?php checked( ! empty( $options['output']['clearfix_before'] ), true ); ?> />
-		<p class="description">
+		<input type="hidden" name="advanced_ad[output][clearfix_before]" value="0" />
+		<input type="checkbox" name="advanced_ad[output][clearfix_before]" value="1" <?php checked( ! empty( $options['clearfix_before'] ), true ); ?> />
+		<p class="description inline">
 			<?php _e( 'Enable this if responsive ads cover something on your site.', 'advanced-ads' ); ?>
 		</p>
 	</div>

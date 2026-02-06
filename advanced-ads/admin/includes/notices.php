@@ -96,6 +96,18 @@ $advanced_ads_admin_notices = [
 		),
 		'global' => true,
 	],
+	// Black Friday 2025 promotion.
+	'bfcm25'          => [
+		'type'   => NOTICE_TYPES['promo'],
+		'text'   => sprintf(
+		/* translators: %1$s is the markup for the discount value, %2$s starts a button link, %3$s closes the button link. */
+			__( 'Save %1$s on all products with our Black Friday / Cyber Monday offer! %2$sGet this deal%3$s', 'advanced-ads' ),
+			'<span style="font-weight: bold; font-size: 1.6em; vertical-align: sub;">30%</span>',
+			'<a class="button button-primary" target="_blank" href="https://wpadvancedads.com/pricing/?utm_source=advanced-ads&utm_medium=link&utm_campaign=bfcm-2025">',
+			'</a>'
+		),
+		'global' => true,
+	],
 	'monetize_wizard' => [
 		'type' => NOTICE_TYPES['info'],
 		'text' => sprintf(
@@ -127,7 +139,7 @@ foreach ( \AdvancedAds\Constants::ADDONS_NON_COMPATIBLE_VERSIONS as $version => 
 				),
 				$manual_addons[ $addon ]['title'],
 				$manual_addons[ $addon ]['zip'],
-				$manual_addons[ $addon ]['link'],
+				$manual_addons[ $addon ]['link']
 			),
 			'global' => true,
 		];
@@ -143,7 +155,56 @@ foreach ( \AdvancedAds\Constants::ADDONS_NON_COMPATIBLE_VERSIONS as $version => 
 					]
 				),
 				ucwords( str_replace( '-', ' ', $addon ) ),
-				ADVADS_VERSION,
+				ADVADS_VERSION
+			),
+			'global' => true,
+		];
+	}
+}
+
+// List of plugins that handle ads and may conflict with Advanced Ads
+$plugin_conflicts = [
+	// Ad management / insertion plugins
+	'ad-inserter/ad-inserter.php'                          	=> 'Ad Inserter',
+	'adsanity/adsanity.php'                                	=> 'AdSanity',
+	'wp-quads/wpquads.php'                                 	=> 'WP QUADS',
+	'quick-adsense-reloaded/quick-adsense-reloaded.php'    	=> 'Quick AdSense Reloaded',
+	'simple-ads-manager/simple-ads-manager.php'            	=> 'Simple Ads Manager',
+	'adrotate/adrotate.php'                                	=> 'AdRotate',
+	'adrotate-pro/adrotate-pro.php'                        	=> 'AdRotate Pro',
+	'wp-insert/wp-insert.php'                              	=> 'WP Insert',
+	'insert-post-ads/insert-post-ads.php'                  	=> 'Insert Post Ads',
+
+	// AdSense specific plugins
+	'adsense-plugin/adsense-plugin.php'                    	=> 'AdSense Plugin',
+	'google-adsense/google-adsense.php'                    	=> 'Google AdSense',
+	'adsense-made-easy/adsense-made-easy.php'              	=> 'AdSense Made Easy',
+
+	// Auto ads / monetization plugins
+	'monetag/monetag.php'                                  	=> 'Monetag',
+	'media-net-ads/media-net-ads.php'                      	=> 'Media.net Ads',
+	'ezoic/ezoic.php'                                      	=> 'Ezoic',
+	'mediavine-control-panel/mediavine.php'                	=> 'Mediavine',
+];
+
+
+// Loop through conflict plugins
+foreach ( $plugin_conflicts as $slug => $name ) {
+
+	// Check if plugin is active
+	if ( is_plugin_active( $slug ) ) {
+
+		// Generate unique notice ID
+		$noticeId  = str_replace( ' ', '_', strtolower( $name ) );
+		$notice_id = sanitize_title( $noticeId ) . '_active';
+
+		// Register admin notice
+		$advanced_ads_admin_notices[ $notice_id ] = [
+			'type'   => NOTICE_TYPES['error'],
+			'text'   => sprintf(
+				/* translators: %s: Plugin name */
+				__( 'The <strong>%s</strong> plugin is active. Running it alongside <strong>Advanced Ads</strong> may lead to ad placement or display issues.', 'advanced-ads' ),
+				esc_html( $name )
 			),
 			'global' => true,
 		];

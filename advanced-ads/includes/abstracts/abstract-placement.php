@@ -13,6 +13,7 @@ use RuntimeException;
 use AdvancedAds\Traits;
 use AdvancedAds\Constants;
 use AdvancedAds\Frontend\Stats;
+use AdvancedAds\Interfaces\Entity_Interface;
 use AdvancedAds\Framework\Utilities\Formatting;
 
 defined( 'ABSPATH' ) || exit;
@@ -20,7 +21,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Placement.
  */
-class Placement extends Data {
+class Placement extends Data implements Entity_Interface {
 
 	use Traits\Entity;
 	use Traits\Wrapper;
@@ -204,25 +205,42 @@ class Placement extends Data {
 	/* Additional Methods ------------------- */
 
 	/**
-	 * Prepares the output for the placement.
+	 * Prepare frontend output.
 	 *
-	 * @return mixed The prepared output or the overridden return value.
+	 * @return string
 	 */
-	public function prepare_output(): string {
-		// Early bail!!
-		if ( empty( $this->get_item_object() ) || Constants::ENTITY_PLACEMENT === $this->get_item_type() || 'publish' !== $this->get_status() ) {
-			return '';
+	public function generate_html(): string {
+		$item_type = $this->get_item_type();
+		$ad_args   = $this->get_prop( 'ad_args' );
+
+		// Move override logic from prepare_output.
+		$method            = Constants::ENTITY_AD === $item_type ? 'ad' : 'group';
+		$args              = wp_advads_default_entity_arguments( $method, $this->item_object->get_id(), $ad_args );
+		$overridden_entity = Constants::ENTITY_AD === $item_type
+			? apply_filters( 'advanced-ads-ad-select-override-by-ad', false, $this->item_object, $args )
+			: apply_filters( 'advanced-ads-ad-select-override-by-group', false, $this->item_object, $this->item_object->get_ordered_ad_ids(), $args );
+
+		if ( false !== $overridden_entity ) {
+			return $overridden_entity;
 		}
 
-		$prefix    = wp_advads()->get_frontend_prefix();
-		$ad_args   = $this->get_prop( 'ad_args' );
-		$item_type = $this->get_item_type();
+		return $this->item_object->can_display() ? $this->item_object->output() : '';
+	}
 
-		// Inject options.
-		$this->item_object->set_prop_temp( 'ad_args', $ad_args );
+	/**
+	 * Get the wrapper attributes.
+	 *
+	 * @return array
+	 */
+	public function get_wrapper_attributes(): array {
+		$prefix  = wp_advads()->get_frontend_prefix();
+		$ad_args = $this->get_prop( 'ad_args' );
 
 		if ( ! $this->is_type( 'header' ) ) {
 			$class = $ad_args['output']['class'] ?? [];
+			if ( ! is_array( $class ) ) {
+				$class = explode( ' ', $class );
+			}
 
 			if ( ! in_array( $prefix . $this->get_slug(), $class, true ) ) {
 				$class[] = $prefix . $this->get_slug();
@@ -235,21 +253,26 @@ class Placement extends Data {
 		// Create placement id for various features like ajax ads.
 		$ad_args['output']['placement_id'] = $this->get_id();
 
-		// Inject options.
-		$this->item_object->set_prop_temp( 'ad_args', $ad_args );
-		$this->item_object->set_parent( $this );
+		return $ad_args;
+	}
 
-		$method            = Constants::ENTITY_AD === $item_type ? 'ad' : 'group';
-		$args              = wp_advads_default_entity_arguments( $method, $this->item_object->get_id(), $ad_args );
-		$overridden_entity = Constants::ENTITY_AD === $item_type
-			? apply_filters( 'advanced-ads-ad-select-override-by-ad', false, $this->item_object, $args )
-			: apply_filters( 'advanced-ads-ad-select-override-by-group', false, $this->item_object, $this->item_object->get_ordered_ad_ids(), $args );
-
-		if ( false !== $overridden_entity ) {
-			return $overridden_entity;
+	/**
+	 * Prepares the output for the placement.
+	 *
+	 * @return mixed The prepared output or the overridden return value.
+	 */
+	public function prepare_output(): string {
+		// Early bail!!
+		if ( empty( $this->get_item_object() ) || Constants::ENTITY_PLACEMENT === $this->get_item_type() || 'publish' !== $this->get_status() ) {
+			return '';
 		}
 
-		$output = $this->item_object->can_display() ? $this->item_object->output() : '';
+		// Inject options.
+		$attrs = $this->get_wrapper_attributes();
+		$this->set_prop_temp( 'ad_args', $attrs );
+		$this->item_object->set_prop_temp( 'ad_args', $attrs );
+
+		$output = $this->generate_html();
 
 		// Maintain Stats.
 		if ( $output ) {
@@ -332,7 +355,7 @@ class Placement extends Data {
 		global $sitepress;
 
 		// Early bail!!
-		if ( empty( $this->get_item() ) ) {
+		if ( empty( $this->get_item() ) || null !== $this->item_object ) {
 			return $this->item_object;
 		}
 

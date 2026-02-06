@@ -104,3 +104,16 @@ function get_user_ip_address() {
 	// phpcs:enable
 	return false;
 }
+
+/**
+ * Returns an empty array if the value is null.
+ *
+ * @param mixed $value The value to check.
+ *
+ * @return array
+ */
+if ( ! function_exists( '__return_array_if_null' ) ) {
+	function __return_array_if_null( $value ): array {
+		return $value ?? [];
+	}
+}

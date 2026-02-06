@@ -120,16 +120,19 @@ class Ad_Repository {
 		// Only update the post when the post data changes.
 		if ( array_intersect( [ 'title', 'status', 'content' ], array_keys( $changes ) ) ) {
 			$is_text_ad = $ad->is_type( [ 'plain', 'content' ] );
-			$post_data  = [
+			$content    = apply_filters(
+				'advanced-ads-pre-ad-save-' . $ad->get_type(),
+				$is_text_ad
+					? wp_unslash( $ad->get_content( 'edit' ) )
+					: apply_filters( 'content_save_pre', wp_unslash( $ad->get_content( 'edit' ) ) )
+			);
+
+			$content   = preg_replace( '/(?<!\\\\)\/\[([^\]\/]+)(?=\/)/', '/\\[$1', $content );
+			$post_data = [
 				'post_title'   => $ad->get_title( 'edit' ),
 				'post_status'  => $ad->get_status( 'edit' ) ? $ad->get_status( 'edit' ) : 'publish',
 				'post_type'    => Constants::POST_TYPE_AD,
-				'post_content' => apply_filters(
-					'advanced-ads-pre-ad-save-' . $ad->get_type(),
-					$is_text_ad
-						? wp_unslash( $ad->get_content( 'edit' ) )
-						: apply_filters( 'content_save_pre', wp_unslash( $ad->get_content( 'edit' ) ) )
-				),
+				'post_content' => $content,
 			];
 
 			/**
@@ -395,6 +398,7 @@ class Ad_Repository {
 					break;
 				case 'display_conditions':
 				case 'visitor_conditions':
+				case 'visitors':
 					$value = WordPress::sanitize_conditions( $value );
 					if (
 						'editpost' === Params::post( 'originalaction' ) &&

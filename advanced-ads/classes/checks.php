@@ -94,6 +94,10 @@ class Advanced_Ads_Checks {
 		}
 
 		foreach ( $add_ons as $_add_on_key => $_add_on ) {
+			if ( 'responsive' === $_add_on['id'] || 'slider-ads' === $_add_on['id'] ) {
+				continue;
+			}
+
 			$status = Advanced_Ads_Admin_Licenses::get_instance()->get_license_status( $_add_on['options_slug'] );
 
 			// check expiry date.

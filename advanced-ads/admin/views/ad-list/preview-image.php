@@ -2,11 +2,15 @@
 /**
  * Render preview information for the image ad type
  *
- * @var string $src              image source URL.
- * @var string $alt              alt attribute value.
- * @var string $preview_hwstring width and height information for the smaller preview icon.
- * @var string $tooltip_hwstring width and height information for the larger version in the tooltip.
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ *
+ * @var string $src              Image source URL.
+ * @var string $alt              Alt attribute value.
+ * @var string $preview_hwstring Width and height information for the smaller preview icon.
+ * @var string $tooltip_hwstring Width and height information for the larger version in the tooltip.
  */
+
 ?>
 <span class="advads-ad-list-tooltip">
 	<span class="advads-ad-list-tooltip-content">

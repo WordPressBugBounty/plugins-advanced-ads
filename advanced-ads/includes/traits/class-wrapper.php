@@ -37,7 +37,7 @@ trait Wrapper {
 	 * @return string
 	 */
 	public function get_wrapper_class( $context = 'view' ): string {
-		return $this->get_prop( 'wrapper-class', $context );
+		return (string) $this->get_prop( 'wrapper-class', $context );
 	}
 
 	/**
@@ -77,17 +77,70 @@ trait Wrapper {
 		return "<{$tag} {$attrs}>{$content}</{$tag}>";
 	}
 
+
 	/**
-	 * Get the wrapper attributes.
+	 * Sets the wrapper styles based on the given position.
 	 *
-	 * @return array
+	 * @param array  $wrapper      The wrapper array to store the styles.
+	 * @param string $position     The position of the ad.
+	 * @param bool   $use_position Whether to use the position or not.
+	 *
+	 * @return void
 	 */
-	public function get_wrapper_attributes(): array {
-		$attrs = [];
+	protected function get_wrapper_styles( &$wrapper, $position, $use_position = false ): void {
+		// Always keep margin before handling position (Specific to Ads).
+		if ( method_exists( $this, 'get_margin' ) ) {
+			$margin = $this->get_margin();
+			foreach ( $margin as $key => $value ) {
+				if ( ! empty( $value ) ) {
+					$wrapper['style'][ 'margin-' . $key ] = $value . 'px';
+				}
+			}
+		}
 
-		$attrs['id']    = $this->get_wrapper_id();
-		$attrs['class'] = $this->get_wrapper_class();
+		switch ( $position ) {
+			case 'left':
+			case 'left_float':
+			case 'left_nofloat':
+				$wrapper['style']['float'] = 'left';
+				break;
+			case 'right':
+			case 'right_float':
+			case 'right_nofloat':
+				$wrapper['style']['float'] = 'right';
+				break;
+			case 'center':
+			case 'center_nofloat':
+			case 'center_float':
+				if ( method_exists( $this, 'get_margin' ) ) {
+					$wrapper['style']['margin-left']  = 'auto';
+					$wrapper['style']['margin-right'] = 'auto';
+				}
 
-		return $attrs;
+				$width             = method_exists( $this, 'get_width' ) ? $this->get_width() : 0;
+				$add_wrapper_sizes = method_exists( $this, 'get_prop' ) ? $this->get_prop( 'add_wrapper_sizes' ) : false;
+
+				if ( empty( $width ) || empty( $add_wrapper_sizes ) || $use_position ) {
+					$wrapper['style']['text-align'] = 'center';
+				}
+				break;
+			case 'clearfix':
+				$wrapper['style']['clear'] = 'both';
+				break;
+		}
+
+		if ( method_exists( $this, 'is_space_reserved' ) && $this->is_space_reserved() ) {
+			if ( method_exists( $this, 'get_width' ) && ! empty( $this->get_width() ) ) {
+				$wrapper['style']['width'] = $this->get_width() . 'px';
+			}
+
+			if ( method_exists( $this, 'get_height' ) && ! empty( $this->get_height() ) ) {
+				$wrapper['style']['height'] = $this->get_height() . 'px';
+			}
+		}
+
+		if ( method_exists( $this, 'get_clearfix' ) && ! empty( $this->get_clearfix() ) ) {
+			$wrapper['style']['clear'] = 'both';
+		}
 	}
 }

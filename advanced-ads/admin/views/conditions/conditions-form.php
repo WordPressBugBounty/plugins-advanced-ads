@@ -1,3 +1,13 @@
+<?php
+/**
+ * Render the conditions form
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ */
+
+?>
+
 <fieldset data-condition-list-target="<?php echo esc_attr( $list_target ); ?>"
 		data-condition-form-name="<?php echo esc_attr( $form_name ); ?>"
 		data-condition-action="<?php echo esc_attr( $action ); ?>"

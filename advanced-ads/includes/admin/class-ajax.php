@@ -297,9 +297,16 @@ class AJAX implements Integration_Interface {
 	 */
 	private function select_one( $request ) {
 		$method = (string) $request['ad_method'] ?? null;
-
 		if ( 'id' === $method ) {
 			$method = 'ad';
+		}
+
+		// Early bail!!
+		if ( ! Conditional::is_entity_allowed( $method ) ) {
+			return [
+				'status'  => 'error',
+				'message' => __( 'The method is not allowed to render.', 'advanced-ads' ),
+			];
 		}
 
 		$function  = "get_the_$method";
@@ -947,6 +954,17 @@ class AJAX implements Integration_Interface {
 	 * @return void
 	 */
 	public function placement_update_item(): void {
+		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
+
+		if ( ! Conditional::user_can( 'advanced_ads_manage_placements' ) ) {
+			wp_send_json_error(
+				[
+					'message' => __( 'Not Authorized', 'advanced-ads' ),
+				],
+				403
+			);
+		}
+
 		$placement     = wp_advads_get_placement( Params::post( 'placement_id', false, FILTER_VALIDATE_INT ) );
 		$new_item      = sanitize_text_field( Params::post( 'item_id' ) );
 		$new_item_type = 0 === strpos( $new_item, 'ad' ) ? 'ad_' : 'group_';

@@ -41,7 +41,7 @@ class Ad_Group extends Ad implements Ad_Interface {
 		}
 
 		// Disable the ad label for the ad group wrapper itself to avoid duplicate labels.
-		$ad_args             = $this->get_prop( 'ad_args' ) ?? [];
+		$ad_args             = $this->get_prop( 'ad_args' );
 		$ad_args['ad_label'] = 'disabled';
 
 		return get_the_group( $this->get_group_id(), '', $ad_args );
