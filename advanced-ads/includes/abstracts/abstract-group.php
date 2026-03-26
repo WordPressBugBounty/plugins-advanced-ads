@@ -160,7 +160,29 @@ class Group extends Data implements Entity_Interface {
 	 * @return array
 	 */
 	public function get_ad_weights( $context = 'view' ): array {
-		return $this->get_prop( 'ad_weights', $context );
+		global $sitepress;
+
+		$weights = $this->get_prop( 'ad_weights', $context );
+
+		if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
+			foreach ( $weights as $ad_id => $weight ) {
+				/**
+				 * Deliver the translated version of an ad if set up with WPML.
+				 * If an ad is not translated, show the ad in the original language when this is the selected option in the WPML settings.
+				 *
+				 * @source https://wpml.org/wpml-hook/wpml_object_id/
+				 * @source https://wpml.org/forums/topic/backend-custom-post-types-page-overview-with-translation-options/
+				 */
+				$translated_ad_id = apply_filters( 'wpml_object_id', $ad_id, 'advanced_ads', $sitepress->is_display_as_translated_post_type( 'advanced_ads' ) );
+
+				if ( $translated_ad_id !== $ad_id ) {
+					$weights[ $translated_ad_id ] = $weight;
+					unset( $weights[ $ad_id ] );
+				}
+			}
+		}
+
+		return $weights;
 	}
 
 	/**

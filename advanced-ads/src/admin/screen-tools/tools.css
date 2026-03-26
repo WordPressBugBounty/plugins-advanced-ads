@@ -1,0 +1,11 @@
+@import "../partials/tailwind.css";
+
+@source "../../../views/admin/tools/";
+
+@import "../partials/header-tabs.css";
+@import "../partials/tabs.css";
+@import "./tab-status.css";
+
+.advads-subpage-title {
+	@apply text-lg font-semibold leading-none mb-4;
+}

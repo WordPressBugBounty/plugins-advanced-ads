@@ -38,7 +38,6 @@ class AJAX implements Integration_Interface {
 	 * @return void
 	 */
 	public function hooks(): void {
-		add_action( 'delete_post', [ $this, 'delete_ad' ] );
 		add_action( 'wp_ajax_advads_ad_select', [ $this, 'ad_select' ] );
 		add_action( 'wp_ajax_nopriv_advads_ad_select', [ $this, 'ad_select' ] );
 		add_action( 'wp_ajax_advads-ad-health-notice-push', [ $this, 'ad_health_notice_push' ] );
@@ -70,34 +69,6 @@ class AJAX implements Integration_Interface {
 		add_action( 'wp_ajax_advads-ad-health-notice-solved', [ $this, 'ad_health_notice_solved' ] );
 		add_action( 'wp_ajax_advads-update-frontend-element', [ $this, 'update_frontend_element' ] );
 		add_action( 'wp_ajax_advads-get-block-hints', [ $this, 'get_block_hints' ] );
-		add_action( 'wp_ajax_advads-placements-allowed-ads', [ $this, 'get_allowed_ads_for_placement_type' ] );
-		add_action( 'wp_ajax_advads-placement-update-item', [ $this, 'placement_update_item' ] );
-	}
-
-	/**
-	 * Prepare the ad post type to be removed
-	 *
-	 * @param int $post_id id of the post.
-	 *
-	 * @return void
-	 */
-	public function delete_ad( $post_id ): void {
-		global $wpdb;
-
-		if ( ! current_user_can( 'delete_posts' ) ) {
-			return;
-		}
-
-		if ( $post_id > 0 ) {
-			$post_type = get_post_type( $post_id );
-			if ( Constants::POST_TYPE_AD === $post_type ) {
-				/**
-				 * Images uploaded to an image ad type get the `_advanced-ads_parent_id` meta key from WordPress automatically
-				 * the following SQL query removes that meta data from any attachment when the ad is removed.
-				 */
-				$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %d", '_advanced-ads_parent_id', $post_id ) ); // phpcs:ignore
-			}
-		}
 	}
 
 	/**
@@ -227,6 +198,7 @@ class AJAX implements Integration_Interface {
 	 * @return bool
 	 */
 	public function can_display_by_consent( $can_display, $ad ) {
+
 		// Early bail!!
 		if ( ! $can_display ) {
 			return $can_display;
@@ -250,6 +222,20 @@ class AJAX implements Integration_Interface {
 			return true;
 		}
 
+		if ( 'not_allowed' === $consent_state ) {
+			// Allow image ads without custom code.
+			if ( $ad->get_type() === 'image' ) {
+				$has_custom_code = class_exists( 'Advanced_Ads_Pro' )
+					&& ! empty( Advanced_Ads_Pro::get_instance()->get_custom_code( $ad ) );
+
+				if ( ! $has_custom_code ) {
+					return true;
+				}
+
+				return false;
+			}
+		}
+
 		// If there is custom code, don't display the ad (unless it's a group).
 		if (
 			class_exists( 'Advanced_Ads_Pro' ) &&
@@ -257,6 +243,10 @@ class AJAX implements Integration_Interface {
 			! $ad->is_type( 'group' )
 		) {
 			return false;
+		}
+
+		if ( $can_display && $ad->get_type() === 'adsense' ) {
+			return true;
 		}
 
 		// See if this ad type needs consent.
@@ -924,79 +914,5 @@ class AJAX implements Integration_Interface {
 		}
 
 		wp_send_json_success( $group->get_hints() );
-	}
-
-	/**
-	 * Get allowed ads per placement.
-	 *
-	 * @return void
-	 */
-	public function get_allowed_ads_for_placement_type() {
-		check_ajax_referer( sanitize_text_field( Params::post( 'action', '' ) ) );
-
-		$placement_type = wp_advads_get_placement_type( sanitize_text_field( Params::post( 'placement_type' ) ) );
-
-		wp_send_json_success(
-			[
-				'items' => array_filter(
-					$placement_type->get_allowed_items(),
-					static function ( $items_group ) {
-						return ! empty( $items_group['items'] );
-					}
-				),
-			]
-		);
-	}
-
-	/**
-	 * Update the item for the placement.
-	 *
-	 * @return void
-	 */
-	public function placement_update_item(): void {
-		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
-
-		if ( ! Conditional::user_can( 'advanced_ads_manage_placements' ) ) {
-			wp_send_json_error(
-				[
-					'message' => __( 'Not Authorized', 'advanced-ads' ),
-				],
-				403
-			);
-		}
-
-		$placement     = wp_advads_get_placement( Params::post( 'placement_id', false, FILTER_VALIDATE_INT ) );
-		$new_item      = sanitize_text_field( Params::post( 'item_id' ) );
-		$new_item_type = 0 === strpos( $new_item, 'ad' ) ? 'ad_' : 'group_';
-
-		try {
-			if ( empty( $new_item ) ) {
-				$placement->remove_item();
-				wp_send_json_success(
-					[
-						'edit_href'    => '#',
-						'placement_id' => $placement->get_id(),
-						'item_id'      => '',
-					]
-				);
-			}
-
-			$new_item = $placement->update_item( $new_item );
-			wp_send_json_success(
-				[
-					'edit_href'    => $new_item->get_edit_link(),
-					'placement_id' => $placement->get_id(),
-					'item_id'      => $new_item_type . $new_item->get_id(),
-				]
-			);
-		} catch ( \RuntimeException $e ) {
-			wp_send_json_error(
-				[
-					'message' => $e->getMessage(),
-					'item_id' => $placement->get_item_object() ? $placement->get_item_object()->get_id() : 0,
-				],
-				400
-			);
-		}
 	}
 }

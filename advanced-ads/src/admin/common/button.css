@@ -1,0 +1,21 @@
+.advads-page {
+	.button {
+		@apply inline-flex items-center gap-x-2;
+	}
+
+	.button.advads-button-primary:hover {
+		@apply bg-secondary-black border-secondary-black text-white;
+	}
+
+	.button.advads-button-secondary:hover {
+		@apply bg-white border-secondary-black text-secondary-black;
+	}
+
+	.button.advads-button-secondary:hover a {
+		@apply text-secondary-black;
+	}
+
+	.button-block {
+		@apply flex items-center justify-center bg-secondary-black text-gray-100 rounded p-4 leading-0 font-normal;
+	}
+}

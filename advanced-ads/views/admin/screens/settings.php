@@ -18,7 +18,8 @@ $setting_tabs = apply_filters(
 		],
 	]
 );
-?><div class="wrap">
+?>
+<div class="wrap">
 	<h2 style="display: none;"><!-- There needs to be an empty H2 headline at the top of the page so that WordPress can properly position admin notifications --></h2>
 	<?php Advanced_Ads_Checks::show_issues(); ?>
 
@@ -28,8 +29,6 @@ $setting_tabs = apply_filters(
 			<a class="nav-tab" id="<?php echo esc_attr( $_setting_tab_id ); ?>-tab"
 				href="#top#<?php echo esc_attr( $_setting_tab_id ); ?>"><?php echo esc_html( $_setting_tab['title'] ); ?></a>
 		<?php endforeach; ?>
-		<a class="nav-tab" id="support-tab"
-				href="#top#support"><?php esc_html_e( 'Support', 'advanced-ads' ); ?></a>
 	</div>
 		<?php foreach ( $setting_tabs as $_setting_tab_id => $_setting_tab ) : ?>
 			<div id="<?php echo esc_attr( $_setting_tab_id ); ?>" class="advads-tab">
@@ -51,13 +50,9 @@ $setting_tabs = apply_filters(
 				<?php do_action( 'advanced-ads-settings-tab-after-form', $_setting_tab_id, $_setting_tab ); ?>
 			</div>
 		<?php endforeach; ?>
-	<div id="support" class="advads-tab">
-		<?php require_once ADVADS_ABSPATH . 'admin/views/support.php'; ?>
-	</div>
 		<?php
 			do_action( 'advanced-ads-additional-settings-form' );
 			// print the filesystem credentials modal if needed.
 			Advanced_Ads_Filesystem::get_instance()->print_request_filesystem_credentials_modal();
 		?>
-
 </div>

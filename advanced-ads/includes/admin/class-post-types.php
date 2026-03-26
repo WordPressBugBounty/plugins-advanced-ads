@@ -28,11 +28,57 @@ class Post_Types implements Integration_Interface {
 	 * @return void
 	 */
 	public function hooks(): void {
+		add_action( 'before_delete_post', [ $this, 'before_delete_ad' ], 10, 2 );
+
 		add_filter( 'post_updated_messages', [ $this, 'post_updated_messages' ] );
 		add_filter( 'bulk_post_updated_messages', [ $this, 'bulk_post_updated_messages' ], 10, 2 );
 
 		add_filter( 'wp_count_posts', [ $this, 'update_count_posts' ], 10, 2 );
 		add_filter( 'get_edit_post_link', [ $this, 'get_edit_post_link' ], 10, 2 );
+	}
+
+	/**
+	 * Prepare the ad groups for ad deletion
+	 *
+	 * @param int $post_id id of the post.
+	 *
+	 * @return void
+	 */
+	public function before_delete_ad( $post_id, $post ): void {
+		global $wpdb;
+
+		if ( ! current_user_can( 'delete_posts' ) ) {
+			return;
+		}
+
+		if ( $post_id > 0 ) {
+			if ( Constants::POST_TYPE_AD === $post->post_type ) {
+				/**
+				 * Images uploaded to an image ad type get the `_advanced-ads_parent_id` meta key from WordPress automatically
+				 * the following SQL query removes that meta data from any attachment when the ad is removed.
+				 */
+				$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %d", '_advanced-ads_parent_id', $post_id ) ); // phpcs:ignore
+
+				$terms = wp_get_object_terms( $post_id, Constants::TAXONOMY_GROUP );
+
+				if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+					$term_ids = wp_list_pluck( $terms, 'term_id' );
+
+					if( ! empty( $term_ids ) ) {
+						foreach( $term_ids as $group_id ) {
+							$group = wp_advads_get_group( $group_id );
+
+							$ad_weights = $group->get_ad_weights();
+
+							unset( $ad_weights[ $post_id ] );
+
+							$group->set_ad_weights( $ad_weights );
+							$group->save();
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**

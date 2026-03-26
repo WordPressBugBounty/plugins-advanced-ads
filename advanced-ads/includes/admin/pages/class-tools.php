@@ -29,6 +29,15 @@ class Tools extends Screen {
 	}
 
 	/**
+	 * Get the order number of the screen.
+	 *
+	 * @return int
+	 */
+	public function get_order(): int {
+		return 21;
+	}
+
+	/**
 	 * Register screen into WordPress admin area.
 	 *
 	 * @return void
@@ -48,11 +57,15 @@ class Tools extends Screen {
 			[
 				'importers' => [
 					'label'    => __( 'Import & Export', 'advanced-ads' ),
-					'filename' => 'views/admin/tools/importers.php',
+					'filename' => ADVADS_ABSPATH . 'views/admin/tools/tab-importers.php',
 				],
 				'version'   => [
 					'label'    => __( 'Version Control', 'advanced-ads' ),
-					'filename' => 'views/admin/tools/version.php',
+					'filename' => ADVADS_ABSPATH . 'views/admin/tools/tab-version.php',
+				],
+				'status'   => [
+					'label'    => __( 'System Status', 'advanced-ads' ),
+					'filename' => ADVADS_ABSPATH . 'views/admin/tools/tab-status.php',
 				],
 			]
 		);
@@ -64,7 +77,6 @@ class Tools extends Screen {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		wp_advads()->registry->enqueue_script( 'admin-common' );
 		wp_advads()->registry->enqueue_style( 'screen-tools' );
 		wp_advads()->registry->enqueue_script( 'screen-tools' );
 	}
@@ -75,6 +87,6 @@ class Tools extends Screen {
 	 * @return void
 	 */
 	public function display(): void {
-		include_once ADVADS_ABSPATH . 'views/admin/screens/tools.php';
+		include_once ADVADS_ABSPATH . 'views/admin/tools/page.php';
 	}
 }

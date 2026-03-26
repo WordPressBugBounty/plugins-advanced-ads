@@ -110,7 +110,7 @@ class Plugin extends Framework\Loader {
 		 */
 		// Public-Facing and Core Functionality.
 		\Advanced_Ads::get_instance();
-		\Advanced_Ads_ModuleLoader::loadModules( ADVADS_ABSPATH . 'modules/' ); // enable modules, requires base class.
+		\Advanced_Ads_ModuleLoader::loadModules( ADVADS_ABSPATH . 'modules/', [ 'disabled' => [ 'pef' => true ] ] ); // enable modules, requires base class.
 
 		if ( is_admin() ) {
 			Advanced_Ads_Admin_Licenses::get_instance();
@@ -247,24 +247,34 @@ class Plugin extends Framework\Loader {
 			return;
 		}
 
+		// Ads.
+		$this->register_integration( Admin\Ads\Ajax::class );
+		$this->register_integration( Admin\Metabox_Ad::class );
+		$this->register_integration( Admin\Metabox_Ad_Settings::class );
+
+		// Groups.
+		$this->register_integration( Admin\Groups\Ajax::class );
+
+		// Placements.
+		$this->register_integration( Admin\Placements\Ajax::class );
+		$this->register_integration( Admin\Placements\Quick_Edit::class );
+
+		// Entities.
+		$this->register_integration( Admin\Quick_Bulk_Edit::class );
+		$this->register_integration( Admin\Page_Quick_Edit::class );
+
 		$this->register_integration( Compatibility\Capability_Manager::class );
 		$this->register_initializer( Upgrades::class );
 		$this->register_integration( Admin\Action_Links::class );
 		$this->register_integration( Admin\Admin_Menu::class, 'screens' );
 		$this->register_integration( Admin\Admin_Notices::class );
 		$this->register_integration( Admin\Assets::class );
-		$this->register_integration( Admin\Header::class );
 		$this->register_integration( Admin\Marketing::class );
-		$this->register_integration( Admin\Metabox_Ad::class );
-		$this->register_integration( Admin\Metabox_Ad_Settings::class );
 		$this->register_integration( Admin\Post_Types::class );
 		$this->register_integration( Admin\Screen_Options::class );
 		$this->register_integration( Admin\Shortcode_Creator::class );
 		$this->register_integration( Admin\TinyMCE::class );
 		$this->register_integration( Admin\WordPress_Dashboard::class );
-		$this->register_integration( Admin\Quick_Bulk_Edit::class );
-		$this->register_integration( Admin\Page_Quick_Edit::class );
-		$this->register_integration( Admin\Placement_Quick_Edit::class );
 		$this->register_integration( Importers\Manager::class, 'importers' );
 		$this->register_integration( Admin\AJAX::class );
 		$this->register_integration( Admin\Version_Control::class );
@@ -273,7 +283,7 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Admin\Settings::class );
 		$this->register_integration( Admin\Misc::class );
 		$this->register_integration( Admin\Post_List::class );
-		$this->register_integration( Admin\Placement\Bulk_Edit::class );
+		$this->register_integration( Admin\Placements\Bulk_Edit::class );
 		$this->register_integration( Admin\Addon_Updater::class );
 
 		if ( ! wp_doing_ajax() ) {
@@ -308,6 +318,7 @@ class Plugin extends Framework\Loader {
 		require_once ADVADS_ABSPATH . 'includes/functions-placement.php';
 		require_once ADVADS_ABSPATH . 'includes/cap_map.php';
 		require_once ADVADS_ABSPATH . 'includes/default-hooks.php';
+		require_once ADVADS_ABSPATH . 'includes/functions-components.php';
 	}
 
 	/**

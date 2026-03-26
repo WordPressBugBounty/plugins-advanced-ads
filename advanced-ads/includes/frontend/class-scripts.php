@@ -45,21 +45,13 @@ class Scripts implements Integration_Interface {
 			return;
 		}
 
-		wp_register_script(
-			ADVADS_SLUG . '-advanced-js',
-			sprintf( '%spublic/assets/js/advanced%s.js', ADVADS_BASE_URL, defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min' ),
-			[ 'jquery' ],
-			ADVADS_VERSION,
-			false
-		);
-
 		$privacy                    = Advanced_Ads_Privacy::get_instance();
 		$privacy_options            = $privacy->options();
 		$privacy_options['enabled'] = ! empty( $privacy_options['enabled'] );
 		$privacy_options['state']   = $privacy->get_state();
 
 		wp_localize_script(
-			ADVADS_SLUG . '-advanced-js',
+			wp_advads()->registry->prefix_it( 'advanced-js' ),
 			'advads_options',
 			[
 				'blog_id' => get_current_blog_id(),
@@ -71,7 +63,7 @@ class Scripts implements Integration_Interface {
 		$activated_js    = apply_filters( 'advanced-ads-activate-advanced-js', isset( Advanced_Ads::get_instance()->options()['advanced-js'] ) );
 
 		if ( $activated_js || ! empty( $frontend_picker ) ) {
-			wp_enqueue_script( ADVADS_SLUG . '-advanced-js' );
+			wp_advads()->registry->enqueue_script( 'advanced-js' );
 		}
 
 		wp_register_script(

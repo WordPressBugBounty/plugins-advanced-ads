@@ -1,0 +1,305 @@
+@import "../partials/tailwind.css";
+
+@import "./spinner.css";
+@import "./addons.css";
+@import "../../../node_modules/select2/dist/css/select2.css";
+@import "./oneclick.css";
+
+#welcome {
+	@apply bg-repeat;
+
+	> *,
+	a {
+		@apply text-white;
+	}
+
+	p {
+		@apply text-justify;
+	}
+
+	#dismiss-welcome {
+		@apply absolute flex items-center right-0 top-0 justify-center;
+		width: 50px;
+		height: 50px;
+
+		.dashicons {
+			@apply cursor-pointer;
+		}
+	}
+
+	> div {
+		@apply p-6;
+	}
+
+	@media screen and (min-width: 601px) {
+		> div {
+			@apply grid grid-cols-2;
+			column-gap: 100px;
+			padding: 50px;
+
+			> div:last-child {
+				@apply flex items-center;
+			}
+		}
+	}
+
+	#head {
+		@apply block;
+		font-size: 1.75rem;
+		margin: 15px 0 30px 0;
+	}
+
+	#subhead {
+		@apply text-base font-medium block m-0 uppercase;
+	}
+
+	#cta {
+		margin-top: 50px;
+		width: 100%;
+
+		a {
+			padding: 12px 20px;
+			@apply inline-block no-underline;
+		}
+
+		&::after {
+			@apply block content-[""] clear-both;
+		}
+	}
+
+	#launch-wizard {
+		border-radius: 5px;
+		background: #1b193a;
+		color: #fff;
+
+		&:hover {
+			transition: ease-in-out 250ms;
+			background: #000;
+		}
+	}
+
+	#first-step {
+		@apply !underline !pr-0;
+		text-underline-offset: 0.25rem;
+
+		&::after {
+			font-family: dashicons, sans-serif;
+			@apply inline-block ml-1.5 align-middle content-["\f118"];
+		}
+	}
+
+	@media screen and (min-width: 1020px) {
+		#cta {
+			@apply w-full;
+			margin-top: 50px;
+
+			> * {
+				@apply align-middle;
+			}
+
+			&::after {
+				@apply block content-[""] clear-both;
+			}
+		}
+
+		#launch-wizard {
+			@apply float-left;
+			box-shadow: 0 0 20px 0 rgb(242 252 255 / 20%);
+		}
+
+		#first-step {
+			@apply float-right;
+		}
+	}
+
+	#welcome-thumbnail {
+		@apply inline-block;
+		box-shadow: 0 0 20px 0 rgb(27 24 58 / 20%);
+
+		img {
+			@apply max-w-full;
+		}
+	}
+}
+
+#advads-overview {
+	.inside {
+		@apply my-0;
+		padding: 0;
+
+		> div {
+			padding-left: 12px;
+			padding-right: 12px;
+		}
+
+		#advanced-ads-addon-box {
+			padding-left: 15px;
+			padding-right: 15px;
+		}
+
+		> footer {
+			@apply m-0 p-3 border-t border-t-border;
+
+			a {
+				@apply p-0 m-0 no-underline;
+
+				&:not(:last-child)::after {
+					@apply font-light;
+					content: " | ";
+					color: #c3c4c7;
+				}
+			}
+
+			a.go-pro {
+				@apply font-semibold;
+			}
+
+			.dashicons-external {
+				@apply text-lg;
+				line-height: normal;
+			}
+
+			.dashicons-lightbulb {
+				@apply text-xl leading-none;
+				color: #0474a2;
+			}
+		}
+	}
+
+	.postbox {
+		h2 {
+			@apply text-sm m-0 px-3 py-2;
+			border-bottom: 1px solid #c3c4c7;
+		}
+	}
+
+	.advads-widget-wrapper {
+		@apply mb-6;
+
+		.section-title {
+			@apply bg-gray-50/70 px-3 py-2.5 my-3;
+			@apply !-mx-3;
+			border: solid #c3c4c7;
+			border-width: 1px 0;
+
+			h3 {
+				@apply m-0 font-semibold text-sm;
+			}
+		}
+
+		.manual-wrapper {
+			@apply flex flex-row justify-around mt-3;
+
+			> div {
+				width: 49%;
+			}
+
+			.title {
+				@apply flex flex-col m-0 text-center no-underline font-bold py-2;
+
+				&:hover,
+				.dashicons {
+					color: #1b193a;
+				}
+
+				.dashicons {
+					@apply text-6xl w-auto h-auto;
+					color: #0474a2;
+
+					&:hover {
+						@apply text-inherit;
+					}
+				}
+			}
+
+			.divider {
+				width: 0.1%;
+				border: solid #c3c4c7;
+				border-width: 0 1px 0 0;
+			}
+		}
+	}
+
+	.advads-ad-health-notices {
+		@apply m-0 mb-3;
+
+		.dashicons-warning {
+			color: #cc3000;
+		}
+
+		.dashicons-info {
+			color: #0474a2;
+		}
+
+		&-show-hidden {
+			@apply ml-8 cursor-pointer underline;
+			color: #0474a2;
+		}
+
+		li {
+			@apply flex justify-between items-start gap-2 mb-0;
+
+			&:not(:last-child) {
+				@apply mb-3;
+			}
+
+			.text {
+				flex: 1;
+
+				a {
+					@apply text-current;
+				}
+			}
+
+			> button {
+				@apply border-none bg-transparent cursor-pointer;
+				color: #a7aaad;
+			}
+
+			.date {
+				@apply italic;
+				color: #a7aaad;
+			}
+		}
+	}
+}
+
+.advads-ui-switch {
+	@apply inline-flex relative items-center cursor-pointer;
+
+	&-list {
+		@apply space-y-4;
+	}
+
+	input {
+		@apply sr-only;
+
+		&:checked ~ div {
+			@apply bg-primary after:left-auto after:right-[2px] after:border-white;
+		}
+
+		&:disabled ~ div {
+			@apply after:bg-gray-100 after:border-gray-200;
+		}
+	}
+
+	div {
+		@apply relative w-11 h-6 bg-gray-200 rounded-full border;
+
+		&::after {
+			@apply content-[""] absolute top-0.5 left-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-all;
+		}
+	}
+
+	span {
+		@apply ml-4;
+	}
+
+	span.muted {
+		@apply block text-gray-400 ml-0;
+	}
+
+	em.muted {
+		@apply text-gray-400;
+	}
+}

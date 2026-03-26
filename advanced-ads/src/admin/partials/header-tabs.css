@@ -1,0 +1,29 @@
+.advads-page .advads-header-tabs {
+	@apply flex border-b border-border -mx-5 mt-4 pl-4;
+
+	a {
+		@apply flex items-center gap-x-2 text-base font-medium py-2.5 px-5 border-t border-l border-border no-underline bg-[#f5f4f4];
+
+		&:first-child {
+			@apply rounded-tl;
+		}
+
+		&:last-of-type {
+			@apply border-r rounded-tr;
+		}
+
+		&:hover,
+		&:focus,
+		&.is-active {
+			@apply shadow-none outline-0 text-secondary-black bg-transparent;
+		}
+
+		&.is-active {
+			@apply border-b border-b-[#f8f9fa] -mb-px;
+		}
+	}
+
+	+ .advads-tab-content {
+		@apply -mx-5 py-6 px-5;
+	}
+}

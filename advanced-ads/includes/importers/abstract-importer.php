@@ -58,7 +58,9 @@ abstract class Importer {
 	 */
 	protected function add_session_key( $ad, $placement, $key ): void {
 		update_post_meta( $ad->get_id(), '_importer_session_key', $key );
-		update_post_meta( $placement->get_id(), '_importer_session_key', $key );
+		if ( $placement ) {
+			update_post_meta( $placement->get_id(), '_importer_session_key', $key );
+		}
 	}
 
 	/**

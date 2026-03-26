@@ -1,0 +1,29 @@
+/* Table CSS */
+
+.wp-list-table {
+	.column-type {
+		@apply w-24;
+	}
+
+	.column-type img {
+		@apply w-auto h-14;
+	}
+}
+
+.advads-placement-item-select {
+	@apply w-[80%];
+}
+
+.advads-placement-item-select-wrap {
+	@apply relative flex items-center gap-x-2;
+
+	.advads-loader {
+		@apply absolute right-[30%] top-2.5 pointer-events-none;
+	}
+}
+
+/* Quick Edit */
+
+.inline-edit-row[id^="edit-"] fieldset:not(.advanced-ads) {
+	@apply hidden;
+}

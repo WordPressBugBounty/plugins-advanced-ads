@@ -1,0 +1,44 @@
+.advads-accordion {
+	@apply bg-white rounded-md divide-y divide-border;
+}
+
+.advads-accordion-item {
+	@apply relative transition-all duration-500;
+
+	input {
+		@apply absolute opacity-0 z-[-1];
+
+		&:checked {
+			~ .accordion__content {
+				@apply max-h-[600px] pb-4;
+			}
+
+			+ .accordion__header::after {
+				content: "\f460";
+			}
+		}
+	}
+}
+
+.accordion__header {
+	@apply flex font-medium text-sm justify-between py-4 px-1 cursor-pointer;
+
+	&::after {
+		content: "\f543";
+		@apply w-4 h-4 text-center transition-all duration-300;
+		font-family: dashicons, sans-serif;
+		display: inline-block;
+	}
+}
+
+.accordion__content {
+	@apply px-1 max-h-0 overflow-hidden;
+
+	> :first-child {
+		@apply pt-0 mt-0;
+	}
+
+	> :last-child {
+		@apply mb-0 pb-0;
+	}
+}

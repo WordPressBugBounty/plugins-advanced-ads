@@ -1,0 +1,3 @@
+/*! tailwindcss v4.1.18 | MIT License | https://tailwindcss.com */
+@layer theme{:root,:host{--spacing:.25rem}}@layer utilities;.advads-page .visible{visibility:visible}.advads-page .hidden{display:none}.advads-page .inline{display:inline}.wp-list-table .column-type{width:calc(var(--spacing)*24)}.wp-list-table .column-type img{height:calc(var(--spacing)*14);width:auto}.advads-placement-item-select{width:80%}.advads-placement-item-select-wrap{align-items:center;column-gap:calc(var(--spacing)*2);display:flex;position:relative}.advads-placement-item-select-wrap .advads-loader{pointer-events:none;top:calc(var(--spacing)*2.5);position:absolute;left:30%}.inline-edit-row[id^=edit-] fieldset:not(.advanced-ads){display:none}
+

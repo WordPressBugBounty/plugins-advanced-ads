@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-const path = require( 'path' );
+const path = require( 'node:path' );
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const { getWebpackEntryPoints } = require( '@wordpress/scripts/utils/config' );
 
@@ -11,21 +11,72 @@ if ( ! isProduction ) {
 	defaultConfig.devServer.allowedHosts = 'all';
 }
 
-// const rootPath = path.resolve(__dirname);
-// const basePath = path.resolve(__dirname, 'src');
+const basePath = path.resolve( __dirname, 'src' );
 
 module.exports = {
 	...defaultConfig,
+	module: {
+		...defaultConfig.module,
+		rules: defaultConfig.module.rules.map( ( rule ) => {
+			// Check if this rule handles CSS files
+			if ( rule.test?.test?.( '.css' ) ) {
+				return {
+					...rule,
+					use: Array.isArray( rule.use )
+						? rule.use.map( ( useEntry ) => {
+								// Handle both string and object loader formats
+								const loaderName =
+									typeof useEntry === 'string'
+										? useEntry
+										: useEntry.loader;
+
+								// Only modify css-loader, not postcss-loader
+								if (
+									loaderName?.includes( 'css-loader' ) &&
+									! loaderName?.includes( 'postcss' )
+								) {
+									return {
+										loader: loaderName,
+										options: {
+											...( typeof useEntry === 'object'
+												? useEntry.options
+												: {} ),
+											url: false, // Disable all URL processing
+										},
+									};
+								}
+								return useEntry;
+						  } )
+						: rule.use,
+				};
+			}
+			return rule;
+		} ),
+	},
 	externals: {
 		...defaultConfig.externals,
+
+		// Global.
 		window: 'window',
 		jquery: 'jQuery',
 		lodash: 'lodash',
 		moment: 'moment',
 
-		// Advanced ads.
-		advancedAds: 'advancedAds',
+		// Advanced Ads.
+		'@advancedAds': 'advancedAds',
 		'@advancedAds/i18n': 'advancedAds.i18n',
+		'@advancedAds/utils': 'advancedAds.utils',
+
+		// WordPress.
+		'@wordpress/dom-ready': 'wp.domReady',
+		'@wordpress/hooks': 'wp.hooks',
+		'@wordpress/commands': 'wp.commands',
+		'@wordpress/i18n': 'wp.i18n',
+		'@wordpress/url': 'wp.url',
+		'@wordpress/data': 'wp.data',
+		'@wordpress/core-data': 'wp.coreData',
+		'@wordpress/element': 'wp.element',
+		'@wordpress/plugins': 'wp.plugins',
 	},
 	resolve: {
 		...defaultConfig.resolve,
@@ -38,10 +89,50 @@ module.exports = {
 	},
 	entry: {
 		...getWebpackEntryPoints(),
-		// CSS
-		// common: path.join(basePath, '/scss/admin/common.js'),
+		// Backend.
+		'admin-common': path.join( basePath, 'admin/common/common.js' ),
+		'screen-dashboard': path.join(
+			basePath,
+			'admin/screen-dashboard/index.js'
+		),
+		'screen-ads-listing': path.join(
+			basePath,
+			'admin/screen-ads/listing.js'
+		),
+		'screen-ads-editing': path.join(
+			basePath,
+			'admin/screen-ads/editing.js'
+		),
+		'screen-groups-listing': path.join(
+			basePath,
+			'admin/screen-groups/listing.js'
+		),
+		'screen-placements-listing': path.join(
+			basePath,
+			'admin/screen-placements/listing.js'
+		),
+		'screen-settings': path.join(
+			basePath,
+			'admin/screen-settings/index.js'
+		),
+		'screen-support': path.join(
+			basePath,
+			'admin/screen-support/support.js'
+		),
+		'screen-tools': path.join( basePath, 'admin/screen-tools/tools.js' ),
+		'wp-dashboard': path.join( basePath, 'admin/wp-dashboard/index.js' ),
+		notifications: path.join(
+			basePath,
+			'admin/notifications/notifications.js'
+		),
+		'post-quick-edit': path.join(
+			basePath,
+			'admin/post-quick-edit/listing.js'
+		),
+		commands: path.join( basePath, 'admin/commands/commands.js' ),
 
-		// JavaScript
+		// Frontend.
+		advanced: path.join( basePath, 'public/advanced.js' ),
 	},
 	output: {
 		filename: '[name].js', // Dynamically generate output file names
@@ -50,54 +141,6 @@ module.exports = {
 };
 
 /** TODO: convert old files to new system */
-/**
- * CSS Files
- */
-// mix.sass(
-// 	'assets/scss/admin/common.scss',
-// 	'assets/css/admin/common.css'
-// ).tailwind('./tailwind.config.common.js');
-// mix.sass(
-// 	'assets/scss/admin/screen-onboarding.scss',
-// 	'assets/css/admin/screen-onboarding.css'
-// ).tailwind('./tailwind.config.onboarding.js');
-// mix.sass(
-// 	'assets/scss/admin/notifications.scss',
-// 	'assets/css/admin/notifications.css'
-// ).tailwind();
-// mix.sass(
-// 	'assets/scss/admin/screen-ads-editing.scss',
-// 	'assets/css/admin/screen-ads-editing.css'
-// ).tailwind();
-// mix.sass(
-// 	'assets/scss/admin/screen-ads-listing.scss',
-// 	'assets/css/admin/screen-ads-listing.css'
-// ).tailwind();
-// mix.sass(
-// 	'assets/scss/admin/screen-dashboard.scss',
-// 	'assets/css/admin/screen-dashboard.css'
-// ).tailwind();
-// mix.sass(
-// 	'assets/scss/admin/screen-groups-listing.scss',
-// 	'assets/css/admin/screen-groups-listing.css'
-// ).tailwind();
-// mix.sass(
-// 	'assets/scss/admin/screen-placements-listing.scss',
-// 	'assets/css/admin/screen-placements-listing.css'
-// ).tailwind();
-// mix.sass(
-// 	'assets/scss/admin/screen-settings.scss',
-// 	'assets/css/admin/screen-settings.css'
-// ).tailwind();
-// mix.sass(
-// 	'assets/scss/admin/screen-status.scss',
-// 	'assets/css/admin/screen-status.css'
-// ).tailwind();
-// mix.sass(
-// 	'assets/scss/admin/wp-dashboard.scss',
-// 	'assets/css/admin/wp-dashboard.css'
-// ).tailwind();
-
 /**
  * JavaScript Files
  */
@@ -122,60 +165,12 @@ module.exports = {
 // 	],
 // 	'modules/adblock-finder/public/ga-adblock-counter.min.js'
 // );
-// mix.combine(
-// 	[
-// 		'admin/assets/js/admin.js',
-// 		'admin/assets/js/termination.js',
-// 		'admin/assets/js/dialog-advads-modal.js',
-// 	],
-// 	'admin/assets/js/admin.min.js'
-// );
 
 // // New files
-// mix.js('assets/src/admin/notifications.js', 'assets/js/admin/notifications.js');
-// mix.js('assets/src/admin/admin-common.js', 'assets/js/admin/admin-common.js');
-// mix.js(
-// 	'assets/src/admin/page-quick-edit.js',
-// 	'assets/js/admin/page-quick-edit.js'
-// );
-// mix.js(
-// 	'assets/src/admin/screen-ads-editing/index.js',
-// 	'assets/js/admin/screen-ads-editing.js'
-// );
-// mix.js(
-// 	'assets/src/admin/screen-ads-listing/index.js',
-// 	'assets/js/admin/screen-ads-listing.js'
-// );
-// mix.js(
-// 	'assets/src/admin/screen-dashboard/index.js',
-// 	'assets/js/admin/screen-dashboard.js'
-// );
-// mix.js(
-// 	'assets/src/admin/screen-groups-listing/index.js',
-// 	'assets/js/admin/screen-groups-listing.js'
-// );
-// mix.js(
-// 	'assets/src/admin/screen-placements-listing/index.js',
-// 	'assets/js/admin/screen-placements-listing.js'
-// );
-// mix.js(
-// 	'assets/src/admin/screen-settings/index.js',
-// 	'assets/js/admin/screen-settings.js'
-// );
-// mix.js(
-// 	'assets/src/admin/wp-dashboard/index.js',
-// 	'assets/js/admin/wp-dashboard.js'
-// );
-
 // // React
 // mix.js(
 // 	'assets/src/screen-onboarding/onboarding.js',
 // 	'assets/js/screen-onboarding.js'
-// ).react();
-
-// mix.js(
-// 	'assets/src/admin/screen-tools/screen-tools.js',
-// 	'assets/js/admin/screen-tools.js'
 // ).react();
 
 // mix.js(

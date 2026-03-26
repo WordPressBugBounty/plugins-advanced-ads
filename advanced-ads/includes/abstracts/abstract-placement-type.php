@@ -55,19 +55,32 @@ class Placement_Type {
 	/**
 	 * Get allowed item array for dropdown
 	 *
+	 * @param string $add_empty Add empty option.
+	 *
 	 * @return array
 	 */
-	public function get_allowed_items(): array {
-		return [
-			'groups' => [
-				'label' => __( 'Ad Groups', 'advanced-ads' ),
-				'items' => $this->get_allowed_groups(),
-			],
-			'ads'    => [
-				'label' => __( 'Ads', 'advanced-ads' ),
-				'items' => $this->get_allowed_ads(),
-			],
+	public function get_allowed_items( $add_empty = '' ): array {
+
+		$options = [];
+
+		if ( ! empty( $add_empty ) ) {
+			$options[] = [
+				'label' => $add_empty,
+				'value' => 0,
+			];
+		}
+
+		$options['ads'] = [
+			'label' => __( 'Ads', 'advanced-ads' ),
+			'items' => $this->get_allowed_ads(),
 		];
+
+		$options['groups'] = [
+			'label' => __( 'Ad Groups', 'advanced-ads' ),
+			'items' => $this->get_allowed_groups(),
+		];
+
+		return $options;
 	}
 
 	/**

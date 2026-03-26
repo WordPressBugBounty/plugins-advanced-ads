@@ -86,27 +86,6 @@ class Conditional {
 	}
 
 	/**
-	 * Check if the current screen uses a search or filter.
-	 *
-	 * @return bool
-	 */
-	public static function has_filter_or_search(): bool {
-		$ad_params        = [ 's', 'adtype', 'adsize', 'adgroup', 'addate', 'ad_author', 'ad_debugmode', 'ad_displayonce', 'ad_privacyignore' ];
-		$group_params     = [ 's', 'group_type' ];
-		$placement_params = [ 's', 'placement-type' ];
-
-		$params = array_merge( $ad_params, $group_params, $placement_params );
-
-		foreach ( $params as $param ) {
-			if ( ! empty( Params::get( $param ) ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Check if the current user has a role on this site.
 	 *
 	 * @return bool

@@ -71,7 +71,7 @@ class Before_Content extends Base implements Placement_Type {
 	 * @return string The upgrade URL for the placement type.
 	 */
 	public function get_image(): string {
-		return ADVADS_BASE_URL . 'admin/assets/img/placements/content-before.png';
+		return ADVADS_BASE_URL . 'assets/img/placement-types/content-before.png';
 	}
 
 	/**

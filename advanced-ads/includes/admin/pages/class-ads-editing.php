@@ -12,6 +12,7 @@ namespace AdvancedAds\Admin\Pages;
 use DateTimeImmutable;
 use AdvancedAds\Constants;
 use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Framework\Utilities\Params;
 
 defined( 'ABSPATH' ) || exit;
@@ -37,7 +38,8 @@ class Ads_Editing extends Ads {
 	 */
 	public function register_screen(): void {
 		$this->set_hook( Constants::POST_TYPE_AD );
-		add_action( 'dbx_post_sidebar', [ $this, 'edit_form_end' ] );
+
+		add_action( 'dbx_post_sidebar', [ $this, 'render_support_callout' ] );
 		add_action( 'edit_form_top', [ $this, 'edit_form_above_title' ] );
 		add_action( 'post_submitbox_misc_actions', [ $this, 'add_submit_box_meta' ] );
 	}
@@ -49,14 +51,40 @@ class Ads_Editing extends Ads {
 	 */
 	public function enqueue_assets(): void {
 		$wp_screen = get_current_screen();
-		if ( 'post' === $wp_screen->base && 'add' !== $wp_screen->action ) {
-			add_action( 'advanced-ads-admin-header-actions', [ $this, 'add_new_ad_button' ] );
+
+		if ( 'post' !== $wp_screen->base || Constants::POST_TYPE_AD !== $wp_screen->post_type ) {
+			return;
 		}
 
-		if ( 'post' === $wp_screen->base && Constants::POST_TYPE_AD === $wp_screen->post_type ) {
-			wp_advads()->registry->enqueue_script( 'screen-ads-editing' );
-			wp_advads()->registry->enqueue_style( 'screen-ads-editing' );
+		wp_advads()->registry->enqueue_script( 'screen-ads-editing' );
+		wp_advads()->registry->enqueue_style( 'screen-ads-editing' );
+
+		// Ad positioning.
+		wp_advads()->registry->enqueue_style( 'ad-positioning' );
+		wp_advads()->registry->enqueue_script( 'ad-positioning' );
+
+		// Enqueue code editor and settings for manipulating HTML.
+		$settings = wp_enqueue_code_editor( [ 'type' => 'application/x-httpd-php' ] );
+
+		// Only if CodeMirror is enabled.
+		if ( false !== $settings ) {
+			wp_advads_json_add(
+				'admin',
+				[
+					'codeMirror' => [
+						'settings' => $settings,
+					],
+				]
+			);
 		}
+
+		// Localize texts.
+		$i18n = [
+			'ads'           => [
+				'afterParagraphPrompt' => __( 'After which paragraph?', 'advanced-ads' ),
+			],
+		];
+		wp_advads_json_add( 'i18n', $i18n );
 	}
 
 	/**
@@ -66,9 +94,20 @@ class Ads_Editing extends Ads {
 	 */
 	public function define_header_args(): array {
 		return [
-			'manual_url'         => 'https://wpadvancedads.com/manual/first-ad/',
-			'show_filter_button' => false,
+			'manual_url' => $this->get_manual_url( '/first-ad/' ),
 		];
+	}
+
+	/**
+	 * Add actions to the header
+	 *
+	 * @return void
+	 */
+	public function header_actions(): void {
+		$wp_screen = get_current_screen();
+		if ( 'post' === $wp_screen->base && 'add' !== $wp_screen->action ) {
+			parent::header_actions();
+		}
 	}
 
 	/**
@@ -80,8 +119,11 @@ class Ads_Editing extends Ads {
 	 *
 	 * @return void
 	 */
-	public function edit_form_end( $post ): void {
-		if ( Constants::POST_TYPE_AD !== $post->post_type ) {
+	public function render_support_callout( $post ): void {
+		if (
+			Constants::POST_TYPE_AD !== $post->post_type ||
+			! Conditional::is_any_addon_activated()
+		) {
 			return;
 		}
 
@@ -105,14 +147,13 @@ class Ads_Editing extends Ads {
 		// Highlight Dummy ad if this is the first ad.
 		if ( ! WordPress::get_count_ads() ) {
 			?>
-			<style>.advanced-ads-type-list-dummy {
-					font-weight: bold;
-				}</style>
+			<style>
+			.advanced-ads-type-list-dummy {
+				font-weight: bold;
+			}
+			</style>
 			<?php
 		}
-
-		// Display general and wizard information.
-		include_once ADVADS_ABSPATH . 'views/admin/ads/info-top.php';
 
 		// Don’t show placement options if this is an ad translated with WPML since the placement might exist already.
 		if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
@@ -163,47 +204,6 @@ class Ads_Editing extends Ads {
 		$enabled = (int) ! empty( $ad->get_expiry_date() );
 
 		include ADVADS_ABSPATH . 'views/admin/ads/submitbox-meta.php';
-	}
-
-	/**
-	 * Whether to start the wizard by default or not
-	 *
-	 * @since 1.7.4
-	 *
-	 * @return bool true, if wizard should start automatically
-	 */
-	private function start_wizard_automatically(): bool {
-		global $post;
-
-		$user_id = get_current_user_id();
-		if ( ! $user_id ) {
-			return true;
-		}
-
-		$hide_wizard = get_user_meta( $user_id, 'advanced-ads-hide-wizard', true );
-
-		// true the ad already exists, if the wizard was never started or closed.
-		return ( 'edit' !== $post->filter && ( ! $hide_wizard || 'false' === $hide_wizard ) ) ? true : false;
-	}
-
-	/**
-	 * Whether to show the wizard welcome message or not
-	 *
-	 * @since 1.7.4
-	 *
-	 * @return bool true, if wizard welcome message should be displayed
-	 */
-	private function show_wizard_welcome(): bool {
-		global $post;
-
-		$user_id = get_current_user_id();
-		if ( ! $user_id ) {
-			return true;
-		}
-
-		$hide_wizard = get_user_meta( $user_id, 'advanced-ads-hide-wizard', true );
-
-		return ( ! $hide_wizard && 'edit' !== $post->filter ) ? true : false;
 	}
 
 	/**

@@ -1,0 +1,16 @@
+@layer theme, utilities;
+
+/* Disable auto detection */
+@import "tailwindcss/theme.css" layer(theme) source(none);
+
+@theme extend {
+	--color-border: #d9d9d9;
+	--color-border-old: #c3c4c7;
+	--color-primary: #0474a2;
+	--color-wordpress: #2271b1;
+	--color-secondary-black: #1b183a;
+}
+
+.advads-page {
+	@import "tailwindcss/utilities.css" source(none);
+}

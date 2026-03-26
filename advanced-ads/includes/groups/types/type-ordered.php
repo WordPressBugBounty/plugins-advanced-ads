@@ -70,6 +70,6 @@ class Ordered implements Group_Type {
 	 * @return string The upgrade URL for the group type.
 	 */
 	public function get_image(): string {
-		return ADVADS_BASE_URL . 'admin/assets/img/groups/ordered.svg';
+		return ADVADS_BASE_URL . 'assets/img/group-types/ordered.svg';
 	}
 }

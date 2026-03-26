@@ -280,8 +280,9 @@ class Ad_Repository {
 	public function get_ads_dropdown(): array {
 		$query = $this->query(
 			[
-				'orderby' => 'title',
-				'order'   => 'ASC',
+				'orderby'          => 'title',
+				'order'            => 'ASC',
+				'suppress_filters' => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false, // Suppress filters if WPML is present.
 			],
 			true
 		);

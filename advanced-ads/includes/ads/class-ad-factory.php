@@ -63,7 +63,10 @@ class Ad_Factory extends Factory {
 		$classname = $this->get_classname( wp_advads_get_ad_type_manager(), $ad_type, 'dummy' );
 
 		try {
-			return new $classname( $ad_id );
+			$ad = new $classname( $ad_id );
+			$ad->set_type( $ad_type );
+
+			return $ad;
 		} catch ( Exception $e ) {
 			return false;
 		}

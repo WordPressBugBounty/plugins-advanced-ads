@@ -73,4 +73,17 @@ class Settings extends Screen {
 	public function display(): void {
 		include_once ADVADS_ABSPATH . 'views/admin/screens/settings.php';
 	}
+
+	/**
+	 * Get page header arguments
+	 *
+	 * @return array
+	 */
+	public function define_header_args(): array {
+		return [
+			'title'            => __( 'Settings', 'advanced-ads' ),
+			'breadcrumb_title' => __( 'Settings', 'advanced-ads' ),
+			'manual_url'       => 'https://wpadvancedads.com/manual/first-ad/',
+		];
+	}
 }

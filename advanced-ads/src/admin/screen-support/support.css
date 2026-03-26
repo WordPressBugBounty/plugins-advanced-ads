@@ -1,0 +1,169 @@
+@import "../partials/tailwind.css";
+
+@source "../../../views/admin/support/";
+
+.advads-wrap > .notice {
+	@apply hidden;
+}
+
+.advads-support-wrap .advads-card {
+	@apply text-sm;
+
+	a:not(footer a, .button) {
+		@apply text-gray-900 underline-offset-3 focus:shadow-none;
+	}
+}
+
+a.advads-view-all-link {
+	@apply no-underline text-blue-500! flex items-center gap-2 focus:shadow-none;
+	@apply hover:underline hover:underline-offset-4;
+
+	svg {
+		@apply stroke-blue-500 size-4;
+	}
+}
+
+.advads-searchbox {
+	@apply relative mt-5 w-lg max-w-lg mx-auto;
+
+	.input {
+		@apply border-border! rounded-lg px-4 py-3 w-full leading-0 focus:shadow-none placeholder:text-gray-400;
+	}
+
+	.icon {
+		@apply absolute top-1/2 right-4 -translate-y-1/2 stroke-gray-600 size-4.5;
+	}
+
+	.suggestions-list {
+		@apply absolute w-full bg-white text-left border border-border max-h-60 overflow-y-auto m-0 mt-0.75 rounded-lg shadow-lg hidden py-2;
+
+		a {
+			@apply no-underline;
+		}
+
+		li {
+			@apply py-2 px-4 cursor-pointer m-0;
+		}
+
+		li.selected {
+			@apply bg-gray-100;
+		}
+
+		.no-results {
+			@apply p-2.5 text-gray-400 cursor-default;
+		}
+
+		.secondary-text {
+			@apply text-gray-400 block text-xs italic;
+		}
+
+		&::-webkit-scrollbar {
+			@apply w-3;
+		}
+
+		&::-webkit-scrollbar-track {
+			@apply bg-transparent shadow-none;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			@apply bg-border rounded-lg border-3 border-transparent bg-clip-content;
+		}
+	}
+}
+
+.advads-videos-grid {
+	iframe {
+		@apply aspect-video;
+	}
+}
+
+.advads-dialog-create-ticket .advads-dialog-footer {
+	@apply border-0 bg-transparent justify-end;
+}
+
+.advads-file-uploader {
+	.dropzone {
+		@apply relative flex flex-col items-center justify-center w-full h-44 border border-dashed border-gray-500 rounded-lg cursor-pointer;
+
+		&:hover,
+		&.dragover {
+			@apply border-blue-500 bg-blue-50;
+		}
+
+		&.limit-reached {
+			@apply opacity-50 pointer-events-none border-gray-500;
+		}
+
+		input[type="file"] {
+			@apply absolute inset-0 opacity-0 cursor-pointer w-full h-full;
+		}
+	}
+
+	.upload-hints {
+		@apply text-xs mt-0 mb-4 px-6 space-x-2 text-center;
+	}
+
+	.file-count-badge {
+		@apply inline-block text-xs font-semibold text-blue-500 bg-blue-50 rounded-full px-2.5 py-1 my-4;
+
+		&.at-limit {
+			@apply text-orange-500 bg-orange-100;
+		}
+	}
+
+	.error-box {
+		@apply bg-red-50 border border-red-200 rounded-lg p-4 mb-4 hidden;
+
+		p {
+			@apply text-xs font-semibold text-red-500 m-0;
+		}
+
+		ul {
+			@apply list-disc list-inside;
+		}
+
+		li {
+			@apply text-xs text-red-500;
+		}
+	}
+
+	.selected-files-container {
+		@apply flex flex-col gap-4;
+	}
+
+	.file-item {
+		@apply flex items-center gap-4 bg-gray-100 rounded-lg py-2.5 px-4 border border-gray-200;
+	}
+
+	.file-image {
+		@apply size-14 rounded-md overflow-hidden flex items-center justify-center shrink-0 bg-gray-200 text-gray-400 text-lg;
+
+		img {
+			@apply w-full h-full object-cover;
+		}
+	}
+
+	.file-detail {
+		@apply flex-1 min-w-0;
+
+		h6 {
+			@apply text-xs font-semibold text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis m-0;
+		}
+
+		p {
+			@apply text-xs text-gray-500 mt-0.5 mb-1;
+		}
+	}
+
+	.file-actions {
+		@apply flex gap-2 flex-wrap;
+	}
+
+	.file-action-btn {
+		@apply text-xs px-3 py-1.5 rounded-md border border-gray-300 bg-white text-gray-500 cursor-pointer no-underline transition-all duration-150 inline-block;
+
+		&:hover {
+			@apply bg-red-500 text-white border-red-500;
+		}
+	}
+}

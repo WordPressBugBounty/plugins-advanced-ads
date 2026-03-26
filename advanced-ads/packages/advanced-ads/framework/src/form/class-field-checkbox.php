@@ -9,6 +9,8 @@
 
 namespace AdvancedAds\Framework\Form;
 
+use AdvancedAds\Framework\Utilities\HTML;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -27,11 +29,17 @@ class Field_Checkbox extends Field {
 			return;
 		}
 
-		echo '<div class="advads-checkbox-list ' . sanitize_html_class( $this->get( 'class' ) ) . '">';
-		foreach ( $this->get( 'options' ) as $key => $label ) :
+		$counter = 1;
+		$count   = count( $this->get( 'options' ) );
+		$name    = $this->get( 'name' ) . ( 1 === $count ? '' : '[]' );
+
+		$wrap_class = HTML::classnames( 'advads-checkbox-list', $this->get( 'class' ) );
+		echo '<div class=" ' . esc_attr( $wrap_class ) . '">';
+		foreach ( $this->get( 'options' ) as $item ) :
+			$option_id   = $this->get( 'id' ) . '-' . ( $counter++ );
 			?>
-			<label>
-				<input type="checkbox" name="<?php echo esc_attr( $this->get( 'name' ) ); ?>[]" value="<?php echo esc_attr( $key ); ?>"<?php checked( $this->get( 'value' ), $key ); ?> /><?php echo esc_html( $label ); ?>
+			<label for="<?php echo esc_attr( $option_id ); ?>">
+				<input type="checkbox" id="<?php echo esc_attr( $option_id ); ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $item['value'] ); ?>"<?php checked( $this->get( 'value' ), $item['value'] ); ?> /><?php echo esc_html( $item['label'] ); ?>
 			</label>
 			<?php
 		endforeach;

@@ -5,8 +5,7 @@
 		@apply hidden mb-3;
 	}
 
-	.wrap .subsubsub,
-	#screen-options-link-wrap {
+	.wrap .subsubsub {
 		@apply hidden;
 	}
 
@@ -86,10 +85,6 @@
 
 	tr:not(.inline-edit-row):not(.no-items) td:not(.column-primary)::before {
 		@apply content-none;
-	}
-
-	#screen-meta {
-		@apply absolute z-[1000] border-black;
 	}
 
 	.advads-quick-edit,

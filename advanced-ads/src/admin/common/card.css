@@ -1,0 +1,15 @@
+.advads-card {
+	@apply border border-border rounded p-6 mb-8 bg-white;
+
+	h3 {
+		@apply text-base font-medium;
+	}
+
+	.header-icon {
+		@apply bg-gray-200 rounded p-3 inline-flex items-center justify-center;
+	}
+
+	.header-icon svg {
+		@apply stroke-gray-700 size-6;
+	}
+}

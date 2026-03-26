@@ -49,6 +49,17 @@ class Placement_Types extends Types {
 	protected $type_interface = Placement_Type::class;
 
 	/**
+	 * Register custom types.
+	 *
+	 * @return void
+	 */
+	public function register_types(): void {
+		parent::register_types();
+
+		$this->sort_types();
+	}
+
+	/**
 	 * Register default types.
 	 *
 	 * @return void
@@ -61,23 +72,6 @@ class Placement_Types extends Types {
 		$this->register_type( Header::class );
 		$this->register_type( Sidebar_Widget::class );
 		$this->register_type( Standard::class );
-	}
-
-	/**
-	 * Get type order weight
-	 *
-	 * @return array
-	 */
-	public function get_order_list(): array {
-		$orders = [];
-
-		foreach ( $this->get_types() as $type ) {
-			$orders[ $type->get_id() ] = $type->get_order();
-		}
-
-		asort( $orders );
-
-		return $orders;
 	}
 
 	/**
@@ -95,5 +89,26 @@ class Placement_Types extends Types {
 		asort( $options );
 
 		return $options;
+	}
+
+	/**
+	 * Sort screens by order.
+	 *
+	 * @return void
+	 */
+	private function sort_types(): void {
+		uasort(
+			$this->types,
+			static function ( $a, $b ) {
+				$order_a = $a->get_order();
+				$order_b = $b->get_order();
+
+				if ( $order_a === $order_b ) {
+					return 0;
+				}
+
+				return ( $order_a < $order_b ) ? -1 : 1;
+			}
+		);
 	}
 }

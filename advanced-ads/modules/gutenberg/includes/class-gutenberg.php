@@ -89,7 +89,7 @@ class Advanced_Ads_Gutenberg {
 
 		$all_ads    = wp_advads_ad_query(
 			[
-				'post_status' => [ 'publish' ],
+				'post_status' => [ 'publish', 'future' ],
 				'orderby'     => 'title',
 				'order'       => 'ASC',
 			]

@@ -85,7 +85,7 @@ class Unknown implements Group_Type {
 	 * @return string The upgrade URL for the group type.
 	 */
 	public function get_image(): string {
-		$fallback = ADVADS_BASE_URL . 'admin/assets/img/placements/manual.png';
+		$fallback = ADVADS_BASE_URL . 'assets/img/placement-types/manual.png';
 
 		return $this->data['image'] ?? $fallback;
 	}

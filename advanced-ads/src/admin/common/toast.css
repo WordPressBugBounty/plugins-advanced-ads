@@ -1,0 +1,57 @@
+/* Toast container (bottom-right, stacked) */
+
+#advads-toast-container {
+	@apply fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none;
+}
+
+/* Base toast */
+
+.advads-toast {
+	@apply relative pointer-events-auto max-w-2xl min-w-80 rounded-md shadow-lg px-4 py-3 flex gap-4 bg-white text-gray-900;
+}
+
+.advads-toast-icon {
+	@apply size-6 text-sm;
+}
+
+.advads-toast-title {
+	@apply font-semibold text-sm mb-1;
+}
+
+.advads-toast-message {
+	@apply text-sm leading-snug;
+}
+
+.advads-toast-actions {
+	@apply mt-2 flex flex-wrap gap-2;
+}
+
+.advads-toast-dismiss {
+	@apply absolute top-2 right-2 inline-block size-6 text-sm text-gray-500 transition-colors no-underline shadow-none!;
+}
+
+.advads-toast-dismissible {
+	@apply pr-8;
+}
+
+/* Variants */
+
+.advads-toast-info {
+	@apply bg-blue-50 text-blue-700;
+}
+
+.advads-toast-success {
+	@apply bg-green-50 text-green-700;
+}
+
+.advads-toast-warning {
+	@apply bg-orange-50 text-orange-500;
+}
+
+.advads-toast-error {
+	@apply bg-red-50 text-red-700;
+}
+
+.advads-toast-muted {
+	@apply border-gray-400;
+}

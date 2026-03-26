@@ -13,7 +13,7 @@ $messages = [];
 if ( Advanced_Ads_Ad_Health_Notices::has_visible_problems() ) {
 	$messages[] = sprintf(
 		/* translators: %1$s is a starting link tag, %2$s is closing the link tag. */
-		esc_attr__( 'Advanced Ads detected potential problems with your ad setup. %1$sShow me these errors%2$s', 'advanced-ads' ),
+		esc_attr__( 'You have unread Advanced Ads notifications. %1$sShow me these notifications%2$s', 'advanced-ads' ),
 		'<a href="' . admin_url( 'admin.php?page=advanced-ads' ) . '">',
 		'</a>'
 	);

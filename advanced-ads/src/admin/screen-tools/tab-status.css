@@ -1,0 +1,18 @@
+.advads-system-information {
+	textarea	 {
+		@apply w-full block max-w-5xl h-160 p-5 rounded border border-border bg-white text-xs text-secondary-black whitespace-pre-wrap overflow-auto resize-none mb-5 focus:outline-none;
+		font-family: Menlo, Monaco, monospace;
+	}
+
+	textarea::-webkit-scrollbar {
+		@apply w-3;
+	}
+
+	textarea::-webkit-scrollbar-track {
+		@apply bg-transparent shadow-none;
+	}
+
+	textarea::-webkit-scrollbar-thumb {
+		@apply bg-border rounded-lg border-3 border-transparent bg-clip-content;
+	}
+}

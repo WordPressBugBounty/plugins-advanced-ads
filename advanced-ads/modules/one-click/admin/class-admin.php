@@ -46,7 +46,7 @@ class Admin implements Integration_Interface {
 		$config = Options::pubguru_config();
 
 		wp_advads()->registry->enqueue_script( 'oneclick-onboarding' );
-		wp_advads()->json->add(
+		wp_advads_json_add(
 			'oneclick',
 			[
 				'security'    => wp_create_nonce( 'pubguru_oneclick_security' ),

@@ -311,9 +311,10 @@ class Placement_Repository {
 			$query = new WP_Query(
 				WordPress::improve_wp_query(
 					[
-						'post_type'      => Constants::POST_TYPE_PLACEMENT,
-						'posts_per_page' => -1,
-						'post_status'    => 'any',
+						'post_type'        => Constants::POST_TYPE_PLACEMENT,
+						'posts_per_page'   => -1,
+						'post_status'      => 'any',
+						'suppress_filters' => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false, // Suppress filters if WPML is present.
 					]
 				)
 			);
@@ -336,10 +337,11 @@ class Placement_Repository {
 			$query = new WP_Query(
 				WordPress::improve_wp_query(
 					[
-						'post_type'      => Constants::POST_TYPE_PLACEMENT,
-						'posts_per_page' => -1,
-						'post_status'    => 'publish',
-						'fields'         => 'ids',
+						'post_type'        => Constants::POST_TYPE_PLACEMENT,
+						'posts_per_page'   => -1,
+						'post_status'      => 'publish',
+						'fields'           => 'ids',
+						'suppress_filters' => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false, // Suppress filters if WPML is present.
 					]
 				)
 			);

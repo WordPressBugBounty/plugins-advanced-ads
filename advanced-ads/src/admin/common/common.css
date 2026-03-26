@@ -1,0 +1,41 @@
+@import "../partials/tailwind.css";
+
+@source "../../../includes/admin/pages/";
+@source "../../../views/admin/header.php";
+@source "../../../views/admin/table-views-list.php";
+@source inline("items-start");
+@source inline("basis-full");
+@source inline("mt-0");
+
+@import "./deprecated.css";
+@import "./accordion.css";
+@import "./button.css";
+@import "./card.css";
+@import "./form.css";
+@import "./header.css";
+@import "./modal.css";
+@import "./modal-new.css";
+@import "./toast.css";
+
+.advads-page {
+	@apply bg-[#f8f9fa];
+
+	table.fixed {
+		@apply relative;
+	}
+}
+
+.advads-loader {
+	@apply block w-11 h-2.5 bg-no-repeat;
+	background-image: url(../img/loader.gif);
+
+	&.hidden {
+		@apply hidden;
+	}
+}
+
+/* Search Label */
+
+.advads-search-results-label {
+	@apply float-left mr-2 leading-7.5 font-bold;
+}

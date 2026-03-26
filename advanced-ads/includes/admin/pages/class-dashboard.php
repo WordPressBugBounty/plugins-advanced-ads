@@ -70,6 +70,17 @@ class Dashboard extends Screen {
 	}
 
 	/**
+	 * Get page header arguments
+	 *
+	 * @return array
+	 */
+	public function define_header_args(): array {
+		return [
+			'breadcrumb' => false,
+		];
+	}
+
+	/**
 	 * Display screen content.
 	 *
 	 * @return void

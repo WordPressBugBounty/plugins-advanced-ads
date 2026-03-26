@@ -65,6 +65,7 @@ class Entities implements Integration_Interface {
 			'labels'       => $labels,
 			'public'       => false,
 			'show_ui'      => true,
+			'show_in_rest' => true,
 			'show_in_menu' => false,
 			'hierarchical' => false,
 			'capabilities' => [
@@ -130,7 +131,7 @@ class Entities implements Integration_Interface {
 			'new_item'           => __( 'New Placement', 'advanced-ads' ),
 			'view'               => __( 'View', 'advanced-ads' ),
 			'view_item'          => __( 'View the Ad Placement', 'advanced-ads' ),
-			'search_items'       => __( 'Search Ad Placements', 'advanced-ads' ),
+			'search_items'       => __( 'Search Placements', 'advanced-ads' ),
 			'not_found'          => __( 'No Ad Placements found', 'advanced-ads' ),
 			'not_found_in_trash' => __( 'No Ad Placements found in Trash', 'advanced-ads' ),
 		];
@@ -140,6 +141,7 @@ class Entities implements Integration_Interface {
 			'description'  => __( 'Placements are physically places in your theme and posts. You can use them if you plan to change ads and ad groups on the same place without the need to change your templates.', 'advanced-ads' ),
 			'public'       => false,
 			'show_ui'      => true,
+			'show_in_rest' => true,
 			'show_in_menu' => false,
 			'hierarchical' => false,
 			'capabilities' => [
@@ -189,7 +191,7 @@ class Entities implements Integration_Interface {
 		$labels = [
 			'name'              => _x( 'Ad Groups & Rotations', 'ad group general name', 'advanced-ads' ),
 			'singular_name'     => _x( 'Ad Group', 'ad group singular name', 'advanced-ads' ),
-			'search_items'      => __( 'Search Ad Groups', 'advanced-ads' ),
+			'search_items'      => __( 'Search Groups', 'advanced-ads' ),
 			'all_items'         => __( 'All Ad Groups', 'advanced-ads' ),
 			'parent_item'       => __( 'Parent Ad Groups', 'advanced-ads' ),
 			'parent_item_colon' => __( 'Parent Ad Groups:', 'advanced-ads' ),
@@ -207,6 +209,7 @@ class Entities implements Integration_Interface {
 			'labels'            => $labels,
 			'show_ui'           => true,
 			'show_in_nav_menus' => false,
+			'show_in_rest'      => true,
 			'show_in_menu'      => false,
 			'show_tagcloud'     => false,
 			'show_admin_column' => true,

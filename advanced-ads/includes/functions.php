@@ -113,7 +113,9 @@ function get_user_ip_address() {
  * @return array
  */
 if ( ! function_exists( '__return_array_if_null' ) ) {
+	// phpcs:disable
 	function __return_array_if_null( $value ): array {
 		return $value ?? [];
 	}
+	// phpcs:enable
 }

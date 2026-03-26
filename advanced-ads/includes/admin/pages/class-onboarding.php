@@ -81,7 +81,7 @@ class Onboarding extends Screen {
 	private function adsense_data(): void {
 		if ( current_user_can( Conditional::user_cap( 'advanced_ads_manage_options' ) ) ) {
 			$nonce = wp_create_nonce( 'advanced_ads_wizard' );
-			wp_advads()->json->add(
+			wp_advads_json_add(
 				'wizard',
 				[
 					'nonce'          => $nonce,

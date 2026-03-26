@@ -2,11 +2,8 @@
 /**
  * Render select field for matching-technique of string-based Display Conditions
  *
- * @package   AdvancedAds
- * @author    Thomas Maier <support@wpadvancedads.com>
- * @license   GPL-2.0+
- * @link      https://wpadvancedads.com
- * @copyright since 2013 Thomas Maier, Advanced Ads GmbH
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
  *
  * @var string $name option name.
  * @var string $operator value of the $operator option.

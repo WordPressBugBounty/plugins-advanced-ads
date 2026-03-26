@@ -28,26 +28,8 @@ class Assets implements Integration_Interface {
 	 * @return void
 	 */
 	public function hooks(): void {
-		add_action( 'admin_enqueue_scripts', [ $this, 'current_screen' ], 10, 0 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_styles' ], 10, 0 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ], 9, 0 );
-	}
-
-	/**
-	 * Enqueue styles and scripts for current screen
-	 *
-	 * @return void
-	 */
-	public function current_screen(): void {
-		$screens   = wp_advads()->screens->get_screens();
-		$wp_screen = get_current_screen();
-
-		foreach ( $screens as $screen ) {
-			if ( $wp_screen->id === $screen->get_hook() ) {
-				$screen->enqueue_assets();
-				do_action( 'advanced-ads-screen-' . $screen->get_id(), $screen );
-			}
-		}
 	}
 
 	/**
@@ -58,34 +40,15 @@ class Assets implements Integration_Interface {
 	public function enqueue_styles(): void {
 		$wp_screen = get_current_screen();
 
-		if ( 'post' === $wp_screen->base && Constants::POST_TYPE_AD === $wp_screen->post_type ) {
-			wp_advads()->registry->enqueue_style( 'screen-ads-editing' );
-			wp_advads()->registry->enqueue_script( 'screen-ads-editing' );
-
-			// Enqueue code editor and settings for manipulating HTML.
-			$settings = wp_enqueue_code_editor( [ 'type' => 'application/x-httpd-php' ] );
-
-			// Only if CodeMirror is enabled.
-			if ( false !== $settings ) {
-				wp_advads()->json->add(
-					'admin',
-					[
-						'codeMirror' => [
-							'settings' => $settings,
-						],
-					]
-				);
-			}
+		// Bail if we should bail.
+		if ( $this->should_bail() ) {
+			return;
 		}
 
 		// TODO: made them load conditionaly.
 		if ( 'dashboard' !== $wp_screen->id ) {
 			wp_advads()->registry->enqueue_style( 'ui' );
 			wp_advads()->registry->enqueue_style( 'admin' );
-		}
-
-		if ( 'post' === $wp_screen->base && Constants::POST_TYPE_AD === $wp_screen->post_type ) {
-			wp_advads()->registry->enqueue_style( 'ad-positioning' );
 		}
 
 		if ( Conditional::is_screen_advanced_ads() ) {
@@ -104,10 +67,16 @@ class Assets implements Integration_Interface {
 		$screen = get_current_screen();
 		$this->enqueue_endpoints();
 		$this->enqueue_site_info();
+		$this->enqueue_i18n();
+
+		// Bail if we should bail.
+		if ( $this->should_bail() ) {
+			return;
+		}
 
 		// TODO: add conditional loading.
 		wp_advads()->registry->enqueue_script( 'admin-global' );
-		wp_advads()->registry->enqueue_script( 'find-adblocker' );
+		wp_advads()->registry->enqueue_script( 'commands' );
 
 		$params = [
 			'ajax_nonce'           => wp_create_nonce( 'advanced-ads-admin-ajax-nonce' ),
@@ -122,7 +91,6 @@ class Assets implements Integration_Interface {
 		if ( Conditional::is_screen_advanced_ads() ) {
 			wp_advads()->registry->enqueue_script( 'admin' );
 			wp_advads()->registry->enqueue_script( 'conditions' );
-			wp_advads()->registry->enqueue_script( 'wizard' );
 			wp_advads()->registry->enqueue_script( 'adblocker-image-data' );
 			wp_advads()->registry->enqueue_script( 'notifications-center' );
 
@@ -144,27 +112,13 @@ class Assets implements Integration_Interface {
 				'show_inactive_ads'             => __( 'Show inactive ads', 'advanced-ads' ),
 				'hide_inactive_ads'             => __( 'Hide inactive ads', 'advanced-ads' ),
 				'display_conditions_form_name'  => Advanced_Ads_Display_Conditions::FORM_NAME, // not meant for translation.
-				'delete_placement_confirmation' => __( 'Permanently delete this placement?', 'advanced-ads' ),
 				'close'                         => __( 'Close', 'advanced-ads' ),
 				'close_save'                    => __( 'Close and save', 'advanced-ads' ),
-				'save_new_placement'            => __( 'Save new placement', 'advanced-ads' ),
 				'confirmation'                  => __( 'Data you have entered has not been saved. Are you sure you want to discard your changes?', 'advanced-ads' ),
 				'admin_page'                    => $screen->id,
 				'placements_allowed_ads'        => [
-					'action' => 'advads-placements-allowed-ads',
-					'nonce'  => wp_create_nonce( 'advads-placements-allowed-ads' ),
-				],
-				'group_forms'                   => [
-					'save'         => __( 'Save', 'advanced-ads' ),
-					'save_new'     => __( 'Save New Group', 'advanced-ads' ),
-					'updated'      => __( 'Group updated', 'advanced-ads' ),
-					'deleted'      => __( 'Group deleted', 'advanced-ads' ),
-					/* translators: an ad group title. */
-					'confirmation' => __( 'You are about to permanently delete %s', 'advanced-ads' ),
-				],
-				'placement_forms'               => [
-					'created' => __( 'New placement created', 'advanced-ads' ),
-					'updated' => __( 'Placement updated', 'advanced-ads' ),
+					'action' => 'advads_placements_allowed_ads',
+					'nonce'  => wp_create_nonce( 'advads-create-new-placement' ),
 				],
 			];
 
@@ -211,5 +165,34 @@ class Assets implements Integration_Interface {
 		];
 
 		wp_advads_json_add( 'endpoints', $endpoints );
+	}
+
+	/**
+	 * Localize i18n strings
+	 *
+	 * @return void
+	 */
+	private function enqueue_i18n() {
+		$data = [
+			'btnCloseLabel'      => __( 'Close', 'advanced-ads' ),
+			'searchResultsLabel' => __( 'Showing search results for', 'advanced-ads' ),
+		];
+
+		wp_advads_json_add( 'i18n', $data );
+	}
+
+	/**
+	 * Check if we should bail from enqueueing assets.
+	 *
+	 * @return bool
+	 */
+	private function should_bail(): bool {
+		$wp_screen = get_current_screen();
+
+		$bail_screens = [
+			'advanced-ads_page_advanced-ads-tools',
+		];
+
+		return in_array( $wp_screen->id, $bail_screens, true );
 	}
 }

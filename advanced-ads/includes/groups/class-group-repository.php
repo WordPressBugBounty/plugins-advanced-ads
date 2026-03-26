@@ -174,6 +174,7 @@ class Group_Repository {
 				'number'                 => 0,
 				'orderby'                => 'name',
 				'update_term_meta_cache' => false,
+				'suppress_filters'       => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false, // Suppress filters if WPML is present.
 			]
 		);
 

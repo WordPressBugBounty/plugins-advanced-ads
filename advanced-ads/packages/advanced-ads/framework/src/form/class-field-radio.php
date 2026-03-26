@@ -9,6 +9,8 @@
 
 namespace AdvancedAds\Framework\Form;
 
+use AdvancedAds\Framework\Utilities\HTML;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -27,11 +29,15 @@ class Field_Radio extends Field {
 			return;
 		}
 
-		echo '<div class="advads-radio-list ' . sanitize_html_class( $this->get( 'class' ) ) . '">';
-		foreach ( $this->get( 'options' ) as $key => $label ) :
+		$counter = 1;
+
+		$wrap_class = HTML::classnames( 'advads-radio-list', $this->get( 'class' ) );
+		echo '<div class=" ' . esc_attr( $wrap_class ) . '">';
+		foreach ( $this->get( 'options' ) as $data ) :
+			$option_id   = $this->get( 'id' ) . '-' . ( $counter++ );
 			?>
-			<label>
-				<input type="radio" name="<?php echo esc_attr( $this->get( 'name' ) ); ?>" value="<?php echo esc_attr( $key ); ?>"<?php checked( $this->get( 'value' ), $key ); ?> /><?php echo esc_html( $label ); ?>
+			<label for="<?php echo esc_attr( $option_id ); ?>">
+				<input type="radio" id="<?php echo esc_attr( $option_id ); ?>" name="<?php echo esc_attr( $this->get( 'name' ) ); ?>" value="<?php echo esc_attr( $data['value'] ); ?>"<?php checked( $this->get( 'value' ), $data['value'] ); ?> /><?php echo esc_html( $data['label'] ); ?>
 			</label>
 			<?php
 		endforeach;

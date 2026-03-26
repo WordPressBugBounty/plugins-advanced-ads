@@ -71,7 +71,7 @@ class Sidebar_Widget extends Base implements Placement_Type {
 	 * @return string The upgrade URL for the placement type.
 	 */
 	public function get_image(): string {
-		return ADVADS_BASE_URL . 'admin/assets/img/placements/widget.png';
+		return ADVADS_BASE_URL . 'assets/img/placement-types/widget.png';
 	}
 
 	/**

@@ -1,3 +1,5 @@
 {
-	"baseURL": "http://wp-ads.vm"
+	"use": {
+		"baseURL": "http://wp-ads.vm"
+	}
 }

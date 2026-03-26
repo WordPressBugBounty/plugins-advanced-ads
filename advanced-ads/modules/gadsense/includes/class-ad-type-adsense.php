@@ -2,11 +2,8 @@
 /**
  * AdSense Ad Type
  *
- * @package   Advanced_Ads
- * @author    Thomas Maier <support@wpadvancedads.com>
- * @license   GPL-2.0+
- * @link      https://wpadvancedads.com
- * @copyright 2013-2022 Thomas Maier, Advanced Ads GmbH
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
  */
 
 use AdvancedAds\Abstracts\Ad;

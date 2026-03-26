@@ -1,0 +1,97 @@
+/* ------------------------------
+   Modal: Layout + Structure
+-------------------------------- */
+
+.advads-dialog {
+	@apply p-0 border-0 bg-transparent size-full z-9991 max-w-full max-h-full;
+	@apply opacity-0 pointer-events-none;
+	@apply transition-opacity duration-200 ease-out;
+}
+
+.advads-dialog::backdrop {
+	@apply bg-black/50 backdrop-blur-[1px];
+	@apply transition-opacity duration-200 ease-out;
+}
+
+.advads-dialog-wrap {
+	@apply w-full sm:max-w-2xl mx-auto;
+}
+
+.advads-dialog-frame {
+	@apply relative flex flex-col bg-white rounded-md;
+
+	max-height: calc(100vh - 2rem - var(--wp-admin--admin-bar--height, 0px));
+	margin-top: calc(1rem + var(--wp-admin--admin-bar--height, 0px));
+
+	box-shadow:
+		0 4px 8px 0 rgba(0, 0, 0, 0.2),
+		0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.advads-dialog-header {
+	@apply p-8 pb-6 relative text-gray-900;
+
+	h3 {
+		@apply m-0 text-xl font-medium;
+	}
+}
+
+.advads-dialog-description {
+	@apply mb-0 text-sm;
+}
+
+.advads-dialog-button-close {
+	@apply block no-underline absolute top-4 right-4 text-gray-500;
+}
+
+.advads-dialog-body {
+	@apply overflow-y-auto px-8 pb-6;
+
+	> :first-child {
+		@apply mt-0;
+	}
+
+	> :last-child {
+		@apply mb-0;
+	}
+
+	&::-webkit-scrollbar {
+		@apply w-3;
+	}
+
+	&::-webkit-scrollbar-track {
+		@apply bg-transparent shadow-none;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		@apply bg-border rounded-lg border-3 border-transparent bg-clip-content;
+	}
+}
+
+.advads-dialog-footer {
+	@apply bg-gray-50 px-6 py-4 flex gap-x-4 justify-between border-t border-border rounded-b-md;
+}
+
+/* ------------------------------
+   Sizes
+-------------------------------- */
+
+.advsads-dialog-sm .advads-dialog-wrap {
+	@apply sm:max-w-lg;
+}
+
+.advsads-dialog-md .advads-dialog-wrap {
+	@apply sm:max-w-xl;
+}
+
+.advsads-dialog-lg .advads-dialog-wrap {
+	@apply sm:max-w-4xl;
+}
+
+/* ------------------------------
+   States
+-------------------------------- */
+
+.advads-dialog[data-state="enter"] {
+	@apply opacity-100 pointer-events-auto;
+}

@@ -43,20 +43,52 @@ class Version_Control implements Integration_Interface {
 	}
 
 	/**
+	 * Get usable version, fetch from the info API if needed
+	 *
+	 * @return mixed|void
+	 */
+	public function get_usable_versions() {
+		$this->check_user_capabilities();
+
+		if ( ! wp_verify_nonce( Params::post( 'nonce', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS ), 'advads-version-control' ) ) {
+			wp_send_json_error( 'Not authorized', 401 );
+		}
+
+		$stored_versions = get_transient( self::VERSIONS_TRANSIENT );
+
+		if ( $stored_versions ) {
+			if ( wp_doing_ajax() ) {
+				wp_send_json_success( $stored_versions, 200 );
+			}
+
+			return $stored_versions;
+		}
+
+		$versions = $this->get_version_from_api();
+
+		if ( is_wp_error( $versions ) ) {
+			wp_send_json_error( $versions->get_error_message() . '>>' . $versions->get_error_message(), $versions->get_error_code() );
+		}
+
+		$versions = $this->filter_version_number( $versions );
+		set_transient( self::VERSIONS_TRANSIENT, $versions, 3 * HOUR_IN_SECONDS );
+		wp_send_json_success( $versions, 200 );
+	}
+
+	/**
 	 * Download and install the desired version
 	 *
 	 * @return void
 	 */
 	public function install_plugin(): void {
 		$this->check_user_capabilities();
-		wp_parse_str( Params::post( 'vars', '' ), $args );
-		$nonce = sanitize_key( $args['nonce'] ) ?? '';
+		$nonce = sanitize_key( Params::post( 'version-control-nonce', '' ) );
 
 		if ( ! wp_verify_nonce( $nonce, 'advads-version-control' ) ) {
 			wp_send_json_error( 'Not authorized', 401 );
 		}
 
-		$exploded  = explode( '|', $args['version'] );
+		$exploded  = explode( '|', Params::post( 'version', '' ) );
 		$version   = sanitize_text_field( $exploded[0] );
 		$package   = sanitize_url( $exploded[1] );
 		$installer = new Plugin_Installer( $version, $package );
@@ -88,39 +120,6 @@ class Version_Control implements Integration_Interface {
 			],
 			200
 		);
-	}
-
-	/**
-	 * Get usable version, fetch from the info API if needed
-	 *
-	 * @return mixed|void
-	 */
-	public function get_usable_versions() {
-		$this->check_user_capabilities();
-
-		if ( ! wp_verify_nonce( Params::post( 'nonce', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS ), 'advads-version-control' ) ) {
-			wp_send_json_error( 'Not authorized', 401 );
-		}
-
-		$stored_versions = get_transient( self::VERSIONS_TRANSIENT );
-
-		if ( $stored_versions ) {
-			if ( wp_doing_ajax() ) {
-				wp_send_json_success( $stored_versions, 200 );
-			}
-
-			return $stored_versions;
-		}
-
-		$versions = $this->get_version_from_api();
-
-		if ( is_wp_error( $versions ) ) {
-			wp_send_json_error( $versions->get_error_message() . '>>' . $versions->get_error_message(), $versions->get_error_code() );
-		}
-
-		$versions = $this->filter_version_number( $versions );
-		set_transient( self::VERSIONS_TRANSIENT, $versions, 3 * HOUR_IN_SECONDS );
-		wp_send_json_success( $versions, 200 );
 	}
 
 	/**

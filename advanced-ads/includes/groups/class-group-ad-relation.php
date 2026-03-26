@@ -75,18 +75,17 @@ class Group_Ad_Relation {
 	 *
 	 * @return void
 	 */
-	private function handle_added_ads( $added_ads, &$group ): void {
-		$changes       = $group->get_changes();
-		$new_ads_final = $changes['ad_weights'] ?? [];
-		$new_ads       = $changes['ad_weights'] ? array_keys( $changes['ad_weights'] ) : [];
+	private function handle_added_ads( array $added_ads, &$group ): void {
+		$group_id   = $group->get_id();
+		$ad_weights = $group->get_ad_weights();
 
-		foreach ( $new_ads as $ad_id ) {
+		foreach ( $added_ads as $ad_id ) {
 			/**
 			 * Check if this ad is representing the current group and remove it in this case
-			 * could cause an infinite loop otherwise
+			 * could cause an infinite loop otherwise.
 			 */
 			if ( $this->is_ad_type_group( $ad_id, $group ) ) {
-				unset( $new_ads_final[ $ad_id ] );
+				unset( $ad_weights[ $ad_id ] );
 				continue;
 			}
 
@@ -94,7 +93,7 @@ class Group_Ad_Relation {
 
 			if ( ! is_wp_error( $terms ) ) {
 				$term_ids   = wp_list_pluck( $terms, 'term_id' );
-				$term_ids[] = $group->get_id();
+				$term_ids[] = $group_id;
 				$term_ids   = array_unique( $term_ids );
 
 				wp_set_object_terms( $ad_id, $term_ids, Constants::TAXONOMY_GROUP );
@@ -102,7 +101,7 @@ class Group_Ad_Relation {
 			}
 		}
 
-		$group->set_ad_weights( $new_ads_final );
+		$group->set_ad_weights( $ad_weights );
 	}
 
 	/**

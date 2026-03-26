@@ -1,0 +1,29 @@
+.wp-list-table {
+	.column-type {
+		@apply w-12;
+	}
+
+	.column-type img {
+		@apply size-12;
+	}
+}
+
+.advads-ad-group-list-ads > div {
+	@apply flex m-0 p-1 items-center justify-between rounded hover:bg-[#eee];
+}
+
+.advads-ad-group-list-ad-title {
+	@apply flex items-center gap-x-2;
+}
+
+#advads-group-filter-form {
+	@apply flex items-center gap-x-4 mb-2;
+
+	.search-box {
+		@apply m-0;
+	}
+}
+
+.toggle-row {
+	@apply hidden;
+}

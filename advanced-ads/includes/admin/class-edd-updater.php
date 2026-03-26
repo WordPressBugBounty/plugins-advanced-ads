@@ -358,6 +358,7 @@ class EDD_Updater {
 		} elseif ( ! empty( $changelog_link ) ) {
 			echo ' ';
 			printf(
+				/* translators: 1: opening anchor tag, do not translate 2. the new plugin version 3. closing anchor tag, do not translate 4. opening anchor tag, do not translate 5. closing anchor tag, do not translate. */
 				__( '%1$sView version %2$s details%3$s or %4$supdate now%5$s.', 'advanced-ads' ), // phpcs:ignore
 				'<a target="_blank" class="thickbox open-plugin-details-modal" href="' . esc_url( $changelog_link ) . '">',
 				esc_html( $update_cache->response[ $this->name ]->new_version ),

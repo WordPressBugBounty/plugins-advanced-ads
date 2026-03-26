@@ -1,10 +1,10 @@
 === Advanced Ads – Ad Manager & AdSense ===
-Contributors: webzunft, advancedads
+Contributors: advancedads
 Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.17
+Stable tag: 2.0.18
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -359,6 +359,27 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.18 (March 26, 2026) =
+
+- Feature: importer for Ads for WP to migrate ads, groups, placements and settings.
+- Improvement: Add Ad Inserter importer
+- Improvement: Replace WP-Cron with Action Scheduler for Ad Expiration
+- Improvement: Brave browser adblocker fallback ads were not triggered, Brave allows detection script through
+- Improvement: Test plugin compatibility with WordPress 6.9.
+- Improvement: Optimize ad rendering by replacing DOM parsing with native PHP regex processing
+- Improvement: Remove Amazon Integration banner from dashboard and disable PEF Module
+- Improvement: Add Ads, Placements, and Groups to Command Palette
+- Fix: fallback images show correctly based on user consent and non-personalized option
+- Fix: Fix nested rendering of sidebar and header placements by optimizing injection logic
+- Fix: Fix multiple WPML bugs, including disabling translations for groups, fix placements not showing translated ads and grous
+- Fix: Adds scheduled ads to the Gutenberg widget dropdown selector, if scheduled ad is selected, will only show when published
+- Fix: AMP - Responsive add-on license field not showing up on License Settings
+- Fix: Duplicated ads not showing on ad group when added via metabox, deleted ads not being cleared from group ad weights
+- Fix: Change the trigger logic of new placement modal when no placements, trigger hashchange event (on dialog-advads-modal.js)
+- Fix: Reword Advanced Ads notifications warning on Settings page, from errors to notifications
+- Fix: Remove Product Experimentation Module, Amazon banner from old support page
+- Fix: Resolved fatal error in Groups upgrade caused by namespace issue
 
 = 2.0.17 (February 3, 2026) =
 

@@ -1,0 +1,183 @@
+#advads_overview_addons {
+	h2 {
+		@apply !border-b-0;
+	}
+
+	.inside {
+		@apply m-0 pb-0;
+	}
+}
+
+#advanced-ads-addon-box {
+	.subheader {
+		@apply font-semibold border-0 border-b border-t border-solid block border-border;
+		background-color: #fdfdfe;
+		font-size: 14px;
+		padding: 8px 12px;
+		margin: 24px -15px auto;
+		line-height: 1.4;
+
+		&:first-of-type {
+			@apply mt-0;
+		}
+	}
+
+	.single-item {
+		&.none {
+			background: #f6f7f7;
+			color: #a7aaad;
+		}
+
+		.item-grid {
+			@apply grid grid-cols-4;
+			margin: 0 24px 24px;
+			padding-bottom: 12px;
+			gap: 12px;
+
+			.feature {
+				@apply flex font-semibold;
+				padding: 12px;
+				background-color: #fff;
+				border-radius: 24px;
+
+				span {
+					@apply text-center w-full;
+				}
+
+				.dashicons::before {
+					content: "\f147";
+				}
+
+				&.more {
+					background-color: transparent;
+
+					.dashicons::before {
+						content: "\f543";
+					}
+				}
+			}
+		}
+	}
+
+	.cta {
+		text-align: end;
+
+		.upsell,
+		.missing {
+			.dashicons::before {
+				content: "\f132";
+			}
+		}
+
+		.dashicons {
+			@apply align-middle;
+
+			&::before {
+				margin-left: -5px;
+			}
+		}
+
+		.active .dashicons::before {
+			content: "\f147";
+		}
+
+		.installed .dashicons::before {
+			content: "\f159";
+		}
+
+		.subscribe .dashicons::before {
+			content: "\f465";
+		}
+
+		.subscribed .dashicons::before {
+			content: "\f132";
+		}
+
+		&.secondary .button,
+		.installed {
+			background: #fff;
+			border-color: #0474a2;
+			color: #0474a2;
+		}
+
+		.upsell {
+			background-color: #1b193a;
+			border-color: #1b193a;
+			color: #fff;
+		}
+
+		.missing,
+		.subscribe,
+		.subscribed,
+		&.primary .button {
+			background-color: #0474a2;
+			color: #fff;
+		}
+
+		.external-link {
+			@apply text-end;
+			margin-top: 12px;
+
+			a {
+				text-decoration: none;
+
+				span {
+					@apply inline-block align-middle;
+				}
+			}
+		}
+	}
+
+	a {
+		color: #0474a2;
+	}
+
+	.item-details,
+	.bundle-details,
+	.bundle-item {
+		@apply grid grid-cols-[50px_12px_15em_24px_auto_24px_auto];
+		padding: 24px;
+
+		.name {
+			@apply font-bold;
+			padding: 6.5px 0;
+		}
+
+		.description {
+			padding: 6.5px 0;
+		}
+
+		.icon {
+			margin: -12px 0 -12px -12px;
+		}
+	}
+
+	.bundle-details {
+		@apply pb-0;
+	}
+
+	.bundle-item a {
+		text-decoration: none;
+	}
+
+	.single-item,
+	.bundle {
+		@apply border border-border rounded-md my-3 mx-0;
+		background-color: #f2fcff;
+		color: #222;
+	}
+
+	.bundle-items {
+		@apply bg-white border border-border rounded-md my-6;
+
+		.separator {
+			margin: 0 24px 0 12px;
+			height: 1px;
+			border-bottom: 1px solid #f6f7f7;
+
+			&:last-of-type {
+				display: none;
+			}
+		}
+	}
+}

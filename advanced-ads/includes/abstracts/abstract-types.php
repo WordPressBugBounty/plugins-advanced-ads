@@ -24,7 +24,7 @@ abstract class Types implements Integration_Interface {
 	 *
 	 * @var array
 	 */
-	private $types = [];
+	protected $types = [];
 
 	/**
 	 * Hook to filter types.

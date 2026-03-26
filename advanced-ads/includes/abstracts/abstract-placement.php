@@ -246,8 +246,9 @@ class Placement extends Data implements Entity_Interface {
 				$class[] = $prefix . $this->get_slug();
 			}
 
-			$ad_args['output']          = $ad_args['output'] ?? [];
-			$ad_args['output']['class'] = $class;
+			$ad_args['output']            = $ad_args['output'] ?? [];
+			$ad_args['output']['class']   = $class;
+			$ad_args['output']['class'][] = $prefix . 'entity-placement';
 		}
 
 		// Create placement id for various features like ajax ads.

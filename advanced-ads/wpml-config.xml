@@ -6,4 +6,7 @@
           	</key>
         </key>
     </admin-texts>
+    <taxonomies>
+        <taxonomy translate="0">advanced_ads_groups</taxonomy>
+    </taxonomies>
 </wpml-config>

@@ -149,7 +149,7 @@ class Addon_Updater implements Integration_Interface {
 	public function add_license_fields(): void {
 		$add_ons = Data::get_addons();
 		foreach ( $add_ons as $data ) {
-			if ( 'responsive' === $data['id'] || 'slider-ads' === $data['id'] ) {
+			if ( 'slider-ads' === $data['id'] ) {
 				continue;
 			}
 

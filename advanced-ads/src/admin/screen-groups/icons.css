@@ -1,0 +1,45 @@
+/* Base icon */
+
+.advads-ad-status-icon {
+	@apply block size-[20px] bg-center bg-[length:20px] bg-no-repeat;
+	background-image: var(--icon-bw);
+}
+
+/* Hover turns BW → color */
+
+.advads-ad-status-icon:hover {
+	background-image: var(--icon-color);
+}
+
+/* Status classes */
+
+.advads-ad-status-icon-published,
+.advads-ad-status-icon-publish {
+	--icon-bw: url(../img/icons/publish-bw.svg);
+	--icon-color: url(../img/icons/publish.svg);
+}
+
+.advads-ad-status-icon-draft {
+	--icon-bw: url(../img/icons/draft-bw.svg);
+	--icon-color: url(../img/icons/draft.svg);
+}
+
+.advads-ad-status-icon-future {
+	--icon-bw: url(../img/icons/future-bw.svg);
+	--icon-color: url(../img/icons/future.svg);
+}
+
+.advads-ad-status-icon-expiring {
+	--icon-bw: url(../img/icons/expiring-bw.svg);
+	--icon-color: url(../img/icons/expiring.svg);
+}
+
+.advads-ad-status-icon-expired,
+.advads-ad-status-icon-trash {
+	--icon-bw: url(../img/icons/trash-bw.svg);
+	--icon-color: url(../img/icons/trash.svg);
+}
+
+.advads-ad-group-list-ads > div:hover .advads-ad-status-icon {
+	background-image: var(--icon-color);
+}

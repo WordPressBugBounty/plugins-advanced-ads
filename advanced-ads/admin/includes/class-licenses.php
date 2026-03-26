@@ -528,6 +528,10 @@ class Advanced_Ads_Admin_Licenses {
 		}
 
 		foreach ( $add_ons as $_add_on ) {
+			if ( 'slider-ads' === $_add_on['id'] ) {
+				continue;
+			}
+
 			$status = self::get_instance()->get_license_status( $_add_on['options_slug'] );
 
 			// check expiry date.

@@ -450,7 +450,7 @@ abstract class Ad extends Data implements Entity_Interface {
 			$url = str_replace( $placeholders, '', $url );
 		}
 
-		$this->set_prop( 'url', trim( $url ) );
+		$this->set_prop( 'url', trim( (string) $url ) );
 	}
 
 	/**
@@ -921,8 +921,8 @@ abstract class Ad extends Data implements Entity_Interface {
 	 */
 	public function get_ad_schedule_html(): string {
 		[
-			'post_start' => $post_start,
-			'status_type' => $status_type,
+			'post_start'     => $post_start,
+			'status_type'    => $status_type,
 			'status_strings' => $status_strings
 		] = $this->get_ad_schedule_details();
 

@@ -65,7 +65,6 @@ class Screen_Options implements Integration_Interface {
 		}
 
 		$selected_filters    = $screen->get_option( 'filters_to_show' ) ?? [];
-		$is_filter_permanent = boolval( $screen->get_option( 'show-filters' ) );
 		$optional_filters    = $this->get_optional_filters();
 
 		// If the default WordPress screen options don't exist, we have to force the submit button to show.

@@ -25,12 +25,6 @@ jQuery(document).ready(function ($) {
 			return jQuery(this).find('.advads-ad-list-tooltip-content').html();
 		},
 	});
-	// show edit icon in the last head column
-	$('.post-type-advanced_ads .wp-list-table thead th:last-of-type')
-		.append('<span class="dashicons dashicons-edit"></span>')
-		.on('click', function () {
-			$('#show-settings-link').trigger('click');
-		});
 
 	/**
 	 * Logic for placement list
@@ -107,21 +101,6 @@ jQuery(document).ready(function ($) {
 		});
 	})();
 
-	jQuery('.advads-delete-tag').each(function () {
-		jQuery(this).on('click', function () {
-			const r = confirm(window.advadstxt.delete_placement_confirmation);
-			if (r === true) {
-				const row = jQuery(this).parents('.advanced-ads-placement-row');
-				row.find('.advads-placements-item-delete').prop(
-					'checked',
-					true
-				);
-				row.data('touched', true);
-				jQuery('#advanced-ads-placements-form').submit();
-			}
-		});
-	});
-
 	// sort placement by type order or name
 	jQuery('.advads-sort').on('click', function (e) {
 		const sort = jQuery(this);
@@ -195,16 +174,6 @@ jQuery(document).ready(function ($) {
 		} else {
 			$('.advads-output-wrapper-id-error').removeClass('hidden');
 		}
-	});
-
-	// show more than 3 ads when clicked on a link
-	$('.advads-group-ads-list-show-more').on('click', function () {
-		$(this)
-			.hide()
-			.parent()
-			.siblings('.advads-ad-group-list-ads')
-			.children('div')
-			.show();
 	});
 
 	/**
@@ -508,20 +477,6 @@ jQuery(document).ready(function ($) {
 			);
 		}
 	);
-	// show screen options when clicking on our custom link or the Close button
-	$('#advads-show-screen-options').on('click', function () {
-		$('#show-settings-link').trigger('click');
-	});
-	// Add a close button to the screen options
-	$(
-		'<button type="button" class="button advads-button-secondary">' +
-			advadstxt.close +
-			'</button>'
-	)
-		.appendTo($('.post-type-advanced_ads #adv-settings .submit'))
-		.on('click', function () {
-			$('#show-settings-link').trigger('click');
-		});
 
 	/**
 	 * PLACEMENTS

@@ -35,10 +35,12 @@ $close_validation_object = [
 	<a href="#close" class="advads-modal-close-background">Close</a>
 	<div class="advads-modal-content">
 		<div class="advads-modal-header">
-			<a href="#close" class="advads-modal-close" title="<?php esc_html_e( 'Cancel', 'advanced-ads' ); ?>">&times;</a>
 			<h2>
 				<?php echo esc_html( $modal_title ); ?>
 			</h2>
+			<a href="#close" class="advads-modal-close" title="<?php esc_html_e( 'Cancel', 'advanced-ads' ); ?>">
+				<span class="dashicons dashicons-no-alt"></span>
+			</a>
 		</div>
 		<div class="advads-modal-body">
 			<?php

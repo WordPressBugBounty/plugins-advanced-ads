@@ -76,14 +76,6 @@ class Admin_Compatibility implements Integration_Interface {
 
 		$screen = get_current_screen();
 
-		// Are we on group edit page and ad group translations are disabled.
-		if ( isset( $screen->id ) && 'advanced-ads_page_advanced-ads-groups' === $screen->id ) {
-			$translatable_taxonomies = $sitepress->get_translatable_taxonomies();
-			if ( ! is_array( $translatable_taxonomies ) || ! in_array( 'advanced_ads_groups', $translatable_taxonomies, true ) ) {
-				return [];
-			}
-		}
-
 		// If ad post type is translatable.
 		if ( isset( $screen->id ) && in_array( $screen->id, [ 'edit-advanced_ads', 'advanced_ads' ], true ) ) {
 			$translatable_documents = $sitepress->get_translatable_documents();

@@ -21,10 +21,7 @@ use AdvancedAds\Utilities\Conditional;
 	<button type="button" id="advads-wizard-controls-next" class="button button-primary button-large"><?php echo esc_attr_x( 'next', 'wizard navigation', 'advanced-ads' ); ?>&nbsp;<span class="dashicons dashicons-controls-forward"></span></button>
 	<p><a href="javascript:void(0)" class="advads-stop-wizard"><?php esc_attr_e( 'Stop Wizard and show all options', 'advanced-ads' ); ?></a></p>
 </div>
-<?php if ( $this->start_wizard_automatically() ) : ?>
-<script>jQuery( document ).ready(function ($) { advads_wizard.start() });</script>
-	<?php
-endif;
+<?php
 
 /**
  * Support and review box

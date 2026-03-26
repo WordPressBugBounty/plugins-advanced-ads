@@ -1,0 +1,36 @@
+.advads-header-manual-link {
+	@apply text-gray-400 no-underline block focus:text-primary hover:text-primary;
+
+	span {
+		@apply size-[30px] text-[28px];
+
+		&::before {
+			@apply text-[28px];
+		}
+	}
+}
+
+.advads-page {
+	#screen-meta {
+		@apply absolute z-[1000] w-4/5 border-border;
+	}
+
+	#advads-header {
+		#adv-settings p.submit {
+			@apply flex items-center gap-x-1;
+		}
+
+		#show-settings-link {
+			@apply focus:border-border focus:shadow-none;
+		}
+	}
+
+	h1.wp-heading-inline,
+	.page-title-action {
+		@apply hidden;
+	}
+}
+
+#wpbody-content #screen-meta-links {
+	@apply hidden;
+}

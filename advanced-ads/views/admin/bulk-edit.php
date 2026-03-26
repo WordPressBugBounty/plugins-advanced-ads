@@ -9,10 +9,10 @@
  * @var array $privacy_options privacy module options.
  */
 
-use AdvancedAds\Admin\Quick_Bulk_Edit;
-use AdvancedAds\Options;
-
 global $wp_locale;
+
+use AdvancedAds\Options;
+use AdvancedAds\Admin\Ads\Quick_Bulk_Edit;
 
 ?>
 <fieldset class="inline-edit-col-right advads-bulk-edit">

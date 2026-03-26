@@ -13,8 +13,8 @@ use WP_Screen;
 use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Screen;
 use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Admin\Placement_List_Table;
-use AdvancedAds\Admin\Placement_Create_Modal;
+use AdvancedAds\Admin\Placements\List_Table;
+use AdvancedAds\Admin\Placements\Create_Modal;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -38,7 +38,7 @@ class Placements extends Screen {
 	 * @return void
 	 */
 	public function register_screen(): void {
-		$hook = add_submenu_page(
+		add_submenu_page(
 			ADVADS_SLUG,
 			__( 'Ad Placements', 'advanced-ads' ),
 			__( 'Placements', 'advanced-ads' ),
@@ -69,7 +69,25 @@ class Placements extends Screen {
 		wp_advads()->registry->enqueue_style( 'screen-placements-listing' );
 		wp_advads()->registry->enqueue_script( 'screen-placements-listing' );
 
-		wp_advads_json_add( 'content_placement_picker_url', $this->get_content_placement_picker_url() );
+		wp_advads_json_add(
+			'placements',
+			[
+				'updateItemNonce' => wp_create_nonce( 'placement-update-item'),
+				'pickerUrl'       => $this->get_placement_picker_url(),
+			]
+		);
+
+		// Localize texts.
+		$i18n = [
+			'placements'               => [
+				'created'   => __( 'New placement created', 'advanced-ads' ),
+				'updated'   => __( 'Placement updated', 'advanced-ads' ),
+				'closeSave' => __( 'Close and save', 'advanced-ads' ),
+				'saveNew'   => __( 'Save new placement', 'advanced-ads' ),
+				'draft'     => __( 'Draft', 'advanced-ads' ),
+			],
+		];
+		wp_advads_json_add( 'i18n', $i18n );
 	}
 
 	/**
@@ -90,9 +108,36 @@ class Placements extends Screen {
 	 */
 	public function load_placement_ui( WP_Screen $screen ): void {
 		if ( 'edit-' . Constants::POST_TYPE_PLACEMENT === $screen->id ) {
-			( new Placement_List_Table() )->hooks();
-			( new Placement_Create_Modal() )->hooks();
+			( new List_Table() )->hooks();
+			( new Create_Modal() )->hooks();
 		}
+	}
+
+	/**
+	 * Get page header arguments
+	 *
+	 * @return array
+	 */
+	public function define_header_args(): array {
+		return [
+			'title'            => __( 'Your Placements', 'advanced-ads' ),
+			'breadcrumb_title' => __( 'Placements', 'advanced-ads' ),
+			'manual_url'       => 'https://wpadvancedads.com/manual/placements/',
+		];
+	}
+
+	/**
+	 * Add actions to the header
+	 *
+	 * @return void
+	 */
+	public function header_actions(): void {
+		?>
+		<a href="#modal-placement-new" data-dialog="modal-placement-new" class="button button-primary advads-button">
+			<span class="dashicons dashicons-plus -ml-1.5 leading-6"></span>
+			<span><?php esc_html_e( 'New Placement', 'advanced-ads' ); ?></span>
+		</a>
+		<?php
 	}
 
 	/**
@@ -100,7 +145,7 @@ class Placements extends Screen {
 	 *
 	 * @return string
 	 */
-	private function get_content_placement_picker_url() {
+	private function get_placement_picker_url() {
 		$location = false;
 
 		if ( get_option( 'show_on_front' ) === 'posts' ) {

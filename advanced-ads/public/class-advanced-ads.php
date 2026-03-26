@@ -4,11 +4,8 @@
 /**
  * Advanced Ads.
  *
- * @package   AdvancedAds
- * @author    Thomas Maier <support@wpadvancedads.com>
- * @license   GPL-2.0+
- * @link      https://wpadvancedads.com
- * @copyright 2013-2018 Thomas Maier, Advanced Ads GmbH
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
  */
 
 use AdvancedAds\Constants;
@@ -22,9 +19,6 @@ use AdvancedAds\Installation\Capabilities;
 /**
  * Plugin class. This class should ideally be used to work with the
  * public-facing side of the WordPress site.
- *
- * @package Advanced_Ads
- * @author  Thomas Maier <support@wpadvancedads.com>
  */
 class Advanced_Ads {
 
@@ -260,6 +254,14 @@ class Advanced_Ads {
 	 * @return string
 	 */
 	public function inject_content( $content = '' ) {
+		// Only inject on singular posts/pages.
+		if (
+			! $this->can_inject_into_content() &&
+			( ! is_singular() || ! $this->in_the_loop() || ! $this->is_main_query()  || ! $this->can_inject_into_content() )
+		) {
+			return $content;
+		}
+
 		$options = $this->options();
 
 		// do not inject in content when on a BuddyPress profile upload page (avatar & cover image).
@@ -302,10 +304,6 @@ class Advanced_Ads {
 
 		// Do not inject in writing REST requests.
 		if ( Conditional::is_gutenberg_writing_request() && Conditional::is_rest_request() ) {
-			return $content;
-		}
-
-		if ( ! $this->can_inject_into_content() ) {
 			return $content;
 		}
 
@@ -538,6 +536,8 @@ class Advanced_Ads {
 		if ( $this->in_the_loop ) {
 			return true;
 		}
+
+		return false;
 	}
 
 	/**

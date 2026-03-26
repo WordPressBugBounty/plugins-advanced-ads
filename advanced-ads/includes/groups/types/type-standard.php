@@ -70,6 +70,6 @@ class Standard implements Group_Type {
 	 * @return string The upgrade URL for the group type.
 	 */
 	public function get_image(): string {
-		return ADVADS_BASE_URL . 'admin/assets/img/groups/random.svg';
+		return ADVADS_BASE_URL . 'assets/img/group-types/random.svg';
 	}
 }

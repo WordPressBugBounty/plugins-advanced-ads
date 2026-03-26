@@ -11,8 +11,9 @@ namespace AdvancedAds\Admin\Pages;
 
 use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Screen;
+use AdvancedAds\Admin\Groups\Create_Modal;
 use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Admin\Groups_List_Table;
+use AdvancedAds\Admin\Groups\List_Table;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -24,7 +25,7 @@ class Groups extends Screen {
 	/**
 	 * Hold table object.
 	 *
-	 * @var null|Groups_List_Table
+	 * @var null|List_Table
 	 */
 	private $list_table = null;
 
@@ -65,6 +66,19 @@ class Groups extends Screen {
 	public function enqueue_assets(): void {
 		wp_advads()->registry->enqueue_style( 'screen-groups-listing' );
 		wp_advads()->registry->enqueue_script( 'screen-groups-listing' );
+
+		// Localize texts.
+		$i18n = [
+			'groups'           => [
+				'save'    => __( 'Save', 'advanced-ads' ),
+				'saveNew' => __( 'Save New Group', 'advanced-ads' ),
+				'updated' => __( 'Group updated', 'advanced-ads' ),
+				'deleted' => __( 'Group deleted', 'advanced-ads' ),
+				/* translators: an ad group title. */
+				'confirmation' => __( 'You are about to permanently delete %s', 'advanced-ads' ),
+			],
+		];
+		wp_advads_json_add( 'i18n', $i18n );
 	}
 
 	/**
@@ -73,9 +87,12 @@ class Groups extends Screen {
 	 * @return void
 	 */
 	public function display(): void {
-		$wp_list_table = $this->get_list_table();
+		global $wp_list_table;
 
-		include_once ADVADS_ABSPATH . 'views/admin/screens/groups.php';
+		$wp_list_table = $this->get_list_table();
+		( new Create_Modal() )->hooks();
+
+		include_once ADVADS_ABSPATH . 'views/admin/groups/page.php';
 	}
 
 	/**
@@ -84,12 +101,13 @@ class Groups extends Screen {
 	 * @return null|Groups_List_Table
 	 */
 	public function get_list_table() {
-		$screen = get_current_screen();
-		if ( 'advanced-ads_page_advanced-ads-groups' === $screen->id && null === $this->list_table ) {
+		$is_screen = wp_advads()->screens->is_screen( $this->get_id() );
+		$wp_screen = get_current_screen();
+		if ( $is_screen && null === $this->list_table ) {
 			wp_advads()->registry->enqueue_script( 'groups' );
-			$screen->taxonomy  = Constants::TAXONOMY_GROUP;
-			$screen->post_type = Constants::POST_TYPE_AD;
-			$this->list_table  = new Groups_List_Table();
+			$wp_screen->taxonomy  = Constants::TAXONOMY_GROUP;
+			$wp_screen->post_type = Constants::POST_TYPE_AD;
+			$this->list_table  = new List_Table();
 		}
 
 		return $this->list_table;
@@ -102,8 +120,8 @@ class Groups extends Screen {
 	 */
 	public function add_screen_options(): void {
 		// Early bail!!
-		$wp_screen = get_current_screen();
-		if ( 'advanced-ads_page_advanced-ads-groups' !== $wp_screen->id ) {
+		$is_screen = wp_advads()->screens->is_screen( $this->get_id() );
+		if ( ! $is_screen ) {
 			return;
 		}
 
@@ -114,5 +132,32 @@ class Groups extends Screen {
 				'option'  => 'edit_' . Constants::TAXONOMY_GROUP . '_per_page',
 			]
 		);
+	}
+
+	/**
+	 * Get page header arguments
+	 *
+	 * @return array
+	 */
+	public function define_header_args(): array {
+		return [
+			'title'            => __( 'Your Groups', 'advanced-ads' ),
+			'breadcrumb_title' => __( 'Groups', 'advanced-ads' ),
+			'manual_url'       => 'https://wpadvancedads.com/manual/ad-groups/',
+		];
+	}
+
+	/**
+	 * Add actions to the header
+	 *
+	 * @return void
+	 */
+	public function header_actions(): void {
+		?>
+		<a href="#modal-group-new" data-dialog="modal-group-new" class="button button-primary advads-button">
+			<span class="dashicons dashicons-plus -ml-1.5 leading-6"></span>
+			<span><?php esc_html_e( 'New Ad Group', 'advanced-ads' ); ?></span>
+		</a>
+		<?php
 	}
 }

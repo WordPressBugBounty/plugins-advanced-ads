@@ -94,7 +94,7 @@ class Advanced_Ads_Checks {
 		}
 
 		foreach ( $add_ons as $_add_on_key => $_add_on ) {
-			if ( 'responsive' === $_add_on['id'] || 'slider-ads' === $_add_on['id'] ) {
+			if ( 'slider-ads' === $_add_on['id'] ) {
 				continue;
 			}
 

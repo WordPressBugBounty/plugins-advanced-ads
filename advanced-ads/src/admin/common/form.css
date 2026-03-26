@@ -1,0 +1,174 @@
+/* ------------------------------
+   Form: Base
+-------------------------------- */
+
+.advads-form {
+	@apply !outline-0;
+
+	.advads-form-description {
+		@apply text-xs text-gray-500 mb-8;
+	}
+
+	.advads-field:last-of-type {
+		@apply mb-0;
+	}
+}
+
+.advads-field {
+	@apply mb-6;
+
+	.notice {
+		@apply block;
+	}
+
+	.spinner {
+		@apply float-none align-top;
+	}
+
+	&.invalid {
+		label { @apply text-red-500; }
+		input { @apply border-red-300; }
+	}
+}
+
+.advads-field-label {
+	@apply block mb-2 font-normal text-sm shrink-0;
+}
+
+.advads-field-input {
+	@apply flex-1;
+
+	.regular-text,
+	.large-text {
+		@apply w-full border-border px-3 py-2 placeholder:text-gray-400;
+	}
+
+	.regular-text {
+		@apply leading-0;
+	}
+}
+
+.advads-field-description {
+	@apply text-xs text-gray-400 mt-2 italic;
+}
+
+.advads-field-error {
+	@apply text-sm text-red-600 mt-2 hidden;
+}
+
+.small-input {
+	@apply w-20;
+}
+
+.advads-field-raw ul {
+	@apply m-0;
+}
+
+/* ------------------------------
+   Form: Bordered
+-------------------------------- */
+
+.advads-form-bordered {
+	.advads-field {
+		@apply border-b border-border mb-4 pb-4;
+	}
+
+	.advads-field:not(.not-last):last-of-type {
+		@apply border-0 mb-0 pb-0;
+	}
+}
+
+/* ------------------------------
+   Form: Horizontal
+-------------------------------- */
+
+.advads-form-horizontal {
+	.advads-field:not(.hidden) {
+		@apply flex gap-x-8;
+	}
+
+	.advads-field-label {
+		@apply text-[14px] w-40 mb-0;
+	}
+
+	.advads-field.w-full {
+		@apply block;
+	}
+
+	.advads-field.w-full .advads-field-label {
+		@apply w-full mb-2;
+	}
+}
+
+/* ------------------------------
+   Field: Image Selector
+-------------------------------- */
+
+.advads-image-selector {
+	@apply flex flex-wrap gap-x-6 gap-y-6 items-center my-4;
+
+	input {
+		@apply hidden;
+	}
+
+	.advads-tooltip-alt {
+		@apply text-left;
+	}
+
+	.advads-selector-item-title {
+		@apply font-bold mb-1;
+	}
+
+	.advads-selector-item {
+		@apply w-20 text-center rounded align-middle;
+	}
+
+	.advads-selector-item img {
+		@apply w-full h-auto;
+	}
+}
+
+.advads-selector-item {
+	@apply block cursor-pointer;
+}
+
+.advads-selector-item-pro {
+	@apply opacity-50 pointer-events-none relative;
+	@apply before:absolute before:-bottom-1 before:right-[2px] before:text-xs before:font-bold before:text-black before:content-['ADD-ON'] before:z-10;
+}
+
+.advads-selector-item-tooltip {
+	@apply hidden;
+}
+
+/* ------------------------------
+   Field: Radio Buttons
+-------------------------------- */
+
+.advads-radio-buttons {
+	@apply inline-flex items-center outline outline-border bg-gray-50 rounded divide-x divide-border;
+
+	input {
+		@apply hidden;
+	}
+
+	label {
+		@apply px-4 py-1.5 cursor-pointer;
+	}
+
+	input:checked + label {
+		@apply bg-wordpress text-white border-transparent;
+	}
+}
+
+/* ------------------------------
+   Field: Group
+-------------------------------- */
+
+.advads-field-group > .advads-field-input {
+	@apply flex gap-4 flex-wrap;
+}
+
+.advads-field-group .advads-field {
+	@apply mb-0;
+}

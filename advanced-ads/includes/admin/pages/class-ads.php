@@ -12,7 +12,7 @@ namespace AdvancedAds\Admin\Pages;
 use WP_Screen;
 use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Screen;
-use AdvancedAds\Admin\Ad_List_Table;
+use AdvancedAds\Admin\Ads\List_Table;
 use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Utilities\Conditional;
 
@@ -72,7 +72,34 @@ class Ads extends Screen {
 	 */
 	public function load_placement_ui( WP_Screen $screen ): void {
 		if ( 'edit-' . Constants::POST_TYPE_AD === $screen->id ) {
-			( new Ad_List_Table() )->hooks();
+			( new List_Table() )->hooks();
 		}
+	}
+
+	/**
+	 * Get page header arguments
+	 *
+	 * @return array
+	 */
+	public function define_header_args(): array {
+		return [
+			'title'      => __( 'Your Ads', 'advanced-ads' ),
+			'manual_url' => $this->get_manual_url( '/first-ad/' ),
+		];
+	}
+
+	/**
+	 * Add actions to the header
+	 *
+	 * @return void
+	 */
+	public function header_actions(): void {
+		$url = admin_url( 'post-new.php?post_type=advanced_ads' );
+		?>
+		<a href="<?php echo esc_url( $url ); ?>" class="button button-primary advads-button">
+			<span class="dashicons dashicons-plus -ml-1.5 leading-6"></span>
+			<span><?php esc_html_e( 'New Ad', 'advanced-ads' ); ?></span>
+		</a>
+		<?php
 	}
 }
