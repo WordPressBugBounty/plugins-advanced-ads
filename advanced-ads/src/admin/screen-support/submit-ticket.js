@@ -66,10 +66,9 @@ function submitFormToAPI( form, uploader ) {
 					title: 'Ticket submitted',
 					message: 'Your ticket has been submitted successfully',
 				} );
-				return;
+			} else {
+				throw new Error( 'Failed to submit form' );
 			}
-
-			throw new Error( 'Failed to submit form' );
 		} )
 		.catch( ( error ) => {
 			// Ideally replace this with user feedback instead of console.error in production

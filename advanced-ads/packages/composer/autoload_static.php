@@ -276,6 +276,7 @@ class ComposerStaticInit_AdvancedAds
         'Advanced_Ads_Inline_Css' => __DIR__ . '/../..' . '/classes/inline-css.php',
         'Advanced_Ads_ModuleLoader' => __DIR__ . '/../..' . '/includes/load_modules.php',
         'Advanced_Ads_Overview_Widgets_Callbacks' => __DIR__ . '/../..' . '/admin/includes/class-overview-widgets.php',
+        'Advanced_Ads_Plugins_Screen_Updates' => __DIR__ . '/../..' . '/admin/includes/class-plugins-screen-updates.php',
         'Advanced_Ads_Utils' => __DIR__ . '/../..' . '/classes/utils.php',
         'Advanced_Ads_Visitor_Conditions' => __DIR__ . '/../..' . '/classes/visitor-conditions.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',

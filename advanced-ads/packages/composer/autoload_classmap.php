@@ -249,6 +249,7 @@ return array(
     'Advanced_Ads_Inline_Css' => $baseDir . '/classes/inline-css.php',
     'Advanced_Ads_ModuleLoader' => $baseDir . '/includes/load_modules.php',
     'Advanced_Ads_Overview_Widgets_Callbacks' => $baseDir . '/admin/includes/class-overview-widgets.php',
+    'Advanced_Ads_Plugins_Screen_Updates' => $baseDir . '/admin/includes/class-plugins-screen-updates.php',
     'Advanced_Ads_Utils' => $baseDir . '/classes/utils.php',
     'Advanced_Ads_Visitor_Conditions' => $baseDir . '/classes/visitor-conditions.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
