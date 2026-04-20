@@ -1,10 +1,20 @@
+<?php
+/**
+ * SVG icon for the support arrow.
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ * @since   2.0.15
+ */
+
+?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18" fill="none">
-  <g clip-path="url(#clip0_22_1586)">
-    <path d="M9 12L12 9M12 9L9 6M12 9L6 9M16.5 9C16.5 13.1421 13.1421 16.5 9 16.5C4.85786 16.5 1.5 13.1421 1.5 9C1.5 4.85786 4.85786 1.5 9 1.5C13.1421 1.5 16.5 4.85786 16.5 9Z" stroke-width="1.6875" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
-  <defs>
-    <clipPath id="clip0_22_1586">
-      <rect width="18" height="18" fill="white"/>
-    </clipPath>
-  </defs>
+	<g clip-path="url(#clip0_22_1586)">
+		<path d="M9 12L12 9M12 9L9 6M12 9L6 9M16.5 9C16.5 13.1421 13.1421 16.5 9 16.5C4.85786 16.5 1.5 13.1421 1.5 9C1.5 4.85786 4.85786 1.5 9 1.5C13.1421 1.5 16.5 4.85786 16.5 9Z" stroke-width="1.6875" stroke-linecap="round" stroke-linejoin="round" />
+	</g>
+	<defs>
+		<clipPath id="clip0_22_1586">
+			<rect width="18" height="18" fill="white" />
+		</clipPath>
+	</defs>
 </svg>

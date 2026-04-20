@@ -9,9 +9,9 @@
 
 namespace AdvancedAds;
 
+use Advanced_Ads_Admin_Licenses;
 use AdvancedAds\Ads\Ads;
 use AdvancedAds\Groups\Groups;
-use Advanced_Ads_Admin_Licenses;
 use AdvancedAds\Installation\Install;
 use AdvancedAds\Placements\Placements;
 
@@ -251,16 +251,17 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Admin\Ads\Ajax::class );
 		$this->register_integration( Admin\Metabox_Ad::class );
 		$this->register_integration( Admin\Metabox_Ad_Settings::class );
+		$this->register_integration( Admin\Ads\Quick_Bulk_Edit::class );
 
 		// Groups.
 		$this->register_integration( Admin\Groups\Ajax::class );
 
 		// Placements.
 		$this->register_integration( Admin\Placements\Ajax::class );
+		$this->register_integration( Admin\Placements\Bulk_Edit::class );
 		$this->register_integration( Admin\Placements\Quick_Edit::class );
 
 		// Entities.
-		$this->register_integration( Admin\Quick_Bulk_Edit::class );
 		$this->register_integration( Admin\Page_Quick_Edit::class );
 
 		$this->register_integration( Compatibility\Capability_Manager::class );
@@ -283,7 +284,6 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Admin\Settings::class );
 		$this->register_integration( Admin\Misc::class );
 		$this->register_integration( Admin\Post_List::class );
-		$this->register_integration( Admin\Placements\Bulk_Edit::class );
 		$this->register_integration( Admin\Addon_Updater::class );
 
 		if ( ! wp_doing_ajax() ) {
@@ -347,5 +347,6 @@ class Plugin extends Framework\Loader {
 		require_once ADVADS_ABSPATH . 'deprecated/Group_Repository.php';
 		require_once ADVADS_ABSPATH . 'deprecated/class-admin.php';
 		require_once ADVADS_ABSPATH . 'deprecated/class-advanced-ads-plugin.php';
+		require_once ADVADS_ABSPATH . 'deprecated/in-content-injector.php';
 	}
 }

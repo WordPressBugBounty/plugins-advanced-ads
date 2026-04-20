@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.19
+Stable tag: 2.0.20
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -360,6 +360,10 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 
 == Changelog ==
 
+= 2.0.20 (April 20, 2026) =
+
+- Fix: Content injection performance issues and handle more use cases
+
 = 2.0.19 (April 9, 2026) =
 
 - Improvement: Added AMP for WP Ads importer to improve ad migration accuracy
@@ -440,61 +444,3 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 - Fix: save pagination display condition in placements
 - Fix: duplicate ad labels when using group as ad type
 - Fix: append ad to existing group when selecting placement from ad edit screen
-
-= 2.0.9 (May 21, 2025) =
-
-- Improvement: improve amp conditions
-- Improvement: Test plugin compatibility with WordPress 6.8.
-- Improvement: add capability check in importer
-- Improvement: standardize `ADVADS_ADS_DISABLED` check
-- Improvement: null checks before accessing ad properties
-- Fix: update failure help link only for Advanced Ads add-ons
-
-= 2.0.8 (April 28, 2025) =
-
-- Improvement: type safety in `add_body_class` to prevent issues from third-party filters
-- Improvement: improve the ad and group relation both way
-- Fix: expiry date not updating for ads that already had one set
-
-= 2.0.7 (April 9, 2025) =
-- Improvement: optimize MailPoet compatibility
-- Fix: force array return in post_updated_messages
-- Fix: quick edit for ads ignores tracking options and overwrites content
-
-= 2.0.6 (April 1, 2025) =
-- Improvement: redirect to placement list after creating a new placement
-- Improvement: remove ad creation message for server type placement
-- Improvement: unify admin notifications
-- Fix: prevent duplicate revision controls
-- Fix: correct order of placement icons
-- Fix: open create placement modal when no placements found
-- Fix: show the search field when "Show filters permanently" is checked
-- Fix: prevent CodeMirror to run on Rich Content ad edit page
-- Fix: prevent 'undefined key' warning in XML feed
-- Fix: use native php get error message function
-
-= 2.0.5 (March 20, 2025) =
-
-- Fix: prevent false unsaved changes notifications for ads
-- Fix: prevent errors with certain custom placement types
-- Fix: hide discarded notification on the Advanced Ads dashboard
-- Fix: prevent an error on the Advanced Ads dashboard
-- Fix: correct ad expiry date inconsistencies
-- Fix: prevent fatal error on Gutenberg editor
-- Fix: restore execute shortcode feature
-
-= 2.0.4 (March 18, 2025) =
-
-- Improvement: add update functionality to ensure receipt of premium updates
-- Fix: resolve a fatal error caused by an invalid license
-- Fix: prevent ad expiry from changing during save when timezone is not UTC
-- Fix: prevent unknown placement types from breaking the page
-- Fix: ensure "Execute Shortcodes" function is savable again
-- Fix: restore PeepSo placement compatibility for Advanced Ads 2.0
-
-= 2.0.3 (March 12, 2025) =
-
-- Improvement: reflect placement status changes immediately in the placement list
-- Improvement: prevent plugin upgrade notice reappearing if already dismissed
-- Fix: ensure ad centers when selected
-- Fix: restore pagination functionality on ad list page

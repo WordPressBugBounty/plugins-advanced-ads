@@ -6,7 +6,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   1.50.0
  *
- * @var string $placement_slug    Placement slug.
+ * @var object $placement         Placement instance.
  * @var string $xpath             xpath option.
  * @var string $selected_tag      The currently selected tag.
  * @var array  $tags              Array of tags; indexded by tag value is label. cf. Content_Injection::get_tags().
@@ -35,14 +35,14 @@
 	<?php endforeach; ?>
 </select>
 
-<div id="advads-frontend-element-<?php echo esc_attr( $placement_slug ); ?>" class="advads-placements-content-custom-xpath<?php echo 'custom' !== $selected_tag ? ' hidden' : ''; ?>">
+<div id="advads-frontend-element-<?php echo esc_attr( $placement->get_id() ); ?>" class="advads-placements-content-custom-xpath<?php echo 'custom' !== $selected_tag ? ' hidden' : ''; ?>">
 	<input name="advads[placements][options][xpath]" class="advads-frontend-element" type="text" value="<?php echo esc_html( $xpath ); ?>" placeholder="<?php esc_html_e( 'use xpath, e.g. `p[not(parent::blockquote)]`', 'advanced-ads' ); ?>"/>
 
 	<button style="display:none; color: red;" type="button" class="advads-deactivate-frontend-picker button ">
 		<?php echo esc_html_x( 'stop selection', 'frontend picker', 'advanced-ads' ); ?>
 	</button>
 
-	<button type="button" class="advads-activate-frontend-picker button " data-placementid="<?php echo esc_attr( $placement_slug ); ?>" data-pathtype="xpath" data-boundary="true">
+	<button type="button" class="advads-activate-frontend-picker button " data-placementid="<?php echo esc_attr( $placement->get_id() ); ?>" data-pathtype="xpath" data-boundary="true">
 		<?php esc_html_e( 'select position', 'advanced-ads' ); ?>
 	</button>
 </div>

@@ -54,6 +54,7 @@ export default function () {
 		document.querySelectorAll( '.advads-activate-frontend-picker' )
 	).forEach( function ( element ) {
 		element.addEventListener( 'click', function () {
+			console.log( 'this.dataset.placementid', this.dataset );
 			localStorage.setItem(
 				'advads_frontend_picker',
 				this.dataset.placementid
@@ -62,7 +63,16 @@ export default function () {
 				'advads_frontend_action',
 				this.dataset.action
 			);
-			localStorage.setItem( 'advads_prev_url', window.location );
+			const redirectUrl = window.location.href.replace(
+				window.location.hash,
+				''
+			);
+			localStorage.setItem(
+				'advads_prev_url',
+				redirectUrl +
+					'#modal-placement-edit-' +
+					this.dataset.placementid
+			);
 			localStorage.setItem(
 				'advads_frontend_pathtype',
 				this.dataset.pathtype

@@ -133,6 +133,7 @@ module.exports = {
 
 		// Frontend.
 		advanced: path.join( basePath, 'public/advanced.js' ),
+		'frontend-picker': path.join( basePath, 'public/frontend-picker.js' ),
 	},
 	output: {
 		filename: '[name].js', // Dynamically generate output file names
@@ -149,10 +150,6 @@ module.exports = {
 // mix.js(
 // 	'public/assets/js/ready-queue.js',
 // 	'public/assets/js/ready-queue.min.js'
-// );
-// mix.js(
-// 	'public/assets/js/frontend-picker.js',
-// 	'public/assets/js/frontend-picker.min.js'
 // );
 // mix.js(
 // 	'modules/adblock-finder/public/adblocker-enabled.js',

@@ -13,6 +13,7 @@ use AdvancedAds\Abstracts\Ad;
 use AdvancedAds\Abstracts\Group;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Content_Injector;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Installation\Capabilities;
 
@@ -344,7 +345,7 @@ class Advanced_Ads {
 					);
 					break;
 				case 'post_content':
-					$content = Advanced_Ads_In_Content_Injector::inject_in_content( $placement_id, $placement_options, $content );
+					$content = Content_Injector::inject_in_content( $placement_id, $placement_options, $content );
 					break;
 			}
 		}

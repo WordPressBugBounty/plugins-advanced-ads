@@ -1,5 +1,9 @@
 {
 	"use": {
 		"baseURL": "http://wp-ads.vm"
+	},
+	"credentials": {
+		"username": "admin",
+		"password": "password"
 	}
 }

@@ -348,23 +348,22 @@ class Edit_Modal implements Integration_Interface {
 	 * @return string
 	 */
 	public function render_placement_position() {
-		$data           = $this->placement->get_data();
-		$placement_slug = $this->placement->get_slug();
-		$index          = max( 1, (int) ( $data['index'] ?? 1 ) );
-		$tags           = Content_Injection::get_tags();
-		$selected_tag   = $data['tag'] ?? 'p';
+		$placement    = $this->placement;
+		$index        = max( 1, (int) ( $placement->get_prop( 'index' ) ?? 1 ) );
+		$tags         = Content_Injection::get_tags();
+		$selected_tag = $placement->get_prop( 'tag' ) ?? 'p';
 
 		// Automatically select the 'custom' option.
-		if ( Params::cookie( 'advads_frontend_picker', '' ) === $placement_slug ) {
+		if ( Params::cookie( 'advads_frontend_picker', '' ) === $placement->get_slug() ) {
 			$selected_tag = 'custom';
 		}
-		$xpath             = stripslashes( $data['xpath'] ?? '' );
+		$xpath             = stripslashes( $placement->get_prop( 'xpath' ) ?? '' );
 		$positions         = [
 			'after'  => __( 'after', 'advanced-ads' ),
 			'before' => __( 'before', 'advanced-ads' ),
 		];
-		$selected_position = $data['position'] ?? 'after';
-		$start_from_bottom = isset( $data['start_from_bottom'] );
+		$selected_position = $placement->get_prop( 'position' ) ?? 'after';
+		$start_from_bottom = $placement->get_prop( 'start_from_bottom' );
 
 		ob_start();
 		include $this->view_path . '/fields/content-index.php';
@@ -372,7 +371,7 @@ class Edit_Modal implements Integration_Interface {
 			include ADVADS_ABSPATH . 'admin/views/upgrades/repeat-the-position.php';
 		}
 
-		do_action( 'advanced-ads-placement-post-content-position', $placement_slug, $this->placement );
+		do_action( 'advanced-ads-placement-post-content-position', $placement->get_slug(), $placement );
 
 		if ( ! extension_loaded( 'dom' ) ) :
 			?>

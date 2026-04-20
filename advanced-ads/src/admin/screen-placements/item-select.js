@@ -45,7 +45,7 @@ const handleSelectChange = async ( select ) => {
 		} );
 
 		const modalSelect = modalForm.querySelector(
-			`select#placement-item-${ data.placement_id }`
+			`.advads-placement-item-select`
 		);
 		if ( modalSelect ) {
 			modalSelect.value = data.item_id;

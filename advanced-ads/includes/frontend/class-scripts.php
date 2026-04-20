@@ -9,13 +9,13 @@
 
 namespace AdvancedAds\Frontend;
 
-use Advanced_Ads;
-use Advanced_Ads_Utils;
 use Advanced_Ads_Privacy;
-use AdvancedAds\Utilities\WordPress;
-use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Params;
+use Advanced_Ads_Utils;
+use Advanced_Ads;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -66,15 +66,10 @@ class Scripts implements Integration_Interface {
 			wp_advads()->registry->enqueue_script( 'advanced-js' );
 		}
 
-		wp_register_script(
-			ADVADS_SLUG . '-frontend-picker',
-			sprintf( '%spublic/assets/js/frontend-picker%s.js', ADVADS_BASE_URL, defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min' ),
-			[ 'jquery', ADVADS_SLUG . '-advanced-js' ],
-			ADVADS_VERSION,
-			false
-		);
+		wp_advads()->registry->register_script( 'frontend-picker', 'assets/dist/frontend-picker.js' );
 
 		if ( ! empty( $frontend_picker ) ) {
+			wp_advads()->registry->enqueue_script( 'advanced-js' );
 			wp_enqueue_script( ADVADS_SLUG . '-frontend-picker' );
 		}
 

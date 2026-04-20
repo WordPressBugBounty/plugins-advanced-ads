@@ -7,12 +7,12 @@
  * @since   1.50.0
  */
 
-namespace AdvancedAds\Admin;
+namespace AdvancedAds\Admin\Placements;
 
 use AdvancedAds\Constants;
-use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
