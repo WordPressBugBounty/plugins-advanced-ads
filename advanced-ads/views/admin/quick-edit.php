@@ -10,6 +10,7 @@
  */
 
 use AdvancedAds\Options;
+use AdvancedAds\Admin\Ads\Quick_Bulk_Edit;
 
 global $wp_locale;
 
@@ -23,7 +24,7 @@ global $wp_locale;
 		<div class="wp-clearfix">
 			<label><input type="checkbox" name="enable_expiry" value="1"/><?php esc_html_e( 'Set expiry date', 'advanced-ads' ); ?></label>
 			<div class="expiry-inputs advads-datetime">
-				<?php \AdvancedAds\Admin\Quick_Bulk_Edit::print_date_time_inputs(); ?>
+				<?php Quick_Bulk_Edit::print_date_time_inputs(); ?>
 			</div>
 		</div>
 

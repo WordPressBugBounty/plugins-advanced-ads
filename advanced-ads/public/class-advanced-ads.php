@@ -564,7 +564,7 @@ class Advanced_Ads {
 	 * @return string label, empty string if label should not be displayed.
 	 */
 	public function get_label( $item, $placement_state = 'default' ) {
-		if ( 'disabled' === $placement_state ) {
+		if ( 'disabled' === $placement_state  || ( $item->get_parent() && $item->get_parent()->get_prop( 'ad_label' ) === 'disabled' ) ) {
 			return '';
 		}
 

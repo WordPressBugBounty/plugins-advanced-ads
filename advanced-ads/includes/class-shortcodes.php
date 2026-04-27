@@ -147,7 +147,7 @@ class Shortcodes implements Integration_Interface {
 
 		// Ad type: 'content' and a shortcode inside.
 		if ( isset( $atts['ad_args'] ) ) {
-			$result = array_merge( $result, json_decode( urldecode( $atts['ad_args'] ), true ) );
+			$result = array_merge( $result, $this->parse_shortcode_ad_args( $atts['ad_args'] ) );
 		}
 
 		// Flat output array for Ad.
@@ -163,6 +163,40 @@ class Shortcodes implements Integration_Interface {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Sanitize shortcode content override by stripping PHP payloads only.
+	 *
+	 * @param string $content Content override provided through ad_args.
+	 *
+	 * @return string
+	 */
+	private function sanitize_shortcode_content( string $content ): string {
+		// Remove PHP tags and all inline php payload.
+		$content = preg_replace( '/<\\?(?:php|=)?[\\s\\S]*?\\?>/i', '', $content );
+
+		return $content ? $content : '';
+	}
+
+	/**
+	 * Parse and sanitize ad_args payload for shortcode rendering.
+	 *
+	 * @param string $ad_args Raw urlencoded ad_args value.
+	 *
+	 * @return array
+	 */
+	private function parse_shortcode_ad_args( string $ad_args ): array {
+		$decoded_ad_args = json_decode( urldecode( $ad_args ), true );
+		if ( ! is_array( $decoded_ad_args ) ) {
+			return [];
+		}
+
+		if ( isset( $decoded_ad_args['content'] ) && is_string( $decoded_ad_args['content'] ) ) {
+			$decoded_ad_args['content'] = $this->sanitize_shortcode_content( $decoded_ad_args['content'] );
+		}
+
+		return $decoded_ad_args;
 	}
 
 	/**

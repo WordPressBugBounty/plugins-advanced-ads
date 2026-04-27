@@ -117,7 +117,7 @@ class List_Filters implements Integration_Interface {
 				}
 
 				if ( $adsense_obj ) {
-					if ( 'responsive' === $adsense_obj['unitType'] ) {
+					if ( ! empty( $adsense_obj['unitType'] ) && 'responsive' === $adsense_obj['unitType'] ) {
 						if ( ! array_key_exists( 'responsive', $all_filters['all_sizes'] ) ) {
 							$all_filters['all_sizes']['responsive'] = __( 'Responsive', 'advanced-ads' );
 						}
