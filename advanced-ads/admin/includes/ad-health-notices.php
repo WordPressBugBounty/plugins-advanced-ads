@@ -212,6 +212,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'</a>'
 			),
 			'type' => 'notice',
+			'hide' => false,
 		],
 		// BuddyBoss installed.
 		'buddyboss_no_pro'                              => [
@@ -223,6 +224,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'</a>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// bbPress installed.
 		'bbpress_no_pro'                                => [
@@ -234,6 +236,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'</a>'
 			),
 			'type' => 'notice',
+			'hide' => false,
 		],
 		// WPML plugin activated.
 		'WPML_active'                                   => [
@@ -311,6 +314,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Paid Membership Pro.
 		'pmp_no_pro'                                    => [
@@ -322,6 +326,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Members plugin.
 		'members_no_pro'                                => [
@@ -333,6 +338,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Members plugin.
 		'translatepress_no_pro'                         => [
@@ -344,6 +350,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Weglot.
 		'weglot_no_pro'                                 => [
@@ -355,6 +362,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// LearnDash.
 		'learndash'                                     => [
@@ -366,6 +374,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// AAWP.
 		'aawp'                                          => [
@@ -377,6 +386,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Polylang.
 		'polylang'                                      => [
@@ -388,6 +398,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// MailPoet.
 		'mailpoet'                                      => [
@@ -399,6 +410,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// WP Rocket.
 		'wp_rocket'                                     => [
@@ -410,6 +422,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Quiz plugins.
 		'quiz_plugins_no_pro'                           => [
@@ -421,6 +434,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Elementor.
 		'elementor'                                     => [
@@ -432,6 +446,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// SiteOrigin.
 		'siteorigin'                                    => [
@@ -443,6 +458,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Divi Theme or Divi builder plugin.
 		'divi_no_pro'                                   => [
@@ -454,6 +470,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Divi Theme or Divi builder plugin.
 		'beaver_builder'                                => [
@@ -465,6 +482,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Pagelayer plugin.
 		'pagelayer'                                     => [
@@ -476,6 +494,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// WPBakery Page Builder.
 		'wpb'                                           => [
@@ -487,6 +506,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 		// Newspaper theme.
 		'newspaper'                                     => [
@@ -498,6 +518,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				'<i class="dashicons dashicons-external"></i>'
 			),
 			'type' => 'pitch',
+			'hide' => false,
 		],
 	]
 );

@@ -9,15 +9,15 @@
 
 namespace AdvancedAds\Abstracts;
 
-use Advanced_Ads;
-use Advanced_Ads_Utils;
 use Advanced_Ads_Inline_Css;
-use AdvancedAds\Traits;
+use Advanced_Ads_Utils;
+use Advanced_Ads;
 use AdvancedAds\Constants;
 use AdvancedAds\Frontend\Stats;
-use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Interfaces\Group_Type;
 use AdvancedAds\Interfaces\Entity_Interface;
+use AdvancedAds\Interfaces\Group_Type;
+use AdvancedAds\Traits;
+use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -655,7 +655,7 @@ class Group extends Data implements Entity_Interface {
 		while ( null !== $random_id ) {
 			$random_id = $this->get_random_ad_by_weight( $weights );
 			unset( $weights[ $random_id ] );
-			if ( ! empty( $ads[ $random_id ] ) ) {
+			if ( $random_id && ! empty( $ads[ $random_id ] ) ) {
 				$shuffled_ads[] = $random_id;
 			}
 		}

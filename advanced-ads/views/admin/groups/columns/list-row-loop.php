@@ -16,9 +16,12 @@ $counter   = 1;
 $ad_count  = $group->get_ads_count();
 $weights   = $group->get_ad_weights();
 $group_ads = $group->get_ads();
-usort($group_ads, function ($a, $b) {
-	return $b->get_weight() <=> $a->get_weight();
-});
+usort(
+	$group_ads,
+	function ( $a, $b ) {
+		return $b->get_weight() <=> $a->get_weight();
+	}
+);
 
 foreach ( $group_ads as $group_ad ) {
 	if ( ! $group_ad->is_status( 'publish' ) ) {
@@ -55,7 +58,7 @@ $weight_sum = array_sum( $weights );
 	?>
 </div>
 
-<?php if ( $ad_count > 4 ) : ?>
+<?php if ( $ad_count > 3 ) : ?>
 <p>
 	<a href="javascript:void(0)" class="advads-group-ads-list-show-more">
 	<?php
@@ -80,5 +83,4 @@ if ( $ad_count > 1 ) :
 
 	/* translators: amount of ads displayed */
 	echo '<p>' . esc_html( sprintf( _n( 'Up to %d ad displayed.', 'Up to %d ads displayed', $ad_count, 'advanced-ads' ), $ad_count ) ) . '</p>';
-
 endif;

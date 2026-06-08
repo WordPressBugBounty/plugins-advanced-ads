@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Advanced Ads 2.0.20\n"
+"Project-Id-Version: Advanced Ads 2.0.21\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/advanced-ads\n"
 "Last-Translator: Shakeeb Ahmed <me@shakeebahmed.com>\n"
 "Language-Team: Advanced Ads <support@wpadvancedads.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-27T14:19:32+00:00\n"
+"POT-Creation-Date: 2026-06-08T12:31:01+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: advanced-ads\n"
@@ -157,148 +157,148 @@ msgstr ""
 
 #. translators: %1$s is a plugin name, %2$s is the opening a tag and %3$s the closing one.
 #: admin/includes/ad-health-notices.php:209
-#: admin/includes/ad-health-notices.php:220
-#: admin/includes/ad-health-notices.php:231
-#: admin/includes/ad-health-notices.php:242
-#: admin/includes/ad-health-notices.php:255
+#: admin/includes/ad-health-notices.php:221
+#: admin/includes/ad-health-notices.php:233
+#: admin/includes/ad-health-notices.php:245
+#: admin/includes/ad-health-notices.php:258
 #, php-format
 msgid "Learn how to integrate %1$s with Advanced Ads %2$shere%3$s."
 msgstr ""
 
 #. translators: %s is a service or plugin name
-#: admin/includes/ad-health-notices.php:269
+#: admin/includes/ad-health-notices.php:272
 #, php-format
 msgid "%s detected."
 msgstr ""
 
-#: admin/includes/ad-health-notices.php:270
+#: admin/includes/ad-health-notices.php:273
 msgid "Learn how this might impact your ad setup."
 msgstr ""
 
 #. translators: %s removable ads.txt plugins
-#: admin/includes/ad-health-notices.php:282
+#: admin/includes/ad-health-notices.php:285
 #, php-format
 msgid "Advanced Ads handles your ads.txt file automatically. You might be able to <strong>remove %1$s</strong>."
 msgstr ""
 
-#: admin/includes/ad-health-notices.php:293
+#: admin/includes/ad-health-notices.php:296
 msgid "Advanced Ads handles header and footer codes."
 msgstr ""
 
 #. translators: %s removable header and footer plugins
-#: admin/includes/ad-health-notices.php:296
+#: admin/includes/ad-health-notices.php:299
 #, php-format
 msgid "You might be able to <strong>remove %1$s</strong>."
 msgstr ""
 
-#: admin/includes/ad-health-notices.php:299
+#: admin/includes/ad-health-notices.php:302
 msgid "Learn how."
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:308
+#: admin/includes/ad-health-notices.php:311
 #, php-format
 msgid "Learn how to target ads on GamiPress websites %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:319
+#: admin/includes/ad-health-notices.php:323
 #, php-format
 msgid "Learn how to manage ads on membership sites running Paid Memberships Pro %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:330
+#: admin/includes/ad-health-notices.php:335
 #, php-format
 msgid "Learn how to target ads to specific user roles created with the Members plugin %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:341
+#: admin/includes/ad-health-notices.php:347
 #, php-format
 msgid "Learn how to target ads to multiple languages in TranslatePress %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:352
+#: admin/includes/ad-health-notices.php:359
 #, php-format
 msgid "Learn how to target ads to multiple languages in Weglot %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:363
+#: admin/includes/ad-health-notices.php:371
 #, php-format
 msgid "Learn how to integrate ads into LearnDash %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:374
+#: admin/includes/ad-health-notices.php:383
 #, php-format
 msgid "Learn how to auto-inject Amazon Ads with AAWP and Advanced Ads %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:385
+#: admin/includes/ad-health-notices.php:395
 #, php-format
 msgid "Learn how to target ads to multiple languages in Polylang %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:396
+#: admin/includes/ad-health-notices.php:407
 #, php-format
 msgid "Learn how to integrate Advanced Ads in MailPoet Newsletters %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:407
+#: admin/includes/ad-health-notices.php:419
 #, php-format
 msgid "Learn how to use WP Rocket with Advanced Ads %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:418
+#: admin/includes/ad-health-notices.php:431
 #, php-format
 msgid "Learn how to embed Ads into a Quiz %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:429
+#: admin/includes/ad-health-notices.php:443
 #, php-format
 msgid "Learn how to create and implement ads in Elementor %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:440
+#: admin/includes/ad-health-notices.php:455
 #, php-format
 msgid "Learn how to embed ads into a website built with the SiteOrigin page builder %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:451
+#: admin/includes/ad-health-notices.php:467
 #, php-format
 msgid "Learn how to integrate ads into the Divi theme and Divi builder %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:462
+#: admin/includes/ad-health-notices.php:479
 #, php-format
 msgid "Learn how to embed ads into your Beaver Builder website %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:473
+#: admin/includes/ad-health-notices.php:491
 #, php-format
 msgid "Learn how to embed ads into a website built with Pagelayer %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:484
+#: admin/includes/ad-health-notices.php:503
 #, php-format
 msgid "Learn more about displaying Ads with WPBakery Page Builder %1$shere%2$s %3$s"
 msgstr ""
 
 #. translators: 1 opening anchor tag, 2 closing tag, 3 icon
-#: admin/includes/ad-health-notices.php:495
+#: admin/includes/ad-health-notices.php:515
 #, php-format
 msgid "Learn how to integrate ads into the tagDiv Newspaper theme %1$shere%2$s %3$s"
 msgstr ""
@@ -1057,7 +1057,7 @@ msgid "repeat the position"
 msgstr ""
 
 #. translators: %1$s is an anchor (link) opening tag, %2$s is the closing tag.
-#: classes/ad-health-notices.php:814
+#: classes/ad-health-notices.php:838
 #: modules/gadsense/includes/class-mapi.php:1680
 #, php-format
 msgid "Learn more about AdSense account issues %1$shere%2$s."
@@ -1286,24 +1286,24 @@ msgstr ""
 msgid "Display ads based on the age of a page or post."
 msgstr ""
 
-#: classes/filesystem.php:62
+#: classes/filesystem.php:72
 msgid "Could not access filesystem."
 msgstr ""
 
-#: classes/filesystem.php:66
+#: classes/filesystem.php:76
 msgid "Filesystem error."
 msgstr ""
 
-#: classes/filesystem.php:73
+#: classes/filesystem.php:83
 msgid "Unable to locate WordPress root directory."
 msgstr ""
 
-#: classes/filesystem.php:77
+#: classes/filesystem.php:87
 msgid "Unable to locate WordPress content directory (wp-content)."
 msgstr ""
 
 #. translators: %s directory
-#: classes/filesystem.php:82
+#: classes/filesystem.php:92
 #, php-format
 msgid "Unable to locate needed folder (%s)."
 msgstr ""
@@ -1423,7 +1423,7 @@ msgid "the following code is used for automatic error detection and only visible
 msgstr ""
 
 #. translators: timezone name
-#: classes/utils.php:290
+#: classes/utils.php:295
 #: includes/utilities/class-wordpress.php:188
 #, php-format
 msgid "time of %s"
@@ -1561,7 +1561,7 @@ msgid "Trashed"
 msgstr ""
 
 #. translators: %1$s is a placement name, %2$s is the ads name.
-#: includes/abstracts/abstract-ad.php:1171
+#: includes/abstracts/abstract-ad.php:1176
 #, php-format
 msgid "Placement name: %1$s; Ads: %2$s"
 msgstr ""
@@ -2069,11 +2069,11 @@ msgstr ""
 msgid "Update now."
 msgstr ""
 
-#: includes/admin/class-edd-updater.php:604
+#: includes/admin/class-edd-updater.php:609
 msgid "You do not have permission to install plugin updates"
 msgstr ""
 
-#: includes/admin/class-edd-updater.php:604
+#: includes/admin/class-edd-updater.php:609
 msgid "Error"
 msgstr ""
 
@@ -2334,7 +2334,7 @@ msgid "Priority of content injection filter"
 msgstr ""
 
 #: includes/admin/class-settings.php:617
-#: includes/class-content-injector.php:710
+#: includes/class-content-injector.php:711
 msgid "Disable level limitation"
 msgstr ""
 
@@ -3175,7 +3175,7 @@ msgid "The %s constant is no longer supported."
 msgstr ""
 
 #. translators: %s stands for the name of the "Disable level limitation" option
-#: includes/class-content-injector.php:709
+#: includes/class-content-injector.php:710
 #, php-format
 msgid "Set <em>%s</em> to show more ads"
 msgstr ""
@@ -5403,18 +5403,18 @@ msgstr ""
 msgid "Add some"
 msgstr ""
 
-#: views/admin/groups/columns/list-row-loop.php:48
+#: views/admin/groups/columns/list-row-loop.php:51
 msgid "Ad weight"
 msgstr ""
 
 #. translators: %d is a number.
-#: views/admin/groups/columns/list-row-loop.php:63
+#: views/admin/groups/columns/list-row-loop.php:66
 #, php-format
 msgid "+ show %d more ads"
 msgstr ""
 
 #. translators: amount of ads displayed
-#: views/admin/groups/columns/list-row-loop.php:82
+#: views/admin/groups/columns/list-row-loop.php:85
 #, php-format
 msgid "Up to %d ad displayed."
 msgid_plural "Up to %d ads displayed"

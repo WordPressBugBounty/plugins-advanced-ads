@@ -146,6 +146,11 @@ class Advanced_Ads_AdSense_Public {
 	 * Handle AdSense AMP code
 	 */
 	public function inject_amp_code() {
+		// Early bail!!
+		if ( wp_doing_ajax() ) {
+			return;
+		}
+
 		// for non-AMP pages we do this on the `template_redirect` hook, this has not fired yet.
 		wp_advads()->frontend->run_checks();
 

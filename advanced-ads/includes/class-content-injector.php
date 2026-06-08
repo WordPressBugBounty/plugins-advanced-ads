@@ -12,6 +12,7 @@ namespace AdvancedAds;
 
 use Advanced_Ads;
 use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Framework\Utilities\Str;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
@@ -749,7 +750,7 @@ class Content_Injector {
 	 * Short-circuits immediately when no restricted ancestors exist,
 	 * avoiding the inner loop entirely.
 	 *
-	 * Uses str_starts_with() instead of stripos() — faster and correct
+	 * Uses Str::starts_with() from Framework instead of stripos()
 	 * since node paths are case-sensitive.
 	 *
 	 * @param array $paragraphs         Array of DOMNode objects.
@@ -767,7 +768,7 @@ class Content_Injector {
 		foreach ( $paragraphs as $paragraph ) {
 			$node_path = $paragraph->getNodePath();
 			foreach ( $ancestors_to_limit as $ancestor ) {
-				if ( str_starts_with( $node_path, $ancestor ) ) {
+				if ( Str::starts_with( $ancestor . '/', $node_path ) ) {
 					continue 2;
 				}
 			}

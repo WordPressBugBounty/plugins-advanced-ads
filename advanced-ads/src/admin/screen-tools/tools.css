@@ -9,3 +9,11 @@
 .advads-subpage-title {
 	@apply text-lg font-semibold leading-none mb-4;
 }
+
+.advads-admin-notice.inline {
+	display: block;
+}
+
+.advads-admin-notice {
+	overflow: hidden;
+}

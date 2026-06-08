@@ -37,26 +37,36 @@ class Advanced_Ads_Filesystem {
 		global $wp_filesystem;
 		$directories = ( is_array( $directories ) && count( $directories ) ) ? $directories : [ WP_CONTENT_DIR ];
 
-		// This will output a credentials form in event of failure, We don't want that, so just hide with a buffer.
-		ob_start();
-		$credentials = request_filesystem_credentials( '', '', false, $directories[0] );
-		ob_end_clean();
+		// Check the filesystem method.
+        $method = get_filesystem_method( [], $directories[0] );
 
-		if ( false === $credentials ) {
-			return false;
-		}
+		if ( 'direct' === $method ) {
+            // If direct method, initialize WP_Filesystem without credentials check.
+            if ( ! WP_Filesystem() ) {
+                return false;
+            }
+        } else {
+            // This will output a credentials form in event of failure. We don't want that, so just hide with a buffer.
+            ob_start();
+            $credentials = request_filesystem_credentials( '', '', false, $directories[0] );
+            ob_end_clean();
 
-		if ( ! WP_Filesystem( $credentials ) ) {
-			$error = true;
-			if ( is_object( $wp_filesystem ) && $wp_filesystem->errors->get_error_code() ) {
-				$error = $wp_filesystem->errors;
-			}
-			// Failed to connect, Error and request again.
-			ob_start();
-			request_filesystem_credentials( '', '', $error, $directories[0] );
-			ob_end_clean();
-			return false;
-		}
+            if ( false === $credentials ) {
+                return false;
+            }
+
+            if ( ! WP_Filesystem( $credentials ) ) {
+                $error = true;
+                if ( is_object( $wp_filesystem ) && $wp_filesystem->errors->get_error_code() ) {
+                    $error = $wp_filesystem->errors;
+                }
+                // Failed to connect, Error and request again.
+                ob_start();
+                request_filesystem_credentials( '', '', $error, $directories[0] );
+                ob_end_clean();
+                return false;
+            }
+        }
 
 		if ( ! is_object( $wp_filesystem) ) {
 			return new WP_Error( 'fs_unavailable', __( 'Could not access filesystem.', 'advanced-ads' ) );

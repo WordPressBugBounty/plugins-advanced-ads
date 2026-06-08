@@ -189,11 +189,12 @@ class Placement_Repository {
 		$query = new WP_Query(
 			WordPress::improve_wp_query(
 				[
-					'post_type'      => Constants::POST_TYPE_PLACEMENT,
-					'posts_per_page' => -1,
-					'fields'         => 'ids',
-					'post_status'    => 'any',
-					'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					'post_type'        => Constants::POST_TYPE_PLACEMENT,
+					'posts_per_page'   => -1,
+					'fields'           => 'ids',
+					'post_status'      => 'any',
+					'suppress_filters' => true,
+					'meta_query'       => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 						[
 							'key'   => 'item',
 							'value' => $item_id,
@@ -228,11 +229,12 @@ class Placement_Repository {
 		$query = new WP_Query(
 			WordPress::improve_wp_query(
 				[
-					'post_type'      => Constants::POST_TYPE_PLACEMENT,
-					'posts_per_page' => -1,
-					'fields'         => 'ids',
-					'post_status'    => 'any',
-					'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					'post_type'        => Constants::POST_TYPE_PLACEMENT,
+					'posts_per_page'   => -1,
+					'fields'           => 'ids',
+					'post_status'      => 'any',
+					'suppress_filters' => true,
+					'meta_query'       => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 						[
 							'key'     => 'type',
 							'compare' => 'IN',

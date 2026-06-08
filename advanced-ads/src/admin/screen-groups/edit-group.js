@@ -29,12 +29,12 @@ function handleAddAdToGroup() {
 		adTable.append(
 			$('<tr></tr>').append(
 				$('<td></td>').html(
-					`<a target="_blank" href="${adUrl}">${$ad.text()}</a>`
-				),
-				$('<td></td>').html(
 					`<span class="advads-help advads-help-no-icon advads-ad-status-icon advads-ad-status-icon-${statusType}">
 						<span class="advads-tooltip">${statusString}</span>
 					</span>`
+				),
+				$('<td></td>').html(
+					`<a target="_blank" href="${adUrl}">${$ad.text()}</a>`
 				),
 				$('<td></td>').append(
 					weightSelector

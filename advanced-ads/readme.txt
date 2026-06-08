@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.21
+Stable tag: 2.0.22
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -359,6 +359,24 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.22 (June 8, 2026) =
+
+- Improvement: Add compatibility check for setAccessible function on HideNoticesTest file, as it was deprecated
+- Fix: dismissed default notices are now permanently hide
+- Fix: Woocommerce plugin was injecting SQL on the WP Query of finding placements by type, suppress filters on query
+- Fix: Remove credentials check from fs_connect function when FS method is direct
+- Fix: Add safeguard on EDD Updater class if request data is not an object
+- Fix: 
+- Fix: Block injection ancestor search logic used str_starts_with, wont work with PHP less than 8, replaced by framework function
+- Fix: Add early bail for Ad Health if the top bar is hidden
+- Fix: Adding new ads to a group made the new ad status and name columns appear misaligned
+- Fix: Ad groups with four ads were not showing the show more button on groups page, wrong comparison math
+- Fix: All In One Video Gallery categories and tags are loaded as pages with shortcode instead of taxonomy, archive display conditions
+- Fix: parallax placement with published status checked
+- Fix: OceanWP theme product quick view conflict with GAdsense module AMP code injection on AJAX
+- Fix: block unterminated PHP in shortcode content overrides
+- Fix: Buttons, widget and notices UI style fixes for WP 7 plus
 
 = 2.0.21 (April 27, 2026) =
 

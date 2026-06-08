@@ -19,3 +19,7 @@
 		@apply flex items-center justify-center bg-secondary-black text-gray-100 rounded p-4 leading-0 font-normal;
 	}
 }
+
+body.advads-wp-7-plus #advads-header .dashicons {
+	line-height: 1;
+}

@@ -34,6 +34,26 @@ class Admin_Compatibility implements Integration_Interface {
 		if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
 			add_filter( 'get_translatable_documents', [ $this, 'wpml_hide_from_translation' ], 10, 1 );
 		}
+
+		add_filter( 'admin_body_class', [ $this, 'add_advads_admin_body_class_wp7' ] );
+	}
+
+	/**
+	 * Adds a new class to admin body to fix CSS on version 7.0+
+	 *
+	 * @param string $classes Space-separated string of admin body classes.
+	 *
+	 * @return string
+	 */
+	public function add_advads_admin_body_class_wp7( string $classes ): string { // FIXED: Changed array to string
+		global $wp_version;
+
+		// Check if WordPress version is 7.0 or greater.
+		if ( version_compare( $wp_version, '7.0-alpha', '>=' ) ) {
+			$classes .= ' advads-wp-7-plus';
+		}
+
+		return $classes;
 	}
 
 	/**

@@ -1,0 +1,24 @@
+# Flow–test matrix
+
+Maps user-visible or contract-critical behavior to automated tests. Update when adding flows or tests.
+
+| Flow                  | User-visible / contract outcome     | PHPUnit                                                                                                          | Playwright                                                     | Gap action                                                 |
+| --------------------- | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| Plugin bootstrap      | Plugin loads without fatal          | —                                                                                                                | —                                                              | Add smoke PHPUnit boot test if regressions appear          |
+| Ads CRUD (model)      | Ad entities persist and validate    | `tests/Unit/Ads/CRUDTest.php`, `FactoryTest.php`, `TypesTest.php`, `ManagerTest.php`, `Concrete/*`               | `tests/Acceptance/Admin/Ads/listing.spec.ts`, `new.ad.spec.ts` | Extend E2E for edit/delete if not covered                  |
+| Ad admin labels       | Labels render correctly in UI       | `tests/Unit/Shortcodes/TheAdShortcodeSecurityTest.php` (shortcode/security)                                      | `tests/Acceptance/Admin/Ads/ad.label.spec.ts`                  | Align naming: shortcode vs admin label scope               |
+| Groups CRUD           | Groups persist                      | `tests/Unit/Groups/CRUDTest.php`, `FactoryTest.php`, `TypesTest.php`, `ManagerTest.php`                          | `tests/Acceptance/Admin/Groups/listing.spec.ts`                | Add E2E for create group if product-critical               |
+| Placements CRUD       | Placements persist                  | `tests/Unit/Placements/CRUDTest.php`, `FactoryTest.php`, `TypesTest.php`, `ManagerTest.php`, `PlacementTest.php` | `tests/Acceptance/Admin/Placements/listing.spec.ts`            | Add E2E for placement attach to content                    |
+| In-content injection  | XPath/CSS injection rules           | `tests/Unit/Core/InContentInjectorXPathTest.php`, `InContentInjectorCssSelectorTest.php`                         | —                                                              | Add Playwright front post with placement if feasible       |
+| Public post shortcode | `[the_ad]` renders on singular post | —                                                                                                                | `tests/Acceptance/Frontend/post-shortcode-renders.spec.ts`     | Add placement-only front test if needed                    |
+| Importers API         | Import contracts                    | `tests/Unit/Importers/ApiTest.php`                                                                               | —                                                              | Manual or E2E for full XML upload path                     |
+| License utilities     | License helper behavior             | `tests/Unit/Utilities/LicenseTest.php`                                                                           | —                                                              | E2E for activate/deactivate if revenue-critical            |
+| WordPress utilities   | Wrapper utilities                   | `tests/Unit/Utilities/WordPressTest.php`                                                                         | —                                                              | Keep unit-level; no E2E required                           |
+| Admin dashboard       | wp-admin home loads for editor      | —                                                                                                                | `tests/Acceptance/Admin/homepage.spec.ts`                      | Add PHPUnit for capability-gated menu if needed            |
+| Auth / storage        | Playwright auth fixture             | —                                                                                                                | `tests/Acceptance/Fixtures/auth.setup.ts`                      | Document secrets / `auth.json` in CI (already in workflow) |
+
+## Coverage notes
+
+-   **PHPUnit:** 24 test classes under `tests/Unit/` (see glob in health report).
+-   **Playwright:** Admin specs + `tests/Acceptance/Frontend/post-shortcode-renders.spec.ts` + setup; `frontend` project depends on `setup` so `auth.json` exists before frontend tests run.
+-   **Frontend E2E:** Shortcode-on-post rendering is covered; **placement-only** public output and logged-out visitors remain good follow-ups.

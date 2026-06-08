@@ -66,6 +66,7 @@ export default defineConfig( {
 			name: 'frontend',
 			testDir: 'tests/Acceptance/Frontend',
 			use: { storageState: 'auth.json' },
+			dependencies: [ 'setup' ],
 		},
 		{
 			name: 'frontend-auth',

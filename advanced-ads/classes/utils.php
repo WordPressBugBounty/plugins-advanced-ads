@@ -128,7 +128,12 @@ class Advanced_Ads_Utils {
 					}
 				}
 			case 'ad':
-				$ad       = wp_advads_get_ad( $id );
+				$ad = wp_advads_get_ad( $id );
+
+                if ( ! $ad ) {
+					break;
+                }
+
 				$result[] = $ad;
 				if ( $ad->is_type( 'group' ) && ! empty( $ad->get_prop( 'group_id' ) ) ) {
 					$result = array_merge( $result, self::get_nested_ads( $ad->get_prop( 'group_id' ), 'group' ) );

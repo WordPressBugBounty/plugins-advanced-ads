@@ -113,7 +113,6 @@ class Assets_Registry extends Framework\Assets_Registry {
 		$this->register_script( 'conditions', 'admin/assets/js/conditions.js', [ 'jquery', self::prefix_it( 'ui' ) ] );
 		$this->register_script( 'inline-edit-group-ads', 'admin/assets/js/inline-edit-group-ads.js', [ 'jquery' ], false, false );
 		$this->register_script( 'ad-positioning', '/modules/ad-positioning/assets/js/ad-positioning.js', [], false, true );
-		$this->register_script( 'groups', 'admin/assets/js/groups.js', [ 'jquery' ], false, true );
 		$this->register_script( 'adblocker-image-data', 'admin/assets/js/adblocker-image-data.js', [ 'jquery' ] );
 
 		$this->register_script( 'termination', 'admin/assets/js/termination.js', [ 'jquery' ], false, false );

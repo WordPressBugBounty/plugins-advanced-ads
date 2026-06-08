@@ -40,6 +40,9 @@ class Compatibility implements Integration_Interface {
 		if ( defined( 'BORLABS_COOKIE_VERSION' ) ) {
 			add_filter( 'advanced-ads-can-display-ads-in-header', [ $this, 'borlabs_cookie_can_add_auto_ads' ], 10 );
 		}
+		if ( defined( 'AIOVG_PLUGIN_VERSION' ) ) {
+			add_filter( 'advanced-ads-ad-select-args', [ $this, 'aiovg_modify_ad_select_args' ], 10 );
+		}
 	}
 
 	/**
@@ -259,5 +262,45 @@ class Compatibility implements Integration_Interface {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Modify ad select arguments to treat AIOVG shortcode pages as native taxonomy archives.
+	 *
+	 * @param array<string, mixed> $args Current ad selection arguments.
+	 *
+	 * @return array<string, mixed> Modified ad selection arguments.
+	 */
+	public function aiovg_modify_ad_select_args( array $args ): array {
+		$aiovg_taxs = [
+			'aiovg_categories' => 'aiovg_category',
+			'aiovg_tags'       => 'aiovg_tag',
+		];
+
+		foreach ( $aiovg_taxs as $aiovg_tax => $aiovg_query_var ) {
+			if ( taxonomy_exists( $aiovg_tax ) ) {
+				$aiovg_slug = get_query_var( $aiovg_query_var );
+
+				if ( ! empty( $aiovg_slug ) && is_scalar( $aiovg_slug ) ) {
+					$aiovg_term = get_term_by( 'slug', (string) $aiovg_slug, $aiovg_tax );
+
+					if ( $aiovg_term instanceof \WP_Term ) {
+						if ( ! isset( $args['wp_the_query'] ) || ! is_array( $args['wp_the_query'] ) ) {
+							$args['wp_the_query'] = [];
+						}
+
+						// Override the standard page parameters so Advanced Ads treats it as an archive.
+						$args['wp_the_query']['term_id']     = $aiovg_term->term_id;
+						$args['wp_the_query']['taxonomy']    = $aiovg_tax;
+						$args['wp_the_query']['is_archive']  = true;
+						$args['wp_the_query']['is_singular'] = false;
+
+						break;
+					}
+				}
+			}
+		}
+
+		return $args;
 	}
 }

@@ -142,3 +142,11 @@
 .advads-custom-period-wrapper {
 	@apply hidden;
 }
+
+body.advads-wp-7-plus .advads-widget-buttons .dashicons {
+	line-height: 1;
+}
+
+body.advads-wp-7-plus #advads-dashboard-widget .inside {
+	padding: 1rem;
+}

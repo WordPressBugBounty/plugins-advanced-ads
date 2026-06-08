@@ -1072,8 +1072,13 @@ abstract class Ad extends Data implements Entity_Interface {
 	 */
 	private function get_label(): string {
 		if ( null === $this->label ) {
-			$state       = $this->get_prop( 'ad_label' ) ?? 'default';
-			$this->label = Advanced_Ads::get_instance()->get_label( $this, $state );
+			$state = $this->get_prop( 'ad_label' ) ?? 'default';
+			$label = Advanced_Ads::get_instance()->get_label( $this, $state );
+			if ( ! $this->parent && $label ) {
+				$this->label = $label;
+			} else {
+				$this->label = $this->is_parent_placement() && $label ? $label : '';
+			}
 		}
 
 		return $this->label;

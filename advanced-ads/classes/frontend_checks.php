@@ -815,6 +815,7 @@ class Advanced_Ads_Frontend_Checks {
 			(function(d, w) {
 				// highlight link as global
 				var highlightLink = d.getElementById( 'wp-admin-bar-advanced_ads_ad_health_highlight_ads' );
+				if ( ! highlightLink ) return;
 				var adWrappers;
 				// update ad count in health tool admin bar
 				updateAdsCount(d);
@@ -1032,6 +1033,7 @@ class Advanced_Ads_Frontend_Checks {
 
 				function updateAdsCount(d){
 					var highlightLink = d.getElementById( 'wp-admin-bar-advanced_ads_ad_health_highlight_ads' );
+					if ( ! highlightLink ) return;
 					// update ad count in health tool admin bar
 					highlightLink.querySelector('.link').innerHTML += ' (<span class="highlighted_ads_count">' + getAdsCount() + '</span>) ';
 

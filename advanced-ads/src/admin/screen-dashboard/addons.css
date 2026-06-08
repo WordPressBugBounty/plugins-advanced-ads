@@ -181,3 +181,7 @@
 		}
 	}
 }
+
+body.advads-wp-7-plus #advanced-ads-addon-box .cta .dashicons {
+	line-height: 1;
+}

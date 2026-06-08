@@ -930,7 +930,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool true if can be displayed
 	 */
-	public static function check_post_type( $options, Ad $ad ) {
+	public static function check_post_type( $options, $ad ) {
 		if ( ! isset( $options['value'] ) || ! is_array( $options['value'] ) ) {
 			return false;
 		}
@@ -959,7 +959,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool true if can be displayed
 	 */
-	public static function check_author( $options, Ad $ad ) {
+	public static function check_author( $options, $ad ) {
 		if ( ! isset( $options['value'] ) || ! is_array( $options['value'] ) ) {
 			return false;
 		}
@@ -988,7 +988,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool true if can be displayed
 	 */
-	public static function check_taxonomies( $options, Ad $ad ) {
+	public static function check_taxonomies( $options, $ad ) {
 		if ( ! isset( $options['value'] ) ) {
 			return false;
 		}
@@ -1039,7 +1039,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool true if can be displayed
 	 */
-	public static function check_taxonomy_archive( $options, Ad $ad ) {
+	public static function check_taxonomy_archive( $options, $ad ) {
 		if ( ! isset( $options['value'] ) ) {
 			return false;
 		}
@@ -1070,7 +1070,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool true if can be displayed
 	 */
-	public static function check_taxonomy( $options, Ad $ad ) {
+	public static function check_taxonomy( $options, $ad ) {
 		if ( ! isset( $options['value'] ) ) {
 			return false;
 		}
@@ -1101,7 +1101,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool true if can be displayed
 	 */
-	public static function check_post_ids( $options, Ad $ad ) {
+	public static function check_post_ids( $options, $ad ) {
 		$operator = 'is';
 		if ( isset( $options['operator'] ) && 'is_not' === $options['operator'] ) {
 			$operator = 'is_not';
@@ -1148,7 +1148,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool true if can be displayed
 	 */
-	public static function check_general( $options, Ad $ad ) {
+	public static function check_general( $options, $ad ) {
 		// display by default.
 		if ( ! isset( $options['value'] ) || ! is_array( $options['value'] ) || ! count( $options['value'] ) ) {
 			return true;
@@ -1206,7 +1206,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @return bool true if can be displayed
 	 */
-	public static function check_content_age( $options, Ad $ad ) { // phpcs:ignore
+	public static function check_content_age( $options, $ad ) { // phpcs:ignore
 		$post   = get_post();
 		$the_id = Params::request( 'theId', 0, FILTER_VALIDATE_INT );
 

@@ -162,19 +162,26 @@ class Shortcodes implements Integration_Interface {
 			unset( $result['tracking']['link'] );
 		}
 
+		if ( isset( $result['content'] ) && is_string( $result['content'] ) ) {
+			$result['content'] = $this->sanitize_shortcode_content( $result['content'] );
+		}
+
 		return $result;
 	}
 
 	/**
 	 * Sanitize shortcode content override by stripping PHP payloads only.
 	 *
-	 * @param string $content Content override provided through ad_args.
+	 * @param string $content Content override from shortcode attributes (ad_args, change-ad__, etc.).
 	 *
 	 * @return string
 	 */
 	private function sanitize_shortcode_content( string $content ): string {
-		// Remove PHP tags and all inline php payload.
-		$content = preg_replace( '/<\\?(?:php|=)?[\\s\\S]*?\\?>/i', '', $content );
+		// Remove PHP blocks (closed or unclosed through end of string).
+		// Handle both cases.
+		// 1. closed PHP tag
+		// 2. unclosed PHP tag
+		$content = preg_replace( '/<\\?(?:php|=)?[\\s\\S]*?(?:\\x3F\\x3E|$)/i', '', $content );
 
 		return $content ? $content : '';
 	}

@@ -135,6 +135,11 @@ class Advanced_Ads_Ad_Health_Notices {
 		// load default notices.
 		if ( [] === $this->default_notices ) {
 			include ADVADS_ABSPATH . '/admin/includes/ad-health-notices.php';
+			$options               = $this->options();
+			$hide_notices          = $options['hide_notices'] ?? [];
+			if ( ! empty( $hide_notices ) ) {
+				$advanced_ads_ad_health_notices = array_diff_key($advanced_ads_ad_health_notices, $hide_notices);
+			}
 			$this->default_notices = $advanced_ads_ad_health_notices;
 		}
 	}
@@ -460,7 +465,8 @@ class Advanced_Ads_Ad_Health_Notices {
 		}
 
 		unset( $options['notices'][ $notice_key ] );
-
+		$options['hide_notices'][ $notice_key] = true;
+		$this->hide_notices( $options[ 'hide_notices' ] ); // for non wp notices
 		$this->update_notices( $options['notices'] );
 	}
 
@@ -535,6 +541,25 @@ class Advanced_Ads_Ad_Health_Notices {
 	}
 
 	/**
+	 * Hide notices list if there is any change
+	 *
+	 * @param array $notices New options.
+	 *
+	 * @return void
+	 */
+	public function hide_notices( $notices ): void {
+		$options = $this->options();
+
+		if ( Arr::get( $options, 'notices', [] ) === $notices ) {
+			return;
+		}
+
+		$options['hide_notices'] = $notices;
+		$this->update_options( $options );
+		$this->load_notices();
+	}
+
+	/**
 	 * Render notice widget on overview page
 	 */
 	public function render_widget() {
@@ -555,7 +580,6 @@ class Advanced_Ads_Ad_Health_Notices {
 		if ( ! is_array( $this->notices ) ) {
 			return;
 		}
-
 		foreach ( $this->notices as $_notice_key => $_notice ) {
 			$notice_array = $this->get_notice_array_for_key( $_notice_key );
 
