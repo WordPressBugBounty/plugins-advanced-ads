@@ -105,7 +105,9 @@ class Misc implements Integration_Interface {
 			wp_add_inline_script(
 				$ad_blocker_notice_id . '-adblocker-notice',
 				"jQuery( document ).ready( function () {
-					if ( typeof advanced_ads_adblocker_test === 'undefined' ) {
+					let has_brave_shields = ( typeof navigator.brave !== 'undefined' && typeof advanced_ads_admin === 'undefined' ) ? true : false;
+
+					if ( typeof advanced_ads_adblocker_test === 'undefined' && ( typeof navigator.brave === 'undefined' || has_brave_shields ) ) {
 						jQuery( '#" . esc_attr( $ad_blocker_notice_id ) . ".message' ).show();
 					}
 				} );"

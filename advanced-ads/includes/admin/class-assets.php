@@ -66,6 +66,7 @@ class Assets implements Integration_Interface {
 
 		$screen = get_current_screen();
 		$this->enqueue_endpoints();
+		$this->enqueue_security();
 		$this->enqueue_site_info();
 		$this->enqueue_i18n();
 
@@ -143,6 +144,21 @@ class Assets implements Integration_Interface {
 
 	/**
 	 * Global variables: advancedAds
+	 *
+	 * @return void
+	 */
+	private function enqueue_security() {
+		$security = [
+			'ajaxNonce' => wp_create_nonce( 'advanced-ads-admin-ajax-nonce' ),
+		];
+
+		wp_advads_json_add( 'security', $security );
+	}
+
+	/**
+	 * Global variables: advancedAds
+	 *
+	 * @return void
 	 */
 	private function enqueue_site_info() {
 		$endpoints = [
@@ -155,6 +171,8 @@ class Assets implements Integration_Interface {
 
 	/**
 	 * Global variables: advancedAds
+	 *
+	 * @return void
 	 */
 	private function enqueue_endpoints() {
 		$endpoints = [

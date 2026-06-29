@@ -94,10 +94,12 @@ class Placement_Type {
 		}
 
 		$this->allowed_ads = [];
-		foreach ( wp_advads_get_all_ads() as $ad ) {
-			if ( $this->is_ad_type_allowed( $ad->get_type() ) ) {
-				$this->allowed_ads[ 'ad_' . $ad->get_id() ] = $ad->get_title() . ( 'draft' === $ad->get_status() ? ' (' . __( 'draft', 'advanced-ads' ) . ')' : '' );
+		foreach ( wp_advads_get_ad_summaries() as $ad_id => $summary ) {
+			if ( ! $this->is_ad_type_allowed( $summary['type'] ) ) {
+				continue;
 			}
+
+			$this->allowed_ads[ 'ad_' . $ad_id ] = $summary['title'] . ( 'draft' === $summary['status'] ? ' (' . __( 'draft', 'advanced-ads' ) . ')' : '' );
 		}
 
 		return $this->allowed_ads;
@@ -115,18 +117,16 @@ class Placement_Type {
 
 		$this->allowed_groups = [];
 
-		$ads    = wp_advads_get_all_ads();
-		$groups = wp_advads_get_all_groups();
+		$group_summaries = wp_advads_get_group_summaries();
 
-		foreach ( $groups as $group ) {
-			if ( ! $this->is_group_type_allowed( $group->get_type() ) ) {
+		foreach ( $group_summaries as $group_id => $summary ) {
+			if ( ! $this->is_group_type_allowed( $summary['type'] ) ) {
 				continue;
 			}
 
-			// Check if group has allowed ads.
-			foreach ( $group->get_ads_ids() as $ad_id ) {
-				if ( array_key_exists( $ad_id, $ads ) && $this->is_ad_type_allowed( $ads[ $ad_id ]->get_type() ) ) {
-					$this->allowed_groups[ 'group_' . $group->get_id() ] = $group->get_name();
+			foreach ( wp_advads_get_ads_by_group_id( $group_id, 'summaries' ) as $ad_id => $ad_summary ) {
+				if ( $this->is_ad_type_allowed( $ad_summary['type'] ) ) {
+					$this->allowed_groups[ 'group_' . $group_id ] = $summary['title'];
 					break;
 				}
 			}

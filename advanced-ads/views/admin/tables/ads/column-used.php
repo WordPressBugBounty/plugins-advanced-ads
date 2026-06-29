@@ -3,11 +3,10 @@
  * Render column.
  *
  * @package AdvancedAds
- * @var int $ad_id Ad ID.
+ * @var int   $ad_id Ad ID.
+ * @var array $groups Groups the ad is used in.
+ * @var array $placements Placements the ad is used in.
  */
-
-$groups     = wp_advads_get_group_repository()->get_groups_by_ad_id( $ad_id );
-$placements = wp_advads_get_placement_repository()->find_by_item_id( 'ad_' . $ad_id );
 
 if ( $groups ) :
 	?>
@@ -16,8 +15,8 @@ if ( $groups ) :
 		<?php
 		$group_links = [];
 		foreach ( $groups as $group ) {
-			$group_links[] = '<a href="' . esc_attr( $group->get_edit_link() ) . '" target="_blank">'
-				. esc_html( $group->get_name() ) . '</a>';
+			$group_links[] = '<a href="' . esc_attr( $group['edit_link'] ) . '" target="_blank">'
+				. esc_html( $group['title'] ) . '</a>';
 		}
 		echo implode( ', ', $group_links ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $group_links is HTML.
 		?>
@@ -34,12 +33,10 @@ if ( $placements ) :
 	<strong><?php echo esc_html__( 'Placements', 'advanced-ads' ) . ':'; ?></strong>
 	<div>
 		<?php
-		$ids             = [];
 		$placement_links = [];
 		foreach ( $placements as $placement ) {
-			$ids[]             = $placement->get_id();
-			$placement_links[] = '<a href="' . esc_attr( $placement->get_edit_link() ) . '" target="_blank">'
-				. esc_html( $placement->get_title() ) . '</a>';
+			$placement_links[] = '<a href="' . esc_attr( $placement['edit_link'] ) . '" target="_blank">'
+				. esc_html( $placement['title'] ) . '</a>';
 		}
 		echo implode( ', ', $placement_links ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- $placement_links is HTML.
 		?>

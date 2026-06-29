@@ -47,7 +47,7 @@ class Ad_Renderer implements Integration_Interface {
 	 * @return void
 	 */
 	public function inject_header(): void {
-		$placements = wp_advads_get_placements_by_types( 'header' );
+		$placements = wp_advads_get_placements_by_types( 'header', \OBJECT, true );
 		foreach ( $placements as $placement ) {
 			the_ad_placement( $placement->get_id() );
 		}
@@ -59,7 +59,7 @@ class Ad_Renderer implements Integration_Interface {
 	 * @return void
 	 */
 	public function inject_footer(): void {
-		$placements = wp_advads_get_placements_by_types( 'footer' );
+		$placements = wp_advads_get_placements_by_types( 'footer', \OBJECT, true );
 		foreach ( $placements as $placement ) {
 			the_ad_placement( $placement->get_id() );
 		}

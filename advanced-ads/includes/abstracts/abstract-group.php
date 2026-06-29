@@ -74,6 +74,13 @@ class Group extends Data implements Entity_Interface {
 	private $sorted_ads = null;
 
 	/**
+	 * Cached ad weights per context (view/edit), including WPML translation when active.
+	 *
+	 * @var array<string, array<int, int>>
+	 */
+	private $ad_weights_cache = [];
+
+	/**
 	 * Wrapper for the group.
 	 *
 	 * @var array|null
@@ -160,6 +167,10 @@ class Group extends Data implements Entity_Interface {
 	 * @return array
 	 */
 	public function get_ad_weights( $context = 'view' ): array {
+		if ( isset( $this->ad_weights_cache[ $context ] ) ) {
+			return $this->ad_weights_cache[ $context ];
+		}
+
 		global $sitepress;
 
 		$weights = $this->get_prop( 'ad_weights', $context );
@@ -181,6 +192,8 @@ class Group extends Data implements Entity_Interface {
 				}
 			}
 		}
+
+		$this->ad_weights_cache[ $context ] = $weights;
 
 		return $weights;
 	}
@@ -246,6 +259,9 @@ class Group extends Data implements Entity_Interface {
 	 * @return void
 	 */
 	public function set_ad_weights( $ad_weights ): void {
+		$this->ad_weights_cache = [];
+		$this->ads              = null;
+		$this->sorted_ads       = null;
 		$this->set_prop( 'ad_weights', $ad_weights );
 	}
 
@@ -647,15 +663,21 @@ class Group extends Data implements Entity_Interface {
 	 */
 	public function shuffle_ads(): array {
 		$shuffled_ads = [];
+		$ads          = $this->get_ads();
+		$weights      = $this->get_ad_weights();
+		$weight_total = array_sum( $weights );
 
-		$random_id = 0;
-		$ads       = $this->get_ads();
-		$weights   = $this->get_ad_weights();
+		while ( $weight_total >= 1 ) {
+			$random_id = $this->get_random_ad_by_weight( $weights, $weight_total );
 
-		while ( null !== $random_id ) {
-			$random_id = $this->get_random_ad_by_weight( $weights );
+			if ( null === $random_id ) {
+				break;
+			}
+
+			$weight_total -= $weights[ $random_id ] ?? 0;
 			unset( $weights[ $random_id ] );
-			if ( $random_id && ! empty( $ads[ $random_id ] ) ) {
+
+			if ( ! empty( $ads[ $random_id ] ) ) {
 				$shuffled_ads[] = $random_id;
 			}
 		}
@@ -744,11 +766,11 @@ class Group extends Data implements Entity_Interface {
 	 *
 	 * @return null|int
 	 */
-	private function get_random_ad_by_weight( $weights ) {
+	private function get_random_ad_by_weight( $weights, $max = null ) {
 
 		// use maximum ad weight for ads without this
 		// ads might have a weight of zero (0); to avoid mt_rand fail assume that at least 1 is set.
-		$max = array_sum( $weights );
+		$max = null === $max ? array_sum( $weights ) : $max;
 		if ( $max < 1 ) {
 			return null;
 		}

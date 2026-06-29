@@ -27,11 +27,13 @@ class Peepso_Ad extends Ad implements Ad_Interface {
 	public function prepare_frontend_output(): string {
 		$content = $this->get_content();
 
-		$image_url = wp_get_attachment_image_url( $this->get_prop( 'image_id' ), 'full' );
-		$image_url = $image_url[0] ?? null;
+		$image_id  = (int) $this->get_prop( 'image_id' );
+		$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : false;
+		$image_url = $image_url ?: null;
 
-		$avatar_url = wp_get_attachment_image_url( $this->get_prop( 'avatar_id' ), 'full' );
-		$avatar_url = $avatar_url[0] ?? null;
+		$avatar_id  = (int) $this->get_prop( 'avatar_id' );
+		$avatar_url = $avatar_id ? wp_get_attachment_image_url( $avatar_id, 'full' ) : false;
+		$avatar_url = $avatar_url ?: null;
 
 		$url            = $this->get_url() ?? '#';
 		$title          = $this->get_title() ?? '';
@@ -67,7 +69,6 @@ class Peepso_Ad extends Ad implements Ad_Interface {
 		<div class="ps-post__body">
 			<div class="ps-post__content">
 				<?php
-				$content    = $this->get_content();
 				$allow_tags = \PeepSo::get_option_new( 'advanced_ads_allow_all_tags' );
 				echo $allow_tags
 					? $content // phpcs:ignore

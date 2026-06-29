@@ -17,24 +17,30 @@ defined( 'ABSPATH' ) || exit;
 abstract class Factory {
 
 	/**
-	 * Retrieves the classname for entity type.
+	 * Request-scoped cache of loaded entity instances keyed by entity ID and optional type override.
 	 *
-	 * @param Types  $manager      The manager object.
-	 * @param string $entity_type  The entity type.
-	 * @param string $default_type The entity default type.
-	 *
-	 * @return string The classname for the given entity type.
+	 * @var array<string, object|false>
 	 */
-	public function get_classname( $manager, $entity_type, $default_type = 'default' ) {
-		// If the manager is called outside `init` hook, we need to initialize it.
-		if ( empty( $manager->get_types() ) || ! $manager->has_type( $default_type ) ) {
-			$manager->register_types();
-		}
+	protected $instances = [];
 
-		$type = $manager->has_type( $entity_type )
-			? $manager->get_type( $entity_type )
-			: $manager->get_type( $default_type );
+	/**
+	 * Clear request-scoped entity instances (e.g. after CRUD writes).
+	 *
+	 * @return void
+	 */
+	public function clear_instance_cache(): void {
+		$this->instances = [];
+	}
 
-		return $type->get_classname();
+	/**
+	 * Build a cache key for a loaded entity instance.
+	 *
+	 * @param int    $id       Entity ID.
+	 * @param string $new_type Optional type override passed to the factory getter.
+	 *
+	 * @return string
+	 */
+	protected function get_instance_cache_key( int $id, string $new_type = '' ): string {
+		return '' !== $new_type ? $id . ':' . $new_type : (string) $id;
 	}
 }

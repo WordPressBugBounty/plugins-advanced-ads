@@ -10,6 +10,11 @@ import jQuery from 'jquery';
 function getAdData(id) {
 	const adVar = `ad_json_${id}`;
 	const adData = window[adVar];
+
+	if (!adData) {
+        return;
+    }
+
 	fillInputs(id, adData);
 }
 

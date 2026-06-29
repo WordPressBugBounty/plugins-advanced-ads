@@ -46,20 +46,6 @@ function wp_advads_set_additional_args( $entity, $args ): void {
 }
 
 /**
- * Load ad conditions.
- *
- * @return array
- */
-function wp_advads_get_ad_conditions(): array {
-	static $ad_conditions;
-	if ( null === $ad_conditions ) {
-		$ad_conditions = include ADVADS_ABSPATH . 'includes/array_ad_conditions.php';
-	}
-
-	return $ad_conditions;
-}
-
-/**
  * Get user IP address.
  *
  * @return bool|string IP address or false if not found

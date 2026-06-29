@@ -166,6 +166,10 @@ class Shortcodes implements Integration_Interface {
 			$result['content'] = $this->sanitize_shortcode_content( $result['content'] );
 		}
 
+		if ( isset( $result['override'] ) && is_string( $result['override'] ) ) {
+			$result['override'] = wp_kses_post( $this->sanitize_shortcode_content( $result['override'] ) );
+		}
+
 		return $result;
 	}
 
@@ -177,17 +181,18 @@ class Shortcodes implements Integration_Interface {
 	 * @return string
 	 */
 	private function sanitize_shortcode_content( string $content ): string {
-		// Remove PHP blocks (closed or unclosed through end of string).
-		// Handle both cases.
-		// 1. closed PHP tag
-		// 2. unclosed PHP tag
-		$content = preg_replace( '/<\\?(?:php|=)?[\\s\\S]*?(?:\\x3F\\x3E|$)/i', '', $content );
+		do {
+			$before  = $content;
+			$content = preg_replace( '/<\\?(?:php|=)?[\\s\\S]*?(?:\\x3F\\x3E|$)/i', '', $content );
+		} while ( $content !== $before );
 
-		return $content ? $content : '';
+		$content = str_replace( '<?', '', (string) $content );
+
+		return '' !== $content ? $content : '';
 	}
 
 	/**
-	 * Parse and sanitize ad_args payload for shortcode rendering.
+	 * Parse ad_args payload for shortcode rendering.
 	 *
 	 * @param string $ad_args Raw urlencoded ad_args value.
 	 *
@@ -195,15 +200,8 @@ class Shortcodes implements Integration_Interface {
 	 */
 	private function parse_shortcode_ad_args( string $ad_args ): array {
 		$decoded_ad_args = json_decode( urldecode( $ad_args ), true );
-		if ( ! is_array( $decoded_ad_args ) ) {
-			return [];
-		}
 
-		if ( isset( $decoded_ad_args['content'] ) && is_string( $decoded_ad_args['content'] ) ) {
-			$decoded_ad_args['content'] = $this->sanitize_shortcode_content( $decoded_ad_args['content'] );
-		}
-
-		return $decoded_ad_args;
+		return is_array( $decoded_ad_args ) ? $decoded_ad_args : [];
 	}
 
 	/**

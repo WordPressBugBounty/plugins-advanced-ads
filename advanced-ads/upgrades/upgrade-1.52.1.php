@@ -27,7 +27,13 @@ function advads_migrate_groups() {
 
 	// link ad post with group ads.
 	foreach ( $ads as $ad ) {
-		foreach ( wp_advads_get_group_repository()->get_groups_by_ad_id( $ad->get_id() ) as $group ) {
+		$group_ids = wp_get_object_terms( $ad->get_id(), Constants::TAXONOMY_GROUP, [ 'fields' => 'ids' ] );
+
+		if ( is_wp_error( $group_ids ) || empty( $group_ids ) ) {
+			continue;
+		}
+
+		foreach ( wp_advads_get_groups_by_ids( $group_ids ) as $group ) {
 			$weights = $group->get_ad_weights();
 			if ( ! isset( $weights[ $ad->get_id() ] ) ) {
 				$weights[ $ad->get_id() ] = 10;

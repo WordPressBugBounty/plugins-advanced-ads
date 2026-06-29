@@ -212,9 +212,11 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Assets_Registry::class, 'registry' );
 		$this->register_integration( Framework\JSON::class, 'json', [ 'advancedAds' ] );
 		$this->register_integration( Compatibility\Compatibility::class );
+		$this->register_integration( Compatibility\Inline_JS::class );
 		$this->register_integration( Compatibility\AAWP::class );
 		$this->register_integration( Compatibility\Peepso::class );
 		$this->register_integration( Post_Data::class );
+		$this->register_integration( Cache_Invalidator::class );
 		$this->register_integration( Crons\Ads::class );
 		$this->register_integration( Shortcodes::class, 'shortcodes' );
 		$this->register_integration( Frontend\Debug_Ads::class );
@@ -342,7 +344,6 @@ class Plugin extends Framework\Loader {
 		require_once ADVADS_ABSPATH . 'deprecated/ad-model.php';
 		require_once ADVADS_ABSPATH . 'deprecated/ad-select.php';
 		require_once ADVADS_ABSPATH . 'deprecated/ad.php';
-		require_once ADVADS_ABSPATH . 'deprecated/deprecated-functions.php';
 		require_once ADVADS_ABSPATH . 'deprecated/gadsense-dummy.php';
 		require_once ADVADS_ABSPATH . 'deprecated/Group_Repository.php';
 		require_once ADVADS_ABSPATH . 'deprecated/class-admin.php';

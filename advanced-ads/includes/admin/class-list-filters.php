@@ -145,10 +145,22 @@ class List_Filters implements Integration_Interface {
 	 * @param WP_Post[] $posts array of ads.
 	 */
 	public function collect_all_ads( $posts ) {
+		$ad_summaries = wp_advads_get_ad_summaries();
+		$post_ids     = wp_list_pluck( $posts, 'ID' );
+
+		if ( ! empty( $post_ids ) ) {
+			update_meta_cache( 'post', $post_ids );
+		}
+
 		foreach ( $posts as $post ) {
 			$this->all_ads_options[ $post->ID ] = get_post_meta( $post->ID, 'advanced_ads_ad_options', true );
 			if ( empty( $this->all_ads_options[ $post->ID ] ) ) {
 				$this->all_ads_options[ $post->ID ] = [];
+			}
+
+			if ( isset( $ad_summaries[ $post->ID ] ) ) {
+				$this->all_ads_options[ $post->ID ]['type']        = $ad_summaries[ $post->ID ]['type'];
+				$this->all_ads_options[ $post->ID ]['expiry_date'] = $ad_summaries[ $post->ID ]['expiry_date'];
 			}
 		}
 
@@ -159,18 +171,19 @@ class List_Filters implements Integration_Interface {
 	 * Collects all ads groups, fills the $all_groups class property.
 	 */
 	private function collect_all_groups() {
-		global $wpdb;
+		$groups = [];
 
-		$groups = wp_advads_get_all_groups();
+		foreach ( wp_advads_get_group_summaries() as $group_id => $summary ) {
+			$ad_ids = wp_advads_get_ads_by_group_id( $group_id, 'ids' );
 
-		foreach ( $groups as $group ) {
-			$group_id   = $group->get_id();
-			$ad_weights = $group->get_ad_weights();
-			if ( ! empty( $ad_weights ) ) {
-				$groups[ $group_id ] = [ 'name' => $group->get_name() ];
-				foreach ( $ad_weights as $ad_id => $weight ) {
-					$this->ads_in_groups[ $group_id ][] = $ad_id;
-				}
+			if ( empty( $ad_ids ) ) {
+				continue;
+			}
+
+			$groups[ $group_id ] = [ 'name' => $summary['title'] ];
+
+			foreach ( $ad_ids as $ad_id ) {
+				$this->ads_in_groups[ $group_id ][] = $ad_id;
 			}
 		}
 
@@ -239,18 +252,15 @@ class List_Filters implements Integration_Interface {
 
 		// Searching an ad ID.
 		if ( 0 !== (int) $the_query->query_vars['s'] ) {
-			$single_ad = wp_advads_ad_query(
-				[
-					'p'           => (int) $the_query->query_vars['s'],
-					'post_status' => [ 'any' ],
-				]
-			)->posts;
+			$searched_id = (int) $the_query->query_vars['s'];
+			$single_ad   = wp_advads_get_ad( $searched_id );
+			$single_post = $single_ad ? get_post( $searched_id ) : null;
 
-			if ( ! empty( $single_ad ) ) {
+			if ( $single_post instanceof WP_Post && Constants::POST_TYPE_AD === $single_post->post_type ) {
 				// Head to the ad edit page if one and only one ad found.
 				$redirect = add_query_arg(
 					[
-						'post'   => $single_ad[0]->ID,
+						'post'   => $single_post->ID,
 						'action' => 'edit',
 					],
 					admin_url( 'post.php' )
@@ -259,8 +269,8 @@ class List_Filters implements Integration_Interface {
 					exit;
 				}
 
-				if ( ! in_array( $single_ad[0]->ID, wp_list_pluck( $posts, 'ID' ), true ) ) {
-					$posts[] = $single_ad[0];
+				if ( ! in_array( $single_post->ID, wp_list_pluck( $posts, 'ID' ), true ) ) {
+					$posts[] = $single_post;
 				}
 			}
 		}
@@ -297,8 +307,6 @@ class List_Filters implements Integration_Interface {
 	 * @return array with posts
 	 */
 	private function ad_filters( $posts, &$the_query ) {
-		global $wpdb;
-
 		$using_original = true;
 		$request        = wp_unslash( $_REQUEST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
@@ -354,35 +362,19 @@ class List_Filters implements Integration_Interface {
 		/**
 		 * Filter by taxonomy
 		 */
-		if ( isset( $request['taxonomy'] ) && isset( $request['term'] ) ) {
-			$term  = $request['term'];
-			$query = "SELECT object_id
-				FROM {$wpdb->term_relationships}
-          		WHERE term_taxonomy_id = (
-					SELECT terms.term_id
-					FROM {$wpdb->terms} AS terms
-					INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy
-					ON terms.term_id = term_taxonomy.term_id
-					WHERE terms.slug = %s AND term_taxonomy.taxonomy = %s
-				)";
-
-			$object_ids      = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare( $query, $term, Constants::TAXONOMY_GROUP ), // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-				'ARRAY_A'
-			);
-			$ads_in_taxonomy = [];
-
-			foreach ( $object_ids as $object ) {
-				$ads_in_taxonomy[] = absint( $object['object_id'] );
-			}
-
+		if ( isset( $request['taxonomy'] ) && isset( $request['term'] ) && Constants::TAXONOMY_GROUP === $request['taxonomy'] ) {
+			$term      = get_term_by( 'slug', $request['term'], Constants::TAXONOMY_GROUP );
+			$group_id  = ( $term && ! is_wp_error( $term ) ) ? (int) $term->term_id : 0;
+			$ad_ids    = ( $group_id && isset( $this->ads_in_groups[ $group_id ] ) ) ? $this->ads_in_groups[ $group_id ] : [];
 			$new_posts = [];
 			$the_list  = $using_original ? $this->all_ads : $posts;
+
 			foreach ( $the_list as $post ) {
-				if ( in_array( $post->ID, $ads_in_taxonomy, true ) ) {
+				if ( in_array( $post->ID, $ad_ids, true ) ) {
 					$new_posts[] = $post;
 				}
 			}
+
 			$posts                  = $new_posts;
 			$the_query->found_posts = count( $posts );
 			$using_original         = false;
@@ -537,12 +529,12 @@ class List_Filters implements Integration_Interface {
 	 * @return array An associative array of authors, keys are the author IDs and values are the author display names.
 	 */
 	private function collect_authors(): array {
-		$ads     = wp_advads_get_all_ads();
 		$authors = [];
 
-		foreach ( $ads as $ad ) {
-			if ( ! isset( $authors[ $ad->get_author_id() ] ) ) {
-				$authors[ $ad->get_author_id() ] = get_the_author_meta( 'display_name', $ad->get_author_id() );
+		foreach ( wp_advads_get_ad_summaries() as $summary ) {
+			$author_id = $summary['author_id'];
+			if ( ! isset( $authors[ $author_id ] ) ) {
+				$authors[ $author_id ] = get_the_author_meta( 'display_name', $author_id );
 			}
 		}
 

@@ -119,8 +119,8 @@ class Advanced_Ads_Utils {
 		switch ( $type ) {
 			// No idea if this is intentional fall through
 			case 'placement':
-				$placements = wp_advads_get_placements();
-				$item       = $placements[ $id ]->get_item();
+				$placement = wp_advads_get_placement( $id );
+				$item      = $placement ? $placement->get_item() : '';
 				if ( ! empty( $item ) ) {
 					$item = explode( '_', $item );
 					if ( isset( $item[1] ) ) {

@@ -60,11 +60,20 @@ class Placement_Factory extends Factory {
 			return false;
 		}
 
+		$cache_key = $this->get_instance_cache_key( (int) $placement_id, $new_type );
+		if ( array_key_exists( $cache_key, $this->instances ) ) {
+			return $this->instances[ $cache_key ];
+		}
+
 		$placement_type = '' !== $new_type ? $new_type : $this->get_placement_type( $placement_id );
-		$classname      = $this->get_classname( wp_advads_get_placement_type_manager(), $placement_type );
+		$classname      = wp_advads_get_placement_type_manager()->get_classname_for_type( $placement_type );
 
 		try {
-			return new $classname( $placement_id );
+			$placement = new $classname( $placement_id );
+
+			$this->instances[ $cache_key ] = $placement;
+
+			return $placement;
 		} catch ( Exception $e ) {
 			return false;
 		}

@@ -66,8 +66,12 @@ class Advanced_Ads_Ads_Txt_Admin {
 		// phpcs:enable
 
 		$this->strategy->toggle( $create, $all_network, $additional_content );
-		$content = $this->get_adsense_blog_data();
-		$this->strategy->add_network_data( self::adsense, $content );
+
+		if ( ! $this->is_adsense_disabled() ) {
+			$content = $this->get_adsense_blog_data();
+			$this->strategy->add_network_data( self::adsense, $content );
+		}
+
 		$r = $this->strategy->save_options();
 
 		if ( is_wp_error( $r ) ) {
@@ -87,6 +91,7 @@ class Advanced_Ads_Ads_Txt_Admin {
 	 * The reason for not using `update_option_*` filter is that the function
 	 * should also get called for newly added AdSense options.
 	 *
+	 * @param array $new New options.
 	 * @param array $prev Previous options.
 	 * @return array $new New options.
 	 */
@@ -94,18 +99,22 @@ class Advanced_Ads_Ads_Txt_Admin {
 		if ( $new === $prev ) {
 			return $new;
 		}
-		$content = $this->get_adsense_blog_data( $new );
-		$this->strategy->add_network_data( self::adsense, $content );
-		$r = $this->strategy->save_options();
 
-		if ( is_wp_error( $r ) ) {
-			add_settings_error(
-				'advanced-ads-adsense',
-				'adsense-ads-txt-created',
-				$r->get_error_message(),
-				'error'
-			);
+		if ( ! $this->is_adsense_disabled() ) {
+			$content = $this->get_adsense_blog_data( $new );
+			$this->strategy->add_network_data( self::adsense, $content );
+			$r = $this->strategy->save_options();
+
+			if ( is_wp_error( $r ) ) {
+				add_settings_error(
+					'advanced-ads-adsense',
+					'adsense-ads-txt-created',
+					$r->get_error_message(),
+					'error'
+				);
+			}
 		}
+
 		return $new;
 	}
 
@@ -162,12 +171,14 @@ class Advanced_Ads_Ads_Txt_Admin {
 	 * Render additional content settings.
 	 */
 	public function render_setting_additional_content() {
-		$content = $this->strategy->get_additional_content();
-		$notices = $this->get_notices();
-		$notices = $this->get_notices_markup( $notices );
-
+		$content      = $this->strategy->get_additional_content();
+		$notices      = $this->get_notices();
+		$notices      = $this->get_notices_markup( $notices );
 		$link         = home_url( '/' ) . 'ads.txt';
 		$adsense_line = $this->get_adsense_blog_data();
+
+		$adsense_disabled = $this->is_adsense_disabled();
+
 		include dirname( __FILE__ ) . '/views/setting-additional-content.php';
 	}
 
@@ -366,7 +377,17 @@ class Advanced_Ads_Ads_Txt_Admin {
 	}
 
 	/**
-	 * Check if a third-party ads.txt file exists.
+	 * Check if the AdSense ads.txt record is disabled.
+	 *
+	 * @return bool
+	 */
+	private function is_adsense_disabled() {
+		$opts = $this->strategy->get_options();
+		return ! empty( $opts['networks'][ self::adsense ]['disabled'] );
+	}
+
+	/**
+	 * Handle AJAX requests for ads.txt notices and actions.
 	 */
 	public function ajax_refresh_notices() {
 
@@ -397,6 +418,25 @@ class Advanced_Ads_Ads_Txt_Admin {
 
 			if ( 'create_real_file' === $request_type ) {
 				$action_notices[] = $this->create_real_file();
+			}
+
+			if ( 'toggle_adsense' === $request_type ) {
+				$disabled = $this->is_adsense_disabled();
+
+				if ( $disabled ) {
+					// Re-enable: restore the record and clear the disabled flag.
+					$content = $this->get_adsense_blog_data();
+					$this->strategy->add_network_data( self::adsense, $content );
+					$this->strategy->set_network_disabled( self::adsense, false );
+    				$response['adsense_line'] = $content;
+				} else {
+					// Disable: clear the record and set the disabled flag.
+					$this->strategy->add_network_data( self::adsense, '' );
+					$this->strategy->set_network_disabled( self::adsense, true );
+				}
+
+				$this->strategy->save_options();
+				$response['adsense_disabled'] = ! $disabled;
 			}
 		}
 
@@ -471,17 +511,16 @@ class Advanced_Ads_Ads_Txt_Admin {
 	}
 
 	/**
-	 * Check if the user is alowed to edit real file.
+	 * Check if the user is allowed to edit real file.
 	 */
 	private function can_edit_real_file() {
 		return is_super_admin();
 	}
 
-
 	/**
 	 * Get transient key.
 	 */
 	public static function get_transient_key() {
-		return 'advanced_ads_ads_txt_ctp' . home_url( '/') ;
+		return 'advanced_ads_ads_txt_ctp' . home_url( '/' );
 	}
 }

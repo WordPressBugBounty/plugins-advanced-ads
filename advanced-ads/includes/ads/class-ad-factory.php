@@ -59,19 +59,24 @@ class Ad_Factory extends Factory {
 			return false;
 		}
 
+		$cache_key = $this->get_instance_cache_key( (int) $ad_id, $new_type );
+		if ( array_key_exists( $cache_key, $this->instances ) ) {
+			return $this->instances[ $cache_key ];
+		}
+
 		$ad_type   = '' !== $new_type ? $new_type : $this->get_ad_type( $ad_id );
-		$classname = $this->get_classname( wp_advads_get_ad_type_manager(), $ad_type, 'dummy' );
+		$classname = wp_advads_get_ad_type_manager()->get_classname_for_type( $ad_type, 'dummy' );
 
 		try {
 			$ad = new $classname( $ad_id );
 			$ad->set_type( $ad_type );
 
+			$this->instances[ $cache_key ] = $ad;
+
 			return $ad;
 		} catch ( Exception $e ) {
 			return false;
 		}
-
-		return new Ad_Content();
 	}
 
 	/**

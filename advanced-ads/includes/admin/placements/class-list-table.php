@@ -9,11 +9,11 @@
 
 namespace AdvancedAds\Admin\Placements;
 
-use WP_Query;
-use AdvancedAds\Modal;
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Admin_List_Table;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Modal;
+use WP_Query;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -136,18 +136,7 @@ class List_Table extends Admin_List_Table {
 
 		$wp_list_table->screen->render_screen_reader_content( 'heading_views' );
 
-		$is_all = count(
-			array_diff_key(
-				$_GET, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				[
-					'post_type' => $this->list_table_type,
-					'orderby'   => '',
-					'order'     => '',
-					'paged'     => '',
-					'mode'      => '',
-				]
-			)
-		) === 0;
+		$is_all = $this->is_all_filters_applied();
 
 		include_once ADVADS_ABSPATH . 'views/admin/table-views-list.php';
 

@@ -8,7 +8,7 @@
 use AdvancedAds\Constants;
 use AdvancedAds\Utilities\Conditional;
 
-$recent_ads = wp_advads_get_all_ads();
+$recent_ads = wp_advads_get_ads_dropdown();
 ?>
 <div class="advads-widget-wrapper">
 	<?php if ( count( $recent_ads ) === 0 ) : ?>

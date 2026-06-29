@@ -9,11 +9,13 @@
 
 namespace AdvancedAds\Placements;
 
-use WP_Query;
-use Exception;
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Placement;
+use AdvancedAds\Constants;
+use AdvancedAds\Cache_Invalidator;
+use AdvancedAds\Utilities\Cache;
 use AdvancedAds\Utilities\WordPress;
+use Exception;
+use WP_Query;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -53,6 +55,8 @@ class Placement_Repository {
 			$placement->set_id( $id );
 			$this->update_post_meta( $placement );
 			$placement->apply_changes();
+
+			Cache_Invalidator::invalidate_placements();
 		}
 
 		return $placement;
@@ -145,6 +149,8 @@ class Placement_Repository {
 		$this->update_post_meta( $placement );
 
 		$placement->apply_changes();
+
+		Cache_Invalidator::invalidate_placements();
 	}
 
 	/**
@@ -168,6 +174,8 @@ class Placement_Repository {
 			wp_trash_post( $placement->get_id() );
 			$placement->set_status( 'trash' );
 		}
+
+		Cache_Invalidator::invalidate_placements();
 	}
 
 	/* Finder Methods ------------------- */
@@ -186,98 +194,69 @@ class Placement_Repository {
 	 * @return Placement[]
 	 */
 	public function find_by_item_id( $item_id ): array {
-		$query = new WP_Query(
-			WordPress::improve_wp_query(
-				[
-					'post_type'        => Constants::POST_TYPE_PLACEMENT,
-					'posts_per_page'   => -1,
-					'fields'           => 'ids',
-					'post_status'      => 'any',
-					'suppress_filters' => true,
-					'meta_query'       => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-						[
-							'key'   => 'item',
-							'value' => $item_id,
-						],
-					],
-				]
-			)
-		);
-
-		$placements    = [];
-		$placement_ids = $query->have_posts() ? $query->posts : [];
-
-		foreach ( $placement_ids as $id ) {
-			$placements[ $id ] = wp_advads_get_placement_by_id( $id );
+		if ( ! is_string( $item_id ) || '' === $item_id ) {
+			return [];
 		}
 
-		return $placements;
+		$placement_ids = [];
+
+		foreach ( $this->get_placement_summaries() as $id => $summary ) {
+			if ( $item_id === $summary['item'] ) {
+				$placement_ids[] = (int) $id;
+			}
+		}
+
+		return $this->hydrate_placements( $placement_ids );
 	}
 
 	/**
 	 * Retrieves placements by type.
 	 *
-	 * This method queries the database to retrieve placements based on their type.
+	 * Filters cached placement summaries by type and hydrates matches.
 	 *
-	 * @param string|array $types  Placement types to query.
-	 * @param string       $output The required return type. One of OBJECT or ids,
-	 *                             which correspond to an Placement object or an array containing post ids respectively.
+	 * @param string|array $types          Placement types to query.
+	 * @param string       $output         The required return type. One of OBJECT or ids,
+	 *                                     which correspond to an Placement object or an array containing post ids respectively.
+	 * @param bool         $published_only Whether to return only published placements.
 	 *
 	 * @return array An associative array of placement IDs as keys and their corresponding placement objects as values.
 	 */
-	public function find_by_types( $types, $output = OBJECT ): array {
-		$query = new WP_Query(
-			WordPress::improve_wp_query(
-				[
-					'post_type'        => Constants::POST_TYPE_PLACEMENT,
-					'posts_per_page'   => -1,
-					'fields'           => 'ids',
-					'post_status'      => 'any',
-					'suppress_filters' => true,
-					'meta_query'       => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-						[
-							'key'     => 'type',
-							'compare' => 'IN',
-							'value'   => (array) $types,
-						],
-					],
-				]
-			)
-		);
+	public function find_by_types( $types, $output = OBJECT, $published_only = false ): array {
+		$types = array_values( array_filter( array_map( 'sanitize_key', (array) $types ) ) );
 
-		$placements    = [];
-		$placement_ids = $query->have_posts() ? $query->posts : [];
+		if ( empty( $types ) ) {
+			return [];
+		}
+
+		$placement_ids = [];
+
+		foreach ( $this->get_placement_summaries() as $id => $summary ) {
+			if ( $published_only && 'publish' !== $summary['status'] ) {
+				continue;
+			}
+
+			if ( in_array( $summary['type'], $types, true ) ) {
+				$placement_ids[] = (int) $id;
+			}
+		}
 
 		if ( 'ids' === $output ) {
 			return $placement_ids;
 		}
 
-		foreach ( $placement_ids as $id ) {
-			$placements[ $id ] = wp_advads_get_placement_by_id( $id );
-		}
-
-		return $placements;
+		return $this->hydrate_placements( $placement_ids );
 	}
 
 	/**
 	 * Get array of all placements.
 	 *
+	 * Prefer get_placement_summaries() for admin lists that only need id, title, type,
+	 * status, or author — avoids constructing a full Placement instance per row.
+	 *
 	 * @return Placement[]
 	 */
 	public function get_all_placements(): array {
-		static $placements;
-
-		if ( null === $placements ) {
-			$placements = [];
-			foreach ( $this->get_placements_dropdown() as $id => $placement ) {
-				$placement_object = wp_advads_get_placement( $id );
-				if ( false !== $placement_object ) {
-					$placements[ $id ] = $placement_object;
-				}
-			}
-		}
-
-		return $placements;
+		return $this->hydrate_placements( array_keys( $this->get_placement_summaries() ) );
 	}
 
 	/**
@@ -286,72 +265,125 @@ class Placement_Repository {
 	 * @return Placement[]
 	 */
 	public function get_all_published(): array {
-		static $placements;
-
-		if ( null === $placements ) {
-			$placements = [];
-			foreach ( $this->get_published_ids() as $id ) {
-				$placement_object = wp_advads_get_placement( $id );
-				if ( false !== $placement_object ) {
-					$placements[ $id ] = $placement_object;
-				}
-			}
-		}
-
-		return $placements;
+		return $this->hydrate_placements( $this->get_published_ids() );
 	}
 
 	/**
-	 * Get all placement as ID => Post Title pair.
+	 * Get lightweight placement summaries for list UIs (cached cross-request).
+	 *
+	 * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, item: string}>
+	 */
+	public function get_placement_summaries(): array {
+		$summaries = Cache::get( Cache::PREFIX_PLACEMENTS, Cache::KEY_SUMMARIES );
+
+		if ( null === $summaries ) {
+			$summaries = $this->query_placement_summaries();
+			Cache::set( Cache::PREFIX_PLACEMENTS, Cache::KEY_SUMMARIES, $summaries );
+		}
+
+		return $summaries;
+	}
+
+	/**
+	 * Get all placement as ID => title, derived from cached summaries.
 	 *
 	 * @return array<int, string>
 	 */
 	public function get_placements_dropdown(): array {
-		static $placement_dropdown;
+		$summaries = $this->get_placement_summaries();
 
-		if ( null === $placement_dropdown ) {
-			$query = new WP_Query(
-				WordPress::improve_wp_query(
-					[
-						'post_type'        => Constants::POST_TYPE_PLACEMENT,
-						'posts_per_page'   => -1,
-						'post_status'      => 'any',
-						'suppress_filters' => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false, // Suppress filters if WPML is present.
-					]
-				)
-			);
-
-			$placement_dropdown = $query->have_posts() ? wp_list_pluck( $query->posts, 'post_title', 'ID' ) : [];
+		if ( empty( $summaries ) ) {
+			return [];
 		}
 
-		return $placement_dropdown;
+		return wp_list_pluck( $summaries, 'title', 'id' );
 	}
 
 	/**
-	 * Get array of all published placements ids.
+	 * Get array of all published placement IDs, derived from cached summaries.
 	 *
 	 * @return int[]
 	 */
 	public function get_published_ids(): array {
-		static $placement_dropdown;
+		$published_ids = [];
 
-		if ( null === $placement_dropdown ) {
-			$query = new WP_Query(
-				WordPress::improve_wp_query(
-					[
-						'post_type'        => Constants::POST_TYPE_PLACEMENT,
-						'posts_per_page'   => -1,
-						'post_status'      => 'publish',
-						'fields'           => 'ids',
-						'suppress_filters' => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false, // Suppress filters if WPML is present.
-					]
-				)
-			);
-
-			$placement_dropdown = $query->have_posts() ? $query->posts : [];
+		foreach ( $this->get_placement_summaries() as $id => $summary ) {
+			if ( 'publish' === $summary['status'] ) {
+				$published_ids[] = (int) $id;
+			}
 		}
 
-		return $placement_dropdown;
+		return $published_ids;
+	}
+
+	/**
+	 * Query lightweight placement summaries without hydrating Placement objects.
+	 *
+	 * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, item: string}>
+	 */
+	private function query_placement_summaries(): array {
+		$query = new WP_Query(
+			WordPress::improve_wp_query(
+				[
+					'post_type'        => Constants::POST_TYPE_PLACEMENT,
+					'posts_per_page'   => -1,
+					'post_status'      => 'any',
+					'orderby'          => 'title',
+					'order'            => 'ASC',
+					'suppress_filters' => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false, // Suppress filters if WPML is present.
+				]
+			)
+		);
+
+		if ( ! $query->have_posts() ) {
+			return [];
+		}
+
+		$post_ids = wp_list_pluck( $query->posts, 'ID' );
+		_prime_post_caches( $post_ids, false, true );
+		update_meta_cache( 'post', $post_ids );
+
+		$summaries = [];
+		foreach ( $query->posts as $post ) {
+			$type = get_post_meta( $post->ID, 'type', true );
+			$item = get_post_meta( $post->ID, 'item', true );
+
+			$summaries[ (int) $post->ID ] = [
+				'id'        => (int) $post->ID,
+				'title'     => $post->post_title,
+				'type'      => $type ? $type : 'default',
+				'status'    => $post->post_status,
+				'author_id' => (int) $post->post_author,
+				'item'      => is_string( $item ) ? $item : '',
+			];
+		}
+
+		return $summaries;
+	}
+
+	/**
+	 * Hydrate placement objects for the given post IDs.
+	 *
+	 * @param int[] $post_ids Placement post IDs.
+	 *
+	 * @return Placement[]
+	 */
+	private function hydrate_placements( array $post_ids ): array {
+		$post_ids = array_values( array_filter( array_map( 'absint', $post_ids ) ) );
+
+		if ( ! empty( $post_ids ) ) {
+			_prime_post_caches( $post_ids, false, true );
+		}
+
+		$placements = [];
+		foreach ( $post_ids as $post_id ) {
+			$placement_object = wp_advads_get_placement( $post_id );
+			if ( false !== $placement_object ) {
+				$placements[ $post_id ] = $placement_object;
+			}
+		}
+
+		return $placements;
 	}
 
 	/* Additional Methods ------------------- */

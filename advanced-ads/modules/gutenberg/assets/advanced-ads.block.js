@@ -49,11 +49,14 @@
 			)
 		);
 
+		const wpMajorMinor = parseFloat( aaGut.wpVersion || '0' );
+		const apiVersion = wpMajorMinor >= 6.9 ? 3 : 2;
+
 		/**
 		 * Register the single ad block type
 		 */
 		registerBlockType('advads/gblock', {
-			apiVersion: 2,
+			apiVersion,
 			title: i18n.advads,
 			icon: advadsIconEl,
 			category: 'common',

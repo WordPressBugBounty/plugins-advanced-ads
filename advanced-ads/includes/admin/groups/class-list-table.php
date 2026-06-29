@@ -9,10 +9,11 @@
 
 namespace AdvancedAds\Admin\Groups;
 
-use WP_Term_Query;
+use stdClass;
 use AdvancedAds\Modal;
 use WP_Terms_List_Table;
 use AdvancedAds\Constants;
+use AdvancedAds\Abstracts\Group;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Admin\Upgrades;
 
@@ -32,70 +33,159 @@ class List_Table extends WP_Terms_List_Table {
 	/**
 	 * Array with all ads.
 	 *
-	 * @var $all_ads
+	 * @var array<int, string>
 	 */
 	private $all_ads = [];
+
+	/**
+	 * Precomputed schedule details for addable ads in the group edit modal.
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private $ad_schedule_details = [];
+
+	/**
+	 * Hydrated groups for the current page, keyed by term ID.
+	 *
+	 * @var array<int, Group>
+	 */
+	private $groups = [];
 
 	/**
 	 * Construct the current list table.
 	 */
 	public function __construct() {
 		parent::__construct();
-		add_action( 'pre_get_terms', [ $this, 'pre_get_terms' ] );
 		add_filter( 'default_hidden_columns', [ $this, 'default_hidden_columns' ] );
 
 		$this->prepare_items();
 		$this->_actions = [];
 		$this->all_ads  = wp_advads_get_ads_dropdown();
+		$this->prime_addable_ad_schedules();
 	}
 
 	/**
-	 * Modify sorting query
+	 * Batch-load schedule details for the add-ad dropdown once per request.
 	 *
-	 * @param WP_Term_Query $query Query object.
-	 *
-	 * @return WP_Term_Query
+	 * @return void
 	 */
-	public function pre_get_terms( $query ) {
-		if ( empty( $query->query_vars['meta_query'] ) ) {
-			$query->query_vars['meta_query'] = []; // phpcs:ignore
+	private function prime_addable_ad_schedules(): void {
+		if ( empty( $this->all_ads ) ) {
+			return;
 		}
 
-		// Filter terms by group type.
+		foreach ( wp_advads_get_ads_by_ids( array_keys( $this->all_ads ) ) as $ad_id => $ad ) {
+			$this->ad_schedule_details[ $ad_id ] = $ad->get_ad_schedule_details();
+		}
+	}
+
+	/**
+	 * Prepare list items from cached group summaries instead of get_terms().
+	 *
+	 * @return void
+	 */
+	public function prepare_items() {
+		$taxonomy = $this->screen->taxonomy;
+		$per_page = (int) $this->get_items_per_page( "edit_{$taxonomy}_per_page" );
+		$search   = ! empty( $_REQUEST['s'] ) ? trim( wp_unslash( $_REQUEST['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$orderby  = Params::request( 'orderby', 'name' );
+		$order    = Params::request( 'order', 'ASC' );
+		$summaries = $this->filter_group_summaries( wp_advads_get_group_summaries(), $search );
+
+		$summaries = $this->sort_group_summaries( $summaries, $orderby, $order );
+
+		$total  = count( $summaries );
+		$offset = ( $this->get_pagenum() - 1 ) * $per_page;
+		$page   = array_slice( $summaries, $offset, $per_page, true );
+
+		$this->items = [];
+		foreach ( $page as $summary ) {
+			$term            = new stdClass();
+			$term->term_id   = $summary['id'];
+			$term->name      = $summary['title'];
+			$term->taxonomy  = Constants::TAXONOMY_GROUP;
+			$this->items[]   = $term;
+		}
+
+		$this->groups = wp_advads_get_groups_by_ids( array_keys( $page ) );
+
+		$this->callback_args = [
+			'number'  => $per_page,
+			'offset'  => $offset,
+			'orderby' => $orderby,
+		];
+
+		$this->set_pagination_args(
+			[
+				'total_items' => $total,
+				'per_page'    => $per_page,
+			]
+		);
+	}
+
+	/**
+	 * Filter group summaries by type and search query.
+	 *
+	 * @param array<int, array<string, mixed>> $summaries Group summaries.
+	 * @param string                           $search    Search query.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function filter_group_summaries( array $summaries, $search ): array {
 		$group_type = Params::get( 'group_type' );
+
 		if ( $group_type ) {
-			$query->query_vars['meta_query'][] = [
-				'key'     => '_advads_group_type',
-				'value'   => $group_type,
-				'compare' => '=',
-			];
+			$summaries = array_filter(
+				$summaries,
+				static function ( $summary ) use ( $group_type ) {
+					return $group_type === $summary['type'];
+				}
+			);
 		}
 
-		// Handle sorting.
-		switch ( $query->query_vars['orderby'] ?? '' ) {
-			case 'date':
-				$query->query_vars['meta_query'][] = [
-					'relation' => 'OR',
-					[
-						'key'     => 'modified_date',
-						'compare' => 'EXISTS',
-					],
-					[
-						'key'     => 'modified_date',
-						'compare' => 'NOT EXISTS',
-					],
-				];
-
-				$query->query_vars['orderby'] = 'meta_value';
-				break;
-
-			case 'details':
-				// Sort by term ID.
-				$query->query_vars['orderby'] = 'term_id';
-				break;
+		if ( '' !== $search ) {
+			$summaries = array_filter(
+				$summaries,
+				static function ( $summary ) use ( $search ) {
+					return false !== stripos( $summary['title'], $search );
+				}
+			);
 		}
 
-		return $query;
+		return $summaries;
+	}
+
+	/**
+	 * Sort group summaries for the list table.
+	 *
+	 * @param array<int, array<string, mixed>> $summaries Group summaries.
+	 * @param string                           $orderby   Sort column.
+	 * @param string                           $order     Sort direction.
+	 *
+	 * @return array<int, array<string, mixed>>
+	 */
+	private function sort_group_summaries( array $summaries, $orderby, $order ): array {
+		$desc = 'DESC' === strtoupper( $order );
+
+		uasort(
+			$summaries,
+			static function ( $left, $right ) use ( $orderby, $desc ) {
+				switch ( $orderby ) {
+					case 'date':
+						$result = strcmp( $left['modified_date'] ?? '', $right['modified_date'] ?? '' );
+						break;
+					case 'details':
+						$result = $left['id'] <=> $right['id'];
+						break;
+					default:
+						$result = strcasecmp( $left['title'], $right['title'] );
+				}
+
+				return $desc ? -$result : $result;
+			}
+		);
+
+		return $summaries;
 	}
 
 	/**
@@ -171,7 +261,11 @@ class List_Table extends WP_Terms_List_Table {
 	 */
 	public function single_row( $term, $level = 0 ): void {
 		$this->type_error = '';
-		$group            = wp_advads_get_group( $term->term_id );
+		$group            = $this->groups[ $term->term_id ] ?? null;
+
+		if ( ! $group ) {
+			return;
+		}
 
 		// Set the group to behave as default, if the original type is not available.
 		$group_type = $group->get_type_object();

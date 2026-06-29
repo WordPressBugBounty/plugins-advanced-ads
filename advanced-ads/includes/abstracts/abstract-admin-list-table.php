@@ -9,8 +9,8 @@
 
 namespace AdvancedAds\Abstracts;
 
-use WP_Screen;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use WP_Screen;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -202,5 +202,25 @@ abstract class Admin_List_Table implements Integration_Interface {
 	 */
 	protected function query_filters( $query_vars ): array {
 		return $query_vars;
+	}
+
+	/**
+	 * Check if all filters are applied.
+	 *
+	 * @return bool
+	 */
+	protected function is_all_filters_applied(): bool {
+		return count(
+			array_diff_key(
+				$_GET, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				[
+					'post_type' => $this->list_table_type,
+					'orderby'   => '',
+					'order'     => '',
+					'paged'     => '',
+					'mode'      => '',
+				]
+			)
+		) === 0;
 	}
 }

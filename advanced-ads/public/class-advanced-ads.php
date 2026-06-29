@@ -308,7 +308,7 @@ class Advanced_Ads {
 			return $content;
 		}
 
-		$placements = wp_advads_get_all_placements();
+		$placements = wp_advads_get_published_placements();
 
 		if ( ! apply_filters( 'advanced-ads-can-inject-into-content', true, $content, $placements ) ) {
 			return $content;
@@ -633,12 +633,12 @@ class Advanced_Ads {
 	/**
 	 * Get the array with ad placements
 	 *
-	 * @deprecated 2.0.0 wp_advads_get_all_placements
+	 * @deprecated 2.0.0 wp_advads_get_placements()
 	 *
 	 * @return array $ad_placements
 	 */
 	public static function get_ad_placements_array() {
-		return wp_advads_get_all_placements();
+		return wp_advads_get_placements();
 	}
 
 	/**

@@ -105,13 +105,16 @@ export default function () {
 
 	// allow to deactivate frontend picker
 	if ( frontendPicker ) {
-		document
-			.querySelector(
-				'[id="advads-frontend-element-' + frontendPicker + '"]'
-			)
-			.querySelector(
+		const pickerWrapper = document.querySelector(
+			'[id="advads-frontend-element-' + frontendPicker + '"]'
+		);
+		if ( pickerWrapper ) {
+			pickerWrapper.querySelector(
 				'.advads-deactivate-frontend-picker'
 			).style.display = 'block';
+		} else {
+			resetLocalStorage();
+		}
 	}
 
 	Array.from(

@@ -44,12 +44,19 @@ class AAWP_Ad extends Ad implements Ad_Interface {
 				$next_input = '';
 		}
 
-		$template = ! empty( $this->get_prop( 'template' ) ) ? $this->get_prop( 'template' ) : 'default';
+		$next_input = esc_attr( (string) $next_input );
+		if ( '' === $next_input ) {
+			return '';
+		}
+
+		$template = esc_attr(
+			! empty( $this->get_prop( 'template' ) ) ? (string) $this->get_prop( 'template' ) : 'default'
+		);
 
 		$shortcode = '[' . aawp_get_shortcode() . ' ' . $display_variant . '="' . $next_input . '"';
 
 		if ( 'bestseller' === $display_variant || 'new' === $display_variant ) {
-			$shortcode = $shortcode . ' items="' . $this->get_prop( 'items' ) . '"';
+			$shortcode = $shortcode . ' items="' . esc_attr( (string) $this->get_prop( 'items' ) ) . '"';
 		}
 
 		$shortcode = $shortcode . ' template="' . $template . '"]';

@@ -10,7 +10,6 @@
 namespace AdvancedAds\Admin;
 
 use stdClass;
-use WP_Query;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
@@ -95,23 +94,16 @@ class Post_Types implements Integration_Interface {
 			return $counts;
 		}
 
-		$query = new WP_Query(
-			[
-				'post_type'   => Constants::POST_TYPE_AD,
-				'post_status' => 'any',
-				'fields'      => 'ids',
-				'meta_query'  => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					[
-						'key'     => Constants::AD_META_EXPIRATION_TIME,
-						'value'   => current_time( 'mysql', true ),
-						'compare' => '>=',
-						'type'    => 'DATETIME',
-					],
-				],
-			]
-		);
+		$now      = time();
+		$expiring = 0;
 
-		$counts->{Constants::AD_STATUS_EXPIRING} = $query->found_posts;
+		foreach ( wp_advads_get_ad_summaries() as $summary ) {
+			if ( ! empty( $summary['expiry_date'] ) && $summary['expiry_date'] > $now ) {
+				++$expiring;
+			}
+		}
+
+		$counts->{Constants::AD_STATUS_EXPIRING} = $expiring;
 
 		return $counts;
 	}

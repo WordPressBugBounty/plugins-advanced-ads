@@ -87,40 +87,37 @@ class Advanced_Ads_Gutenberg {
 			false
 		);
 
-		$all_ads    = wp_advads_ad_query(
-			[
-				'post_status' => [ 'publish', 'future' ],
-				'orderby'     => 'title',
-				'order'       => 'ASC',
-			]
-		)->posts;
-		$all_groups = wp_advads_get_all_groups();
-
 		$ads        = [];
 		$groups     = [];
 		$placements = [];
 
-		foreach ( $all_ads as $ad ) {
-			$ads[] = [
-				'id'    => $ad->ID,
-				'title' => $ad->post_title,
-			];
-		}
-
-		foreach ( $all_groups as $group ) {
-			$groups[] = [
-				'id'   => $group->get_id(),
-				'name' => $group->get_name(),
-			];
-		}
-
-		foreach ( wp_advads_get_all_placements() as $placement ) {
-			if ( $placement->is_type( [ 'sidebar_widget', 'default' ] ) ) {
-				$placements[] = [
-					'id'   => $placement->get_id(),
-					'name' => $placement->get_title(),
-				];
+		foreach ( wp_advads_get_ad_summaries() as $id => $summary ) {
+			if ( ! in_array( $summary['status'], [ 'publish', 'future' ], true ) ) {
+				continue;
 			}
+
+			$ads[] = [
+				'id'    => $id,
+				'title' => $summary['title'],
+			];
+		}
+
+		foreach ( wp_advads_get_groups_dropdown() as $id => $title ) {
+			$groups[] = [
+				'id'   => $id,
+				'name' => $title,
+			];
+		}
+
+		foreach ( wp_advads_get_placement_summaries() as $id => $summary ) {
+			if ( ! in_array( $summary['type'], [ 'sidebar_widget', 'default' ], true ) ) {
+				continue;
+			}
+
+			$placements[] = [
+				'id'   => $id,
+				'name' => $summary['title'],
+			];
 		}
 
 		ksort( $placements );
@@ -143,6 +140,7 @@ class Advanced_Ads_Gutenberg {
 
 		$inline_script = wp_json_encode(
 			[
+				'wpVersion'  => get_bloginfo( 'version' ),
 				'ads'        => $ads,
 				'groups'     => $groups,
 				'placements' => $placements,

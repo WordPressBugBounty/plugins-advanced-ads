@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.22
+Stable tag: 2.0.23
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -359,6 +359,25 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.23 (June 30, 2026) =
+
+- Improvement: Change email address to send plugin uninstall feedback
+- Fix: When user interrupted custom position frontend picker selection, traces were left on localStorage object, causing JS errors
+- Fix: Add early bail before quick edit fillInputs function, legacy CSS on list pages updated
+- Fix: Make string type nullable on add_body_class functions, to prevent null values from 3rd party plugins
+- Fix: Adblocker notice being shown on admin pages even with Shields disabled on Brave browser
+- Fix: Add a button on General settings admin page to remove Adsense record from ads.txt file
+- Fix: Gutenberg blocks API Version 2 is deprecated since WP 6.9+, raise API to version 3 from version 6.9+
+- Fix: Reduce database load on admin pages by caching ad, group, and placement list data across requests and deriving dropdowns and published-placement lookups from that shared cache
+- Fix: Improve ad load performance by skipping legacy meta migration when ad settings are already stored in the current format
+- Fix: Fix content ad output to apply responsive image and lazy-loading attributes using the current WordPress content filter API instead of deprecated functions
+- Fix: Improve group performance by caching each group's ad weight map for the duration of the request instead of rebuilding it on every access
+- Fix: Fix unsaved changes being cleared when reverting a single property on an ad, group, or placement in the editor
+- Fix: Fix visitor display conditions with chained OR and AND rules not evaluating correctly in some cases
+- Fix: Fix stale ad wrapper markup when layout options or wrapper ID and class are changed before the ad is saved
+- Fix: Improve weighted ad rotation performance in large groups by avoiding repeated weight recalculation during shuffle
+- Fix: Reduce database round-trips when loading multiple ads, groups, or placements during the same request
 
 = 2.0.22 (June 8, 2026) =
 

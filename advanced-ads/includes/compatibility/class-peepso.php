@@ -93,8 +93,8 @@ class Peepso implements Integration_Interface {
 	public function render_parameters( $ad ) {
 		$content        = $ad->get_content();
 		$title_override = $ad->get_prop( 'title_override' ) ?? '';
-		$image_id       = $ad->get_prop( 'image_id' ) ?? '';
-		$avatar_id      = $ad->get_prop( 'avatar_id' ) ?? '';
+		$image_id       = (int) ( $ad->get_prop( 'image_id' ) ?? 0 );
+		$avatar_id      = (int) ( $ad->get_prop( 'avatar_id' ) ?? 0 );
 		$url            = $ad->get_url() ?? '#';
 		?>
 		<script type="text/javascript">
@@ -115,7 +115,7 @@ class Peepso implements Integration_Interface {
 			#advads-avatar-preview img {
 				height: auto;
 				max-width: 128px;
-				max-heigth:128px;
+				max-height:128px;
 				width: 100%;
 			}
 
@@ -145,7 +145,7 @@ class Peepso implements Integration_Interface {
 			<?php echo $this->object->image_tag( $avatar_id ); ?>
 		</div>
 
-		<input type="hidden" name="advanced_ad[output][avatar_id]" value="<?php echo $avatar_id; ?>" id="advads-avatar-id"/>
+		<input type="hidden" name="advanced_ad[output][avatar_id]" value="<?php echo esc_attr( (string) $avatar_id ); ?>" id="advads-avatar-id"/>
 
 		<br class="clear" />
 
@@ -159,7 +159,7 @@ class Peepso implements Integration_Interface {
 		<?php esc_html_e( 'Optional. If nothing is provided, the general ad title will be used.', 'peepso-advanced-ads' ); ?>
 		</div>
 
-		<input type="text" size="64" maxlength=="128" id="advanced_ad[output][title_override]" name="advanced_ad[output][title_override]" value="<?php echo ( $title_override ); ?>" />
+		<input type="text" size="64" maxlength="128" id="advanced_ad[output][title_override]" name="advanced_ad[output][title_override]" value="<?php echo esc_attr( $title_override ); ?>" />
 
 		<!-- Content -->
 		<h1>
@@ -199,7 +199,7 @@ class Peepso implements Integration_Interface {
 			<?php echo $this->object->image_tag( $image_id ); ?>
 		</div>
 
-		<input type="hidden" name="advanced_ad[output][image_id]" value="<?php echo $image_id; ?>" id="advads-image-id"/>
+		<input type="hidden" name="advanced_ad[output][image_id]" value="<?php echo esc_attr( (string) $image_id ); ?>" id="advads-image-id"/>
 
 		<br class="clear" />
 
@@ -212,7 +212,7 @@ class Peepso implements Integration_Interface {
 			<?php esc_html_e( 'Clicking the image, avatar or title will open the link in a new window/tab. ', 'peepso-advanced-ads' ); ?>
 		</div>
 
-		<input type="url" name="advanced_ad[url]" id="advads-url" value="<?php echo $url; ?>"/>
+		<input type="url" name="advanced_ad[url]" id="advads-url" value="<?php echo esc_url( $url ); ?>"/>
 
 		<br class="clear" />
 

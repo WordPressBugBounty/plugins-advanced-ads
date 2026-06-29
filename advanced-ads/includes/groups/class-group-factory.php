@@ -59,11 +59,20 @@ class Group_Factory extends Factory {
 			return false;
 		}
 
+		$cache_key = $this->get_instance_cache_key( (int) $group_id, $new_type );
+		if ( array_key_exists( $cache_key, $this->instances ) ) {
+			return $this->instances[ $cache_key ];
+		}
+
 		$group_type = '' !== $new_type ? $new_type : $this->get_group_type( $group_id );
-		$classname  = $this->get_classname( wp_advads_get_group_type_manager(), $group_type );
+		$classname  = wp_advads_get_group_type_manager()->get_classname_for_type( $group_type );
 
 		try {
-			return new $classname( $group_id );
+			$group = new $classname( $group_id );
+
+			$this->instances[ $cache_key ] = $group;
+
+			return $group;
 		} catch ( Exception $e ) {
 			return false;
 		}

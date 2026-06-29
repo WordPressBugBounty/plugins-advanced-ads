@@ -12,6 +12,7 @@
 
 $max_weight = $group->get_max_weight();
 $sorted_ads = $group->get_sorted_ads();
+$group_ads  = $group->get_ads();
 ?>
 <table class="wp-list-table widefat fixed striped advads-group-ads">
 	<thead>
@@ -25,7 +26,12 @@ $sorted_ads = $group->get_sorted_ads();
 	<tbody>
 		<?php
 		foreach ( $sorted_ads as $ad_id => $ad ) :
-			$ad_object = wp_advads_get_ad( $ad_id );
+			$ad_object = $group_ads[ $ad_id ] ?? null;
+
+			if ( ! $ad_object ) {
+				continue;
+			}
+
 			$ad_url    = add_query_arg(
 				[
 					'post'   => $ad_id,
@@ -73,7 +79,7 @@ $sorted_ads = $group->get_sorted_ads();
 				<select class="advads-group-add-ad-list-ads">
 					<?php
 					foreach ( $this->all_ads as $ad_id => $ad_title ) {
-						$ad_status = wp_advads_get_ad( $ad_id )->get_ad_schedule_details();
+						$ad_status = $this->ad_schedule_details[ $ad_id ] ?? [];
 						printf(
 							'<option value="advads-groups[%1$d][ads][%2$d]" data-status="%3$s" data-status-string="%4$s">%5$s</option>',
 							absint( $group->get_id() ),

@@ -84,7 +84,7 @@ class Admin_Menu implements Integration_Interface {
 	 *
 	 * @return string
 	 */
-	public function add_body_class( string $classes ): string {
+	public function add_body_class( ?string $classes ): string {
 		if ( $this->is_screen() ) {
 			// Ensure $classes is always a string due to 3rd party plugins interfering with the filter.
 			$classes  = is_string( $classes ) ? $classes : '';

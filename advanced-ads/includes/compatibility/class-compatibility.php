@@ -11,8 +11,7 @@ namespace AdvancedAds\Compatibility;
 
 use Exception;
 use ReflectionClass;
-use AdvancedAds\Utilities\Data;
-use AdvancedAds\Framework\Utilities\Str;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 
 defined( 'ABSPATH' ) || exit;
@@ -59,9 +58,7 @@ class Compatibility implements Integration_Interface {
 			return $url;
 		}
 
-		$ad_ids = Data::get_ads_ids();
-
-		if ( isset( $post->post_parent ) && in_array( $post->post_parent, $ad_ids, true ) ) {
+		if ( ! empty( $post->post_parent ) && Constants::POST_TYPE_AD === get_post_type( (int) $post->post_parent ) ) {
 			return false;
 		}
 
@@ -170,6 +167,7 @@ class Compatibility implements Integration_Interface {
 			return $result;
 		}
 
+		$opt_in_js   = '';
 		$all_cookies = self::borlabs_get_cookies();
 		if ( empty( $all_cookies ) ) {
 			$result = false;
@@ -181,6 +179,7 @@ class Compatibility implements Integration_Interface {
 				foreach ( $cookie_group_data->cookies as $cookie_data ) {
 					if ( self::is_adsense_cookie( $cookie_data ) ) {
 						$opt_in_js = $cookie_data->opt_in_js;
+						break 2;
 					}
 				}
 			}
@@ -246,7 +245,7 @@ class Compatibility implements Integration_Interface {
 	}
 
 	/**
-	 * Is cookie is of marketing and has data
+	 * Whether the cookie is the Google AdSense entry with opt-in JS.
 	 *
 	 * @param mixed $cookie Cookie to check.
 	 *

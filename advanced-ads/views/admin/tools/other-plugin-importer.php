@@ -42,10 +42,10 @@ foreach ( $importers->get_importers() as $importer ) {
 		<p class="text-sm"><?php esc_html_e( 'To make things even easier, we are working on new ways to import your settings and data from other plugins.', 'advanced-ads' ); ?></p>
 	</header>
 	<div class="advads-tabs-wrap">
-		<?php echo join( '', $inputs ); ?>
+		<?php echo join( '', $inputs ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 
 		<div class="advads-tab-nav">
-			<?php echo join( '', $links ); ?>
+			<?php echo join( '', $links ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 		<?php
 		foreach ( $importers->get_importers() as $importer ) :

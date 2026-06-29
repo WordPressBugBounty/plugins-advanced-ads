@@ -9,15 +9,17 @@
 
 namespace AdvancedAds\Ads;
 
-use WP_Query;
-use Exception;
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Ad;
 use AdvancedAds\Admin\Metabox_Ad;
-use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Arr;
-use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Utilities\Formatting;
+use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Utilities\Cache;
+use AdvancedAds\Cache_Invalidator;
+use AdvancedAds\Utilities\WordPress;
+use Exception;
+use WP_Query;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -70,6 +72,8 @@ class Ad_Repository {
 			$this->update_version( $ad );
 
 			$ad->apply_changes();
+
+			Cache_Invalidator::invalidate_ads();
 		}
 
 		return $ad;
@@ -169,6 +173,8 @@ class Ad_Repository {
 		$this->update_post_term( $ad );
 
 		$ad->apply_changes();
+
+		Cache_Invalidator::invalidate_ads();
 	}
 
 	/**
@@ -192,6 +198,8 @@ class Ad_Repository {
 			wp_trash_post( $ad->get_id() );
 			$ad->set_status( 'trash' );
 		}
+
+		Cache_Invalidator::invalidate_ads();
 	}
 
 	/* Finder Methods ------------------- */
@@ -210,13 +218,13 @@ class Ad_Repository {
 	/**
 	 * Get ads belonging to a specific group.
 	 *
-	 * @param int $group_id The ID of the group.
+	 * @param int    $group_id The ID of the group.
+	 * @param string $output   OBJECT for hydrated ads, 'ids' for ad IDs, 'summaries' for cached ad rows.
 	 *
-	 * @return Ad[]
+	 * @return Ad[]|int[]|array
 	 */
-	public function get_ads_by_group_id( $group_id ): array {
-		$group = wp_advads_get_group( $group_id );
-		return $group->get_ads();
+	public function get_ads_by_group_id( $group_id, $output = OBJECT ): array {
+		return wp_advads_get_group_repository()->get_ads_by_group_id( (int) $group_id, $output );
 	}
 
 	/**
@@ -249,45 +257,163 @@ class Ad_Repository {
 	 * @return array
 	 */
 	public function get_ads_by_type( $type ): array {
-		return [];
+		$type = sanitize_key( $type );
+
+		if ( '' === $type ) {
+			return [];
+		}
+
+		$ad_ids = [];
+
+		foreach ( $this->get_ad_summaries() as $id => $summary ) {
+			if ( $type === $summary['type'] ) {
+				$ad_ids[] = (int) $id;
+			}
+		}
+
+		return $this->hydrate_ads( $ad_ids );
+	}
+
+	/**
+	 * Hydrate ad objects for the given post IDs.
+	 *
+	 * @param int[] $post_ids Ad post IDs.
+	 *
+	 * @return array<int, Ad>
+	 */
+	public function get_ads_by_ids( array $post_ids ): array {
+		return $this->hydrate_ads( $post_ids );
 	}
 
 	/**
 	 * Get all ads object.
 	 *
-	 * @return array
+	 * Prefer get_ad_summaries() for admin lists that only need id, title, type,
+	 * status, or author — avoids constructing a full Ad instance per row.
+	 *
+	 * @return Ad[]
 	 */
 	public function get_all_ads(): array {
-		static $advads_all_ads;
-
-		if ( isset( $advads_all_ads ) ) {
-			return $advads_all_ads;
-		}
-
-		$advads_all_ads = [];
-		foreach ( $this->get_ads_dropdown() as $post_id => $name ) {
-			$advads_all_ads[ $post_id ] = wp_advads_get_ad( $post_id );
-		}
-
-		return $advads_all_ads;
+		return $this->hydrate_ads( array_keys( $this->get_ad_summaries() ) );
 	}
 
 	/**
-	 * Get all ads as dropdown.
+	 * Get lightweight ad summaries for list UIs (cached cross-request).
 	 *
-	 * @return array
+	 * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
+	 */
+	public function get_ad_summaries(): array {
+		$summaries = Cache::get( Cache::PREFIX_ADS, Cache::KEY_SUMMARIES );
+
+		if ( null === $summaries ) {
+			$summaries = $this->query_ad_summaries();
+			Cache::set( Cache::PREFIX_ADS, Cache::KEY_SUMMARIES, $summaries );
+		}
+
+		return $summaries;
+	}
+
+	/**
+	 * Get ad summaries for every registered ad post status, including trash.
+	 *
+	 * Uses get_post_stati() because WordPress post_status "any" excludes trash.
+	 *
+	 * Cached separately from get_ad_summaries().
+	 *
+	 * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
+	 */
+	public function get_all_statuses(): array {
+		$summaries = Cache::get( Cache::PREFIX_ADS, Cache::KEY_SUMMARIES_ALL_STATUSES );
+
+		if ( null === $summaries ) {
+			$summaries = $this->query_ad_summaries( get_post_stati() );
+			Cache::set( Cache::PREFIX_ADS, Cache::KEY_SUMMARIES_ALL_STATUSES, $summaries );
+		}
+
+		return $summaries;
+	}
+
+	/**
+	 * Get all ads as dropdown (ID => title), derived from cached summaries.
+	 *
+	 * @return array<int, string>
 	 */
 	public function get_ads_dropdown(): array {
-		$query = $this->query(
-			[
-				'orderby'          => 'title',
-				'order'            => 'ASC',
-				'suppress_filters' => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false, // Suppress filters if WPML is present.
-			],
-			true
-		);
+		$summaries = $this->get_ad_summaries();
 
-		return $query->have_posts() ? wp_list_pluck( $query->posts, 'post_title', 'ID' ) : [];
+		if ( empty( $summaries ) ) {
+			return [];
+		}
+
+		return wp_list_pluck( $summaries, 'title', 'id' );
+	}
+
+	/**
+	 * Query lightweight ad summaries without hydrating Ad objects.
+	 *
+	 * @param array|string|null $post_status Post status query arg, or null for repository default.
+	 *
+	 * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
+	 */
+	private function query_ad_summaries( $post_status = null ): array {
+		$args = [
+			'orderby'          => 'title',
+			'order'            => 'ASC',
+			'suppress_filters' => defined( 'ICL_SITEPRESS_VERSION' ) ? true : false,
+		];
+
+		if ( null !== $post_status ) {
+			$args['post_status'] = $post_status;
+		}
+
+		$query = $this->query( $args, true );
+
+		if ( ! $query->have_posts() ) {
+			return [];
+		}
+
+		$post_ids = wp_list_pluck( $query->posts, 'ID' );
+		_prime_post_caches( $post_ids, false, true );
+		update_meta_cache( 'post', $post_ids );
+
+		$summaries = [];
+		foreach ( $query->posts as $post ) {
+			$meta = get_post_meta( $post->ID, self::OPTION_METAKEY, true );
+			$type = is_array( $meta ) ? ( $meta['type'] ?? 'dummy' ) : 'dummy';
+
+			$summaries[ (int) $post->ID ] = [
+				'id'          => (int) $post->ID,
+				'title'       => $post->post_title,
+				'type'        => $type,
+				'status'      => $post->post_status,
+				'author_id'   => (int) $post->post_author,
+				'expiry_date' => is_array( $meta ) ? absint( $meta['expiry_date'] ?? 0 ) : 0,
+			];
+		}
+
+		return $summaries;
+	}
+
+	/**
+	 * Hydrate ad objects for the given post IDs.
+	 *
+	 * @param int[] $post_ids Ad post IDs.
+	 *
+	 * @return Ad[]
+	 */
+	private function hydrate_ads( array $post_ids ): array {
+		$post_ids = array_values( array_filter( array_map( 'absint', $post_ids ) ) );
+
+		if ( ! empty( $post_ids ) ) {
+			_prime_post_caches( $post_ids, false, true );
+		}
+
+		$ads = [];
+		foreach ( $post_ids as $post_id ) {
+			$ads[ $post_id ] = wp_advads_get_ad( $post_id );
+		}
+
+		return $ads;
 	}
 
 	/**
@@ -448,6 +574,21 @@ class Ad_Repository {
 	}
 
 	/**
+	 * Whether stored meta still uses legacy keys that require migration.
+	 *
+	 * @param array $values Raw meta values.
+	 *
+	 * @return bool
+	 */
+	private function needs_meta_migration( array $values ): bool {
+		if ( isset( $values['output'] ) || isset( $values['visitor'] ) ) {
+			return true;
+		}
+
+		return in_array( $values['position'] ?? '', [ 'left', 'center', 'right' ], true );
+	}
+
+	/**
 	 * Migrate values to new version
 	 *
 	 * @param array $values Values to migrate.
@@ -455,6 +596,14 @@ class Ad_Repository {
 	 * @return array
 	 */
 	private function migrate_values( $values ): array {
+		if ( ! $this->needs_meta_migration( $values ) ) {
+			if ( isset( $values['margin'] ) && is_array( $values['margin'] ) ) {
+				$values['margin'] = array_map( 'intval', $values['margin'] );
+			}
+
+			return $values;
+		}
+
 		$output = wp_parse_args(
 			$values['output'] ?? [],
 			[

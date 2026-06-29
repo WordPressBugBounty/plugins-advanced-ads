@@ -127,6 +127,11 @@ class Plugin_Exporter {
 		$search     = '/' . preg_quote( home_url(), '/' ) . '(\S+?)\.(' . implode( '|', array_keys( $mime_types ) ) . ')/i';
 
 		$posts = $this->get_posts( Constants::POST_TYPE_AD );
+
+		if ( ! empty( $posts ) ) {
+			update_meta_cache( 'post', wp_list_pluck( $posts, 'ID' ) );
+		}
+
 		foreach ( $posts as $index => $post ) {
 			if ( ! empty( $post['post_content'] ) ) {
 				// Wrap images in <advads_import_img></advads_import_img> tags.
@@ -134,12 +139,12 @@ class Plugin_Exporter {
 			}
 
 			if ( in_array( 'groups', $this->options, true ) ) {
-				$terms = wp_get_object_terms( $post['ID'], Constants::TAXONOMY_GROUP );
+				$group_ids = get_post_meta( $post['ID'], Constants::AD_META_GROUP_IDS, true );
 
-				if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
+				if ( is_array( $group_ids ) && ! empty( $group_ids ) ) {
 					$post['groups'] = [];
-					foreach ( $terms as $term ) {
-						$post['groups'][] = $this->get_group( $term->term_id );
+					foreach ( $group_ids as $group_id ) {
+						$post['groups'][] = $this->get_group( (int) $group_id );
 					}
 				}
 			}
@@ -260,6 +265,25 @@ class Plugin_Exporter {
 	}
 
 	/**
+	 * Get post IDs to export from cached summaries.
+	 *
+	 * @param string $post_type Post type to fetch.
+	 *
+	 * @return int[]
+	 */
+	private function get_export_post_ids( $post_type ): array {
+		if ( Constants::POST_TYPE_AD === $post_type ) {
+			return array_map( 'absint', array_keys( wp_advads_get_ad_summaries() ) );
+		}
+
+		if ( Constants::POST_TYPE_PLACEMENT === $post_type ) {
+			return array_map( 'absint', array_keys( wp_advads_get_placement_summaries() ) );
+		}
+
+		return [];
+	}
+
+	/**
 	 * Get posts for export
 	 *
 	 * @param string $post_type Post type to fetch.
@@ -268,6 +292,12 @@ class Plugin_Exporter {
 	 */
 	private function get_posts( $post_type ): array {
 		global $wpdb;
+
+		$post_ids = $this->get_export_post_ids( $post_type );
+
+		if ( empty( $post_ids ) ) {
+			return [];
+		}
 
 		$export_fields = implode(
 			', ',
@@ -286,11 +316,13 @@ class Plugin_Exporter {
 			]
 		);
 
+		$placeholders = implode( ', ', array_fill( 0, count( $post_ids ), '%d' ) );
+
 		// phpcs:disable
 		return $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT $export_fields FROM {$wpdb->posts} where post_type = '%s' and post_status not in ('trash', 'auto-draft')",
-				$post_type
+				"SELECT $export_fields FROM {$wpdb->posts} WHERE ID IN ($placeholders) AND post_status NOT IN ('trash', 'auto-draft')",
+				...$post_ids
 			),
 			ARRAY_A
 		);

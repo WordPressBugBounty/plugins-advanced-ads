@@ -11,11 +11,11 @@ namespace AdvancedAds\Admin\Ads;
 
 defined( 'ABSPATH' ) || exit;
 
-use AdvancedAds\Options;
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Ad;
 use AdvancedAds\Abstracts\Admin_List_Table;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Options;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -198,18 +198,7 @@ class List_Table extends Admin_List_Table {
 		// Render views.
 		$wp_list_table->screen->render_screen_reader_content( 'heading_views' );
 
-		$is_all = count(
-			array_diff_key(
-				$_GET, // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				[
-					'post_type' => $this->list_table_type,
-					'orderby'   => '',
-					'order'     => '',
-					'paged'     => '',
-					'mode'      => '',
-				]
-			)
-		) === 0;
+		$is_all = $this->is_all_filters_applied();
 
 		include_once ADVADS_ABSPATH . 'views/admin/table-views-list.php';
 
@@ -418,6 +407,66 @@ class List_Table extends Admin_List_Table {
 	}
 
 	/**
+	 * Cached group/placement usage maps for the ads list table.
+	 *
+	 * @var array{groups_by_ad: array<int, array<int, array{id: int, title: string, edit_link: string}>>, placements_by_item: array<string, array<int, array{id: int, title: string, edit_link: string}>>}|null
+	 */
+	private static $ad_usage_maps = null;
+
+	/**
+	 * Build group and placement usage maps once per list table request.
+	 *
+	 * @return array{groups_by_ad: array<int, array<int, array{id: int, title: string, edit_link: string}>>, placements_by_item: array<string, array<int, array{id: int, title: string, edit_link: string}>>}
+	 */
+	private function get_ad_usage_maps(): array {
+		if ( null !== self::$ad_usage_maps ) {
+			return self::$ad_usage_maps;
+		}
+
+		$placements_by_item = [];
+
+		foreach ( wp_advads_get_placement_summaries() as $id => $summary ) {
+			if ( '' === $summary['item'] ) {
+				continue;
+			}
+
+			$placements_by_item[ $summary['item'] ][] = [
+				'id'        => $id,
+				'title'     => $summary['title'],
+				'edit_link' => add_query_arg(
+					[ 'post_type' => Constants::POST_TYPE_PLACEMENT ],
+					admin_url( 'edit.php#modal-placement-edit-' . $id )
+				),
+			];
+		}
+
+		$groups_by_ad = [];
+
+		foreach ( wp_advads_get_group_summaries() as $group_id => $summary ) {
+			foreach ( wp_advads_get_ads_by_group_id( $group_id, 'ids' ) as $ad_id ) {
+				$groups_by_ad[ (int) $ad_id ][] = [
+					'id'        => $group_id,
+					'title'     => $summary['title'],
+					'edit_link' => add_query_arg(
+						[
+							'page'                     => 'advanced-ads-groups',
+							'advads-last-edited-group' => $group_id,
+						],
+						admin_url( 'admin.php' ) . '#modal-group-edit-' . $group_id
+					),
+				];
+			}
+		}
+
+		self::$ad_usage_maps = [
+			'groups_by_ad'       => $groups_by_ad,
+			'placements_by_item' => $placements_by_item,
+		];
+
+		return self::$ad_usage_maps;
+	}
+
+	/**
 	 * Display ad usage in groups & placements.
 	 *
 	 * @return void
@@ -428,6 +477,10 @@ class List_Table extends Admin_List_Table {
 		if ( ! $ad_id ) {
 			return;
 		}
+
+		$maps       = $this->get_ad_usage_maps();
+		$groups     = $maps['groups_by_ad'][ $ad_id ] ?? [];
+		$placements = $maps['placements_by_item'][ 'ad_' . $ad_id ] ?? [];
 
 		include ADVADS_ABSPATH . 'views/admin/tables/ads/column-used.php';
 	}

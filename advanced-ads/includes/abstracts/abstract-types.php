@@ -132,6 +132,26 @@ abstract class Types implements Integration_Interface {
 	}
 
 	/**
+	 * Resolve the entity class for a type id, with lazy registration and default fallback.
+	 *
+	 * @param string $entity_type  Entity type id.
+	 * @param string $default_type Fallback type id when $entity_type is unknown.
+	 *
+	 * @return string Entity class name.
+	 */
+	public function get_classname_for_type( $entity_type, $default_type = 'default' ): string {
+		if ( empty( $this->types ) || ! $this->has_type( $default_type ) ) {
+			$this->register_types();
+		}
+
+		$type = $this->has_type( $entity_type )
+			? $this->get_type( $entity_type )
+			: $this->get_type( $default_type );
+
+		return $type->get_classname();
+	}
+
+	/**
 	 * Get the registered types.
 	 *
 	 * @param bool $with_unknown Include unknown type placements.

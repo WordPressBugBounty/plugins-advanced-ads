@@ -76,11 +76,24 @@ class WordPress {
 	 * @return int
 	 */
 	public static function get_count_ads( $status = 'any' ): int {
-		$counts = (array) wp_count_posts( Constants::POST_TYPE_AD );
+		$summaries = wp_advads_get_ad_summaries();
 
 		if ( 'any' === $status ) {
-			return array_sum( $counts );
+			return count( $summaries );
 		}
+
+		$count = 0;
+		foreach ( $summaries as $summary ) {
+			if ( $status === $summary['status'] ) {
+				++$count;
+			}
+		}
+
+		if ( in_array( $status, [ 'publish', 'future', 'draft' ], true ) ) {
+			return $count;
+		}
+
+		$counts = (array) wp_count_posts( Constants::POST_TYPE_AD );
 
 		return $counts[ $status ] ?? 0;
 	}

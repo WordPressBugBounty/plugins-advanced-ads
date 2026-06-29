@@ -8,20 +8,36 @@
 
 if ( $adsense_line ) : ?>
 <p>
-
-	<?php
-	echo wp_kses(
-		sprintf(
-			/* translators: %s: The adsense line added automically by Advanced Ads. */
-			__( 'The following line will be added automatically because you connected your AdSense account with Advanced Ads: %s', 'advanced-ads' ),
-			'<br><code>' . $adsense_line . '</code>'
-		),
-		[
-			'br'   => [],
-			'code' => [],
-		]
-	);
-	?>
+	<span id="advads-ads-txt-adsense-notice"
+		data-enabled-text="<?php esc_attr_e( 'The following line will be added automatically because you connected your AdSense account with Advanced Ads:', 'advanced-ads' ); ?>"
+		data-disabled-text="<?php esc_attr_e( 'The AdSense record is not being added to ads.txt automatically.', 'advanced-ads' ); ?>">
+		<?php if ( ! empty( $adsense_disabled ) ) : ?>
+			<?php esc_html_e( 'The AdSense record is not being added to ads.txt automatically.', 'advanced-ads' ); ?>
+		<?php else : ?>
+			<?php
+			echo wp_kses_post(
+				sprintf(
+					/* translators: %s: The adsense line added automatically by Advanced Ads. */
+					__( 'The following line will be added automatically because you connected your AdSense account with Advanced Ads: %s', 'advanced-ads' ),
+					'<br><code>' . $adsense_line . '</code>'
+				)
+			);
+			?>
+		<?php endif; ?>
+	</span>
+	<br><br>
+	<button
+		type="button"
+		class="button advads-ads-txt-action"
+		id="advads-ads-txt-toggle-adsense"
+		data-disable-label="<?php esc_attr_e( 'Remove from ads.txt', 'advanced-ads' ); ?>"
+		data-enable-label="<?php esc_attr_e( 'Add AdSense record to ads.txt', 'advanced-ads' ); ?>">
+		<?php if ( $adsense_disabled ) : ?>
+			<?php esc_html_e( 'Add AdSense record to ads.txt', 'advanced-ads' ); ?>
+		<?php else : ?>
+			<?php esc_html_e( 'Remove from ads.txt', 'advanced-ads' ); ?>
+		<?php endif; ?>
+	</button>
 </p>
 <?php endif; ?>
 

@@ -9,10 +9,12 @@
 
 namespace AdvancedAds\Groups;
 
-use Exception;
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Group;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Formatting;
+use AdvancedAds\Cache_Invalidator;
+use AdvancedAds\Utilities\Cache;
+use Exception;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -60,6 +62,8 @@ class Group_Repository {
 			$group->set_id( $ids['term_id'] );
 			$this->update_term_meta( $group );
 			$group->apply_changes();
+
+			Cache_Invalidator::invalidate_groups();
 		}
 
 		return $group;
@@ -117,6 +121,8 @@ class Group_Repository {
 
 		$this->update_term_meta( $group );
 		$group->apply_changes();
+
+		Cache_Invalidator::invalidate_groups();
 	}
 
 	/**
@@ -137,6 +143,8 @@ class Group_Repository {
 
 		$group->set_id( 0 );
 		$group->set_status( 'trash' );
+
+		Cache_Invalidator::invalidate_groups();
 	}
 
 	/* Finder Methods ------------------- */
@@ -144,29 +152,100 @@ class Group_Repository {
 	/**
 	 * Get all groups object.
 	 *
+	 * Prefer get_group_summaries() for admin lists that only need id, title, or type.
+	 *
 	 * @return Group[]
 	 */
 	public function get_all_groups(): array {
-		static $advads_all_groups;
-
-		if ( isset( $advads_all_groups ) ) {
-			return $advads_all_groups;
-		}
-
-		$advads_all_groups = [];
-		foreach ( $this->get_groups_dropdown() as $term_id => $name ) {
-			$advads_all_groups[ $term_id ] = wp_advads_get_group( $term_id );
-		}
-
-		return $advads_all_groups;
+		return $this->hydrate_groups( array_keys( $this->get_group_summaries() ) );
 	}
 
 	/**
-	 * Get all group as dropdown.
+	 * Get lightweight group summaries for list UIs (cached cross-request).
 	 *
-	 * @return array
+	 * @return array<int, array{id: int, title: string, slug: string, type: string, ad_weights: array<int, int>, publish_date: string, modified_date: string}>
+	 */
+	public function get_group_summaries(): array {
+		$summaries = Cache::get( Cache::PREFIX_GROUPS, Cache::KEY_SUMMARIES );
+
+		if ( null === $summaries ) {
+			$summaries = $this->query_group_summaries();
+			Cache::set( Cache::PREFIX_GROUPS, Cache::KEY_SUMMARIES, $summaries );
+		}
+
+		return $summaries;
+	}
+
+	/**
+	 * Get all group as dropdown (ID => title), derived from cached summaries.
+	 *
+	 * @return array<int, string>
 	 */
 	public function get_groups_dropdown(): array {
+		$summaries = $this->get_group_summaries();
+
+		if ( empty( $summaries ) ) {
+			return [];
+		}
+
+		return wp_list_pluck( $summaries, 'title', 'id' );
+	}
+
+	/**
+	 * Get ads belonging to a group in the requested shape.
+	 *
+	 * @param int    $group_id Group term ID.
+	 * @param string $output   OBJECT for hydrated ads, 'ids' for ad IDs, 'summaries' for cached ad rows.
+	 *
+	 * @return Ad[]|int[]|array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
+	 */
+	public function get_ads_by_group_id( int $group_id, $output = OBJECT ): array {
+		$ad_ids = $this->get_ad_ids_by_group_id( $group_id );
+
+		if ( empty( $ad_ids ) ) {
+			return [];
+		}
+
+		if ( 'ids' === $output ) {
+			return $ad_ids;
+		}
+
+		if ( 'summaries' === $output ) {
+			return array_intersect_key( wp_advads_get_ad_summaries(), array_flip( $ad_ids ) );
+		}
+
+		$group = wp_advads_get_group( $group_id );
+
+		if ( ! $group ) {
+			return [];
+		}
+
+		return $group->get_ads();
+	}
+
+	/**
+	 * Get ad IDs assigned to a group from cached summaries.
+	 *
+	 * @param int $group_id Group term ID.
+	 *
+	 * @return int[]
+	 */
+	private function get_ad_ids_by_group_id( int $group_id ): array {
+		$summaries = $this->get_group_summaries();
+
+		if ( ! isset( $summaries[ $group_id ] ) ) {
+			return [];
+		}
+
+		return array_map( 'absint', array_keys( $summaries[ $group_id ]['ad_weights'] ?? [] ) );
+	}
+
+	/**
+	 * Query lightweight group summaries without hydrating Group objects.
+	 *
+	 * @return array<int, array{id: int, title: string, slug: string, type: string, ad_weights: array<int, int>, publish_date: string, modified_date: string}>
+	 */
+	private function query_group_summaries(): array {
 		$terms = get_terms(
 			[
 				'taxonomy'               => Constants::TAXONOMY_GROUP,
@@ -178,7 +257,94 @@ class Group_Repository {
 			]
 		);
 
-		return ! empty( $terms ) && ! is_wp_error( $terms ) ? wp_list_pluck( $terms, 'name', 'term_id' ) : [];
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
+			return [];
+		}
+
+		$term_ids = wp_list_pluck( $terms, 'term_id' );
+		update_termmeta_cache( $term_ids );
+
+		$summaries = [];
+		foreach ( $terms as $term ) {
+			$type        = get_term_meta( $term->term_id, self::TYPE_METAKEY, true );
+			$meta_values = get_term_meta( $term->term_id, self::OPTION_METAKEY, true );
+
+			if ( ! $type ) {
+				$type = is_array( $meta_values ) ? ( $meta_values['type'] ?? 'refresh' ) : 'refresh';
+			}
+
+			if ( 'ordered' === $type || 'default' === $type ) {
+				$type = 'refresh';
+			}
+
+			$summaries[ (int) $term->term_id ] = [
+				'id'            => (int) $term->term_id,
+				'title'         => $term->name,
+				'slug'          => $term->slug,
+				'type'          => $type,
+				'ad_weights'    => $this->extract_ad_weights_from_meta( $meta_values, $type ),
+				'publish_date'  => (string) get_term_meta( $term->term_id, 'publish_date', true ),
+				'modified_date' => (string) get_term_meta( $term->term_id, 'modified_date', true ),
+			];
+		}
+
+		return $summaries;
+	}
+
+	/**
+	 * Extract ad weights from stored group term meta.
+	 *
+	 * @param mixed  $meta_values Group option meta values.
+	 * @param string $type        Resolved group type.
+	 *
+	 * @return array<int, int>
+	 */
+	private function extract_ad_weights_from_meta( $meta_values, $type ): array {
+		if ( ! is_array( $meta_values ) ) {
+			return [];
+		}
+
+		if ( isset( $meta_values['options'][ $type ] ) && is_array( $meta_values['options'][ $type ] ) ) {
+			$meta_values = array_merge( $meta_values['options'][ $type ], $meta_values );
+		}
+
+		$ad_weights = $meta_values['ad_weights'] ?? [];
+
+		return is_array( $ad_weights ) ? $ad_weights : [];
+	}
+
+	/**
+	 * Hydrate group objects for the given term IDs.
+	 *
+	 * @param int[] $term_ids Group term IDs.
+	 *
+	 * @return Group[]
+	 */
+	private function hydrate_groups( array $term_ids ): array {
+		$term_ids = array_values( array_filter( array_map( 'absint', $term_ids ) ) );
+
+		if ( ! empty( $term_ids ) ) {
+			if ( function_exists( 'wp_prime_term_caches' ) ) {
+				wp_prime_term_caches( $term_ids, Constants::TAXONOMY_GROUP );
+			} else {
+				foreach ( $term_ids as $term_id ) {
+					get_term( $term_id, Constants::TAXONOMY_GROUP );
+				}
+			}
+
+			update_termmeta_cache( $term_ids );
+		}
+
+		$groups = [];
+		foreach ( $term_ids as $term_id ) {
+			$group = wp_advads_get_group( $term_id );
+
+			if ( $group ) {
+				$groups[ $term_id ] = $group;
+			}
+		}
+
+		return $groups;
 	}
 
 	/**
@@ -189,20 +355,30 @@ class Group_Repository {
 	 * @return Group[] Groups array
 	 */
 	public function get_groups_by_ad_id( $ad_id ) {
-		$terms = $ad_id ? wp_get_object_terms( $ad_id, Constants::TAXONOMY_GROUP ) : false;
+		$ad_id = absint( $ad_id );
 
-		// Early bail!!
-		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		if ( ! $ad_id ) {
 			return [];
 		}
 
-		$groups = [];
+		$group_ids = get_post_meta( $ad_id, Constants::AD_META_GROUP_IDS, true );
 
-		foreach ( $terms as $group_id ) {
-			$groups[] = wp_advads_get_group( $group_id );
+		if ( ! is_array( $group_ids ) || empty( $group_ids ) ) {
+			return [];
 		}
 
-		return $groups;
+		return $this->hydrate_groups( $group_ids );
+	}
+
+	/**
+	 * Hydrate group objects for the given term IDs.
+	 *
+	 * @param int[] $term_ids Group term IDs.
+	 *
+	 * @return array<int, Group>
+	 */
+	public function get_groups_by_ids( array $term_ids ): array {
+		return $this->hydrate_groups( $term_ids );
 	}
 
 	/* Additional Methods ------------------- */

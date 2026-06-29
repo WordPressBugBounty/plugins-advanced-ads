@@ -48,6 +48,10 @@ trait Wrapper {
 	 * @return void
 	 */
 	public function set_wrapper_id( $wrapper_id ): void {
+		if ( property_exists( $this, 'wrapper' ) ) {
+			$this->wrapper = null;
+		}
+
 		$this->set_prop( 'wrapper-id', sanitize_key( $wrapper_id ) );
 	}
 
@@ -59,6 +63,10 @@ trait Wrapper {
 	 * @return void
 	 */
 	public function set_wrapper_class( $wrapper_class ): void {
+		if ( property_exists( $this, 'wrapper' ) ) {
+			$this->wrapper = null;
+		}
+
 		$this->set_prop( 'wrapper-class', sanitize_text_field( $wrapper_class ) );
 	}
 

@@ -28,6 +28,13 @@ class Advanced_Ads_Frontend_Checks {
 	private $options = [];
 
 	/**
+	 * Published placements loaded once per request for frontend checks.
+	 *
+	 * @var array|null
+	 */
+	private $frontend_placements = null;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -1184,12 +1191,25 @@ class Advanced_Ads_Frontend_Checks {
 	}
 
 	/**
+	 * Get published placements once per request for frontend checks.
+	 *
+	 * @return array
+	 */
+	private function get_frontend_placements() {
+		if ( null === $this->frontend_placements ) {
+			$this->frontend_placements = wp_advads_get_published_placements();
+		}
+
+		return $this->frontend_placements;
+	}
+
+	/**
 	 * Check if at least one placement uses `the_content`.
 	 *
 	 * @return bool True/False.
 	 */
 	private function has_the_content_placements() {
-		$placements = wp_advads_get_placements();
+		$placements = $this->get_frontend_placements();
 
 		// Find a placement that depends on 'the_content' filter.
 		foreach ( $placements as $placement ) {
@@ -1207,7 +1227,7 @@ class Advanced_Ads_Frontend_Checks {
 	 * @return bool True/False.
 	 */
 	private function has_adblocker_placements() {
-		$placements = wp_advads_get_placements();
+		$placements = $this->get_frontend_placements();
 		foreach ( $placements as $placement ) {
 			if ( ! empty( $placement->get_prop( 'item_adblocker' ) ) ) {
 				return true;
@@ -1223,7 +1243,7 @@ class Advanced_Ads_Frontend_Checks {
 	 * @return bool True/False.
 	 */
 	public function has_adblocker_visitor_condition() {
-		$placements = wp_advads_get_placements();
+		$placements = $this->get_frontend_placements();
 
 		foreach ( $placements as $placement ) {
 			$item = $placement->get_item();

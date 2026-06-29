@@ -50,15 +50,6 @@ class Autoloader {
 	}
 
 	/**
-	 * Get plugin directory.
-	 *
-	 * @return string
-	 */
-	public function get_directory(): string {
-		return dirname( ADVADS_FILE );
-	}
-
-	/**
 	 * Runs this initializer.
 	 *
 	 * @return void
@@ -83,10 +74,10 @@ class Autoloader {
 	 * @return bool|string
 	 */
 	private function locate() {
-		$directory = $this->get_directory();
+		$directory = dirname( ADVADS_FILE );
 		$packages  = $directory . '/packages/autoload.php';
 		$vendors   = $directory . '/vendor/autoload.php';
-		$is_debug  = $this->is_debug() || 'local' === $this->get_environment_type();
+		$is_debug  = ( defined( 'WP_DEBUG' ) && WP_DEBUG ) || 'local' === wp_get_environment_type();
 
 		if ( is_readable( $packages ) && ( ! $is_debug || ! is_readable( $vendors ) ) ) {
 			return $packages;
@@ -133,81 +124,5 @@ class Autoloader {
 			</p>
 		</div>
 		<?php
-	}
-
-	/**
-	 * Retrieves the current environment type.
-	 *
-	 * @return string
-	 */
-	public function get_environment_type(): string {
-		return function_exists( 'wp_get_environment_type' )
-			? wp_get_environment_type()
-			: $this->get_environment_type_fallback();
-	}
-
-	/**
-	 * Retrieves the current environment type.
-	 *
-	 * @return string
-	 */
-	private function get_environment_type_fallback(): string {
-		static $current_env = '';
-
-		if ( ! defined( 'WP_RUN_CORE_TESTS' ) && $current_env ) {
-			return $current_env;
-		}
-
-		$wp_environments = [
-			'local',
-			'development',
-			'staging',
-			'production',
-		];
-
-		// Add a note about the deprecated WP_ENVIRONMENT_TYPES constant.
-		if ( defined( 'WP_ENVIRONMENT_TYPES' ) && function_exists( '_deprecated_argument' ) ) {
-			if ( function_exists( '__' ) ) {
-				/* translators: %s: WP_ENVIRONMENT_TYPES */
-				$message = sprintf( __( 'The %s constant is no longer supported.', 'advanced-ads' ), 'WP_ENVIRONMENT_TYPES' );
-			} else {
-				$message = sprintf( 'The %s constant is no longer supported.', 'WP_ENVIRONMENT_TYPES' );
-			}
-
-			_deprecated_argument(
-				'define()',
-				'5.5.1',
-				$message // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			);
-		}
-
-		// Check if the environment variable has been set, if `getenv` is available on the system.
-		if ( function_exists( 'getenv' ) ) {
-			$has_env = getenv( 'WP_ENVIRONMENT_TYPE' );
-			if ( false !== $has_env ) {
-				$current_env = $has_env;
-			}
-		}
-
-		// Fetch the environment from a constant, this overrides the global system variable.
-		if ( defined( 'WP_ENVIRONMENT_TYPE' ) && WP_ENVIRONMENT_TYPE ) {
-			$current_env = WP_ENVIRONMENT_TYPE;
-		}
-
-		// Make sure the environment is an allowed one, and not accidentally set to an invalid value.
-		if ( ! in_array( $current_env, $wp_environments, true ) ) {
-			$current_env = 'production';
-		}
-
-		return $current_env;
-	}
-
-	/**
-	 * Is WordPress debug mode enabled
-	 *
-	 * @return bool
-	 */
-	private function is_debug(): bool {
-		return defined( 'WP_DEBUG' ) && WP_DEBUG;
 	}
 }

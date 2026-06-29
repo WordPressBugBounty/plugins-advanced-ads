@@ -88,6 +88,25 @@ class Advanced_Ads_Ads_Txt_Strategy {
 	}
 
 	/**
+	 * Set the disabled flag for a network entry.
+	 * When disabled, the network record is excluded from the ads.txt output
+	 * even if a record value is stored, and will not be re-added automatically on settings save.
+	 *
+	 * @param string $id       Ad network id.
+	 * @param bool   $disabled Whether to disable the network record.
+	 *
+	 * @return bool
+	 */
+	public function set_network_disabled( $id, $disabled ) {
+		$prev = $this->options;
+		$this->options['networks'][ $id ]['disabled'] = $disabled;
+		if ( $this->options !== $prev ) {
+			$this->changed = true;
+		}
+		return true;
+	}
+
+	/**
 	 * Set additional content.
 	 *
 	 * @param string $custom Additional content.
@@ -122,7 +141,7 @@ class Advanced_Ads_Ads_Txt_Strategy {
 		$o = '';
 
 		foreach ( $options['networks'] as $_id => $data ) {
-			if ( ! empty( $data['rec'] ) ) {
+			if ( ! empty( $data['rec'] ) && empty( $data['disabled'] ) ) {
 				$o .= $data['rec'] . "\n";
 			}
 		}
@@ -212,6 +231,9 @@ class Advanced_Ads_Ads_Txt_Strategy {
 		}
 		if ( ! isset( $options['networks'] ) || ! is_array( $options['networks'] ) ) {
 			$options['networks'] = [];
+		}
+		if ( ! isset( $options['networks']['adsense']['disabled'] ) ) {
+			$options['networks']['adsense']['disabled'] = false;
 		}
 
 		return $options;

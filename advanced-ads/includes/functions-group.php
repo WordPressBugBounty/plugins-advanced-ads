@@ -192,6 +192,15 @@ function wp_advads_get_all_groups(): array {
 }
 
 /**
+ * Get lightweight group summaries for admin list UIs.
+ *
+ * @return array<int, array{id: int, title: string, slug: string, type: string, ad_weights: array<int, int>, publish_date: string, modified_date: string}>
+ */
+function wp_advads_get_group_summaries(): array {
+	return wp_advads_get_group_repository()->get_group_summaries();
+}
+
+/**
  * Get all group as dropdown.
  *
  * @return array
@@ -232,4 +241,26 @@ function wp_advads_get_group_types() {
  */
 function wp_advads_get_group( $group_id = false, $new_type = '' ) {
 	return wp_advads_get_group_factory()->get_group( $group_id, $new_type );
+}
+
+/**
+ * Get groups associated with a given ad id.
+ *
+ * @param int $ad_id The ID of the ad.
+ *
+ * @return Group[]
+ */
+function wp_advads_get_groups_by_ad_id( $ad_id ): array {
+	return wp_advads_get_group_repository()->get_groups_by_ad_id( $ad_id );
+}
+
+/**
+ * Hydrate group objects for the given term IDs.
+ *
+ * @param int[] $group_ids Group term IDs.
+ *
+ * @return array<int, Group>
+ */
+function wp_advads_get_groups_by_ids( array $group_ids ): array {
+	return wp_advads_get_group_repository()->get_groups_by_ids( $group_ids );
 }

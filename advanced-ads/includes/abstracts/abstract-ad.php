@@ -9,19 +9,20 @@
 
 namespace AdvancedAds\Abstracts;
 
-use Advanced_Ads;
 use Advanced_Ads_Inline_Css;
 use Advanced_Ads_Utils;
 use Advanced_Ads_Visitor_Conditions;
-use AdvancedAds\Traits;
-use AdvancedAds\Constants;
-use AdvancedAds\Frontend\Stats;
-use AdvancedAds\Utilities\WordPress;
-use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Str;
-use AdvancedAds\Interfaces\Entity_Interface;
+use Advanced_Ads;
 use AdvancedAds\Compatibility\Compatibility;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Formatting;
+use AdvancedAds\Framework\Utilities\Str;
+use AdvancedAds\Frontend\Stats;
+use AdvancedAds\Interfaces\Entity_Interface;
+use AdvancedAds\Traits;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\Ad_List_Stats;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -267,21 +268,13 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * @return int
 	 */
 	public function get_clicks(): int {
-		$post = get_post();
+		$stats = Ad_List_Stats::get( $this->get_id() );
 
-		if ( isset( $post->clicks ) ) {
-			return absint( $post->clicks );
+		if ( null !== $stats ) {
+			return $stats['clicks'];
 		}
 
-		global $wpdb;
-		$clicks = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				'SELECT SUM(count) FROM ' . $wpdb->prefix . 'advads_clicks WHERE ad_id = %d',
-				$this->get_id()
-			)
-		);
-
-		return absint( $clicks );
+		return 0;
 	}
 
 	/**
@@ -290,22 +283,13 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * @return int
 	 */
 	public function get_impressions(): int {
-		$post = get_post();
+		$stats = Ad_List_Stats::get( $this->get_id() );
 
-		if ( isset( $post->impressions ) ) {
-			return absint( $post->impressions );
+		if ( null !== $stats ) {
+			return $stats['impressions'];
 		}
 
-		global $wpdb;
-
-		$impressions = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				'SELECT SUM(count) FROM ' . $wpdb->prefix . 'advads_impressions WHERE ad_id = %d',
-				$this->get_id()
-			)
-		);
-
-		return absint( $impressions );
+		return 0;
 	}
 
 	/**
@@ -316,11 +300,15 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * @return int|string
 	 */
 	public function get_ctr( $context = 'view' ) {
-		$post = get_post();
-		$ctr  = $post->ctr ?? 0;
+		$stats = Ad_List_Stats::get( $this->get_id() );
+		$ctr   = 0;
 
-		if ( ! $ctr && $this->get_impressions() > 0 ) {
-			$ctr = $this->get_clicks() / $this->get_impressions();
+		if ( null !== $stats ) {
+			if ( $stats['ctr'] > 0 ) {
+				$ctr = $stats['ctr'];
+			} elseif ( $stats['impressions'] > 0 ) {
+				$ctr = $stats['clicks'] / $stats['impressions'];
+			}
 		}
 
 		return 'view' === $context ? number_format_i18n( 100 * $ctr, 2 ) : $ctr;
@@ -358,6 +346,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * @return void
 	 */
 	public function set_clearfix( $clearfix ): void {
+		$this->clear_wrapper_cache();
 		$this->set_prop( 'clearfix', Formatting::string_to_bool( $clearfix ) );
 	}
 
@@ -369,6 +358,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * @return void
 	 */
 	public function set_position( $position ): void {
+		$this->clear_wrapper_cache();
 		$this->set_prop( 'position', empty( $position ) ? 'none' : $position );
 	}
 
@@ -387,6 +377,7 @@ abstract class Ad extends Data implements Entity_Interface {
 			'left'   => intval( $margin['left'] ?? 0 ),
 		];
 
+		$this->clear_wrapper_cache();
 		$this->set_prop( 'margin', $margin );
 	}
 
@@ -459,6 +450,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * @param float|string $width Total width.
 	 */
 	public function set_width( $width ) {
+		$this->clear_wrapper_cache();
 		$this->set_prop( 'width', '' === $width ? 0 : absint( $width ) );
 	}
 
@@ -470,6 +462,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * @return void
 	 */
 	public function set_height( $height ): void {
+		$this->clear_wrapper_cache();
 		$this->set_prop( 'height', '' === $height ? 0 : absint( $height ) );
 	}
 
@@ -514,6 +507,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * @return void
 	 */
 	public function set_reserve_space( $allowed ): void {
+		$this->clear_wrapper_cache();
 		$this->set_prop( 'reserve_space', Formatting::string_to_bool( $allowed ) );
 	}
 
@@ -710,6 +704,15 @@ abstract class Ad extends Data implements Entity_Interface {
 	}
 
 	/**
+	 * Clear cached wrapper attributes.
+	 *
+	 * @return void
+	 */
+	protected function clear_wrapper_cache(): void {
+		$this->wrapper = null;
+	}
+
+	/**
 	 * Get the wrapper attributes.
 	 *
 	 * @return array
@@ -833,13 +836,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 */
 	public function get_groups() {
 		if ( null === $this->groups ) {
-			$this->groups = [];
-			$terms        = wp_get_object_terms( $this->get_id(), Constants::TAXONOMY_GROUP );
-			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
-				foreach ( $terms as $term ) {
-					$this->groups[ $term->term_id ] = wp_advads_get_group( $term );
-				}
-			}
+			$this->groups = $this->get_id() ? wp_advads_get_groups_by_ad_id( $this->get_id() ) : [];
 		}
 
 		return $this->groups;
@@ -1101,33 +1098,31 @@ abstract class Ad extends Data implements Entity_Interface {
 			return true;
 		}
 
+		$has_mobile_legacy = array_key_exists( 'mobile', $conditions );
+		$mobile_legacy     = $has_mobile_legacy ? $conditions['mobile'] : null;
+		$indexed     = array_values( $conditions );
 		$last_result = false;
-		$length      = count( $conditions );
 
-		for ( $i = 0; $i < $length; ++$i ) {
-			$_condition = current( $conditions );
+		foreach ( $indexed as $i => $_condition ) {
 			// Ignore OR if last result was true.
 			if ( $last_result && isset( $_condition['connector'] ) && 'or' === $_condition['connector'] ) {
-				next( $conditions );
 				continue;
 			}
 
 			$result      = Advanced_Ads_Visitor_Conditions::frontend_check( $_condition, $this );
 			$last_result = $result;
 			if ( ! $result ) {
-				// return false only, if the next condition doesn’t have an OR operator.
-				$next = next( $conditions );
+				// Return false only if the next condition doesn't have an OR operator.
+				$next = $indexed[ $i + 1 ] ?? null;
 				if ( ! isset( $next['connector'] ) || 'or' !== $next['connector'] ) {
 					return false;
 				}
-			} else {
-				next( $conditions );
 			}
 		}
 
 		// Check mobile condition.
-		if ( isset( $conditions['mobile'] ) ) {
-			switch ( $conditions['mobile'] ) {
+		if ( $has_mobile_legacy ) {
+			switch ( $mobile_legacy ) {
 				case 'only':
 					if ( ! wp_is_mobile() ) {
 						return false;

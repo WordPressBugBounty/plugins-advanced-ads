@@ -169,7 +169,7 @@ class Action_Links implements Integration_Interface {
 			$headers[] = "Reply-To: $from";
 		}
 
-		wp_mail( 'improve@wpadvancedads.com', $subject, $text, $headers );
+		wp_mail( 'support@wpadvancedads.com', $subject, $text, $headers );
 		die();
 	}
 }

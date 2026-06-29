@@ -45,11 +45,14 @@ class Admin_Compatibility implements Integration_Interface {
 	 *
 	 * @return string
 	 */
-	public function add_advads_admin_body_class_wp7( string $classes ): string { // FIXED: Changed array to string
+	public function add_advads_admin_body_class_wp7( ?string $classes ): string {
 		global $wp_version;
 
+		// Catch null values passed by 3rd party plugins to prevent TypeError on return.
+		$classes = $classes ?? '';
+
 		// Check if WordPress version is 7.0 or greater.
-		if ( version_compare( $wp_version, '7.0-alpha', '>=' ) ) {
+		if ( version_compare( $wp_version, '7.0-alpha', '>=' ) && Conditional::is_screen_advanced_ads() ) {
 			$classes .= ' advads-wp-7-plus';
 		}
 

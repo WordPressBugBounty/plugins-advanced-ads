@@ -9,9 +9,9 @@
 
 namespace AdvancedAds\Utilities;
 
-use WP_Role;
 use AdvancedAds\Framework\Utilities\HTML;
 use AdvancedAds\Framework\Utilities\Str;
+use WP_Role;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -362,6 +362,8 @@ class Data {
 	public static function support_url( $utm = '' ) {
 
 		$utm = empty( $utm ) ? '?utm_source=advanced-ads&utm_medium=link&utm_campaign=support' : $utm;
+		$utm = ltrim( $utm, '/' );
+
 		$url = 'https://wpadvancedads.com/support/' . $utm . '-free-user';
 
 		if ( Conditional::is_any_addon_activated() ) {

@@ -1158,6 +1158,37 @@ function advads_ads_txt_find_issues() {
 			advanced_ads_admin.filesystem.ajax(args);
 		}
 	);
+
+	document.addEventListener('click', function (event) {
+		if ( ! event.target.matches('#advads-ads-txt-toggle-adsense') ) {
+			return;
+		}
+		event.preventDefault();
+		set_loading(true);
+		fetch(advancedAds.endpoints.ajaxUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({
+				action: 'advads-ads-txt',
+				nonce: advancedAds.security.ajaxNonce,
+				type: 'toggle_adsense',
+			}),
+		})
+			.then((r) => r.json())
+			.then(function (response) {
+				const btn    = document.getElementById('advads-ads-txt-toggle-adsense');
+				const notice = document.getElementById('advads-ads-txt-adsense-notice');
+				if (response.adsense_disabled) {
+					btn.textContent = btn.dataset.enableLabel;
+					notice.textContent = notice.dataset.disabledText;
+				} else {
+					btn.textContent = btn.dataset.disableLabel;
+					notice.innerHTML = notice.dataset.enabledText + '<br><code>' + response.adsense_line + '</code>';
+				}
+				done(response);
+			})
+			.catch(fail);
+	});
 }
 
 window.advanced_ads_admin = window.advanced_ads_admin || {};

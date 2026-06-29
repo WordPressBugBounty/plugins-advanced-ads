@@ -10,9 +10,9 @@
 namespace AdvancedAds\Ads;
 
 use AdvancedAds\Abstracts\Ad;
-use AdvancedAds\Utilities\WordPress;
-use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Interfaces\Ad_Interface;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -32,8 +32,7 @@ class Ad_Plain extends Ad implements Ad_Interface {
 		// Evaluate the code as PHP if setting was never saved or is allowed.
 		if ( $this->is_php_allowed() && Conditional::is_php_allowed() ) {
 			ob_start();
-			// phpcs:ignore Squiz.PHP.Eval.Discouraged -- this is specifically eval'd so allow eval here.
-			eval( '?>' . $content );
+			eval( '?>' . $content ); // phpcs:ignore Squiz.PHP.Eval.Discouraged -- this is specifically eval'd so allow eval here.
 			$content = ob_get_clean();
 		}
 

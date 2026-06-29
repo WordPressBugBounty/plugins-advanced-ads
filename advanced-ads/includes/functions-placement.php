@@ -213,6 +213,15 @@ function wp_advads_get_published_placements(): array {
 }
 
 /**
+ * Get lightweight placement summaries for admin list UIs.
+ *
+ * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, item: string}>
+ */
+function wp_advads_get_placement_summaries(): array {
+	return wp_advads_get_placement_repository()->get_placement_summaries();
+}
+
+/**
  * Get all placement as ID => Post Title pair.
  *
  * @return array<int, string>
@@ -323,14 +332,15 @@ function wp_advads_placements_by_item_id( $item_id ): array {
 /**
  * Retrieves placements by type.
  *
- * This method queries the database to retrieve placements based on their type.
+ * Filters cached placement summaries by type and hydrates matches.
  *
- * @param string|array $types  Placement types to query.
- * @param string       $output The required return type. One of OBJECT or ids,
- *                             which correspond to an Placement object or an array containing post ids respectively.
+ * @param string|array $types          Placement types to query.
+ * @param string       $output         The required return type. One of OBJECT or ids,
+ *                                     which correspond to an Placement object or an array containing post ids respectively.
+ * @param bool         $published_only Whether to return only published placements.
  *
  * @return array An associative array of placement IDs as keys and their corresponding placement objects as values.
  */
-function wp_advads_get_placements_by_types( $types, $output = OBJECT ): array {
-	return wp_advads_get_placement_repository()->find_by_types( $types, $output );
+function wp_advads_get_placements_by_types( $types, $output = OBJECT, $published_only = false ): array {
+	return wp_advads_get_placement_repository()->find_by_types( $types, $output, $published_only );
 }

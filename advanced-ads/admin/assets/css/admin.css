@@ -689,7 +689,7 @@ h3:hover > .advads-help:before,
 
 /* WP Admin notifications branded for Advanced Ads */
 .advads-notice,
-.advanced-ads-post-type-list .notice,
+.advads-page .notice,
 .advanced-ads_page_advanced-ads-groups .notice,
 .advanced-ads_page_advanced-ads-groups #message {
 	border-left-color: #1B183A;
@@ -700,11 +700,11 @@ h3:hover > .advads-help:before,
 	color: #FFF;
 }
 .advads-notice.inline,
-.advanced-ads-post-type-list .notice.inline {
+.advads-page .notice.inline {
 	display: block;
 }
 .advads-notice.inline.hidden,
-.advanced-ads-post-type-list .notice.inline.hidden {
+.advads-page .notice.inline.hidden {
 	display: none;
 }
 .advads-notice .notice-dismiss:before,
@@ -815,7 +815,7 @@ span.advads-notice-inline {
 /* Filter dropdowns on the ad list table */
 .advads-ad-list-even { background-color: #f9f9f9 !important; }
 .advads-ad-list-odd { background-color: #fff !important; }
-.advanced-ads-post-type-list #filter-by-date, .advanced-ads-post-type-list label[for=filter-by-date]{
+.advads-page #filter-by-date, .advads-page label[for=filter-by-date]{
 	display: none;
 }
 

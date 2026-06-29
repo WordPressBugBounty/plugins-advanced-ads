@@ -194,6 +194,24 @@ function wp_advads_get_all_ads(): array {
 }
 
 /**
+ * Get lightweight ad summaries for admin list UIs.
+ *
+ * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
+ */
+function wp_advads_get_ad_summaries(): array {
+	return wp_advads_get_ad_repository()->get_ad_summaries();
+}
+
+/**
+ * Get ad summaries for every registered ad post status, including trash.
+ *
+ * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
+ */
+function wp_advads_get_all_statuses(): array {
+	return wp_advads_get_ad_repository()->get_all_statuses();
+}
+
+/**
  * Get all ads.
  *
  * @return array
@@ -239,12 +257,13 @@ function wp_advads_get_ad( $ad_id = false, $new_type = '' ) {
 /**
  * Get ads belonging to a specific group.
  *
- * @param int $group_id The ID of the group.
+ * @param int    $group_id The ID of the group.
+ * @param string $output   OBJECT for hydrated ads, 'ids' for ad IDs, 'summaries' for cached ad rows.
  *
- * @return Ad[]
+ * @return Ad[]|int[]|array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
  */
-function wp_advads_get_ads_by_group_id( $group_id ): array {
-	return wp_advads_get_ad_repository()->get_ads_by_group_id( $group_id );
+function wp_advads_get_ads_by_group_id( $group_id, $output = OBJECT ): array {
+	return wp_advads_get_group_repository()->get_ads_by_group_id( (int) $group_id, $output );
 }
 
 /**
@@ -267,6 +286,17 @@ function wp_advads_get_ads_by_placement_id( $placement_id ): array {
  */
 function wp_advads_get_ads_by_type( $type ): array {
 	return wp_advads_get_ad_repository()->get_ads_by_type( $type );
+}
+
+/**
+ * Hydrate ad objects for the given post IDs.
+ *
+ * @param int[] $ad_ids Ad post IDs.
+ *
+ * @return array<int, Ad>
+ */
+function wp_advads_get_ads_by_ids( array $ad_ids ): array {
+	return wp_advads_get_ad_repository()->get_ads_by_ids( $ad_ids );
 }
 
 /**
