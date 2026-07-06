@@ -62,8 +62,6 @@ class Group_Repository {
 			$group->set_id( $ids['term_id'] );
 			$this->update_term_meta( $group );
 			$group->apply_changes();
-
-			Cache_Invalidator::invalidate_groups();
 		}
 
 		return $group;
@@ -105,13 +103,22 @@ class Group_Repository {
 
 		$changed = array_keys( $group->get_changes() );
 
-		// Only update term when the term data changes.
-		if ( in_array( 'name', $changed, true ) ) {
-			wp_update_term( $group->get_id(), Constants::TAXONOMY_GROUP, [ 'name' => $group->get_name( 'edit' ) ] );
-		}
+		$term_args = [];
 
 		if ( in_array( 'title', $changed, true ) ) {
-			wp_update_term( $group->get_id(), Constants::TAXONOMY_GROUP, [ 'name' => $group->get_title( 'edit' ) ] );
+			$term_args['name'] = $group->get_title( 'edit' );
+		}
+
+		if ( in_array( 'slug', $changed, true ) ) {
+			$term_args['slug'] = $group->get_slug( 'edit' );
+		}
+
+		if ( in_array( 'content', $changed, true ) ) {
+			$term_args['description'] = $group->get_content( 'edit' );
+		}
+
+		if ( ! empty( $term_args ) ) {
+			wp_update_term( $group->get_id(), Constants::TAXONOMY_GROUP, $term_args );
 		}
 
 		// Only update weights when there is a change.
@@ -122,29 +129,29 @@ class Group_Repository {
 		$this->update_term_meta( $group );
 		$group->apply_changes();
 
-		Cache_Invalidator::invalidate_groups();
+		if ( empty( $term_args ) ) {
+			Cache_Invalidator::invalidate_groups();
+		}
 	}
 
 	/**
 	 * Delete an group from the database.
 	 *
-	 * @param Group $group Group object or Id.
+	 * @param Group $group        Group object or Id.
+	 * @param bool  $force_delete Unused; taxonomy terms are always deleted permanently.
 	 *
 	 * @return void
 	 */
-	public function delete( &$group ): void {
+	public function delete( &$group, $force_delete = false ): void {
 		// Early bail!!
 		if ( ! $group || ! $group->get_id() ) {
 			return;
 		}
 
 		wp_delete_term( $group->get_id(), Constants::TAXONOMY_GROUP );
-		$this->update_old_storage( $group->get_id() );
 
 		$group->set_id( 0 );
 		$group->set_status( 'trash' );
-
-		Cache_Invalidator::invalidate_groups();
 	}
 
 	/* Finder Methods ------------------- */
@@ -152,7 +159,7 @@ class Group_Repository {
 	/**
 	 * Get all groups object.
 	 *
-	 * Prefer get_group_summaries() for admin lists that only need id, title, or type.
+	 * @deprecated 2.0.24 Use get_group_summaries() or get_groups_by_ids() instead.
 	 *
 	 * @return Group[]
 	 */
@@ -200,11 +207,13 @@ class Group_Repository {
 	 * @return Ad[]|int[]|array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
 	 */
 	public function get_ads_by_group_id( int $group_id, $output = OBJECT ): array {
-		$ad_ids = $this->get_ad_ids_by_group_id( $group_id );
+		$ad_weights = $this->get_ad_weights_by_group_id( $group_id );
 
-		if ( empty( $ad_ids ) ) {
+		if ( empty( $ad_weights ) ) {
 			return [];
 		}
+
+		$ad_ids = array_map( 'absint', array_keys( $ad_weights ) );
 
 		if ( 'ids' === $output ) {
 			return $ad_ids;
@@ -214,13 +223,13 @@ class Group_Repository {
 			return array_intersect_key( wp_advads_get_ad_summaries(), array_flip( $ad_ids ) );
 		}
 
-		$group = wp_advads_get_group( $group_id );
+		$ads = wp_advads_get_ads_by_ids( $ad_ids );
 
-		if ( ! $group ) {
-			return [];
+		foreach ( $ads as $ad_id => $ad ) {
+			$ad->set_prop( 'weight', $ad_weights[ $ad_id ] );
 		}
 
-		return $group->get_ads();
+		return $ads;
 	}
 
 	/**
@@ -231,13 +240,24 @@ class Group_Repository {
 	 * @return int[]
 	 */
 	private function get_ad_ids_by_group_id( int $group_id ): array {
+		return array_map( 'absint', array_keys( $this->get_ad_weights_by_group_id( $group_id ) ) );
+	}
+
+	/**
+	 * Get ad weights for a group from cached summaries.
+	 *
+	 * @param int $group_id Group term ID.
+	 *
+	 * @return array<int, int>
+	 */
+	private function get_ad_weights_by_group_id( int $group_id ): array {
 		$summaries = $this->get_group_summaries();
 
 		if ( ! isset( $summaries[ $group_id ] ) ) {
 			return [];
 		}
 
-		return array_map( 'absint', array_keys( $summaries[ $group_id ]['ad_weights'] ?? [] ) );
+		return $summaries[ $group_id ]['ad_weights'] ?? [];
 	}
 
 	/**
@@ -270,12 +290,10 @@ class Group_Repository {
 			$meta_values = get_term_meta( $term->term_id, self::OPTION_METAKEY, true );
 
 			if ( ! $type ) {
-				$type = is_array( $meta_values ) ? ( $meta_values['type'] ?? 'refresh' ) : 'refresh';
+				$type = is_array( $meta_values ) ? ( $meta_values['type'] ?? 'default' ) : 'default';
 			}
 
-			if ( 'ordered' === $type || 'default' === $type ) {
-				$type = 'refresh';
-			}
+			$type = $this->normalize_group_type( $type );
 
 			$summaries[ (int) $term->term_id ] = [
 				'id'            => (int) $term->term_id,
@@ -304,9 +322,7 @@ class Group_Repository {
 			return [];
 		}
 
-		if ( isset( $meta_values['options'][ $type ] ) && is_array( $meta_values['options'][ $type ] ) ) {
-			$meta_values = array_merge( $meta_values['options'][ $type ], $meta_values );
-		}
+		$meta_values = $this->merge_group_options_meta( $meta_values, $type );
 
 		$ad_weights = $meta_values['ad_weights'] ?? [];
 
@@ -396,18 +412,14 @@ class Group_Repository {
 		$publish_date  = get_term_meta( $group->get_id(), 'publish_date', true );
 		$modified_date = get_term_meta( $group->get_id(), 'modified_date', true );
 
-		if ( empty( $meta_values ) ) {
-			$meta_values = $this->migrate_values( $group );
-			$type        = $meta_values['type'] ?? $type;
+		if ( ! is_array( $meta_values ) ) {
+			$meta_values = [];
 		}
 
-		if ( 'ordered' === $type || 'default' === $type ) {
-			$type = 'refresh';
-		}
+		$type = $this->normalize_group_type( $type ?: ( $meta_values['type'] ?? 'default' ) );
 
-		if ( isset( $meta_values['options'], $meta_values['options'][ $type ] ) ) {
-			$meta_values = array_merge( $meta_values['options'][ $type ], $meta_values );
-		}
+		$meta_values = $this->merge_group_options_meta( $meta_values, $type );
+		$meta_values['type'] = $type;
 
 		$meta_values['publish_date']  = $publish_date ?? '';
 		$meta_values['modified_date'] = $modified_date ?? '';
@@ -449,50 +461,47 @@ class Group_Repository {
 	}
 
 	/**
-	 * Migrate values to new version
+	 * Normalize stored group type to a registered type slug.
 	 *
-	 * @param Group $group Group object.
+	 * @param string $type Raw type from meta or legacy storage.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	private function migrate_values( $group ): array {
-		$values = [];
-
-		$all_groups = get_option( 'advads-ad-groups', [] );
-		$ad_weights = get_option( 'advads-ad-weights', [] );
-
-		if ( isset( $all_groups[ $group->get_id() ] ) && is_array( $all_groups[ $group->get_id() ] ) ) {
-			$values = $all_groups[ $group->get_id() ];
+	private function normalize_group_type( $type ): string {
+		if ( empty( $type ) ) {
+			return 'default';
 		}
 
-		if ( isset( $ad_weights[ $group->get_id() ] ) && is_array( $ad_weights[ $group->get_id() ] ) ) {
-			$values['ad_weights'] = $ad_weights[ $group->get_id() ];
+		if ( 'refresh' === $type ) {
+			return 'default';
 		}
 
-		return $values;
+		return $type;
 	}
 
 	/**
-	 * Update old storage.
+	 * Merge per-type options from stored group meta.
 	 *
-	 * TODO: Remove it later
+	 * @param array  $meta_values Group option meta values.
+	 * @param string $type        Normalized group type.
 	 *
-	 * @param int $id Group ID.
-	 *
-	 * @return void
+	 * @return array
 	 */
-	private function update_old_storage( $id ): void {
-		$all_groups  = get_option( 'advads-ad-groups', [] );
-		$all_weights = get_option( 'advads-ad-weights', [] );
-
-		if ( $all_groups && isset( $all_groups[ $id ] ) ) {
-			unset( $all_groups[ $id ] );
-			update_option( 'advads-ad-groups', $all_groups );
+	private function merge_group_options_meta( array $meta_values, string $type ): array {
+		if ( ! isset( $meta_values['options'] ) || ! is_array( $meta_values['options'] ) ) {
+			return $meta_values;
 		}
 
-		if ( $all_weights && isset( $all_weights[ $id ] ) ) {
-			unset( $all_weights[ $id ] );
-			update_option( 'advads-ad-weights', $all_weights );
+		$bucket = $type;
+
+		if ( ! isset( $meta_values['options'][ $bucket ] ) && 'default' === $type && isset( $meta_values['options']['refresh'] ) ) {
+			$bucket = 'refresh';
 		}
+
+		if ( isset( $meta_values['options'][ $bucket ] ) && is_array( $meta_values['options'][ $bucket ] ) ) {
+			return array_merge( $meta_values['options'][ $bucket ], $meta_values );
+		}
+
+		return $meta_values;
 	}
 }

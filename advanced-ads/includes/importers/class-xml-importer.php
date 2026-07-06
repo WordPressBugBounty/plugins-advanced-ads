@@ -563,23 +563,30 @@ class XML_Importer extends Importer implements Interface_Importer {
 									$_item_existing = explode( '_', $placement['item'] );
 
 									if ( ! empty( $_item_existing[1] ) && Constants::ENTITY_GROUP === $_item_existing[0] ) {
-										$advads_ad_weights = get_option( 'advads-ad-weights', [] );
+										$group_id = absint( $_item_existing[1] );
 
-										if ( term_exists( absint( $_item_existing[1] ), Constants::TAXONOMY_GROUP ) ) {
-											wp_set_post_terms( $found, $_item_existing[1], Constants::TAXONOMY_GROUP, true );
+										if ( term_exists( $group_id, Constants::TAXONOMY_GROUP ) ) {
+											wp_set_object_terms( $found, $group_id, Constants::TAXONOMY_GROUP, true );
 
-											/**
-											 * By default, a new add added to a group receives the weight of 5
-											 * so that users could set the weight of existing ads either higher or lower
-											 * depending on whether they want to show the new ad with a higher weight or not.
-											 * This is especially useful with Selling Ads to replace an existing ad in a group
-											 * with a newly sold one
-											 *
-											 * Advanced users could use the `advanced-ads-import-default-group-weight` filter
-											 * to manipulate the value
-											 */
-											$advads_ad_weights[ $_item_existing[1] ][ $found ] = apply_filters( 'advanced-ads-import-default-group-weight', 5 );
-											update_option( 'advads-ad-weights', $advads_ad_weights );
+											$group = wp_advads_get_group( $group_id );
+
+											if ( $group ) {
+												/**
+												 * By default, a new add added to a group receives the weight of 5
+												 * so that users could set the weight of existing ads either higher or lower
+												 * depending on whether they want to show the new ad with a higher weight or not.
+												 * This is especially useful with Selling Ads to replace an existing ad in a group
+												 * with a newly sold one
+												 *
+												 * Advanced users could use the `advanced-ads-import-default-group-weight` filter
+												 * to manipulate the value
+												 */
+												$weights            = $group->get_ad_weights();
+												$weights[ $found ]  = apply_filters( 'advanced-ads-import-default-group-weight', 5 );
+												$group->set_ad_weights( $weights );
+												$group->save();
+											}
+
 											// new placement key => old placement key.
 											$this->imported_data['placements'][ $placement_key_uniq ] = $placement_key_uniq;
 											break;

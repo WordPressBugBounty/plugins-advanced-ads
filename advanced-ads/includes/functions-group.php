@@ -185,6 +185,8 @@ function is_a_group( $thing ): bool {
 /**
  * Get all groups object.
  *
+ * @deprecated 2.0.24 Use wp_advads_get_group_summaries() or wp_advads_get_groups_by_ids().
+ *
  * @return Group[]
  */
 function wp_advads_get_all_groups(): array {

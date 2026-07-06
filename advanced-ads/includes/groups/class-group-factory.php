@@ -76,8 +76,6 @@ class Group_Factory extends Factory {
 		} catch ( Exception $e ) {
 			return false;
 		}
-
-		return new Group_Standard();
 	}
 
 	/**
@@ -95,13 +93,31 @@ class Group_Factory extends Factory {
 		}
 
 		$type = get_term_meta( $group_id, Group_Repository::TYPE_METAKEY, true );
+
 		if ( empty( $type ) ) {
-			$options = get_option( 'advads-ad-groups', [] );
-			$type    = $options[ $group_id ]['type'] ?? 'default';
-			update_term_meta( $group_id, Group_Repository::TYPE_METAKEY, $type );
+			$meta_values = get_term_meta( $group_id, Group_Repository::OPTION_METAKEY, true );
+
+			if ( is_array( $meta_values ) && ! empty( $meta_values['type'] ) ) {
+				$type = $meta_values['type'];
+			}
 		}
 
-		return $type ?? 'default';
+		return $this->normalize_group_type( $type );
+	}
+
+	/**
+	 * Normalize stored group type to a registered type slug.
+	 *
+	 * @param string $type Raw type from meta or legacy storage.
+	 *
+	 * @return string
+	 */
+	private function normalize_group_type( string $type ): string {
+		if ( empty( $type ) || 'refresh' === $type ) {
+			return 'default';
+		}
+
+		return $type;
 	}
 
 	/**

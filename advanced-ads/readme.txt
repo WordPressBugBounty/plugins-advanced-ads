@@ -4,7 +4,7 @@ Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 2.0.23
+Stable tag: 2.0.24
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -359,6 +359,11 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.24 (July 6, 2026) =
+
+- Fix: UI fixes for Advanced Ads widget buttons on WP Dashboard on WP 7+
+- Fix: a compatibility issue with group ad weights
 
 = 2.0.23 (June 30, 2026) =
 

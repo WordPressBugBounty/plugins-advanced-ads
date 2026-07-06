@@ -12,6 +12,7 @@ namespace AdvancedAds\Abstracts;
 use Advanced_Ads_Inline_Css;
 use Advanced_Ads_Utils;
 use Advanced_Ads;
+use AdvancedAds\Framework\Utilities\Arr;
 use AdvancedAds\Constants;
 use AdvancedAds\Frontend\Stats;
 use AdvancedAds\Interfaces\Entity_Interface;
@@ -166,9 +167,32 @@ class Group extends Data implements Entity_Interface {
 	 *
 	 * @return array
 	 */
-	public function get_ad_weights( $context = 'view' ): array {
+	public function get_ad_weights( $context = 'view' ) {
+		if ( is_array( $context ) ) {
+			$weights = $this->_ad_weights( 'view' );
+			$out     = [];
+			foreach ( $context as $ad_id ) {
+				$out[ $ad_id ] = $weights[ $ad_id ] ?? Constants::GROUP_AD_DEFAULT_WEIGHT;
+			}
+
+			return $out;
+		}
+
+		return $this->_ad_weights( $context );
+	}
+
+
+	/**
+	 * Get ad weights.
+	 *
+	 * @param string $context What the value is for. Valid values are view and edit.
+	 *
+	 * @return array
+	 */
+	public function _ad_weights( $context = 'view' ) {
+		$context = is_string( $context ) ? $context : 'view';
 		if ( isset( $this->ad_weights_cache[ $context ] ) ) {
-			return $this->ad_weights_cache[ $context ];
+			return $this->ad_weights_cache[ $context ] ?? [];
 		}
 
 		global $sitepress;
@@ -262,7 +286,16 @@ class Group extends Data implements Entity_Interface {
 		$this->ad_weights_cache = [];
 		$this->ads              = null;
 		$this->sorted_ads       = null;
-		$this->set_prop( 'ad_weights', $ad_weights );
+
+		if ( true === $this->object_read ) {
+			if ( Arr::get( $this->data, 'ad_weights' ) !== $ad_weights ) {
+				Arr::set( $this->changes, 'ad_weights', $ad_weights );
+			} elseif ( array_key_exists( 'ad_weights', $this->changes ) ) {
+				unset( $this->changes['ad_weights'] );
+			}
+		} else {
+			Arr::set( $this->data, 'ad_weights', $ad_weights );
+		}
 	}
 
 	/**

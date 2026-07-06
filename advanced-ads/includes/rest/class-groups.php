@@ -132,18 +132,41 @@ class Groups implements Routes_Interface {
 	public function update( $request ): array {
 		$payload = $this->get_payload( $request );
 
-		if ( ! wp_verify_nonce( $payload['nonce'], 'advads-update-group' ) ) {
+		if ( ! wp_verify_nonce( $payload['nonce'] ?? '', 'advads-update-group' ) ) {
 			return [ 'error' => esc_html__( 'Invalid nonce', 'advanced-ads' ) ];
 		}
 
-		$data  = wp_unslash( $payload['advads-groups'] );
-		$data  = $data[ key( $data ) ];
-		$group = wp_advads_get_group( $data['id'] );
-		$group->set_name( $data['name'] );
-		$group->set_type( $data['type'] );
-		$group->set_ad_count( $data['ad_count'] );
-		$group->set_options( $data['options'] ?? [] );
-		$group->set_ad_weights( $data['ads'] ?? [] );
+		$groups_data = wp_unslash( $payload['advads-groups'] ?? [] );
+		$data        = is_array( $groups_data ) ? reset( $groups_data ) : null;
+
+		if ( ! is_array( $data ) ) {
+			return [ 'error' => esc_html__( 'Invalid group data.', 'advanced-ads' ) ];
+		}
+
+		$group = wp_advads_get_group( absint( $data['id'] ?? 0 ) );
+
+		if ( ! $group ) {
+			return [ 'error' => esc_html__( 'Group not found.', 'advanced-ads' ) ];
+		}
+
+		$name = sanitize_text_field( $data['name'] ?? '' );
+
+		if ( '' !== $name ) {
+			$group->set_name( $name );
+		}
+
+		$type = $data['type'] ?? $group->get_type();
+
+		if ( ! wp_advads_has_group_type( $type ) ) {
+			$type = 'default';
+		}
+
+		$group->set_type( $type );
+		$group->set_ad_count( $data['ad_count'] ?? $group->get_ad_count() );
+
+		$options = $data['options'] ?? [];
+		$group->set_options( is_array( $options ) ? $options : [] );
+		$group->set_ad_weights( $this->sanitize_ad_weights( $data['ads'] ?? [] ) );
 		$group->save();
 
 		return [
@@ -151,6 +174,31 @@ class Groups implements Routes_Interface {
 			'group_data' => $group->get_data(),
 			'reload'     => true,
 		];
+	}
+
+	/**
+	 * Sanitize ad weights from REST payload.
+	 *
+	 * @param mixed $ads Raw ads payload.
+	 *
+	 * @return array<int, int>
+	 */
+	private function sanitize_ad_weights( $ads ): array {
+		if ( ! is_array( $ads ) ) {
+			return [];
+		}
+
+		$weights = [];
+
+		foreach ( $ads as $ad_id => $weight ) {
+			$ad_id = absint( $ad_id );
+
+			if ( $ad_id > 0 ) {
+				$weights[ $ad_id ] = absint( $weight );
+			}
+		}
+
+		return $weights;
 	}
 
 	/**

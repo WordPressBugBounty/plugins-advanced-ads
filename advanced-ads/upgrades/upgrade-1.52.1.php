@@ -15,13 +15,13 @@ use AdvancedAds\Constants;
  * @since 1.52.1
  */
 function advads_migrate_groups() {
-	$groups = wp_advads_get_all_groups();
-	$ads    = wp_advads_get_all_ads();
+	$group_summaries = wp_advads_get_group_summaries();
+	$ads             = wp_advads_get_all_ads();
 
 	// link group ads with ad post.
-	foreach ( $groups as $group ) {
-		foreach ( $group->get_ad_weights() as $ad_id => $weight ) {
-			wp_set_object_terms( $ad_id, $group->get_id(), Constants::TAXONOMY_GROUP, true );
+	foreach ( $group_summaries as $group_id => $summary ) {
+		foreach ( $summary['ad_weights'] ?? [] as $ad_id => $weight ) {
+			wp_set_object_terms( $ad_id, $group_id, Constants::TAXONOMY_GROUP, true );
 		}
 	}
 

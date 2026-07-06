@@ -35,6 +35,7 @@ class Upgrades extends Updates implements Initializer_Interface {
 			'1.52.1' => 'upgrade-1.52.1.php',
 			'2.0.0'  => 'upgrade-2.0.0.php',
 			'2.0.8'  => 'upgrade-2.0.8.php',
+			'2.0.9'  => 'upgrade-2.0.9.php',
 		];
 	}
 

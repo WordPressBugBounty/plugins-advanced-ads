@@ -42,6 +42,12 @@ class Group_Ad_Relation {
 		$removed_ads = array_diff( $old_ads, $new_ads );
 		$added_ads   = array_diff( $new_ads, $old_ads );
 
+		$affected_ad_ids = array_unique( array_map( 'intval', array_merge( $removed_ads, $added_ads ) ) );
+
+		if ( ! empty( $affected_ad_ids ) ) {
+			update_object_term_cache( $affected_ad_ids, Constants::TAXONOMY_GROUP );
+		}
+
 		$this->handle_removed_ads( $removed_ads, $group->get_id() );
 		$this->handle_added_ads( $added_ads, $group );
 	}
