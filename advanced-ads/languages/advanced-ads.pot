@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: Advanced Ads 2.0.23\n"
+"Project-Id-Version: Advanced Ads 2.0.24\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/advanced-ads\n"
 "Last-Translator: Shakeeb Ahmed <me@shakeebahmed.com>\n"
 "Language-Team: Advanced Ads <support@wpadvancedads.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-06T12:28:02+00:00\n"
+"POT-Creation-Date: 2026-07-10T06:37:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: advanced-ads\n"
@@ -21,6 +21,10 @@ msgstr ""
 #: includes/admin/class-wordpress-dashboard.php:70
 #: includes/compatibility/class-capability-manager.php:67
 #: modules/gutenberg/includes/class-gutenberg.php:131
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AutoUpdateModal.jsx:39
+#: src/admin/screen-licenses/components/LicenseItem.jsx:187
+#: src/admin/screen-licenses/utils.js:1228
 msgid "Advanced Ads"
 msgstr ""
 
@@ -71,13 +75,13 @@ msgid "Some assets were changed. Please <strong>rebuild the asset folder</strong
 msgstr ""
 
 #: admin/includes/ad-health-notices.php:94
-#: admin/includes/notices.php:66
+#: admin/includes/notices.php:67
 msgid "One or more license keys for <strong>Advanced Ads add-ons are invalid or missing</strong>."
 msgstr ""
 
 #. translators: %s is a target URL.
 #: admin/includes/ad-health-notices.php:97
-#: admin/includes/notices.php:68
+#: admin/includes/notices.php:69
 #, php-format
 msgid "Please add valid license keys <a href=\"%s\">here</a>."
 msgstr ""
@@ -137,11 +141,13 @@ msgid "Google AdSense deprecated Link Units. Please choose another format."
 msgstr ""
 
 #: admin/includes/ad-health-notices.php:191
-#: includes/admin/class-addon-box.php:466
-#: includes/admin/class-addon-box.php:560
-#: includes/admin/class-addon-box.php:609
-#: includes/admin/class-addon-box.php:654
+#: includes/admin/class-addon-box.php:468
+#: includes/admin/class-addon-box.php:562
+#: includes/admin/class-addon-box.php:611
+#: includes/admin/class-addon-box.php:656
 #: modules/gadsense/admin/views/adsense-ad-parameters.php:147
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonsList.jsx:58
 msgid "Learn more"
 msgstr ""
 
@@ -311,126 +317,59 @@ msgstr ""
 msgid "You sent an invalid request."
 msgstr ""
 
-#: admin/includes/class-licenses.php:65
-msgid "Error while trying to register the license. Please contact support."
-msgstr ""
-
-#: admin/includes/class-licenses.php:70
-#: admin/views/setting-license.php:84
-msgid "Please enter a valid license key"
-msgstr ""
-
-#: admin/includes/class-licenses.php:111
-#: admin/includes/class-licenses.php:312
-msgid "The license status does not change as long as ADVANCED_ADS_SHOW_LICENSE_RESPONSE is enabled in wp-config.php."
-msgstr ""
-
-#: admin/includes/class-licenses.php:130
-msgid "License couldn’t be activated. Please try again later."
-msgstr ""
-
-#: admin/includes/class-licenses.php:149
-msgid "This is the bundle license key."
-msgstr ""
-
-#: admin/includes/class-licenses.php:150
-msgid "This is not the correct key for this add-on."
-msgstr ""
-
-#: admin/includes/class-licenses.php:151
-msgid "There are no activations left."
-msgstr ""
-
-#. translators: %1$s is a starting link tag, %2$s is the closing one.
-#: admin/includes/class-licenses.php:155
-#, php-format
-msgid "You can manage activations in %1$syour account%2$s."
-msgstr ""
-
-#. translators: %1$s is a starting link tag, %2$s is the closing one.
-#: admin/includes/class-licenses.php:161
-#, php-format
-msgid "%1$sUpgrade%2$s for more activations."
-msgstr ""
-
-#. translators: %s is a string containing information about the issue.
-#: admin/includes/class-licenses.php:175
-#, php-format
-msgid "License is invalid. Reason: %s"
-msgstr ""
-
-#. translators: %s is a list of server information like IP address. Just keep it as is.
-#: admin/includes/class-licenses.php:215
-#, php-format
-msgid "Your request was blocked by our firewall. Please send us the following information to unblock you: %s."
-msgstr ""
-
-#: admin/includes/class-licenses.php:278
-msgid "Error while trying to disable the license. Please contact support."
-msgstr ""
-
-#: admin/includes/class-licenses.php:321
-#: admin/includes/class-licenses.php:345
-msgid "License couldn’t be deactivated. Please try again later."
-msgstr ""
-
 #. translators: %s plugin update link
-#: admin/includes/class-licenses.php:485
+#: admin/includes/class-licenses.php:208
 #, php-format
 msgid "Download failed. <a href=\"%s\">Click here to try another method</a>."
 msgstr ""
 
 #. translators: %s download failed knowledgebase link
-#: admin/includes/class-licenses.php:488
+#: admin/includes/class-licenses.php:211
 #, php-format
 msgid "Download failed. <a href=\"%s\" target=\"_blank\">Click here to learn why</a>."
 msgstr ""
 
-#: admin/includes/class-licenses.php:653
-msgid "License deactivated. Please try again later."
-msgstr ""
-
 #. translators: %s: is a URL.
-#: admin/includes/class-notices.php:467
+#: admin/includes/class-notices.php:468
 #, php-format
 msgid "You don’t seem to have an email address. Please use <a href=\"%s\" target=\"_blank\">this form</a> to sign up."
 msgstr ""
 
-#: admin/includes/class-notices.php:488
+#: admin/includes/class-notices.php:489
 msgid "How embarrassing. The email server seems to be down. Please try again later."
 msgstr ""
 
 #. translators: the first %s is an email address, the seconds %s is a URL.
-#: admin/includes/class-notices.php:496
+#: admin/includes/class-notices.php:497
 #, php-format
 msgid "Please check your email (%1$s) for the confirmation message. If you didn’t receive one or want to use another email address then please use <a href=\"%2$s\" target=\"_blank\">this form</a> to sign up."
 msgstr ""
 
-#: admin/includes/class-overview-widgets.php:47
+#: admin/includes/class-overview-widgets.php:48
 msgid "Notifications"
 msgstr ""
 
-#: admin/includes/class-overview-widgets.php:52
+#: admin/includes/class-overview-widgets.php:53
 msgid "Next Steps"
 msgstr ""
 
-#: admin/includes/class-overview-widgets.php:59
+#: admin/includes/class-overview-widgets.php:60
 msgid "Manual & Support"
 msgstr ""
 
-#: admin/includes/class-overview-widgets.php:68
+#: admin/includes/class-overview-widgets.php:69
 #: includes/admin/metaboxes/class-ad-adsense.php:101
 #: views/admin/page-bulk-edit.php:22
 #: views/admin/page-bulk-edit.php:35
 msgid "Disable"
 msgstr ""
 
-#: admin/includes/class-overview-widgets.php:72
+#: admin/includes/class-overview-widgets.php:73
 #: includes/admin/class-wordpress-dashboard.php:92
 msgid "AdSense Earnings"
 msgstr ""
 
-#: admin/includes/class-overview-widgets.php:79
+#: admin/includes/class-overview-widgets.php:80
 #: includes/admin/class-action-links.php:59
 msgid "Add-Ons"
 msgstr ""
@@ -439,77 +378,77 @@ msgstr ""
 msgid "Heads up!"
 msgstr ""
 
-#: admin/includes/notices.php:46
+#: admin/includes/notices.php:47
 msgid "Thank you for activating <strong>Advanced Ads</strong>. Would you like to receive the first steps via email?"
 msgstr ""
 
-#: admin/includes/notices.php:47
+#: admin/includes/notices.php:48
 msgid "Yes, send it"
 msgstr ""
 
-#: admin/includes/notices.php:53
+#: admin/includes/notices.php:54
 msgid "Hey, welcome to Advanced Ads! Join our newsletter and snag <strong>2 free add-ons</strong> plus our email intro course. It’s the perfect way to get started smoothly!"
 msgstr ""
 
-#: admin/includes/notices.php:54
+#: admin/includes/notices.php:55
 #: admin/views/notices/inline.php:19
 #: admin/views/notices/subscribe.php:17
 #: views/admin/widgets/aa-dashboard/next-steps/newsletter.php:75
 msgid "Subscribe me now"
 msgstr ""
 
-#: admin/includes/notices.php:60
+#: admin/includes/notices.php:61
 msgid "Learn more about how and <strong>how much you can earn with AdSense</strong> and Advanced Ads from my dedicated newsletter."
 msgstr ""
 
-#: admin/includes/notices.php:76
+#: admin/includes/notices.php:77
 msgid "… ads created using <strong>Advanced Ads</strong>."
 msgstr ""
 
-#: admin/includes/notices.php:77
+#: admin/includes/notices.php:78
 msgid "Do you find the plugin useful and would like to thank us for updates, fixing bugs and improving your ad setup?"
 msgstr ""
 
 #. translators: this belongs to our message asking the user for a review. You can find a nice equivalent in your own language.
-#: admin/includes/notices.php:80
+#: admin/includes/notices.php:81
 msgid "When you give 5-stars, an actual person does a little happy dance!"
 msgstr ""
 
-#: admin/includes/notices.php:82
+#: admin/includes/notices.php:83
 msgid "Sure, I appreciate your work"
 msgstr ""
 
-#: admin/includes/notices.php:83
+#: admin/includes/notices.php:84
 msgid "Yes, but help me first to solve a problem, please"
 msgstr ""
 
 #. translators: %1$s is the markup for the discount value, %2$s starts a button link, %3$s closes the button link.
-#: admin/includes/notices.php:92
-#: admin/includes/notices.php:104
+#: admin/includes/notices.php:93
+#: admin/includes/notices.php:105
 #, php-format
 msgid "Save %1$s on all products with our Black Friday / Cyber Monday offer! %2$sGet this deal%3$s"
 msgstr ""
 
 #. translators: %s: URL to the Advanced Ads onboarding wizard.
-#: admin/includes/notices.php:116
+#: admin/includes/notices.php:117
 #, php-format
 msgid "Quickly set up Advanced Ads and monetize your website with just a few clicks. <a class=\"button button-primary\" href=\"%s\">Launch the wizard</a>"
 msgstr ""
 
 #. translators: %1$s: URL to the plugin file, %2$s: URL to the guide
-#: admin/includes/notices.php:131
+#: admin/includes/notices.php:132
 #, php-format
 msgid "Your automatically deactivated version of <strong>%1$s needs to be updated manually</strong>. Please <a href=\"%2$s\" target=\"_blank\">download the newest plugin file</a> and follow our guide on <a href=\"%3$s\" target=\"_blank\">How to install an add-on</a>."
 msgstr ""
 
 #. translators: %1$s: URL to the plugin file, %2$s: URL to the guide
-#: admin/includes/notices.php:152
+#: admin/includes/notices.php:153
 #, php-format
 msgid "Your version of <strong>%1$s</strong> is incompatible with <strong>Advanced Ads %2$s</strong> and has been deactivated. Please update the plugin to the latest version."
 msgstr ""
 
 #. translators: %s: Plugin name
-#: admin/includes/notices.php:206
+#: admin/includes/notices.php:207
 #, php-format
 msgid "The <strong>%s</strong> plugin is active. Running it alongside <strong>Advanced Ads</strong> may lead to ad placement or display issues."
 msgstr ""
@@ -575,11 +514,11 @@ msgstr ""
 #: admin/views/conditions/condition-number.php:23
 #: admin/views/conditions/condition-string.php:9
 #: admin/views/notices/adblock.php:11
-#: classes/display-conditions.php:919
+#: classes/display-conditions.php:927
 #: includes/admin/metaboxes/class-ad-layout.php:63
 #: includes/admin/metaboxes/class-ad-types.php:63
 #: includes/ads/types/type-plain.php:230
-#: includes/utilities/class-wordpress.php:459
+#: includes/utilities/class-wordpress.php:401
 #: modules/ads-txt/admin/views/setting-create.php:26
 #: modules/gadsense/admin/views/adsense-ad-parameters.php:142
 #: modules/privacy/admin/views/setting-general.php:43
@@ -591,6 +530,8 @@ msgstr ""
 #: views/admin/settings/general/disable-notices.php:19
 #: views/admin/settings/general/link-target.php:17
 #: views/admin/widgets/aa-dashboard/support.php:16
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonsList.jsx:67
 msgid "Manual"
 msgstr ""
 
@@ -654,7 +595,8 @@ msgstr ""
 #: admin/views/modal.php:41
 #: admin/views/modal.php:55
 #: modules/one-click/admin/class-admin.php:54
-#: views/admin/support/page.php:33
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:379
 msgid "Cancel"
 msgstr ""
 
@@ -918,50 +860,6 @@ msgstr ""
 msgid "Ads in content disabled"
 msgstr ""
 
-#: admin/views/setting-license.php:15
-msgid "Your license expired."
-msgstr ""
-
-#: admin/views/setting-license.php:23
-msgid "Update expiry date"
-msgstr ""
-
-#. translators: 1: is a URL, 2: is HTML of a button.
-#: admin/views/setting-license.php:31
-#, php-format
-msgid "Click on %2$s if you renewed it or have a subscription or <a href=\"%1$s\" class=\"advads-renewal-link\" target=\"_blank\">renew your license</a>."
-msgstr ""
-
-#. translators: %d is a number of days.
-#: admin/views/setting-license.php:49
-#, php-format
-msgid "(%d days left)"
-msgstr ""
-
-#: admin/views/setting-license.php:55
-msgid "License key"
-msgstr ""
-
-#: admin/views/setting-license.php:72
-msgid "Deactivate License"
-msgstr ""
-
-#: admin/views/setting-license.php:81
-msgid "Update License"
-msgstr ""
-
-#: admin/views/setting-license.php:81
-msgid "Activate License"
-msgstr ""
-
-#: admin/views/setting-license.php:86
-msgid "License key invalid"
-msgstr ""
-
-#: admin/views/setting-license.php:90
-msgid "active"
-msgstr ""
-
 #: admin/views/support-callout.php:14
 msgid "Problems or questions?"
 msgstr ""
@@ -1063,74 +961,74 @@ msgstr ""
 msgid "Learn more about AdSense account issues %1$shere%2$s."
 msgstr ""
 
-#: classes/display-conditions.php:95
+#: classes/display-conditions.php:94
 msgid "post type"
 msgstr ""
 
-#: classes/display-conditions.php:96
+#: classes/display-conditions.php:95
 msgid "Choose the public post types on which to display the ad."
 msgstr ""
 
-#: classes/display-conditions.php:102
+#: classes/display-conditions.php:101
 msgid "specific pages"
 msgstr ""
 
-#: classes/display-conditions.php:103
+#: classes/display-conditions.php:102
 msgid "Choose on which individual posts, pages and public post type pages you want to display or hide ads."
 msgstr ""
 
-#: classes/display-conditions.php:109
+#: classes/display-conditions.php:108
 msgid "general conditions"
 msgstr ""
 
-#: classes/display-conditions.php:115
+#: classes/display-conditions.php:114
 msgid "author"
 msgstr ""
 
-#: classes/display-conditions.php:121
+#: classes/display-conditions.php:120
 msgid "content age"
 msgstr ""
 
-#: classes/display-conditions.php:122
+#: classes/display-conditions.php:121
 msgid "Display ads based on age of the page."
 msgstr ""
 
-#: classes/display-conditions.php:128
+#: classes/display-conditions.php:127
 msgid "taxonomy"
 msgstr ""
 
-#: classes/display-conditions.php:129
+#: classes/display-conditions.php:128
 msgid "Display ads based on the taxonomy of an archive page."
 msgstr ""
 
 #. translators: %s is a label of an archive page.
-#: classes/display-conditions.php:177
+#: classes/display-conditions.php:176
 #, php-format
 msgid "archive: %s"
 msgstr ""
 
-#: classes/display-conditions.php:285
+#: classes/display-conditions.php:293
 msgid "parent page"
 msgstr ""
 
-#: classes/display-conditions.php:286
+#: classes/display-conditions.php:294
 msgid "post meta"
 msgstr ""
 
-#: classes/display-conditions.php:287
+#: classes/display-conditions.php:295
 msgid "page template"
 msgstr ""
 
-#: classes/display-conditions.php:288
+#: classes/display-conditions.php:296
 msgid "url parameters"
 msgstr ""
 
-#: classes/display-conditions.php:291
+#: classes/display-conditions.php:299
 msgid "accelerated mobile pages"
 msgstr ""
 
-#: classes/display-conditions.php:315
-#: classes/visitor-conditions.php:318
+#: classes/display-conditions.php:323
+#: classes/visitor-conditions.php:325
 #: includes/admin/class-assets.php:99
 #: modules/gadsense/admin/views/external-ads-links.php:27
 #: modules/gadsense/admin/views/external-ads-links.php:32
@@ -1138,33 +1036,33 @@ msgstr ""
 msgid "or"
 msgstr ""
 
-#: classes/display-conditions.php:315
-#: classes/visitor-conditions.php:318
+#: classes/display-conditions.php:323
+#: classes/visitor-conditions.php:325
 #: includes/admin/class-assets.php:100
 msgid "and"
 msgstr ""
 
-#: classes/display-conditions.php:644
+#: classes/display-conditions.php:652
 msgctxt "display the terms search field on ad edit page"
 msgid "add more terms"
 msgstr ""
 
-#: classes/display-conditions.php:650
+#: classes/display-conditions.php:658
 msgid "term name or id"
 msgstr ""
 
-#: classes/display-conditions.php:732
+#: classes/display-conditions.php:740
 msgid "ID"
 msgstr ""
 
-#: classes/display-conditions.php:732
+#: classes/display-conditions.php:740
 #: includes/admin/placements/class-edit-modal.php:120
 #: views/admin/groups/edit-modal/list-row-option-ads.php:20
 #: views/admin/placements/quick-edit.php:14
 msgid "Status"
 msgstr ""
 
-#: classes/display-conditions.php:734
+#: classes/display-conditions.php:742
 #: includes/abstracts/abstract-ad.php:902
 #: includes/admin/groups/class-list-table.php:349
 #: views/admin/placements/quick-edit.php:16
@@ -1172,101 +1070,101 @@ msgstr ""
 msgid "Published"
 msgstr ""
 
-#: classes/display-conditions.php:736
+#: classes/display-conditions.php:744
 #: includes/admin/groups/class-list-table.php:349
 #: views/admin/tables/ads/column-date.php:18
 msgid "Last Modified"
 msgstr ""
 
-#: classes/display-conditions.php:758
+#: classes/display-conditions.php:766
 msgid "title or id"
 msgstr ""
 
-#: classes/display-conditions.php:832
+#: classes/display-conditions.php:840
 msgid "Home Page"
 msgstr ""
 
-#: classes/display-conditions.php:833
+#: classes/display-conditions.php:841
 msgid "show on Home page"
 msgstr ""
 
-#: classes/display-conditions.php:837
+#: classes/display-conditions.php:845
 msgid "Singular Pages"
 msgstr ""
 
-#: classes/display-conditions.php:838
+#: classes/display-conditions.php:846
 msgid "show on singular pages/posts"
 msgstr ""
 
-#: classes/display-conditions.php:842
+#: classes/display-conditions.php:850
 msgid "Archive Pages"
 msgstr ""
 
-#: classes/display-conditions.php:843
+#: classes/display-conditions.php:851
 msgid "show on any type of archive page (category, tag, author and date)"
 msgstr ""
 
-#: classes/display-conditions.php:847
+#: classes/display-conditions.php:855
 msgid "Search Results"
 msgstr ""
 
-#: classes/display-conditions.php:848
+#: classes/display-conditions.php:856
 msgid "show on search result pages"
 msgstr ""
 
-#: classes/display-conditions.php:852
+#: classes/display-conditions.php:860
 msgid "404 Page"
 msgstr ""
 
-#: classes/display-conditions.php:853
+#: classes/display-conditions.php:861
 msgid "show on 404 error page"
 msgstr ""
 
-#: classes/display-conditions.php:857
+#: classes/display-conditions.php:865
 msgid "Attachment Pages"
 msgstr ""
 
-#: classes/display-conditions.php:858
+#: classes/display-conditions.php:866
 msgid "show on attachment pages"
 msgstr ""
 
-#: classes/display-conditions.php:862
+#: classes/display-conditions.php:870
 msgid "Secondary Queries"
 msgstr ""
 
-#: classes/display-conditions.php:863
+#: classes/display-conditions.php:871
 msgid "allow ads in secondary queries"
 msgstr ""
 
-#: classes/display-conditions.php:867
+#: classes/display-conditions.php:875
 msgid "RSS Feed"
 msgstr ""
 
-#: classes/display-conditions.php:868
+#: classes/display-conditions.php:876
 msgid "allow ads in RSS Feed"
 msgstr ""
 
-#: classes/display-conditions.php:872
+#: classes/display-conditions.php:880
 msgid "REST API"
 msgstr ""
 
-#: classes/display-conditions.php:873
+#: classes/display-conditions.php:881
 msgid "allow ads in REST API"
 msgstr ""
 
-#: classes/display-conditions.php:908
+#: classes/display-conditions.php:916
 msgid "older than"
 msgstr ""
 
-#: classes/display-conditions.php:909
+#: classes/display-conditions.php:917
 msgid "younger than"
 msgstr ""
 
-#: classes/display-conditions.php:914
+#: classes/display-conditions.php:922
 msgid "days"
 msgstr ""
 
-#: classes/display-conditions.php:917
+#: classes/display-conditions.php:925
 msgid "Display ads based on the age of a page or post."
 msgstr ""
 
@@ -1413,78 +1311,78 @@ msgstr ""
 msgid "time of %s"
 msgstr ""
 
-#: classes/visitor-conditions.php:42
+#: classes/visitor-conditions.php:40
 msgid "Device"
 msgstr ""
 
-#: classes/visitor-conditions.php:49
+#: classes/visitor-conditions.php:47
 msgctxt "Device condition"
 msgid "Mobile"
 msgstr ""
 
-#: classes/visitor-conditions.php:53
+#: classes/visitor-conditions.php:51
 msgctxt "Device condition"
 msgid "Tablet"
 msgstr ""
 
-#: classes/visitor-conditions.php:57
+#: classes/visitor-conditions.php:55
 msgctxt "Device condition"
 msgid "Desktop"
 msgstr ""
 
-#: classes/visitor-conditions.php:62
+#: classes/visitor-conditions.php:60
 msgid "logged-in visitor"
 msgstr ""
 
-#: classes/visitor-conditions.php:63
+#: classes/visitor-conditions.php:61
 msgid "Whether the visitor has to be logged in or not in order to see the ad."
 msgstr ""
 
-#: classes/visitor-conditions.php:279
+#: classes/visitor-conditions.php:286
 msgid "browser language"
 msgstr ""
 
-#: classes/visitor-conditions.php:280
+#: classes/visitor-conditions.php:287
 msgid "cookie"
 msgstr ""
 
-#: classes/visitor-conditions.php:281
+#: classes/visitor-conditions.php:288
 msgid "max. ad clicks"
 msgstr ""
 
-#: classes/visitor-conditions.php:282
+#: classes/visitor-conditions.php:289
 msgid "max. ad impressions"
 msgstr ""
 
-#: classes/visitor-conditions.php:283
+#: classes/visitor-conditions.php:290
 msgid "new visitor"
 msgstr ""
 
-#: classes/visitor-conditions.php:284
+#: classes/visitor-conditions.php:291
 msgid "page impressions"
 msgstr ""
 
-#: classes/visitor-conditions.php:285
+#: classes/visitor-conditions.php:292
 msgid "geo location"
 msgstr ""
 
-#: classes/visitor-conditions.php:286
+#: classes/visitor-conditions.php:293
 msgid "referrer url"
 msgstr ""
 
-#: classes/visitor-conditions.php:287
+#: classes/visitor-conditions.php:294
 msgid "user agent"
 msgstr ""
 
-#: classes/visitor-conditions.php:288
+#: classes/visitor-conditions.php:295
 msgid "user can (capabilities)"
 msgstr ""
 
-#: classes/visitor-conditions.php:289
+#: classes/visitor-conditions.php:296
 msgid "user role"
 msgstr ""
 
-#: classes/visitor-conditions.php:290
+#: classes/visitor-conditions.php:297
 msgid "browser width"
 msgstr ""
 
@@ -1550,14 +1448,14 @@ msgstr ""
 msgid "Placement name: %1$s; Ads: %2$s"
 msgstr ""
 
-#: includes/abstracts/abstract-group.php:617
-#: includes/admin/class-addon-box.php:732
+#: includes/abstracts/abstract-group.php:616
+#: includes/admin/class-addon-box.php:734
 msgid "Get this add-on"
 msgstr ""
 
 #: includes/abstracts/abstract-group.php:620
-#: includes/admin/class-addon-box.php:449
-#: includes/admin/class-addon-box.php:671
+#: includes/admin/class-addon-box.php:451
+#: includes/admin/class-addon-box.php:673
 msgid "Activate now"
 msgstr ""
 
@@ -1573,7 +1471,7 @@ msgstr ""
 #: includes/admin/pages/class-ads.php:47
 #: includes/class-entities.php:44
 #: includes/class-widget.php:135
-#: includes/utilities/class-data.php:289
+#: includes/utilities/class-data.php:252
 #: modules/gutenberg/includes/class-gutenberg.php:132
 #: views/admin/groups/edit-modal/form.php:113
 msgid "Ads"
@@ -1581,7 +1479,7 @@ msgstr ""
 
 #: includes/abstracts/abstract-placement-type.php:79
 #: includes/class-widget.php:128
-#: includes/utilities/class-data.php:296
+#: includes/utilities/class-data.php:259
 #: modules/gutenberg/includes/class-gutenberg.php:133
 #: views/admin/ads/filters.php:75
 msgid "Ad Groups"
@@ -1702,8 +1600,11 @@ msgid "Second"
 msgstr ""
 
 #: includes/admin/class-action-links.php:54
-#: includes/admin/pages/class-support.php:47
-#: includes/admin/pages/class-support.php:48
+#: includes/admin/class-app.php:129
+#: includes/admin/class-app.php:132
+#: assets/dist/app.js:19
+#: src/admin/screen-support/route.jsx:14
+#: src/admin/screen-support/route.jsx:19
 msgid "Support"
 msgstr ""
 
@@ -1717,214 +1618,220 @@ msgstr ""
 msgid "Thank the developer with a &#9733;&#9733;&#9733;&#9733;&#9733; review on <a href=\"%1$s\" target=\"_blank\">wordpress.org</a>"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:60
+#: includes/admin/class-addon-box.php:62
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:14
 msgid "Take the monetization of your website to the next level."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:68
+#: includes/admin/class-addon-box.php:70
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:26
 msgid "Integrate your ads on AMP (Accelerated Mobile Pages) and auto-convert your Google AdSense ad units for enhanced mobile performance."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:76
+#: includes/admin/class-addon-box.php:78
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:38
 msgid "Simplify the process of implementing ad units from Google Ad Manager swiftly and without errors."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:84
+#: includes/admin/class-addon-box.php:86
 msgid "Capture attention with customizable pop-ups that ensure your ads and messages get noticed. Set timing and closing options for optimal user engagement."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:92
+#: includes/admin/class-addon-box.php:94
 msgid "Earn more money by enabling advertisers to buy ad space directly on your site’s frontend."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:100
+#: includes/admin/class-addon-box.php:102
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:74
 msgid "Increase click rates by anchoring ads in sticky positions above, alongside, or below your website."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:108
+#: includes/admin/class-addon-box.php:110
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:86
 msgid "Monitor your ad performance to maximize your revenue."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:116
+#: includes/admin/class-addon-box.php:118
 msgid "Create a beautiful ad slider and increase the ad impressions per page view. Free add-on for subscribers to our newsletter."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:124
+#: includes/admin/class-addon-box.php:126
 msgid "Place AdSense In-feed ads between posts on homepage, category, and archive pages for optimal engagement."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:189
+#: includes/admin/class-addon-box.php:191
 msgid "Cache Busting"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:190
+#: includes/admin/class-addon-box.php:192
 #: includes/admin/pages/class-onboarding.php:247
 #: views/admin/upgrades/pro-tab.php:18
 msgid "Click Fraud Protection"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:191
+#: includes/admin/class-addon-box.php:193
 #: includes/admin/pages/class-onboarding.php:252
 #: views/admin/upgrades/pro-tab.php:19
 msgid "Lazy Loading"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:192
+#: includes/admin/class-addon-box.php:194
 msgid "Anti Ad Blocker"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:193
+#: includes/admin/class-addon-box.php:195
 #: views/admin/upgrades/pro-tab.php:21
 msgid "Geo Targeting"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:194
+#: includes/admin/class-addon-box.php:196
 msgid "+23 Conditions"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:195
+#: includes/admin/class-addon-box.php:197
 msgid "+11 Placements"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:196
+#: includes/admin/class-addon-box.php:198
 msgid "Parallax Ads"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:197
+#: includes/admin/class-addon-box.php:199
 msgid "Ad Grids"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:198
+#: includes/admin/class-addon-box.php:200
 msgid "Ad Refresh"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:199
+#: includes/admin/class-addon-box.php:201
 msgid "A/B Tests"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:205
+#: includes/admin/class-addon-box.php:207
 msgid "Impressions & Clicks"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:206
+#: includes/admin/class-addon-box.php:208
 msgid "Click-Through Rate"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:207
+#: includes/admin/class-addon-box.php:209
 #: includes/admin/class-marketing.php:51
 msgid "Statistics"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:208
+#: includes/admin/class-addon-box.php:210
 msgid "Google Analytics"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:209
+#: includes/admin/class-addon-box.php:211
 msgid "Local Data Processing"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:210
+#: includes/admin/class-addon-box.php:212
 msgid "Email Reports"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:211
+#: includes/admin/class-addon-box.php:213
 msgid "Link Cloaking"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:388
+#: includes/admin/class-addon-box.php:390
 msgid "No add-ons installed"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:391
+#: includes/admin/class-addon-box.php:393
 msgid "Please select from the list below."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:393
+#: includes/admin/class-addon-box.php:395
 msgid "Learn how to download, install, and activate an add-on"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:440
+#: includes/admin/class-addon-box.php:442
 #: includes/admin/pages/class-onboarding.php:130
 msgid "Subscribe now"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:443
-#: includes/admin/class-addon-box.php:673
+#: includes/admin/class-addon-box.php:445
+#: includes/admin/class-addon-box.php:675
 msgid "Download"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:446
+#: includes/admin/class-addon-box.php:448
 msgid "Install now"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:446
-#: includes/admin/class-addon-box.php:556
-#: includes/admin/class-addon-box.php:605
+#: includes/admin/class-addon-box.php:448
+#: includes/admin/class-addon-box.php:558
+#: includes/admin/class-addon-box.php:607
 #: includes/admin/class-upgrades.php:52
 msgid "Upgrade"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:452
-#: includes/admin/class-addon-box.php:669
+#: includes/admin/class-addon-box.php:454
+#: includes/admin/class-addon-box.php:671
 #: includes/admin/class-assets.php:111
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:172
 msgid "Active"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:460
+#: includes/admin/class-addon-box.php:462
 #: views/admin/widgets/wordpress-dashboard/footer.php:14
 msgid "See the manual"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:482
+#: includes/admin/class-addon-box.php:484
 msgid "many more features"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:545
+#: includes/admin/class-addon-box.php:547
 msgid "Advanced Ads All Access long-term"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:549
+#: includes/admin/class-addon-box.php:551
 msgid "Secure 4 years of ongoing support and updates with just one payment. Enjoy savings of up to 70% compared to individual add-on purchases."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:594
+#: includes/admin/class-addon-box.php:596
 msgid "Advanced Ads All Access"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:598
+#: includes/admin/class-addon-box.php:600
 msgid "Every tool you need for website success in one package. Enjoy our complete suite of add-ons for limitless possibilities."
 msgstr ""
 
-#: includes/admin/class-addon-box.php:667
+#: includes/admin/class-addon-box.php:669
 msgid "Included"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:694
+#: includes/admin/class-addon-box.php:696
 msgid "Installed Add-ons"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:698
+#: includes/admin/class-addon-box.php:700
 msgid "Available Add-ons"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:702
+#: includes/admin/class-addon-box.php:704
 msgid "Free Add-ons & Special Purpose"
 msgstr ""
 
-#: includes/admin/class-addon-box.php:742
+#: includes/admin/class-addon-box.php:744
 msgid "How to download, install, and activate an add-on"
 msgstr ""
 
 #. Translators: 1: add-on name 2: admin URL to license page
-#: includes/admin/class-addon-updater.php:136
+#: includes/admin/class-addon-updater.php:128
 #, php-format
 msgid "There might be a new version of %1$s. Please <strong>provide a valid license key</strong> in order to receive updates and support <a href=\"%2$s\">on this page</a>."
-msgstr ""
-
-#: includes/admin/class-admin-menu.php:262
-#: includes/admin/class-admin-menu.php:266
-#: includes/admin/class-settings.php:91
-msgid "Licenses"
 msgstr ""
 
 #. translators: %s: version number
@@ -1938,15 +1845,25 @@ msgid "You have successfully rolled back to a previous version of Advanced Ads."
 msgstr ""
 
 #. translators: %s is a URL.
-#: includes/admin/class-ajax.php:96
-#: includes/admin/class-ajax.php:268
-#: includes/admin/class-ajax.php:599
+#: includes/admin/class-ajax.php:93
+#: includes/admin/class-ajax.php:265
+#: includes/admin/class-ajax.php:596
 #, php-format
 msgid "An error occurred. Please use <a href=\"%s\" target=\"_blank\">this form</a> to sign up."
 msgstr ""
 
-#: includes/admin/class-ajax.php:298
+#: includes/admin/class-ajax.php:295
 msgid "The method is not allowed to render."
+msgstr ""
+
+#: includes/admin/class-app.php:56
+#: includes/admin/class-app.php:57
+msgid "App"
+msgstr ""
+
+#: includes/admin/class-app.php:137
+#: includes/admin/class-app.php:140
+msgid "Licenses"
 msgstr ""
 
 #: includes/admin/class-assets.php:101
@@ -2002,11 +1919,14 @@ msgid "Hide inactive ads"
 msgstr ""
 
 #: includes/admin/class-assets.php:116
-#: includes/admin/class-assets.php:195
+#: includes/admin/class-assets.php:204
 #: includes/admin/groups/class-list-table.php:448
 #: includes/admin/placements/class-list-table.php:319
 #: includes/functions-components.php:27
 #: modules/one-click/admin/class-admin.php:55
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AutoUpdateModal.jsx:77
+#: src/admin/screen-licenses/components/SitesModal.jsx:52
 msgid "Close"
 msgstr ""
 
@@ -2019,7 +1939,7 @@ msgstr ""
 msgid "Data you have entered has not been saved. Are you sure you want to discard your changes?"
 msgstr ""
 
-#: includes/admin/class-assets.php:196
+#: includes/admin/class-assets.php:205
 msgid "Showing search results for"
 msgstr ""
 
@@ -2028,37 +1948,41 @@ msgid "Sorry, you're not allowed to assign this user."
 msgstr ""
 
 #. translators: the plugin name.
-#: includes/admin/class-edd-updater.php:342
+#: includes/admin/class-edd-updater.php:348
 #, php-format
 msgid "There is a new version of %1$s available."
 msgstr ""
 
-#: includes/admin/class-edd-updater.php:348
+#: includes/admin/class-edd-updater.php:354
 msgid "Contact your network administrator to install the update."
 msgstr ""
 
 #. translators: 1: opening anchor tag, do not translate 2. the new plugin version 3. closing anchor tag, do not translate.
-#: includes/admin/class-edd-updater.php:353
+#: includes/admin/class-edd-updater.php:359
 #, php-format
 msgid "%1$sView version %2$s details%3$s."
 msgstr ""
 
 #. translators: 1: opening anchor tag, do not translate 2. the new plugin version 3. closing anchor tag, do not translate 4. opening anchor tag, do not translate 5. closing anchor tag, do not translate.
-#: includes/admin/class-edd-updater.php:362
+#: includes/admin/class-edd-updater.php:368
 #, php-format
 msgid "%1$sView version %2$s details%3$s or %4$supdate now%5$s."
 msgstr ""
 
-#: includes/admin/class-edd-updater.php:373
+#: includes/admin/class-edd-updater.php:379
 msgid "Update now."
 msgstr ""
 
-#: includes/admin/class-edd-updater.php:609
+#: includes/admin/class-edd-updater.php:638
 msgid "You do not have permission to install plugin updates"
 msgstr ""
 
-#: includes/admin/class-edd-updater.php:609
+#: includes/admin/class-edd-updater.php:638
 msgid "Error"
+msgstr ""
+
+#: includes/admin/class-license-admin-post.php:44
+msgid "Forbidden."
 msgstr ""
 
 #: includes/admin/class-list-filters.php:122
@@ -2096,7 +2020,16 @@ msgstr ""
 msgid "You don’t have access to ads. Please deactivate and re-enable Advanced Ads again to fix this."
 msgstr ""
 
-#: includes/admin/class-plugin-installer.php:103
+#: includes/admin/class-plugin-auto-update.php:101
+msgid "Invalid auto-update state."
+msgstr ""
+
+#: includes/admin/class-plugin-auto-update.php:105
+#: includes/license/class-license.php:2766
+msgid "Unknown add-on."
+msgstr ""
+
+#: includes/admin/class-plugin-installer.php:113
 msgid "Rollback to Previous Version"
 msgstr ""
 
@@ -2222,108 +2155,110 @@ msgstr[1] ""
 msgid "Author"
 msgstr ""
 
-#: includes/admin/class-settings.php:75
+#: includes/admin/class-settings.php:68
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:16
 msgid "Pro"
 msgstr ""
 
-#: includes/admin/class-settings.php:83
+#: includes/admin/class-settings.php:76
 #: views/marketing/ad-metabox-all-access.php:14
 #: views/marketing/ad-metabox-tracking.php:13
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:85
+#: src/admin/screen-licenses/components/PricingTable.jsx:58
+#: src/admin/screen-licenses/components/PricingTable.jsx:83
 msgid "Tracking"
 msgstr ""
 
-#: includes/admin/class-settings.php:340
+#: includes/admin/class-settings.php:323
 msgctxt "label before ads"
 msgid "Advertisements"
 msgstr ""
 
-#: includes/admin/class-settings.php:434
+#: includes/admin/class-settings.php:417
 msgid "Admin"
 msgstr ""
 
-#: includes/admin/class-settings.php:441
+#: includes/admin/class-settings.php:424
 msgid "Disable Ad Health and other notices"
 msgstr ""
 
-#: includes/admin/class-settings.php:449
+#: includes/admin/class-settings.php:432
 msgid "Allow editors to manage ads"
 msgstr ""
 
 #. translators: unfiltered_html
-#: includes/admin/class-settings.php:463
+#: includes/admin/class-settings.php:446
 #, php-format
 msgid "Add the %s capability to user roles on multisite"
 msgstr ""
 
-#: includes/admin/class-settings.php:473
+#: includes/admin/class-settings.php:456
 msgid "Delete data on uninstall"
 msgstr ""
 
-#: includes/admin/class-settings.php:490
-#: includes/admin/class-settings.php:497
+#: includes/admin/class-settings.php:473
+#: includes/admin/class-settings.php:480
 #: views/admin/page-bulk-edit.php:17
 msgid "Disable ads"
 msgstr ""
 
-#: includes/admin/class-settings.php:505
+#: includes/admin/class-settings.php:488
 msgid "Hide ads for user roles"
 msgstr ""
 
-#: includes/admin/class-settings.php:513
+#: includes/admin/class-settings.php:496
 msgid "Hide ads for IP addresses"
 msgstr ""
 
-#: includes/admin/class-settings.php:521
+#: includes/admin/class-settings.php:504
 msgid "Hide ads from bots"
 msgstr ""
 
-#: includes/admin/class-settings.php:530
+#: includes/admin/class-settings.php:513
 msgid "Disable ads for post types"
 msgstr ""
 
-#: includes/admin/class-settings.php:547
+#: includes/admin/class-settings.php:530
 #: includes/admin/metaboxes/class-ad-layout.php:40
 msgid "Layout / Output"
 msgstr ""
 
-#: includes/admin/class-settings.php:554
+#: includes/admin/class-settings.php:537
 msgid "ID prefix"
 msgstr ""
 
-#: includes/admin/class-settings.php:562
+#: includes/admin/class-settings.php:545
 #: views/admin/bulk-edit.php:42
 #: views/admin/metaboxes/ads/ad-layout.php:52
 #: views/admin/quick-edit.php:39
 msgid "Ad label"
 msgstr ""
 
-#: includes/admin/class-settings.php:570
+#: includes/admin/class-settings.php:553
 msgid "Open links in a new window"
 msgstr ""
 
-#: includes/admin/class-settings.php:578
+#: includes/admin/class-settings.php:561
 msgid "Use advanced JavaScript"
 msgstr ""
 
-#: includes/admin/class-settings.php:594
+#: includes/admin/class-settings.php:577
 msgid "Content injection"
 msgstr ""
 
-#: includes/admin/class-settings.php:601
+#: includes/admin/class-settings.php:584
 msgid "Content placement in post lists"
 msgstr ""
 
-#: includes/admin/class-settings.php:609
+#: includes/admin/class-settings.php:592
 msgid "Priority of content injection filter"
 msgstr ""
 
-#: includes/admin/class-settings.php:617
+#: includes/admin/class-settings.php:600
 #: includes/class-content-injector.php:711
 msgid "Disable level limitation"
-msgstr ""
-
-#: includes/admin/class-settings.php:700
-msgid "Are you missing something?"
 msgstr ""
 
 #: includes/admin/class-shortcode-creator.php:193
@@ -2396,6 +2331,8 @@ msgstr ""
 #: includes/class-entities.php:129
 #: includes/importers/class-xml-importer.php:340
 #: includes/importers/class-xml-importer.php:855
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:293
 msgid "Edit"
 msgstr ""
 
@@ -2458,7 +2395,7 @@ msgid "Your Ads"
 msgstr ""
 
 #: includes/admin/pages/class-ads.php:101
-#: includes/ads/class-ad-repository.php:57
+#: includes/ads/class-ad-repository.php:59
 #: includes/class-entities.php:46
 #: includes/class-entities.php:50
 #: views/admin/groups/edit-modal/list-row-option-ads.php:76
@@ -2547,7 +2484,8 @@ msgid "Subscribe to our newsletter and get 2 add-ons for free"
 msgstr ""
 
 #: includes/admin/pages/class-onboarding.php:131
-#: views/admin/support/create-ticket.php:23
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:170
 msgid "Enter your email address"
 msgstr ""
 
@@ -2803,7 +2741,7 @@ msgstr ""
 #: includes/admin/pages/class-placements.php:44
 #: includes/admin/pages/class-placements.php:124
 #: includes/class-widget.php:121
-#: includes/utilities/class-data.php:303
+#: includes/utilities/class-data.php:266
 #: modules/gutenberg/includes/class-gutenberg.php:134
 #: views/admin/tables/ads/column-used.php:33
 msgid "Placements"
@@ -2830,7 +2768,7 @@ msgstr ""
 #: includes/admin/placements/class-create-modal.php:49
 #: includes/class-entities.php:127
 #: includes/class-entities.php:131
-#: includes/placements/class-placement-repository.php:45
+#: includes/placements/class-placement-repository.php:47
 msgid "New Placement"
 msgstr ""
 
@@ -2963,11 +2901,11 @@ msgstr ""
 msgid "Delivery"
 msgstr ""
 
-#: includes/ads/class-ad-repository.php:58
+#: includes/ads/class-ad-repository.php:60
 msgid "New ad content goes here"
 msgstr ""
 
-#: includes/ads/class-ad-repository.php:95
+#: includes/ads/class-ad-repository.php:97
 msgid "Invalid ad."
 msgstr ""
 
@@ -3144,6 +3082,8 @@ msgstr ""
 
 #: includes/class-entities.php:51
 #: includes/class-entities.php:132
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:249
 msgid "View"
 msgstr ""
 
@@ -3259,7 +3199,7 @@ msgid "Title:"
 msgstr ""
 
 #: includes/class-widget.php:119
-#: includes/utilities/class-data.php:287
+#: includes/utilities/class-data.php:250
 #: modules/gutenberg/includes/class-gutenberg.php:130
 msgid "--empty--"
 msgstr ""
@@ -3300,7 +3240,7 @@ msgstr ""
 msgid "main query"
 msgstr ""
 
-#: includes/groups/class-group-repository.php:83
+#: includes/groups/class-group-repository.php:85
 msgid "Invalid group."
 msgstr ""
 
@@ -3693,11 +3633,87 @@ msgstr ""
 msgid "Enables shortcode button"
 msgstr ""
 
-#: includes/placements/class-placement-repository.php:46
+#: includes/license/class-license-exchange.php:33
+#: includes/license/class-license.php:359
+msgid "No license keys to exchange."
+msgstr ""
+
+#: includes/license/class-license-exchange.php:69
+msgid "Missing exchange token."
+msgstr ""
+
+#: includes/license/class-license-exchange.php:135
+msgid "License exchange request failed."
+msgstr ""
+
+#: includes/license/class-license-exchange.php:144
+msgid "Invalid license exchange response."
+msgstr ""
+
+#: includes/license/class-license-package-installer.php:114
+msgid "Add-on install failed. Check that wp-content/plugins is writable and the download URL is reachable from this site."
+msgstr ""
+
+#. translators: %s: expected plugin folder, e.g. advanced-ads-tracking
+#: includes/license/class-license-package-installer.php:128
+#, php-format
+msgid "Downloaded package did not install the expected add-on (%s)."
+msgstr ""
+
+#: includes/license/class-license-shop-client.php:242
+#: includes/license/class-license-shop-client.php:298
+msgid "Provide license and site."
+msgstr ""
+
+#: includes/license/class-license-shop-client.php:275
+msgid "Failed to deactivate license."
+msgstr ""
+
+#: includes/license/class-license-shop-client.php:339
+#: assets/dist/app.js:2
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:77
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:269
+msgid "Failed to activate license."
+msgstr ""
+
+#: includes/license/class-license-shop-client.php:390
+#: includes/license/class-license-shop-client.php:398
+msgid "Invalid license validate response from the shop."
+msgstr ""
+
+#. translators: %d: HTTP status code
+#: includes/license/class-license-shop-client.php:477
+#, php-format
+msgid "Could not refresh license download URLs from the shop (HTTP %d)."
+msgstr ""
+
+#: includes/license/class-license.php:390
+msgid "License exchange returned no license records."
+msgstr ""
+
+#: includes/license/class-license.php:825
+#: includes/license/class-license.php:926
+msgid "Missing license key."
+msgstr ""
+
+#: includes/license/class-license.php:950
+msgid "Error while trying to disable the license. Please contact support."
+msgstr ""
+
+#: includes/license/class-license.php:2249
+msgid "You do not have permission to install plugins."
+msgstr ""
+
+#: includes/license/class-license.php:2773
+msgid "You do not have permission to deactivate plugins."
+msgstr ""
+
+#: includes/placements/class-placement-repository.php:48
 msgid "New placement content goes here"
 msgstr ""
 
-#: includes/placements/class-placement-repository.php:79
+#: includes/placements/class-placement-repository.php:81
 msgid "Invalid placement."
 msgstr ""
 
@@ -3791,6 +3807,10 @@ msgstr ""
 msgid "Placement not found"
 msgstr ""
 
+#: includes/rest/class-utilities.php:99
+msgid "Unknown support link source."
+msgstr ""
+
 #: includes/traits/class-entity.php:42
 msgctxt "ad placement singular name"
 msgid "Placement"
@@ -3882,7 +3902,7 @@ msgid "custom"
 msgstr ""
 
 #. translators: %1$s is the opening link tag, %2$s is closing link tag
-#: includes/utilities/class-wordpress.php:426
+#: includes/utilities/class-wordpress.php:384
 #, php-format
 msgid "This feature is deprecated. Please find the removal schedule %1$shere%2$s"
 msgstr ""
@@ -4182,6 +4202,10 @@ msgid "The AdSense verification and Auto ads code should be set up in the <a hre
 msgstr ""
 
 #: modules/gadsense/admin/admin.php:249
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:212
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:236
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:251
 msgid "Activate"
 msgstr ""
 
@@ -4997,29 +5021,29 @@ msgstr ""
 msgid "You can manually republish specific ads and placements or fully rollback at any time."
 msgstr ""
 
-#: modules/one-click/admin/class-ajax.php:65
+#: modules/one-click/admin/class-ajax.php:69
 msgid "Refreshing PubGuru Ads"
 msgstr ""
 
-#: modules/one-click/admin/class-ajax.php:98
+#: modules/one-click/admin/class-ajax.php:102
 msgid "We have successfully migrated your MonetizeMore PubGuru Ad Units to your WordPress site. The existing placements and ads have been paused."
 msgstr ""
 
-#: modules/one-click/admin/class-ajax.php:116
+#: modules/one-click/admin/class-ajax.php:120
 msgid "PubGuru successfully disconnected."
 msgstr ""
 
 #. translators: 1 is the opening link to the Advanced Ads website, 2 the closing link
-#: modules/one-click/admin/class-ajax.php:152
+#: modules/one-click/admin/class-ajax.php:156
 #, php-format
 msgid "The backup of your ads.txt file has failed. Please ensure that a manual backup is created You can find detailed instructions on how to manually back up your ads.txt file in the manual. %1$sManual%2$s"
 msgstr ""
 
-#: modules/one-click/admin/class-ajax.php:162
+#: modules/one-click/admin/class-ajax.php:166
 msgid "File successfully backed up."
 msgstr ""
 
-#: modules/one-click/admin/class-ajax.php:242
+#: modules/one-click/admin/class-ajax.php:246
 msgid "An error has occurred please try again."
 msgstr ""
 
@@ -5147,17 +5171,17 @@ msgstr ""
 msgid "The selected tracking method is not compatible with the TCF 2.0 integration."
 msgstr ""
 
-#: public/class-advanced-ads.php:172
+#: public/class-advanced-ads.php:165
 msgid "Advanced Ads Error following:"
 msgstr ""
 
 #. translators: %s is an error message generated by the plugin.
-#: public/class-advanced-ads.php:176
+#: public/class-advanced-ads.php:169
 #, php-format
 msgid "Advanced Ads Error: %s"
 msgstr ""
 
-#: public/class-advanced-ads.php:577
+#: public/class-advanced-ads.php:570
 msgctxt "label above ads"
 msgid "Advertisements"
 msgstr ""
@@ -5824,297 +5848,6 @@ msgstr ""
 msgid "Clean up all data related to Advanced Ads when removing the plugin."
 msgstr ""
 
-#: views/admin/settings/license/section-help.php:13
-msgid "How to install and activate an add-on."
-msgstr ""
-
-#. translators: %s is a URL.
-#: views/admin/settings/license/section-help.php:19
-#, php-format
-msgid "See also <a href=\"%s\" target=\"_blank\">Issues and questions about licenses</a>."
-msgstr ""
-
-#: views/admin/support/articles.php:18
-msgid "Articles"
-msgstr ""
-
-#: views/admin/support/articles.php:36
-#: views/admin/support/getting-started.php:37
-msgid "View all articles"
-msgstr ""
-
-#: views/admin/support/create-ticket.php:13
-msgid "Email address"
-msgstr ""
-
-#: views/admin/support/create-ticket.php:31
-msgid "Subject"
-msgstr ""
-
-#: views/admin/support/create-ticket.php:34
-msgid "Enter the subject of your issue"
-msgstr ""
-
-#: views/admin/support/create-ticket.php:40
-msgid "Your Message"
-msgstr ""
-
-#: views/admin/support/create-ticket.php:43
-msgid "Enter the message of your issue"
-msgstr ""
-
-#: views/admin/support/create-ticket.php:49
-msgid "Attachments"
-msgstr ""
-
-#. translators: 1: strong tag with class text-blue-500, 2: closing strong tag
-#: views/admin/support/create-ticket.php:62
-#, php-format
-msgid "Drag & drop or %1$sclick to upload%2$s"
-msgstr ""
-
-#. translators: 1: opening a tag, 2: opening a tag, 3: closing a tag
-#: views/admin/support/create-ticket.php:82
-#, php-format
-msgid "By submitting this form, I accept the %1$sTerms%3$s and %2$sPrivacy Policy%3$s and consent that my personal information in this form will be stored and processed for the purposes of providing support."
-msgstr ""
-
-#: views/admin/support/error.php:11
-msgid "No links found."
-msgstr ""
-
-#: views/admin/support/faqs.php:11
-msgid "What are best practices for getting started with Advanced Ads?"
-msgstr ""
-
-#: views/admin/support/faqs.php:15
-msgid "Are video ads better than image ads?"
-msgstr ""
-
-#: views/admin/support/faqs.php:19
-msgid "How do I activate my license on a test site?"
-msgstr ""
-
-#: views/admin/support/faqs.php:23
-msgid "I purchased a subscription but can’t see the features in the backend of my website. Why?"
-msgstr ""
-
-#: views/admin/support/faqs.php:27
-msgid "Does Advanced Ads work on cached websites?"
-msgstr ""
-
-#: views/admin/support/faqs.php:31
-msgid "How can I share the statistics of my ads with my clients?"
-msgstr ""
-
-#: views/admin/support/faqs.php:35
-msgid "Can I manage ads across multiple WordPress installations from one website?"
-msgstr ""
-
-#: views/admin/support/faqs.php:39
-msgid "How can I prevent click fraud on my ads?"
-msgstr ""
-
-#: views/admin/support/faqs.php:52
-msgid "FAQ's"
-msgstr ""
-
-#: views/admin/support/faqs.php:55
-msgid "Everything you need to know about the product."
-msgstr ""
-
-#: views/admin/support/faqs.php:59
-msgid "Couldn’t find what you were looking for?"
-msgstr ""
-
-#: views/admin/support/faqs.php:61
-msgid "Get help from the community."
-msgstr ""
-
-#: views/admin/support/faqs.php:65
-msgid "Visit WordPress Forum"
-msgstr ""
-
-#: views/admin/support/faqs/activate-license.php:11
-msgid "Many customers maintain a local, non-public site for testing, or troubleshooting purposes. This setup is particularly helpful for staging complex changes and verifying their expected behaviour before releasing it to the public."
-msgstr ""
-
-#. translators: 1: link to purchase licenses page, 2: closing anchor tag
-#: views/admin/support/faqs/activate-license.php:19
-#, php-format
-msgid "Testing sites do not count towards your Advanced Ads site limit. We automatically detect testing sites based on the URL patterns in %1$sthis list%2$s."
-msgstr ""
-
-#. translators: 1: link to purchase licenses page, 2: closing anchor tag
-#: views/admin/support/faqs/activate-license.php:32
-#, php-format
-msgid "If you are running the plugin on one of those URLs, the activation works even if you hit your limit. You can always manage license activations in %1$syour account%2$s."
-msgstr ""
-
-#. translators: 1: link to cache busting page, 2: closing anchor tag
-#: views/admin/support/faqs/cached-websites.php:15
-#, php-format
-msgid "Yes, it does. However, if you plan to deliver ads dynamically based on specific conditions or rotate multiple ads within the same placement, you’ll need to enable %1$sCache Busting%2$s. You can enable this option by going to: Advanced Ads → Settings → Pro → Cache Busting"
-msgstr ""
-
-#: views/admin/support/faqs/getting-started.php:13
-msgid "<strong>Using placements for delivery is best practice</strong>, whether you are inserting a single ad or an ad group. Even if you prefer working with shortcodes, you can use a <strong>Manual Placement</strong>, which also provides a shortcode. This gives you the flexibility of shortcode insertion while still keeping centralized control."
-msgstr ""
-
-#: views/admin/support/faqs/getting-started.php:21
-msgid "<strong>Here’s why that matters:</strong> If you manually insert an ad shortcode into 100 individual posts and later stop working with that advertiser, you would need to edit all 100 posts to remove or replace the shortcode (unless it’s embedded in a template). With placements, you simply replace or disable the ad (or ad group) assigned to that placement, and the change is applied everywhere instantly. This significantly reduces maintenance effort and makes your setup more scalable and future-proof."
-msgstr ""
-
-#. translators: 1: link to manage ads page, 2: closing anchor tag
-#: views/admin/support/faqs/manage-ads-across-multiple-installations.php:15
-#, php-format
-msgid "You can do this by using the <strong>Ad Server placement</strong>. It allows you to embed the generated JavaScript code or iframe on your other WordPress installations to deliver ads from your main site. Please review the feature’s limitations before implementation to ensure it fits your needs. %1$sYou can find more details here%2$s."
-msgstr ""
-
-#. translators: 1: link to manage ads page, 2: closing anchor tag
-#: views/admin/support/faqs/prevent-click-fraud.php:15
-#, php-format
-msgid "You can protect your ads by using the Click Fraud Protection feature included in Advanced Ads Pro. This feature automatically hides an ad once a defined number of clicks from the same user is reached, helping to prevent repeated or suspicious clicks and reducing the risk of fraudulent activity. %1$sYou can find more details here%2$s."
-msgstr ""
-
-#. translators: 1: link to shareable link page, 2: closing anchor tag
-#: views/admin/support/faqs/share-statistics.php:15
-#, php-format
-msgid "%1$sAs shown here%2$s, the Tracking add-on allows you to generate non-indexed public statistics pages for each ad. You can share these links directly with your advertisers so they can view performance data, including impressions, clicks, a visual graph, and customizable date range filters."
-msgstr ""
-
-#. translators: 1: link to purchase licenses page, 2: closing anchor tag
-#: views/admin/support/faqs/subscription-not-working.php:15
-#, php-format
-msgid "This is likely because you haven’t installed the additional add-ons. Please log in to your Advanced Ads account, download the necessary add-ons, and upload the downloaded zip files to your WordPress site. Install and activate them as you would any other WordPress plugin. %1$sHow to install an Add-On%2$s"
-msgstr ""
-
-#: views/admin/support/faqs/video-ads.php:13
-msgid "In general, <strong>video ads tend to generate higher engagement rates</strong> compared to static image ads, primarily because motion naturally draws user attention, especially on content-heavy pages where users are scrolling quickly. That moving part will make users stop scrolling and check."
-msgstr ""
-
-#: views/admin/support/faqs/video-ads.php:19
-msgid "Performance is highly dependent on several factors:"
-msgstr ""
-
-#: views/admin/support/faqs/video-ads.php:23
-msgid "Your audience and niche"
-msgstr ""
-
-#: views/admin/support/faqs/video-ads.php:24
-msgid "Placement position"
-msgstr ""
-
-#: views/admin/support/faqs/video-ads.php:25
-msgid "Page load performance"
-msgstr ""
-
-#: views/admin/support/faqs/video-ads.php:26
-msgid "The quality and relevance of the creative"
-msgstr ""
-
-#: views/admin/support/faqs/video-ads.php:27
-msgid "How intrusive the format is"
-msgstr ""
-
-#: views/admin/support/faqs/video-ads.php:31
-msgid "While video ads often deliver stronger engagement metrics (CTR, viewability, time on ad), they can also negatively impact user experience and performance if not implemented carefully."
-msgstr ""
-
-#. translators: 1: link to video ads guide, 2: link to video ads configuration guide, 3: closing anchor tag
-#: views/admin/support/faqs/video-ads.php:39
-#, php-format
-msgid "%1$sRead more%3$s about video ads, and %2$slearn how to configure them%3$s using Advanced Ads."
-msgstr ""
-
-#: views/admin/support/getting-started.php:19
-msgid "Getting started"
-msgstr ""
-
-#: views/admin/support/latest-tutorials.php:18
-msgid "Latest tutorials"
-msgstr ""
-
-#: views/admin/support/latest-tutorials.php:36
-msgid "View all tutorials"
-msgstr ""
-
-#: views/admin/support/need-help-paid.php:18
-msgid "Access Priority Support"
-msgstr ""
-
-#: views/admin/support/need-help-paid.php:21
-msgid "As a paid user, you receive <strong>priority, premium support from our specialists</strong>. Submit a support ticket and get fast, tailored assistance to resolve your request."
-msgstr ""
-
-#: views/admin/support/need-help-paid.php:26
-msgid "Submit a ticket"
-msgstr ""
-
-#: views/admin/support/need-help.php:11
-msgid "Need more help?"
-msgstr ""
-
-#: views/admin/support/need-help.php:14
-msgid "On the free plan, support is available via guides and community forums."
-msgstr ""
-
-#: views/admin/support/need-help.php:18
-msgid "Upgrade to <strong>A2 Pro</strong> to get:"
-msgstr ""
-
-#: views/admin/support/need-help.php:23
-msgid "Priority support from our team"
-msgstr ""
-
-#: views/admin/support/need-help.php:26
-msgid "Help directly inside the plugin"
-msgstr ""
-
-#: views/admin/support/need-help.php:29
-msgid "Faster issue resolution"
-msgstr ""
-
-#: views/admin/support/need-help.php:34
-msgid "Upgrade to Premium"
-msgstr ""
-
-#: views/admin/support/page.php:30
-msgid "Get help from our support team"
-msgstr ""
-
-#: views/admin/support/page.php:31
-msgid "Describe your issue and our support team will review it as soon as possible. You’ll receive a confirmation email after submitting your request."
-msgstr ""
-
-#: views/admin/support/page.php:32
-msgid "Submit"
-msgstr ""
-
-#: views/admin/support/searchbox.php:11
-msgid "How can we help?"
-msgstr ""
-
-#: views/admin/support/searchbox.php:12
-msgid "Search for a topic or browse our documentation."
-msgstr ""
-
-#: views/admin/support/searchbox.php:22
-msgid "Search help articles, guides and FAQs"
-msgstr ""
-
-#: views/admin/support/searchbox.php:33
-msgid "How to create a new ad"
-msgstr ""
-
-#: views/admin/support/videos.php:33
-msgid "Video tutorials"
-msgstr ""
-
-#: views/admin/support/videos.php:45
-msgid "View all videos tutorials on YouTube"
-msgstr ""
-
 #: views/admin/tables/ads/column-type.php:37
 msgid "Ad updated"
 msgstr ""
@@ -6281,6 +6014,8 @@ msgstr ""
 
 #: views/admin/widgets/wordpress-dashboard/footer.php:17
 #: views/marketing/ad-metabox-all-access.php:23
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:45
 msgid "Get All Access"
 msgstr ""
 
@@ -6373,6 +6108,11 @@ msgid "All Access – with all available add-ons"
 msgstr ""
 
 #: views/marketing/ad-metabox-all-access.php:13
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:13
+#: src/admin/screen-licenses/components/PricingTable.jsx:33
+#: src/admin/screen-licenses/components/PricingTable.jsx:57
+#: src/admin/screen-licenses/components/PricingTable.jsx:82
 msgid "Advanced Ads Pro"
 msgstr ""
 
@@ -6381,10 +6121,14 @@ msgid "Responsive, AMP and Mobile ads"
 msgstr ""
 
 #: views/marketing/ad-metabox-all-access.php:16
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:37
 msgid "Google Ad Manager Integration"
 msgstr ""
 
 #: views/marketing/ad-metabox-all-access.php:17
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:73
 msgid "Sticky Ads"
 msgstr ""
 
@@ -6393,6 +6137,8 @@ msgid "PopUp Ads"
 msgstr ""
 
 #: views/marketing/ad-metabox-all-access.php:19
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:61
 msgid "Selling Ads"
 msgstr ""
 
@@ -6428,4 +6174,858 @@ msgstr ""
 
 #: views/notices/create-first-ad.php:17
 msgid "Watch the “First Ad” Tutorial (Video)"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:25
+msgid "AMP Ads"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:49
+msgid "PopUp and Layer Ads"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:50
+msgid "Capture attention with customizable pop-ups that ensure your ads and messages get noticed."
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/addon-catalog.js:62
+msgid "Earn more money by enabling advertisers to buy ad space directly on your site's frontend."
+msgstr ""
+
+#: assets/dist/app.js:1
+#: assets/dist/app.js:10
+#: src/admin/screen-licenses/route.jsx:14
+#: src/admin/screen-licenses/route.jsx:19
+#: src/admin/screen-licenses/utils.js:386
+#: src/admin/screen-licenses/utils.js:1456
+msgid "License"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/utils.js:389
+msgid "sites"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/utils.js:1453
+msgid "All Access (5 sites)"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:38
+#: src/admin/screen-licenses/components/PricingTable.jsx:63
+#: src/admin/screen-licenses/utils.js:1454
+msgid "All Access"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTableItem.jsx:29
+msgid "/ year"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTableItem.jsx:41
+msgid "Popular"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:17
+#: src/admin/screen-licenses/components/PricingTable.jsx:39
+msgid "Single site"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:19
+msgid "For small businesses and bloggers who want to increase ad revenue"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:23
+msgid "Upgrade to Pro"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:29
+#: src/admin/screen-licenses/components/PricingTable.jsx:52
+msgid "1 site"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:30
+#: src/admin/screen-licenses/components/PricingTable.jsx:53
+#: src/admin/screen-licenses/components/PricingTable.jsx:78
+msgid "1 year of support and updates"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:31
+#: src/admin/screen-licenses/components/PricingTable.jsx:54
+#: src/admin/screen-licenses/components/PricingTable.jsx:79
+msgid "30-day money-back guarantee"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:32
+#: src/admin/screen-licenses/components/PricingTable.jsx:55
+#: src/admin/screen-licenses/components/PricingTable.jsx:80
+msgid "Free activation on test sites"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:41
+msgid "For professional publishers to increase revenue and save development time"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:56
+#: src/admin/screen-licenses/components/PricingTable.jsx:81
+msgid "Including all add-ons"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:64
+#: src/admin/screen-licenses/components/PricingTable.jsx:77
+msgid "5 sites"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:66
+msgid "For large publishing companies and agencies managing multiple sites"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingTable.jsx:70
+msgid "Scale to multiple sites"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: src/admin/screen-licenses/components/PricingModal.jsx:25
+msgid "Free"
+msgstr ""
+
+#: assets/dist/app.js:1
+#: assets/dist/app.js:9
+#: assets/dist/app.js:10
+#: src/admin/screen-licenses/components/LicenseItem.jsx:351
+#: src/admin/screen-licenses/components/LicenseItem.jsx:416
+#: src/admin/screen-licenses/components/PricingModal.jsx:28
+msgid "Upgrade plan"
+msgstr ""
+
+#. translators: %s: Current plan name (e.g. Free).
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/PricingModal.jsx:49
+#, js-format
+msgid "Current plan: %s"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/EmptyState.jsx:37
+msgid "No active licenses there yet"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/EmptyState.jsx:40
+msgid "Purchase a license to unlock premium features."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/EmptyState.jsx:45
+msgid "Free plugins don’t require a license and won’t appear here."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/EmptyState.jsx:55
+msgid "Connect license"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/EmptyState.jsx:63
+msgid "Buy license"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/EmptyState.jsx:70
+msgid "Buy plan"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:195
+msgid "This license could not be upgraded to the selected plan. Ensure upgrade paths are configured in the shop (Pro → All Access), then try again."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:204
+msgid "This license could not be renewed. It may not be expired, renewals may be disabled on the shop, or the license may be lifetime."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:213
+msgid "License connection failed. The link may have expired — try connecting again from the license screen."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:222
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:253
+msgid "Could not reach the license server. Check your connection and try again."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:231
+msgid "This account has no licenses. Please connect with another account or buy a license."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:399
+msgid "Dismiss notice"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:261
+msgid "Failed to activate license on the shop."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/utils.js:1614
+msgid "License purchased successfully"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/utils.js:1615
+msgid "License upgraded successfully"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/utils.js:1616
+msgid "License renewed successfully"
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/utils.js:1619
+msgid "Your license is ready."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/utils.js:1620
+msgid "Your license is ready. Use 'activate' to set it up on this site."
+msgstr ""
+
+#: assets/dist/app.js:2
+#: src/admin/screen-licenses/utils.js:1624
+msgid "Your license is ready. Use 'Download and activate' to set it up on this site."
+msgstr ""
+
+#. translators: %s: license product name
+#: assets/dist/app.js:3
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:539
+#, js-format
+msgid "%s has expired. Renew to restore updates and support."
+msgstr ""
+
+#. translators: 1: license name, 2: days remaining
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/LicenseNotices.jsx:558
+#, js-format
+msgid "%1$s expires in %2$s days. Renew to avoid interruption."
+msgstr ""
+
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:89
+msgid "Activation failed."
+msgstr ""
+
+#: assets/dist/app.js:4
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:158
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:199
+msgid "Deactivating…"
+msgstr ""
+
+#: assets/dist/app.js:4
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:132
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:162
+msgid "Deactivation failed."
+msgstr ""
+
+#: assets/dist/app.js:4
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:181
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:200
+msgid "Deactivate"
+msgstr ""
+
+#: assets/dist/app.js:4
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:196
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:209
+msgid "Activating…"
+msgstr ""
+
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:197
+msgid "Installing…"
+msgstr ""
+
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:227
+msgid "Plugin active"
+msgstr ""
+
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:265
+msgid "Installation failed"
+msgstr ""
+
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:111
+msgid "Installation failed."
+msgstr ""
+
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:275
+msgid "Download and install"
+msgstr ""
+
+#: assets/dist/app.js:4
+#: src/admin/screen-licenses/components/AddonRowActions.jsx:284
+msgid "Manual install"
+msgstr ""
+
+#. translators: %d: Number of included add-ons.
+#: assets/dist/app.js:5
+#: src/admin/screen-licenses/components/AddonsList.jsx:158
+#, js-format
+msgid "Included add-ons (%d)"
+msgstr ""
+
+#: assets/dist/app.js:5
+#: src/admin/screen-licenses/utils.js:1084
+msgid "All installed"
+msgstr ""
+
+#. translators: %d: Total number of included add-ons.
+#: assets/dist/app.js:6
+#: src/admin/screen-licenses/utils.js:1090
+#, js-format
+msgid "None installed (%d add-ons)"
+msgstr ""
+
+#. translators: 1: Number installed, 2: Total add-ons, 3: Number downloaded but not finished.
+#: assets/dist/app.js:7
+#: src/admin/screen-licenses/utils.js:1098
+#, js-format
+msgid "%1$d of %2$d installed (%3$d ready)"
+msgstr ""
+
+#. translators: 1: Number installed, 2: Total add-ons.
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/utils.js:1107
+#, js-format
+msgid "%1$d of %2$d installed"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/LicenseStatus.jsx:38
+msgid "Renew"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AutoUpdateModal.jsx:24
+msgid "Plugin auto-updates"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AutoUpdateModal.jsx:50
+msgid "Enable plugin auto-updates"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/AutoUpdateModal.jsx:58
+msgid "When enabled, updates are automatically installed. When off, you'll be notified when updates are available to install."
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:71
+msgid "Automatic setup didn't complete"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:86
+msgid "All set"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:89
+msgid "Your license and plugin are fully set up and ready to use."
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/DownloadActivateButton.jsx:210
+msgid "Download and activate"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/utils.js:1182
+#: src/admin/screen-licenses/utils.js:1195
+msgid "On"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/utils.js:1185
+#: src/admin/screen-licenses/utils.js:1196
+msgid "Off"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/utils.js:1188
+msgid "Mixed"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/utils.js:1222
+msgid "All add-ons"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/LicenseItem.jsx:216
+msgid "License type:"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/LicenseItem.jsx:220
+msgid "License status:"
+msgstr ""
+
+#: assets/dist/app.js:8
+#: src/admin/screen-licenses/components/LicenseItem.jsx:230
+msgid "Sites:"
+msgstr ""
+
+#. translators: 1: Number of sites activated, 2: Number of sites in the license.
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:236
+#, js-format
+msgid "%1$s of %2$s used"
+msgstr ""
+
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:255
+msgid "License key:"
+msgstr ""
+
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:263
+msgid "Purchase date:"
+msgstr ""
+
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:269
+msgid "Renews:"
+msgstr ""
+
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:270
+msgid "License expiration:"
+msgstr ""
+
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:278
+msgid "Auto-updates:"
+msgstr ""
+
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:300
+msgid "Add-ons:"
+msgstr ""
+
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:339
+msgid "Manage"
+msgstr ""
+
+#: assets/dist/app.js:9
+#: src/admin/screen-licenses/components/LicenseItem.jsx:362
+msgid "Renew license"
+msgstr ""
+
+#. translators: 1: Number of sites activated, 2: Number of sites in the license.
+#: assets/dist/app.js:10
+#: src/admin/screen-licenses/components/LicenseItem.jsx:397
+#, js-format
+msgid "Activated on %1$s out of %2$s sites."
+msgstr ""
+
+#: assets/dist/app.js:10
+#: src/admin/screen-support/components/SearchBox.jsx:16
+msgid "How can we help?"
+msgstr ""
+
+#: assets/dist/app.js:10
+#: src/admin/screen-support/components/SearchBox.jsx:19
+msgid "Search for a topic or browse our documentation."
+msgstr ""
+
+#: assets/dist/app.js:10
+#: src/admin/screen-support/components/SearchBox.jsx:27
+msgid "Search help articles, guides and FAQs"
+msgstr ""
+
+#: assets/dist/app.js:10
+#: src/admin/screen-support/faqs/getting-started.jsx:7
+msgid "<strong>Using placements for delivery is best practice</strong>, whether you are inserting a single ad or an ad group. Even if you prefer working with shortcodes, you can use a <strong>Manual Placement</strong>, which also provides a shortcode. This gives you the flexibility of shortcode insertion while still keeping centralized control."
+msgstr ""
+
+#: assets/dist/app.js:10
+#: src/admin/screen-support/faqs/getting-started.jsx:11
+msgid "<strong>Here’s why that matters:</strong> If you manually insert an ad shortcode into 100 individual posts and later stop working with that advertiser, you would need to edit all 100 posts to remove or replace the shortcode (unless it’s embedded in a template). With placements, you simply replace or disable the ad (or ad group) assigned to that placement, and the change is applied everywhere instantly. This significantly reduces maintenance effort and makes your setup more scalable and future-proof."
+msgstr ""
+
+#. translators: 1: link to purchase licenses page, 2: closing anchor tag
+#: assets/dist/app.js:11
+#: src/admin/screen-support/faqs/activate-license.jsx:9
+#, js-format
+msgid "Testing sites do not count towards your Advanced Ads site limit. We automatically detect testing sites based on the URL patterns in %1$sthis list%2$s."
+msgstr ""
+
+#. translators: 1: link to purchase licenses page, 2: closing anchor tag
+#: assets/dist/app.js:12
+#: src/admin/screen-support/faqs/activate-license.jsx:19
+#, js-format
+msgid "If you are running the plugin on one of those URLs, the activation works even if you hit your limit. You can always manage license activations in %1$syour account%2$s."
+msgstr ""
+
+#: assets/dist/app.js:12
+#: src/admin/screen-support/faqs/activate-license.jsx:30
+msgid "Many customers maintain a local, non-public site for testing, or troubleshooting purposes. This setup is particularly helpful for staging complex changes and verifying their expected behaviour before releasing it to the public."
+msgstr ""
+
+#: assets/dist/app.js:12
+#: src/admin/screen-support/faqs/video-ads.jsx:7
+msgid "In general, <strong>video ads tend to generate higher engagement rates</strong> compared to static image ads, primarily because motion naturally draws user attention, especially on content-heavy pages where users are scrolling quickly. That moving part will make users stop scrolling and check."
+msgstr ""
+
+#. translators: 1: link to video ads guide, 2: link to video ads configuration guide, 3: closing anchor tag
+#: assets/dist/app.js:13
+#: src/admin/screen-support/faqs/video-ads.jsx:13
+#, js-format
+msgid "%1$sRead more%3$s about video ads, and %2$slearn how to configure them%3$s using Advanced Ads."
+msgstr ""
+
+#: assets/dist/app.js:13
+#: src/admin/screen-support/faqs/video-ads.jsx:26
+msgid "Performance is highly dependent on several factors:"
+msgstr ""
+
+#: assets/dist/app.js:13
+#: src/admin/screen-support/faqs/video-ads.jsx:32
+msgid "Your audience and niche"
+msgstr ""
+
+#: assets/dist/app.js:13
+#: src/admin/screen-support/faqs/video-ads.jsx:33
+msgid "Placement position"
+msgstr ""
+
+#: assets/dist/app.js:13
+#: src/admin/screen-support/faqs/video-ads.jsx:34
+msgid "Page load performance"
+msgstr ""
+
+#: assets/dist/app.js:13
+#: src/admin/screen-support/faqs/video-ads.jsx:36
+msgid "The quality and relevance of the creative"
+msgstr ""
+
+#: assets/dist/app.js:13
+#: src/admin/screen-support/faqs/video-ads.jsx:41
+msgid "How intrusive the format is"
+msgstr ""
+
+#: assets/dist/app.js:13
+#: src/admin/screen-support/faqs/video-ads.jsx:45
+msgid "While video ads often deliver stronger engagement metrics (CTR, viewability, time on ad), they can also negatively impact user experience and performance if not implemented carefully."
+msgstr ""
+
+#. translators: 1: link to purchase licenses page, 2: closing anchor tag
+#: assets/dist/app.js:14
+#: src/admin/screen-support/faqs/subscription-not-working.jsx:9
+#, js-format
+msgid "This is likely because you haven’t installed the additional add-ons. Please log in to your Advanced Ads account, download the necessary add-ons, and upload the downloaded zip files to your WordPress site. Install and activate them as you would any other WordPress plugin. %1$sHow to install an Add-On%2$s"
+msgstr ""
+
+#. translators: 1: link to cache busting page, 2: closing anchor tag
+#: assets/dist/app.js:15
+#: src/admin/screen-support/faqs/cached-websites.jsx:9
+#, js-format
+msgid "Yes, it does. However, if you plan to deliver ads dynamically based on specific conditions or rotate multiple ads within the same placement, you’ll need to enable %1$sCache Busting%2$s. You can enable this option by going to: Advanced Ads → Settings → Pro → Cache Busting"
+msgstr ""
+
+#. translators: 1: link to shareable link page, 2: closing anchor tag
+#: assets/dist/app.js:16
+#: src/admin/screen-support/faqs/share-statistics.jsx:9
+#, js-format
+msgid "%1$sAs shown here%2$s, the Tracking add-on allows you to generate non-indexed public statistics pages for each ad. You can share these links directly with your advertisers so they can view performance data, including impressions, clicks, a visual graph, and customizable date range filters."
+msgstr ""
+
+#. translators: 1: link to manage ads page, 2: closing anchor tag
+#: assets/dist/app.js:17
+#: src/admin/screen-support/faqs/manage-ads-across-multiple-installations.jsx:9
+#, js-format
+msgid "You can do this by using the <strong>Ad Server placement</strong>. It allows you to embed the generated JavaScript code or iframe on your other WordPress installations to deliver ads from your main site. Please review the feature’s limitations before implementation to ensure it fits your needs. %1$sYou can find more details here%2$s."
+msgstr ""
+
+#. translators: 1: link to manage ads page, 2: closing anchor tag
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/prevent-click-fraud.jsx:9
+#, js-format
+msgid "You can protect your ads by using the Click Fraud Protection feature included in Advanced Ads Pro. This feature automatically hides an ad once a defined number of clicks from the same user is reached, helping to prevent repeated or suspicious clicks and reducing the risk of fraudulent activity. %1$sYou can find more details here%2$s."
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/index.jsx:20
+msgid "What are best practices for getting started with Advanced Ads?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/index.jsx:27
+msgid "Are video ads better than image ads?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/index.jsx:31
+msgid "How do I activate my license on a test site?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/index.jsx:38
+msgid "I purchased a subscription but can’t see the features in the backend of my website. Why?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/index.jsx:45
+msgid "Does Advanced Ads work on cached websites?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/index.jsx:52
+msgid "How can I share the statistics of my ads with my clients?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/index.jsx:59
+msgid "Can I manage ads across multiple WordPress installations from one website?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/faqs/index.jsx:66
+msgid "How can I prevent click fraud on my ads?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/components/FAQs.jsx:25
+msgid "FAQ's"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/components/FAQs.jsx:29
+msgid "Everything you need to know about the product."
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/components/FAQs.jsx:37
+msgid "Couldn’t find what you were looking for?"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/components/FAQs.jsx:42
+msgid "Get help from the community."
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/components/FAQs.jsx:54
+msgid "Visit WordPress Forum"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/components/Videos.jsx:27
+msgid "Video tutorials"
+msgstr ""
+
+#: assets/dist/app.js:18
+#: src/admin/screen-support/components/Videos.jsx:52
+msgid "View all videos tutorials on YouTube"
+msgstr ""
+
+#. translators: 1: opening a tag, 2: opening a tag, 3: closing a tag
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:33
+#, js-format
+msgid "By submitting this form, I accept the %1$sTerms%3$s and %2$sPrivacy Policy%3$s and consent that my personal information in this form will be stored and processed for the purposes of providing support."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:136
+msgid "Get help from our support team"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:145
+msgid "Describe your issue and our support team will review it as soon as possible. You’ll receive a confirmation email after submitting your request."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/utils.js:35
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/utils.js:33
+msgid "Please enter your email address."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/utils.js:42
+msgid "Please enter a subject."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/utils.js:46
+msgid "Please enter your message."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/utils.js:50
+msgid "Please accept the terms and privacy policy to continue."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:109
+msgid "Ticket submitted"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:110
+msgid "Your ticket has been submitted successfully."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:118
+#: src/admin/screen-support/components/TicketModal.jsx:122
+msgid "Failed to submit form"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:126
+msgid "Something went wrong."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:160
+msgid "Email address"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:210
+msgid "Subject"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:219
+msgid "Enter the subject of your issue"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:261
+msgid "Your Message"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:272
+msgid "Enter the message of your issue"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/TicketModal.jsx:389
+msgid "Submit"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/PaidSupport.jsx:16
+msgid "As a paid user, you receive <strong>priority, premium support from our specialists</strong>. Submit a support ticket and get fast, tailored assistance to resolve your request."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/PaidSupport.jsx:37
+msgid "Access Priority Support"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/PaidSupport.jsx:51
+msgid "Submit a ticket"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/SupportForum.jsx:12
+msgid "Upgrade to <strong>A2 Pro</strong> to get:"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/SupportForum.jsx:21
+msgid "Need more help?"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/SupportForum.jsx:24
+msgid "On the free plan, support is available via guides and community forums."
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/SupportForum.jsx:32
+msgid "Priority support from our team"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/SupportForum.jsx:38
+msgid "Help directly inside the plugin"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/SupportForum.jsx:43
+msgid "Faster issue resolution"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/components/SupportForum.jsx:52
+msgid "Upgrade to Premium"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/Support.jsx:29
+msgid "Getting started"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/Support.jsx:32
+#: src/admin/screen-support/Support.jsx:58
+msgid "View all articles"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/Support.jsx:42
+msgid "Latest tutorials"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/Support.jsx:45
+msgid "View all tutorials"
+msgstr ""
+
+#: assets/dist/app.js:19
+#: src/admin/screen-support/Support.jsx:55
+msgid "Articles"
 msgstr ""

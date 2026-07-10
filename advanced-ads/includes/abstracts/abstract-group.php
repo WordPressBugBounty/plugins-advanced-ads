@@ -18,6 +18,7 @@ use AdvancedAds\Frontend\Stats;
 use AdvancedAds\Interfaces\Entity_Interface;
 use AdvancedAds\Interfaces\Group_Type;
 use AdvancedAds\Traits;
+use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
@@ -97,7 +98,7 @@ class Group extends Data implements Entity_Interface {
 		parent::__construct();
 
 		$this->set_group_id( $group );
-		$this->data_store = wp_advads_get_group_repository();
+		$this->data_store = wp_advads()->groups->repository;
 
 		if ( $this->get_id() > 0 ) {
 			$this->data_store->read( $this );
@@ -611,12 +612,11 @@ class Group extends Data implements Entity_Interface {
 		}
 
 		if ( ! class_exists( 'Advanced_Ads_Pro' ) ) {
-			$installed_plugins = get_plugins();
-
 			$link       = 'https://wpadvancedads.com/add-ons/advanced-ads-pro/?utm_source=advanced-ads&utm_medium=link&utm_campaign=groups-CB';
 			$link_title = __( 'Get this add-on', 'advanced-ads' );
-			if ( isset( $installed_plugins['advanced-ads-pro/advanced-ads-pro.php'] ) ) {
-				$link       = wp_nonce_url( 'plugins.php?action=activate&amp;plugin=advanced-ads-pro/advanced-ads-pro.php', 'activate-plugin_advanced-ads-pro/advanced-ads-pro.php' );
+			$pro_file   = Addons::resolve_installed_plugin_file( 'pro' );
+			if ( null !== $pro_file ) {
+				$link       = wp_nonce_url( 'plugins.php?action=activate&amp;plugin=' . $pro_file, 'activate-plugin_' . $pro_file );
 				$link_title = __( 'Activate now', 'advanced-ads' );
 			}
 

@@ -1,6 +1,7 @@
 <?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
 
 use AdvancedAds\Admin\Translation_Promo;
+use AdvancedAds\Utilities\WordPress;
 
 /**
  * Container class for callbacks for overview widgets
@@ -131,7 +132,7 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 		$report_filter = get_option( 'advanced-ads-adsense-dashboard-filter', '' );
 
 		if ( ! $report_filter ) {
-			$report_filter = self::get_site_domain();
+			$report_filter = WordPress::get_site_domain();
 		}
 
 		if ( '*' === $report_filter ) {
@@ -175,18 +176,6 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 			self::$gadsense_dashboard_nonce = wp_create_nonce( 'advads-gadsense-dashboard' );
 		}
 		return self::$gadsense_dashboard_nonce;
-	}
-
-	/**
-	 * Extracts the domain from the site url
-	 *
-	 * @return string the domain, that was extracted from get_site_url()
-	 */
-	public static function get_site_domain() {
-		$site = get_site_url();
-		preg_match( '|^([\d\w]+://)?([^/]+)|', $site, $matches );
-
-		return count( $matches ) > 1 ? $matches[2] : null;
 	}
 
 	/**

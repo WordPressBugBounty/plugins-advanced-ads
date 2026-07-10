@@ -8,14 +8,14 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  */
 
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Ad;
 use AdvancedAds\Abstracts\Group;
-use AdvancedAds\Framework\Utilities\Params;
-use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Constants;
 use AdvancedAds\Content_Injector;
-use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Installation\Capabilities;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
 
 /**
  * Plugin class. This class should ideally be used to work with the
@@ -83,13 +83,6 @@ class Advanced_Ads {
 	 * @var bool
 	 */
 	private $is_main_query;
-
-	/**
-	 * Save number of ads
-	 *
-	 * @var array
-	 */
-	private $number_of_ads = [];
 
 	/**
 	 * Initialize frontend features

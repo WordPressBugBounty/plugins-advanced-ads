@@ -9,6 +9,8 @@
 
 namespace AdvancedAds\Admin;
 
+use AdvancedAds\License\License_Utils;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -127,6 +129,7 @@ class EDD_Updater {
 	public function init() {
 		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ] );
 		add_filter( 'plugins_api', [ $this, 'plugins_api_filter' ], 10, 3 );
+		add_filter( 'http_request_args', [ $this, 'http_request_args' ], 10, 2 );
 		add_action( 'after_plugin_row', [ $this, 'show_update_notification' ], 10, 2 );
 		add_action( 'admin_init', [ $this, 'show_changelog' ] );
 	}
@@ -151,7 +154,10 @@ class EDD_Updater {
 		}
 
 		if ( ! empty( $_transient_data->response ) && ! empty( $_transient_data->response[ $this->name ] ) && false === $this->wp_override ) {
-			return $_transient_data;
+			$existing = $_transient_data->response[ $this->name ];
+			if ( ! empty( $existing->package ) ) {
+				return $_transient_data;
+			}
 		}
 
 		$current = $this->get_update_transient_data();
@@ -225,7 +231,7 @@ class EDD_Updater {
 		$limited_data->slug         = $this->slug;
 		$limited_data->plugin       = $this->name;
 		$limited_data->url          = $version_info->url ?? '';
-		$limited_data->package      = $version_info->package;
+		$limited_data->package      = $this->resolve_package_url( $version_info );
 		$limited_data->icons        = $this->convert_object_to_array( $version_info->icons );
 		$limited_data->banners      = $this->convert_object_to_array( $version_info->banners );
 		$limited_data->new_version  = $version_info->new_version;
@@ -509,10 +515,33 @@ class EDD_Updater {
 	 */
 	public function http_request_args( $args, $url ) {
 
-		if ( strpos( $url, 'https://' ) !== false && strpos( $url, 'edd_action=package_download' ) ) {
+		if ( is_string( $url ) && (
+			str_contains( $url, 'edd_action=package_download' )
+			|| str_contains( $url, '/edd-sl/package_download/' )
+		) ) {
 			$args['sslverify'] = $this->verify_ssl();
 		}
+
 		return $args;
+	}
+
+	/**
+	 * Resolve package download URL from shop get_version payload.
+	 *
+	 * @param object $version_info Remote version payload.
+	 * @return string
+	 */
+	private function resolve_package_url( $version_info ): string {
+		$package = is_object( $version_info ) ? trim( (string) ( $version_info->package ?? '' ) ) : '';
+		if ( '' !== $package ) {
+			return $package;
+		}
+
+		if ( is_object( $version_info ) ) {
+			return trim( (string) ( $version_info->download_link ?? '' ) );
+		}
+
+		return '';
 	}
 
 	/**
@@ -666,11 +695,23 @@ class EDD_Updater {
 
 		$body = json_decode( wp_remote_retrieve_body( $request ) );
 
-		if ( $body && isset( $body->sections ) ) {
-			$body->sections = maybe_unserialize( $body->sections );
-		} else {
-			$body = false;
+		if ( ! $body || ! is_object( $body ) ) {
+			$this->log_failed_request();
+
+			return false;
 		}
+
+		if ( isset( $body->sections ) ) {
+			$body->sections = maybe_unserialize( $body->sections );
+		}
+
+		if ( '' === $this->resolve_package_url( $body ) ) {
+			$this->log_failed_request();
+
+			return false;
+		}
+
+		$body->package = $this->resolve_package_url( $body );
 
 		if ( $body && isset( $body->banners ) ) {
 			$body->banners = maybe_unserialize( $body->banners );
@@ -747,7 +788,9 @@ class EDD_Updater {
 	 * @return bool
 	 */
 	private function verify_ssl() {
-		return (bool) apply_filters( 'edd_sl_api_request_verify_ssl', true, $this );
+		$default = License_Utils::should_verify_ssl_for_url( $this->api_url );
+
+		return (bool) apply_filters( 'edd_sl_api_request_verify_ssl', $default, $this );
 	}
 
 	/**

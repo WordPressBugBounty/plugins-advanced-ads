@@ -15,7 +15,6 @@ use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Ad;
 use Advanced_Ads_Admin_Notices;
 use AdvancedAds\Frontend\Stats;
-use Advanced_Ads_Admin_Licenses;
 use Advanced_Ads_Ad_Blocker_Admin;
 use Advanced_Ads_Ad_Health_Notices;
 use Advanced_Ads_Display_Conditions;
@@ -55,8 +54,6 @@ class AJAX implements Integration_Interface {
 		add_action( 'wp_ajax_advads-close-notice', [ $this, 'close_notice' ] );
 		add_action( 'wp_ajax_advads-hide-notice', [ $this, 'hide_notice' ] );
 		add_action( 'wp_ajax_advads-subscribe-notice', [ $this, 'subscribe' ] );
-		add_action( 'wp_ajax_advads-activate-license', [ $this, 'activate_license' ] );
-		add_action( 'wp_ajax_advads-deactivate-license', [ $this, 'deactivate_license' ] );
 		add_action( 'wp_ajax_advads-adblock-rebuild-assets', [ $this, 'adblock_rebuild_assets' ] );
 		add_action( 'wp_ajax_advads-post-search', [ $this, 'post_search' ] );
 		add_action( 'wp_ajax_advads-ad-injection-content', [ $this, 'inject_placement' ] );
@@ -603,63 +600,6 @@ class AJAX implements Integration_Interface {
 		}
 
 		wp_send_json_success( [ 'message' => Advanced_Ads_Admin_Notices::get_instance()->subscribe( $notice ) ] );
-	}
-
-	/**
-	 * Activate license of an add-on
-	 *
-	 * @since 1.5.7
-	 */
-	public function activate_license() {
-		if ( ! Conditional::user_can( 'advanced_ads_manage_options' ) ) {
-			return;
-		}
-
-		check_ajax_referer( 'advads_ajax_license_nonce', 'security' );
-
-		$addon = Params::post( 'addon' );
-		if ( '' === $addon ) {
-			die();
-		}
-
-		// phpcs:disable
-		echo Advanced_Ads_Admin_Licenses::get_instance()->activate_license(
-			$addon,
-			Params::post( 'pluginname' ),
-			Params::post( 'optionslug' ),
-			Params::post( 'license' )
-		);
-		// phpcs:enable
-
-		die();
-	}
-
-	/**
-	 * Deactivate license of an add-on
-	 *
-	 * @since 1.6.11
-	 */
-	public function deactivate_license() {
-		if ( ! Conditional::user_can( 'advanced_ads_manage_options' ) ) {
-			return;
-		}
-
-		check_ajax_referer( 'advads_ajax_license_nonce', 'security' );
-
-		$addon = Params::post( 'addon' );
-		if ( '' === $addon ) {
-			die();
-		}
-
-		// phpcs:disable
-		echo Advanced_Ads_Admin_Licenses::get_instance()->deactivate_license(
-			$addon,
-			Params::post( 'pluginname' ),
-			Params::post( 'optionslug' )
-		);
-		// phpcs:enable
-
-		die();
 	}
 
 	/**

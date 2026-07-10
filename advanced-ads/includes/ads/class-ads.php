@@ -9,42 +9,38 @@
 
 namespace AdvancedAds\Ads;
 
-use AdvancedAds\Framework\Interfaces\Initializer_Interface;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Ads Ads.
  */
-class Ads implements Initializer_Interface {
+class Ads {
 
 	/**
 	 * Hold factory instance
 	 *
 	 * @var Ad_Factory
 	 */
-	public $factory = null;
+	public $factory;
 
 	/**
 	 * Hold repository instance
 	 *
 	 * @var Ad_Repository
 	 */
-	public $repository = null;
+	public $repository;
 
 	/**
 	 * Hold types manager
 	 *
 	 * @var Ad_Types
 	 */
-	public $types = null;
+	public $types;
 
 	/**
-	 * Runs this initializer.
-	 *
-	 * @return void
+	 * Construct ads services.
 	 */
-	public function initialize(): void {
+	public function __construct() {
 		$this->factory    = new Ad_Factory();
 		$this->types      = new Ad_Types();
 		$this->repository = new Ad_Repository();

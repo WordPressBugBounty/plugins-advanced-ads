@@ -9,9 +9,9 @@
 
 namespace AdvancedAds\Admin;
 
-use AdvancedAds\Framework\Utilities\Params;
-use AdvancedAds\Framework\Utilities\Formatting;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Formatting;
+use AdvancedAds\Framework\Utilities\Params;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -40,30 +40,56 @@ class Page_Quick_Edit implements Integration_Interface {
 	public function save_bulk_edit_fields() {
 		// Not bulk edit, not post/page or not enough permissions.
 		if (
-			! wp_verify_nonce( sanitize_key( Params::get( '_wpnonce', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ), 'bulk-posts' )
-			|| ! in_array( sanitize_key( Params::get( 'post_type' ) ), [ 'post', 'page' ], true )
+			! wp_verify_nonce( sanitize_key( Params::request( '_wpnonce', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ), 'bulk-posts' )
+			|| ! in_array( sanitize_key( Params::request( 'post_type' ) ), [ 'post', 'page' ], true )
 			|| ! current_user_can( 'edit_posts' )
 		) {
 			return;
 		}
-		$disable_ads         = Params::get( 'advads_disable_ads', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$disable_the_content = Params::get( 'advads_disable_the_content', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$disable_ads         = Params::request( 'advads_disable_ads', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$disable_the_content = Params::request( 'advads_disable_the_content', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
 		if ( empty( $disable_ads ) && empty( $disable_the_content ) ) {
 			return;
 		}
 
-		$ids = Params::get( 'post', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$ids = Params::request( 'post', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
 
+		$this->update_bulk_ad_settings_for_posts( $ids, $disable_ads, $disable_the_content );
+	}
+
+	/**
+	 * Update ad settings meta for bulk-edited posts.
+	 *
+	 * @param array<int|string> $ids                 Post IDs from the bulk edit form.
+	 * @param string            $disable_ads         Disable ads field value.
+	 * @param string            $disable_the_content Disable the content field value.
+	 *
+	 * @return void
+	 */
+	private function update_bulk_ad_settings_for_posts( array $ids, string $disable_ads, string $disable_the_content ): void {
 		foreach ( $ids as $id ) {
-			$meta = get_post_meta( (int) $id, '_advads_ad_settings', true );
+			$post_id = (int) $id;
+			if ( $post_id <= 0 || ! current_user_can( 'edit_post', $post_id ) ) {
+				continue;
+			}
+
+			$post = get_post( $post_id );
+			if ( ! $post || ! in_array( $post->post_type, [ 'post', 'page' ], true ) ) {
+				continue;
+			}
+
+			$meta = get_post_meta( $post_id, '_advads_ad_settings', true );
+			if ( ! is_array( $meta ) ) {
+				$meta = [];
+			}
 			if ( ! empty( $disable_ads ) ) {
 				$meta['disable_ads'] = Formatting::string_to_bool( $disable_ads ) ? 1 : 0;
 			}
 			if ( ! empty( $disable_the_content ) ) {
 				$meta['disable_the_content'] = Formatting::string_to_bool( $disable_the_content ) ? 1 : 0;
 			}
-			update_post_meta( (int) $id, '_advads_ad_settings', $meta );
+			update_post_meta( $post_id, '_advads_ad_settings', $meta );
 		}
 	}
 

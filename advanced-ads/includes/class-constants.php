@@ -108,6 +108,52 @@ class Constants {
 	 */
 	const CRON_JOB_AD_EXPIRATION = 'advanced-ads-ad-expiration';
 
+	/**
+	 * License expiry: one month before expiration.
+	 *
+	 * @var string
+	 */
+	const CRON_JOB_LICENSE_EXPIRY_ONE_MONTH = 'advanced-ads-license-expiry-one-month';
+
+	/**
+	 * License expiry: ten days before expiration.
+	 *
+	 * @var string
+	 */
+	const CRON_JOB_LICENSE_EXPIRY_TEN_DAYS = 'advanced-ads-license-expiry-ten-days';
+
+	/**
+	 * License expiry: two hours after expiration (grace).
+	 *
+	 * @var string
+	 */
+	const CRON_JOB_LICENSE_EXPIRY_GRACE = 'advanced-ads-license-expiry-grace';
+
+	/**
+	 * Action Scheduler group for Advanced Ads cron jobs.
+	 *
+	 * @var string
+	 */
+	const CRON_GROUP_ADVANCED_ADS = 'advanced_ads';
+
+	/**
+	 * Legacy daily license validate cron hook (unschedule on deactivate only).
+	 *
+	 * @var string
+	 */
+	const CRON_JOB_LICENSE_VALIDATE = 'advanced-ads-license-validate';
+
+	/**
+	 * License expiry cron hooks mapped to milestone level keys.
+	 *
+	 * @var array<string, string>
+	 */
+	const LICENSE_EXPIRY_CRONS = [
+		self::CRON_JOB_LICENSE_EXPIRY_ONE_MONTH => 'month',
+		self::CRON_JOB_LICENSE_EXPIRY_TEN_DAYS  => 'ten_days',
+		self::CRON_JOB_LICENSE_EXPIRY_GRACE     => 'grace',
+	];
+
 	/* Meta keys ------------------- */
 
 	/**
@@ -181,6 +227,14 @@ class Constants {
 	 * @const string
 	 */
 	const API_ENDPOINT = 'https://wpadvancedads.com/license-api/';
+
+	/**
+	 * License key exchange endpoint (legacy map → rich records).
+	 * Override with filter `advanced_ads_license_exchange_url` in License_Exchange.
+	 *
+	 * @const string
+	 */
+	const LICENSE_EXCHANGE_ENDPOINT = 'https://wpadvancedads.com/license-api/exchange';
 
 	/**
 	 * Add-on slugs and their EDD ID

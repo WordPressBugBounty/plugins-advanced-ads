@@ -95,7 +95,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				. sprintf(
 					/* translators: %s is a target URL. */
 					__( 'Please add valid license keys <a href="%s">here</a>.', 'advanced-ads' ),
-					get_admin_url( null, 'admin.php?page=advanced-ads-settings#top#licenses' )
+					\AdvancedAds\License\License_Utils::admin_screen_url()
 				),
 			'type'    => 'problem',
 			'hide'    => false,

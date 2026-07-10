@@ -10,7 +10,7 @@
 namespace AdvancedAds\Installation;
 
 use AdvancedAds\Constants;
-use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 
 defined( 'ABSPATH' ) || exit;
@@ -60,7 +60,7 @@ class Compatibility implements Integration_Interface {
 			return;
 		}
 
-		$plugins = WordPress::get_wp_plugins();
+		$plugins = Addons::get_plugins_by_text_domain( true );
 		foreach ( Constants::ADDONS_NON_COMPATIBLE_VERSIONS as $version => $slug ) {
 			$addon = $plugins[ $slug ] ?? null;
 			if ( ! $addon || ! is_plugin_active( $addon['file'] ) ) {

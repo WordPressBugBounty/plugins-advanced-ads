@@ -1,7 +1,6 @@
 <?php // phpcs:ignore WordPress.Files.FileName
 
 use AdvancedAds\Abstracts\Ad;
-use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Framework\Utilities\Params;
 
 /**
@@ -192,7 +191,16 @@ class Advanced_Ads_Display_Conditions {
 	 * @since 1.8.12
 	 */
 	public function get_conditions() {
-		uasort( $this->conditions, [ WordPress::class, 'sort_array_by_label' ] );
+		uasort(
+			$this->conditions,
+			static function ( $a, $b ) {
+				if ( ! isset( $a['label'], $b['label'] ) ) {
+					return 0;
+				}
+
+				return strcmp( strtolower( $a['label'] ), strtolower( $b['label'] ) );
+			}
+		);
 
 		return $this->conditions;
 	}

@@ -8,6 +8,7 @@
  */
 
 use AdvancedAds\Abstracts\Ad;
+use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Framework\Utilities\Arr;
@@ -204,7 +205,7 @@ class Advanced_Ads_Admin_Notices {
 		}
 
 		$addons  = \AdvancedAds\Constants::ADDONS_NON_COMPATIBLE_VERSIONS;
-		$plugins = WordPress::get_wp_plugins();
+		$plugins = Addons::get_plugins_by_text_domain( true );
 		$options = $this->options();
 		$queue   = isset( $options['queue'] ) ? $options['queue'] : [];
 		$closed  = isset( $options['closed'] ) ? $options['closed'] : [];

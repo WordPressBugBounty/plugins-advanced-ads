@@ -2,6 +2,11 @@
 /**
  * Admin Addon Updater.
  *
+ * License keys and validity come from {@see \AdvancedAds\License\License}:
+ * - {@see License::get_addon_key_map()} — rich app-licenses + site activation list
+ * - {@see License::get_mirror_status_for_options_slug()} — EDD-compatible status
+ * - {@see License::get_mirror_expires_for_options_slug()} — expiry from rich rows
+ *
  * @package AdvancedAds
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   1.50.0
@@ -10,8 +15,9 @@
 namespace AdvancedAds\Admin;
 
 use AdvancedAds\Constants;
+use AdvancedAds\License\License;
+use AdvancedAds\License\License_Utils;
 use AdvancedAds\Utilities\Data;
-use Advanced_Ads_Admin_Licenses;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 
 defined( 'ABSPATH' ) || exit;
@@ -22,57 +28,44 @@ defined( 'ABSPATH' ) || exit;
 class Addon_Updater implements Integration_Interface {
 
 	/**
-	 * Get the license manager.
-	 *
-	 * @var \Advanced_Ads_Admin_Licenses
-	 */
-	private $manager = null;
-
-	/**
 	 * Hook into WordPress.
 	 *
 	 * @return void
 	 */
 	public function hooks(): void {
-		$this->manager = Advanced_Ads_Admin_Licenses::get_instance();
+		// Local/dev: WordPress blocks .test shop hosts (127.0.0.1) without this filter.
+		License::register_local_development_shop_http_filters();
 
 		if ( ! wp_doing_ajax() ) {
 			add_action( 'load-plugins.php', [ $this, 'plugin_licenses_warning' ] );
 		}
 
-		if ( ! wp_doing_ajax() ) {
-			add_action( 'admin_init', [ $this, 'add_on_updater' ], 1 );
-		}
-		add_action( 'advanced-ads-settings-init', [ $this, 'add_license_fields' ], 99 );
+		// Register on every admin request (including AJAX plugin updates).
+		add_action( 'admin_init', [ $this, 'add_on_updater' ], 1 );
 	}
 
 	/**
-	 * Register the Updater class for every add-on, which includes getting version information
+	 * Register the EDD updater for each add-on that has a license key on this site.
+	 *
+	 * @return void
 	 */
-	public function add_on_updater() {
-		// Ignore, if not main blog or if updater was disabled.
+	public function add_on_updater(): void {
 		if ( ( is_multisite() && ! is_main_site() ) || ! apply_filters( 'advanced-ads-add-ons-updater', true ) ) {
 			return;
 		}
 
-		$add_ons = Data::get_addons();
-		foreach ( $add_ons as $_add_on ) {
-			$_add_on_key  = $_add_on['id'];
-			$options_slug = $_add_on['options_slug'];
+		$addon_keys = License::get_addon_key_map();
 
-			// Check if a license expired over time.
-			$expiry_date = $this->manager->get_license_expires( $options_slug );
-			$now         = time();
-			if ( $expiry_date && 'lifetime' !== $expiry_date && strtotime( $expiry_date ) < $now ) {
-				// Remove license status.
-				delete_option( $options_slug . '-license-status' );
+		foreach ( Data::get_addons() as $_add_on ) {
+			$addon_id     = (string) ( $_add_on['id'] ?? '' );
+			$options_slug = (string) ( $_add_on['options_slug'] ?? '' );
+			$license_key  = trim( (string) ( $addon_keys[ $addon_id ] ?? '' ) );
+
+			if ( '' === $license_key ) {
+				continue;
 			}
 
-			// Retrieve our license key.
-			$licenses    = get_option( ADVADS_SLUG . '-licenses', [] );
-			$license_key = $licenses[ $_add_on_key ] ?? '';
-
-			( new EDD_Updater(
+			new EDD_Updater(
 				Constants::API_ENDPOINT,
 				$_add_on['path'],
 				[
@@ -81,12 +74,12 @@ class Addon_Updater implements Integration_Interface {
 					'item_id' => Constants::ADDON_SLUGS_ID[ $options_slug ] ?? false,
 					'author'  => 'Advanced Ads',
 				]
-			) );
+			);
 		}
 	}
 
 	/**
-	 * Initiate plugin checks
+	 * Show a license warning below add-ons with an invalid license on the plugins list.
 	 *
 	 * @since 1.7.12
 	 *
@@ -97,13 +90,12 @@ class Addon_Updater implements Integration_Interface {
 			return;
 		}
 
-		$add_ons = Data::get_addons();
-		foreach ( $add_ons as $_add_on ) {
+		foreach ( Data::get_addons() as $_add_on ) {
 			if ( 'slider-ads' === $_add_on['id'] ) {
 				continue;
 			}
 
-			if ( $this->manager->get_license_status( $_add_on['options_slug'] ) !== 'valid' ) {
+			if ( 'valid' !== License::get_mirror_status_for_options_slug( (string) $_add_on['options_slug'] ) ) {
 				$plugin_file = plugin_basename( $_add_on['path'] );
 				add_action( 'after_plugin_row_' . $plugin_file, [ $this, 'add_plugin_list_license_notice' ], 10, 2 );
 			}
@@ -135,52 +127,9 @@ class Addon_Updater implements Integration_Interface {
 					/* Translators: 1: add-on name 2: admin URL to license page */
 					__( 'There might be a new version of %1$s. Please <strong>provide a valid license key</strong> in order to receive updates and support <a href="%2$s">on this page</a>.', 'advanced-ads' ),
 					$plugin_data['Title'],
-					admin_url( 'admin.php?page=advanced-ads-settings#top#licenses' )
+					License_Utils::admin_screen_url()
 				)
 			)
 		);
-	}
-
-	/**
-	 * Add license fields to the settings page.
-	 *
-	 * @return void
-	 */
-	public function add_license_fields(): void {
-		$add_ons = Data::get_addons();
-		foreach ( $add_ons as $data ) {
-			if ( 'slider-ads' === $data['id'] ) {
-				continue;
-			}
-
-			add_settings_field(
-				$data['id'] . '-license',
-				$data['name'],
-				[ $this, 'render_license_field' ],
-				'advanced-ads-settings-license-page',
-				'advanced_ads_settings_license_section',
-				$data
-			);
-		}
-	}
-
-	/**
-	 * Render license key field
-	 *
-	 * @param array $data add-on data.
-	 *
-	 * @return void
-	 */
-	public function render_license_field( $data ): void {
-		$id             = $data['id'];
-		$licenses       = $this->manager->get_licenses();
-		$license_key    = $licenses[ $id ] ?? '';
-		$options_slug   = $data['options_slug'];
-		$license_status = $this->manager->get_license_status( $data['options_slug'] );
-		$index          = $id;
-		$plugin_name    = $data['name'];
-		$plugin_url     = $data['uri'];
-
-		include ADVADS_ABSPATH . 'admin/views/setting-license.php';
 	}
 }

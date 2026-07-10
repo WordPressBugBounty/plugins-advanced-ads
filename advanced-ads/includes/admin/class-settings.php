@@ -26,13 +26,6 @@ use AdvancedAds\Framework\Interfaces\Integration_Interface;
 class Settings implements Integration_Interface {
 
 	/**
-	 * Settings page slug
-	 *
-	 * @var string
-	 */
-	const ADVADS_SETTINGS_LICENSES = ADVADS_SLUG . '-licenses';
-
-	/**
 	 * Setting options
 	 *
 	 * @var array with plugin options
@@ -84,13 +77,6 @@ class Settings implements Integration_Interface {
 			];
 		}
 
-		$tabs['licenses'] = [
-			'page'  => 'advanced-ads-settings-license-page',
-			'group' => self::ADVADS_SETTINGS_LICENSES,
-			'tabid' => 'licenses',
-			'title' => __( 'Licenses', 'advanced-ads' ),
-		];
-
 		return $tabs;
 	}
 
@@ -104,14 +90,12 @@ class Settings implements Integration_Interface {
 	public function settings_init(): void {
 		$this->hook = wp_advads()->screens->get_hook( 'settings' );
 		register_setting( ADVADS_SLUG, ADVADS_SLUG, [ $this, 'sanitize_settings' ] );
-		register_setting( self::ADVADS_SETTINGS_LICENSES, self::ADVADS_SETTINGS_LICENSES );
 
 		$this->section_management();
 		$this->section_disable_ads();
 		$this->section_layout();
 		$this->section_content_injection();
 		$this->section_pro_pitches();
-		$this->section_licenses();
 
 		// hook for additional settings from add-ons.
 		do_action( 'advanced-ads-settings-init', $this->hook );
@@ -149,7 +133,6 @@ class Settings implements Integration_Interface {
 	 */
 	public function allow_save_settings( $options ) {
 		$options[] = ADVADS_SETTINGS_ADBLOCKER;
-		$options[] = self::ADVADS_SETTINGS_LICENSES;
 		return $options;
 	}
 
@@ -664,40 +647,5 @@ class Settings implements Integration_Interface {
 	public function render_settings_tracking_pitch_section_callback() {
 		echo '<br/>';
 		include ADVADS_ABSPATH . 'views/marketing/ad-metabox-tracking.php';
-	}
-
-	/**
-	 * Licenses section
-	 *
-	 * @return void
-	 */
-	private function section_licenses(): void {
-		add_settings_section(
-			'advanced_ads_settings_license_section',
-			'',
-			[ $this, 'render_settings_licenses_section_callback' ],
-			'advanced-ads-settings-license-page'
-		);
-
-		add_settings_section(
-			'advanced_ads_settings_license_pitch_section',
-			'',
-			[ $this, 'render_settings_licenses_pitch_section_callback' ],
-			'advanced-ads-settings-license-page'
-		);
-	}
-	/**
-	 * Render licenses settings section
-	 */
-	public function render_settings_licenses_section_callback() {
-		include ADVADS_ABSPATH . 'views/admin/settings/license/section-help.php';
-	}
-
-	/**
-	 * Render licenses pithces settings section
-	 */
-	public function render_settings_licenses_pitch_section_callback() {
-		echo '<h3>' . esc_attr__( 'Are you missing something?', 'advanced-ads' ) . '</h3>';
-		\Advanced_Ads_Overview_Widgets_Callbacks::render_addons( true, false );
 	}
 }

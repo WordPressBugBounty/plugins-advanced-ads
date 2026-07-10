@@ -49,6 +49,23 @@ class Placement_Types extends Types {
 	protected $type_interface = Placement_Type::class;
 
 	/**
+	 * Built-in placement type classes.
+	 *
+	 * @return string[]
+	 */
+	protected function default_type_classes(): array {
+		return [
+			After_Content::class,
+			Before_Content::class,
+			Content::class,
+			Footer::class,
+			Header::class,
+			Sidebar_Widget::class,
+			Standard::class,
+		];
+	}
+
+	/**
 	 * Register custom types.
 	 *
 	 * @return void
@@ -57,21 +74,6 @@ class Placement_Types extends Types {
 		parent::register_types();
 
 		$this->sort_types();
-	}
-
-	/**
-	 * Register default types.
-	 *
-	 * @return void
-	 */
-	protected function register_default_types(): void {
-		$this->register_type( After_Content::class );
-		$this->register_type( Before_Content::class );
-		$this->register_type( Content::class );
-		$this->register_type( Footer::class );
-		$this->register_type( Header::class );
-		$this->register_type( Sidebar_Widget::class );
-		$this->register_type( Standard::class );
 	}
 
 	/**

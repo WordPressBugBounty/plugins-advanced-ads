@@ -108,7 +108,7 @@ abstract class Ad extends Data implements Entity_Interface {
 		parent::__construct();
 
 		$this->set_ad_id( $ad );
-		$this->data_store = wp_advads_get_ad_repository();
+		$this->data_store = wp_advads()->ads->repository;
 
 		if ( $this->get_id() > 0 ) {
 			$this->data_store->read( $this );

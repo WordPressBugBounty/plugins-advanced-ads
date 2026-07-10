@@ -215,7 +215,7 @@ class List_Table extends Admin_List_Table {
 		}
 
 		$order = strtoupper( Params::get( 'order', 'asc' ) ) === 'DESC' ? 'DESC' : 'ASC';
-		$types_order = wp_advads_get_placement_type_manager()->get_types();
+		$types_order = wp_advads()->placements->types->get_types();
 		$types_order = array_keys( $types_order );
 
 		$order_strings = [

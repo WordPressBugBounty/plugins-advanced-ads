@@ -82,6 +82,8 @@ function the_ad_group( $id = 0, $args = [] ): void {
 /**
  * Get Group Factory
  *
+ * @deprecated 2.0.24 Use wp_advads()->groups->factory instead.
+ *
  * @return Group_Factory
  */
 function wp_advads_get_group_factory(): Group_Factory {
@@ -91,6 +93,8 @@ function wp_advads_get_group_factory(): Group_Factory {
 /**
  * Get Group Repository
  *
+ * @deprecated 2.0.24 Use wp_advads()->groups->repository instead.
+ *
  * @return Group_Repository
  */
 function wp_advads_get_group_repository(): Group_Repository {
@@ -99,6 +103,8 @@ function wp_advads_get_group_repository(): Group_Repository {
 
 /**
  * Get Group Types
+ *
+ * @deprecated 2.0.24 Use wp_advads()->groups->types instead.
  *
  * @return Group_Types
  */
@@ -116,7 +122,7 @@ function wp_advads_get_group_type_manager(): Group_Types {
  * @return Group|bool Group object or false if the group type not found.
  */
 function wp_advads_create_new_group( $type = 'default' ) {
-	return wp_advads_get_group_factory()->create_group( $type );
+	return wp_advads()->groups->factory->create_group( $type );
 }
 
 /**
@@ -142,7 +148,7 @@ function wp_advads_delete_group( &$group ): void {
  * @return void
  */
 function wp_advads_create_group_type( $type ): void {
-	wp_advads_get_group_type_manager()->create_missing( $type );
+	wp_advads()->groups->types->create_missing( $type );
 }
 
 /**
@@ -153,7 +159,7 @@ function wp_advads_create_group_type( $type ): void {
  * @return void
  */
 function wp_advads_register_group_type( $classname ): void {
-	wp_advads_get_group_type_manager()->register_type( $classname );
+	wp_advads()->groups->types->register_type( $classname );
 }
 
 /* 4. Conditional ------------------- */
@@ -166,7 +172,7 @@ function wp_advads_register_group_type( $classname ): void {
  * @return bool
  */
 function wp_advads_has_group_type( $type ): bool {
-	return wp_advads_get_group_type_manager()->has_type( $type );
+	return wp_advads()->groups->types->has_type( $type );
 }
 
 /**
@@ -190,7 +196,7 @@ function is_a_group( $thing ): bool {
  * @return Group[]
  */
 function wp_advads_get_all_groups(): array {
-	return wp_advads_get_group_repository()->get_all_groups();
+	return wp_advads()->groups->repository->get_all_groups();
 }
 
 /**
@@ -199,7 +205,7 @@ function wp_advads_get_all_groups(): array {
  * @return array<int, array{id: int, title: string, slug: string, type: string, ad_weights: array<int, int>, publish_date: string, modified_date: string}>
  */
 function wp_advads_get_group_summaries(): array {
-	return wp_advads_get_group_repository()->get_group_summaries();
+	return wp_advads()->groups->repository->get_group_summaries();
 }
 
 /**
@@ -208,7 +214,7 @@ function wp_advads_get_group_summaries(): array {
  * @return array
  */
 function wp_advads_get_groups_dropdown() {
-	return wp_advads_get_group_repository()->get_groups_dropdown();
+	return wp_advads()->groups->repository->get_groups_dropdown();
 }
 
 /**
@@ -219,7 +225,7 @@ function wp_advads_get_groups_dropdown() {
  * @return Group_Type|bool
  */
 function wp_advads_get_group_type( $type ) {
-	return wp_advads_get_group_type_manager()->get_type( $type );
+	return wp_advads()->groups->types->get_type( $type );
 }
 
 /**
@@ -228,7 +234,7 @@ function wp_advads_get_group_type( $type ) {
  * @return Group_Type[]
  */
 function wp_advads_get_group_types() {
-	return wp_advads_get_group_type_manager()->get_types();
+	return wp_advads()->groups->types->get_types();
 }
 
 /* 6. Finder ------------------- */
@@ -242,7 +248,7 @@ function wp_advads_get_group_types() {
  * @return Group|bool Group object or false if the group cannot be loaded.
  */
 function wp_advads_get_group( $group_id = false, $new_type = '' ) {
-	return wp_advads_get_group_factory()->get_group( $group_id, $new_type );
+	return wp_advads()->groups->factory->get_group( $group_id, $new_type );
 }
 
 /**
@@ -253,7 +259,7 @@ function wp_advads_get_group( $group_id = false, $new_type = '' ) {
  * @return Group[]
  */
 function wp_advads_get_groups_by_ad_id( $ad_id ): array {
-	return wp_advads_get_group_repository()->get_groups_by_ad_id( $ad_id );
+	return wp_advads()->groups->repository->get_groups_by_ad_id( $ad_id );
 }
 
 /**
@@ -264,5 +270,5 @@ function wp_advads_get_groups_by_ad_id( $ad_id ): array {
  * @return array<int, Group>
  */
 function wp_advads_get_groups_by_ids( array $group_ids ): array {
-	return wp_advads_get_group_repository()->get_groups_by_ids( $group_ids );
+	return wp_advads()->groups->repository->get_groups_by_ids( $group_ids );
 }

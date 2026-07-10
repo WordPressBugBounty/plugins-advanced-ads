@@ -14,6 +14,7 @@ use AdvancedAds\Ads\Ads;
 use AdvancedAds\Groups\Groups;
 use AdvancedAds\Installation\Install;
 use AdvancedAds\Placements\Placements;
+use AdvancedAds\Rest\Licenses;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -120,9 +121,6 @@ class Plugin extends Framework\Loader {
 		add_action( 'widgets_init', [ $this, 'register_widgets' ] );
 
 		// Load it all.
-		$this->ads->initialize();
-		$this->groups->initialize();
-		$this->placements->initialize();
 		$this->modules->initialize();
 		$this->load();
 	}
@@ -218,6 +216,7 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Post_Data::class );
 		$this->register_integration( Cache_Invalidator::class );
 		$this->register_integration( Crons\Ads::class );
+		$this->register_integration( Crons\Licenses::class );
 		$this->register_integration( Shortcodes::class, 'shortcodes' );
 		$this->register_integration( Frontend\Debug_Ads::class );
 	}
@@ -249,6 +248,10 @@ class Plugin extends Framework\Loader {
 			return;
 		}
 
+		// App.
+		$this->register_integration( Admin\App::class );
+		$this->register_integration( Admin\License_Admin_Post::class );
+
 		// Ads.
 		$this->register_integration( Admin\Ads\Ajax::class );
 		$this->register_integration( Admin\Metabox_Ad::class );
@@ -265,7 +268,6 @@ class Plugin extends Framework\Loader {
 
 		// Entities.
 		$this->register_integration( Admin\Page_Quick_Edit::class );
-
 		$this->register_integration( Compatibility\Capability_Manager::class );
 		$this->register_initializer( Upgrades::class );
 		$this->register_integration( Admin\Action_Links::class );
@@ -280,6 +282,7 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Admin\WordPress_Dashboard::class );
 		$this->register_integration( Importers\Manager::class, 'importers' );
 		$this->register_integration( Admin\AJAX::class );
+		$this->register_integration( Admin\Plugin_Auto_Update::class );
 		$this->register_integration( Admin\Version_Control::class );
 		$this->register_integration( Admin\Upgrades::class );
 		$this->register_integration( Admin\Authors::class );
@@ -300,10 +303,12 @@ class Plugin extends Framework\Loader {
 	 */
 	private function includes_rest(): void {
 		$this->register_route( Rest\Groups::class );
+		$this->register_route( Rest\Licenses::class );
 		$this->register_route( Rest\Page_Quick_Edit::class );
 		$this->register_route( Rest\Placements::class );
 		$this->register_route( Rest\OnBoarding::class );
 		$this->register_route( Rest\Utilities::class );
+		$this->register_route( Licenses::class );
 	}
 
 	/**

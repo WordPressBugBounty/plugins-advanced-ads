@@ -23,49 +23,12 @@ class Data {
 	/**
 	 * Get the list of all add-ons.
 	 *
+	 * @deprecated 2.0.24 Use Addons::get_installed_addons() instead.
+	 *
 	 * @return array
 	 */
 	public static function get_addons(): array {
-		static $advads_addons = null;
-
-		if ( null === $advads_addons ) {
-			$advads_addons = [];
-			if ( ! function_exists( 'get_plugins' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			}
-
-			$plugins = \get_plugins();
-			$allowed = [
-				'advanced-ads-pro',
-				'advanced-ads-responsive',
-				'advanced-ads-gam',
-				'advanced-ads-layer',
-				'advanced-ads-selling',
-				'advanced-ads-sticky',
-				'advanced-ads-tracking',
-				'slider-ads',
-			];
-
-			foreach ( $plugins as $plugin_file => $plugin_data ) {
-				$slug = $plugin_data['TextDomain'];
-				if ( ! in_array( $slug, $allowed, true ) ) {
-					continue;
-				}
-
-				$name = str_replace( [ '– ', 'Advanced Ads ' ], '', $plugin_data['Name'] );
-
-				$advads_addons[ $slug ] = [
-					'id'           => str_replace( 'advanced-ads-', '', $slug ),
-					'name'         => $name,
-					'version'      => $plugin_data['Version'] ?? '0.0.1',
-					'path'         => $plugin_file,
-					'options_slug' => $slug,
-					'uri'          => $plugin_data['PluginURI'] ?? 'https://wpadvancedads.com',
-				];
-			}
-		}
-
-		return $advads_addons;
+		return Addons::get_installed_addons();
 	}
 
 	/**

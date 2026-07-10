@@ -11,6 +11,7 @@
 
 namespace AdvancedAds\Admin;
 
+use AdvancedAds\License\License_Shop_Client;
 use stdClass;
 use WP_Error;
 use Plugin_Upgrader;
@@ -51,16 +52,25 @@ class Plugin_Installer {
 	private $plugin_slug;
 
 	/**
+	 * Whether to replace an existing plugin directory on local zip install.
+	 *
+	 * @var bool
+	 */
+	private $replace_existing;
+
+	/**
 	 * Constructor
 	 *
-	 * @param string $version     The version to install.
-	 * @param string $package_url The url to the .zip archive on https://wordpress.org.
+	 * @param string    $version          The version to install.
+	 * @param string    $package_url      The url or local path to the .zip archive.
+	 * @param bool|null $replace_existing Replace an existing plugin directory for local zip installs.
 	 */
-	public function __construct( $version, $package_url ) {
-		$this->version     = $version;
-		$this->package_url = $package_url;
-		$this->plugin_name = ADVADS_PLUGIN_BASENAME;
-		$this->plugin_slug = basename( ADVADS_FILE ) . '.php';
+	public function __construct( $version, $package_url, $replace_existing = null ) {
+		$this->version          = $version;
+		$this->package_url      = $package_url;
+		$this->plugin_name      = ADVADS_PLUGIN_BASENAME;
+		$this->plugin_slug      = basename( ADVADS_FILE ) . '.php';
+		$this->replace_existing = null !== $replace_existing ? (bool) $replace_existing : is_file( $package_url );
 	}
 
 	/**
@@ -92,7 +102,7 @@ class Plugin_Installer {
 	 * @return array|bool|WP_Error
 	 */
 	public function install() {
-		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		self::require_upgrader_dependencies();
 
 		$this->apply_package();
 
@@ -106,5 +116,47 @@ class Plugin_Installer {
 		$upgrader = new Plugin_Upgrader( new Automatic_Upgrader_Skin( $upgrader_args ) );
 
 		return $upgrader->upgrade( $this->plugin_name );
+	}
+
+	/**
+	 * Install a plugin from a remote or local package URL.
+	 *
+	 * @param string $package_url      Package URL or local zip path.
+	 * @param bool   $replace_existing Overwrite an existing plugin directory.
+	 * @return bool|array|WP_Error|null
+	 */
+	public static function install_from_url( string $package_url, bool $replace_existing = false ) {
+		self::require_upgrader_dependencies();
+
+		License_Shop_Client::add_local_development_http_filter();
+		if ( ! License_Shop_Client::should_verify_ssl() ) {
+			add_filter( 'https_ssl_verify', '__return_false' );
+		}
+
+		$upgrader = new Plugin_Upgrader( new Automatic_Upgrader_Skin() );
+		$result   = $upgrader->install(
+			$package_url,
+			$replace_existing ? [ 'overwrite_package' => true ] : []
+		);
+
+		if ( ! License_Shop_Client::should_verify_ssl() ) {
+			remove_filter( 'https_ssl_verify', '__return_false' );
+		}
+		License_Shop_Client::remove_local_development_http_filter();
+
+		return $result;
+	}
+
+	/**
+	 * Admin includes required by Plugin_Upgrader (not loaded during REST requests).
+	 *
+	 * @return void
+	 */
+	private static function require_upgrader_dependencies(): void {
+		if ( ! function_exists( 'request_filesystem_credentials' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
 	}
 }

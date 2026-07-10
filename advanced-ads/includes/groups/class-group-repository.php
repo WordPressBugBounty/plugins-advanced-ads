@@ -13,6 +13,7 @@ use AdvancedAds\Abstracts\Group;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Formatting;
 use AdvancedAds\Cache_Invalidator;
+use AdvancedAds\Traits\Repository_Helpers;
 use AdvancedAds\Utilities\Cache;
 use Exception;
 
@@ -22,6 +23,7 @@ defined( 'ABSPATH' ) || exit;
  * Group Repository.
  */
 class Group_Repository {
+	use Repository_Helpers;
 
 	/**
 	 * Group options metakey
@@ -189,13 +191,7 @@ class Group_Repository {
 	 * @return array<int, string>
 	 */
 	public function get_groups_dropdown(): array {
-		$summaries = $this->get_group_summaries();
-
-		if ( empty( $summaries ) ) {
-			return [];
-		}
-
-		return wp_list_pluck( $summaries, 'title', 'id' );
+		return $this->summaries_to_dropdown( $this->get_group_summaries() );
 	}
 
 	/**
@@ -337,7 +333,7 @@ class Group_Repository {
 	 * @return Group[]
 	 */
 	private function hydrate_groups( array $term_ids ): array {
-		$term_ids = array_values( array_filter( array_map( 'absint', $term_ids ) ) );
+		$term_ids = $this->normalize_entity_ids( $term_ids );
 
 		if ( ! empty( $term_ids ) ) {
 			if ( function_exists( 'wp_prime_term_caches' ) ) {

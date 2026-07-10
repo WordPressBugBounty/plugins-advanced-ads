@@ -72,7 +72,7 @@ class Placement extends Data implements Entity_Interface {
 		parent::__construct();
 
 		$this->set_placement_id( $placement );
-		$this->data_store = wp_advads_get_placement_repository();
+		$this->data_store = wp_advads()->placements->repository;
 
 		if ( $this->get_id() > 0 ) {
 			$this->data_store->read( $this );
@@ -374,13 +374,16 @@ class Placement extends Data implements Entity_Interface {
 		}
 
 		$this->item_type   = $item_type;
-		$this->item_object = 'ad' === $item_type
+		$item_object = 'ad' === $item_type
 			? wp_advads_get_ad( $item_id )
 			: wp_advads_get_group( $item_id );
 
-		if ( $this->item_object ) {
-			$this->item_object->set_parent( $this );
+		if ( $item_object ) {
+			$item_object = clone $item_object; // avoid mutating the shared factory instance.
+			$item_object->set_parent( $this );
 		}
+
+		$this->item_object = $item_object;
 
 		return $this->item_object;
 	}

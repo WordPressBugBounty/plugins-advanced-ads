@@ -12,6 +12,7 @@ namespace AdvancedAds\Placements;
 use AdvancedAds\Abstracts\Placement;
 use AdvancedAds\Constants;
 use AdvancedAds\Cache_Invalidator;
+use AdvancedAds\Traits\Repository_Helpers;
 use AdvancedAds\Utilities\Cache;
 use AdvancedAds\Utilities\WordPress;
 use Exception;
@@ -23,6 +24,7 @@ defined( 'ABSPATH' ) || exit;
  * Placements Repository.
  */
 class Placement_Repository {
+	use Repository_Helpers;
 
 	/* CRUD Methods ------------------- */
 
@@ -133,17 +135,7 @@ class Placement_Repository {
 				wp_update_post( array_merge( [ 'ID' => $placement->get_id() ], $post_data ) );
 			}
 		} else { // Only update post modified time to record this save event.
-			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$wpdb->posts,
-				[
-					'post_modified'     => current_time( 'mysql' ),
-					'post_modified_gmt' => current_time( 'mysql', 1 ),
-				],
-				[
-					'ID' => $placement->get_id(),
-				]
-			);
-			clean_post_cache( $placement->get_id() );
+			$this->touch_post_modified_time( $placement->get_id() );
 		}
 
 		$this->update_post_meta( $placement );
@@ -290,13 +282,7 @@ class Placement_Repository {
 	 * @return array<int, string>
 	 */
 	public function get_placements_dropdown(): array {
-		$summaries = $this->get_placement_summaries();
-
-		if ( empty( $summaries ) ) {
-			return [];
-		}
-
-		return wp_list_pluck( $summaries, 'title', 'id' );
+		return $this->summaries_to_dropdown( $this->get_placement_summaries() );
 	}
 
 	/**
@@ -369,21 +355,7 @@ class Placement_Repository {
 	 * @return Placement[]
 	 */
 	private function hydrate_placements( array $post_ids ): array {
-		$post_ids = array_values( array_filter( array_map( 'absint', $post_ids ) ) );
-
-		if ( ! empty( $post_ids ) ) {
-			_prime_post_caches( $post_ids, false, true );
-		}
-
-		$placements = [];
-		foreach ( $post_ids as $post_id ) {
-			$placement_object = wp_advads_get_placement( $post_id );
-			if ( false !== $placement_object ) {
-				$placements[ $post_id ] = $placement_object;
-			}
-		}
-
-		return $placements;
+		return $this->hydrate_post_entities( $post_ids, 'wp_advads_get_placement', true );
 	}
 
 	/* Additional Methods ------------------- */

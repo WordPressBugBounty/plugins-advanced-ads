@@ -80,6 +80,8 @@ function the_ad_placement( $placement_id = '', $args = [] ): void {
 /**
  * Get Placement Factory
  *
+ * @deprecated 2.0.24 Use wp_advads()->placements->factory instead.
+ *
  * @return Placement_Factory
  */
 function wp_advads_get_placement_factory(): Placement_Factory {
@@ -89,6 +91,8 @@ function wp_advads_get_placement_factory(): Placement_Factory {
 /**
  * Get Placement Repository
  *
+ * @deprecated 2.0.24 Use wp_advads()->placements->repository instead.
+ *
  * @return Placement_Repository
  */
 function wp_advads_get_placement_repository(): Placement_Repository {
@@ -97,6 +101,8 @@ function wp_advads_get_placement_repository(): Placement_Repository {
 
 /**
  * Get Placement Types
+ *
+ * @deprecated 2.0.24 Use wp_advads()->placements->types instead.
  *
  * @return Placement_Types
  */
@@ -114,7 +120,7 @@ function wp_advads_get_placement_type_manager(): Placement_Types {
  * @return Placement|bool Placement object or false if the placement type not found.
  */
 function wp_advads_create_new_placement( $type = 'default' ) {
-	return wp_advads_get_placement_factory()->create_placement( $type );
+	return wp_advads()->placements->factory->create_placement( $type );
 }
 
 /**
@@ -141,7 +147,7 @@ function wp_advads_delete_placement( &$placement, $force_delete = false ): void 
  * @return void
  */
 function wp_advads_create_placement_type( $type ): void {
-	wp_advads_get_placement_type_manager()->create_missing( $type );
+	wp_advads()->placements->types->create_missing( $type );
 }
 
 /**
@@ -152,7 +158,7 @@ function wp_advads_create_placement_type( $type ): void {
  * @return void
  */
 function wp_advads_register_placement_type( $classname ): void {
-	wp_advads_get_placement_type_manager()->register_type( $classname );
+	wp_advads()->placements->types->register_type( $classname );
 }
 
 /* 4. Conditional ------------------- */
@@ -165,7 +171,7 @@ function wp_advads_register_placement_type( $classname ): void {
  * @return bool
  */
 function wp_advads_has_placement_type( $type ): bool {
-	return wp_advads_get_placement_type_manager()->has_type( $type );
+	return wp_advads()->placements->types->has_type( $type );
 }
 
 /**
@@ -200,7 +206,7 @@ function wp_advads_get_placements(): array {
  * @return Placement[]
  */
 function wp_advads_get_all_placements(): array {
-	return wp_advads_get_placement_repository()->get_all_placements();
+	return wp_advads()->placements->repository->get_all_placements();
 }
 
 /**
@@ -209,7 +215,7 @@ function wp_advads_get_all_placements(): array {
  * @return Placement[]
  */
 function wp_advads_get_published_placements(): array {
-	return wp_advads_get_placement_repository()->get_all_published();
+	return wp_advads()->placements->repository->get_all_published();
 }
 
 /**
@@ -218,7 +224,7 @@ function wp_advads_get_published_placements(): array {
  * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, item: string}>
  */
 function wp_advads_get_placement_summaries(): array {
-	return wp_advads_get_placement_repository()->get_placement_summaries();
+	return wp_advads()->placements->repository->get_placement_summaries();
 }
 
 /**
@@ -227,7 +233,7 @@ function wp_advads_get_placement_summaries(): array {
  * @return array<int, string>
  */
 function wp_advads_get_placements_dropdown(): array {
-	return wp_advads_get_placement_repository()->get_placements_dropdown();
+	return wp_advads()->placements->repository->get_placements_dropdown();
 }
 
 /**
@@ -238,7 +244,7 @@ function wp_advads_get_placements_dropdown(): array {
  * @return Placement_Type|bool
  */
 function wp_advads_get_placement_type( $type ) {
-	return wp_advads_get_placement_type_manager()->get_type( $type );
+	return wp_advads()->placements->types->get_type( $type );
 }
 
 /**
@@ -249,7 +255,7 @@ function wp_advads_get_placement_type( $type ) {
  * @return Placement_Type[]
  */
 function wp_advads_get_placement_types( $with_unknown = true ): array {
-	return wp_advads_get_placement_type_manager()->get_types( $with_unknown );
+	return wp_advads()->placements->types->get_types( $with_unknown );
 }
 
 /* 6. Finder ------------------- */
@@ -283,7 +289,7 @@ function wp_advads_get_placement( $placement_id = false, $new_type = '' ) {
  * @return Placement|bool
  */
 function wp_advads_get_placement_by_id( $id, $new_type = '' ) {
-	return wp_advads_get_placement_factory()->get_placement( $id, $new_type );
+	return wp_advads()->placements->factory->get_placement( $id, $new_type );
 }
 
 /**
@@ -326,7 +332,7 @@ function wp_advads_get_placement_by_slug( $slug, $new_type = '' ) {
  * @return array
  */
 function wp_advads_placements_by_item_id( $item_id ): array {
-	return wp_advads_get_placement_repository()->find_by_item_id( $item_id );
+	return wp_advads()->placements->repository->find_by_item_id( $item_id );
 }
 
 /**
@@ -342,5 +348,5 @@ function wp_advads_placements_by_item_id( $item_id ): array {
  * @return array An associative array of placement IDs as keys and their corresponding placement objects as values.
  */
 function wp_advads_get_placements_by_types( $types, $output = OBJECT, $published_only = false ): array {
-	return wp_advads_get_placement_repository()->find_by_types( $types, $output, $published_only );
+	return wp_advads()->placements->repository->find_by_types( $types, $output, $published_only );
 }

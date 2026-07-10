@@ -83,6 +83,8 @@ function the_ad( $id = 0, $args = [] ): void {
 /**
  * Get Ad Factory
  *
+ * @deprecated 2.0.24 Use wp_advads()->ads->factory instead.
+ *
  * @return Ad_Factory
  */
 function wp_advads_get_ad_factory(): Ad_Factory {
@@ -92,6 +94,8 @@ function wp_advads_get_ad_factory(): Ad_Factory {
 /**
  * Get Ad Repository
  *
+ * @deprecated 2.0.24 Use wp_advads()->ads->repository instead.
+ *
  * @return Ad_Repository
  */
 function wp_advads_get_ad_repository(): Ad_Repository {
@@ -100,6 +104,8 @@ function wp_advads_get_ad_repository(): Ad_Repository {
 
 /**
  * Get Ad Types
+ *
+ * @deprecated 2.0.24 Use wp_advads()->ads->types instead.
  *
  * @return Ad_Types
  */
@@ -117,7 +123,7 @@ function wp_advads_get_ad_type_manager(): Ad_Types {
  * @return Ad|bool Ad object or false if the ad type not found.
  */
 function wp_advads_create_new_ad( $type = 'dummy' ) {
-	return wp_advads_get_ad_factory()->create_ad( $type );
+	return wp_advads()->ads->factory->create_ad( $type );
 }
 
 /**
@@ -144,7 +150,7 @@ function wp_advads_delete_ad( &$ad, $force_delete = false ): void {
  * @return void
  */
 function wp_advads_create_ad_type( $type ): void {
-	wp_advads_get_ad_type_manager()->create_missing( $type );
+	wp_advads()->ads->types->create_missing( $type );
 }
 
 /**
@@ -155,7 +161,7 @@ function wp_advads_create_ad_type( $type ): void {
  * @return void
  */
 function wp_advads_register_ad_type( $classname ): void {
-	wp_advads_get_ad_type_manager()->register_type( $classname );
+	wp_advads()->ads->types->register_type( $classname );
 }
 
 /* 4. Conditional ------------------- */
@@ -168,7 +174,7 @@ function wp_advads_register_ad_type( $classname ): void {
  * @return bool
  */
 function wp_advads_has_ad_type( $type ): bool {
-	return wp_advads_get_ad_type_manager()->has_type( $type );
+	return wp_advads()->ads->types->has_type( $type );
 }
 
 /**
@@ -190,7 +196,7 @@ function is_an_ad( $thing ): bool {
  * @return Ad[]
  */
 function wp_advads_get_all_ads(): array {
-	return wp_advads_get_ad_repository()->get_all_ads();
+	return wp_advads()->ads->repository->get_all_ads();
 }
 
 /**
@@ -199,7 +205,7 @@ function wp_advads_get_all_ads(): array {
  * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
  */
 function wp_advads_get_ad_summaries(): array {
-	return wp_advads_get_ad_repository()->get_ad_summaries();
+	return wp_advads()->ads->repository->get_ad_summaries();
 }
 
 /**
@@ -208,7 +214,7 @@ function wp_advads_get_ad_summaries(): array {
  * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
  */
 function wp_advads_get_all_statuses(): array {
-	return wp_advads_get_ad_repository()->get_all_statuses();
+	return wp_advads()->ads->repository->get_all_statuses();
 }
 
 /**
@@ -217,7 +223,7 @@ function wp_advads_get_all_statuses(): array {
  * @return array
  */
 function wp_advads_get_ads_dropdown(): array {
-	return wp_advads_get_ad_repository()->get_ads_dropdown();
+	return wp_advads()->ads->repository->get_ads_dropdown();
 }
 
 /**
@@ -228,7 +234,7 @@ function wp_advads_get_ads_dropdown(): array {
  * @return Ad_Type|bool
  */
 function wp_advads_get_ad_type( $type ) {
-	return wp_advads_get_ad_type_manager()->get_type( $type );
+	return wp_advads()->ads->types->get_type( $type );
 }
 
 /**
@@ -237,7 +243,7 @@ function wp_advads_get_ad_type( $type ) {
  * @return Ad_Type[]
  */
 function wp_advads_get_ad_types(): array {
-	return wp_advads_get_ad_type_manager()->get_types();
+	return wp_advads()->ads->types->get_types();
 }
 
 /* 6. Finder ------------------- */
@@ -251,7 +257,7 @@ function wp_advads_get_ad_types(): array {
  * @return Ad|bool Ad object or false if the ad cannot be loaded.
  */
 function wp_advads_get_ad( $ad_id = false, $new_type = '' ) {
-	return wp_advads_get_ad_factory()->get_ad( $ad_id, $new_type );
+	return wp_advads()->ads->factory->get_ad( $ad_id, $new_type );
 }
 
 /**
@@ -263,7 +269,7 @@ function wp_advads_get_ad( $ad_id = false, $new_type = '' ) {
  * @return Ad[]|int[]|array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
  */
 function wp_advads_get_ads_by_group_id( $group_id, $output = OBJECT ): array {
-	return wp_advads_get_group_repository()->get_ads_by_group_id( (int) $group_id, $output );
+	return wp_advads()->groups->repository->get_ads_by_group_id( (int) $group_id, $output );
 }
 
 /**
@@ -274,7 +280,7 @@ function wp_advads_get_ads_by_group_id( $group_id, $output = OBJECT ): array {
  * @return array
  */
 function wp_advads_get_ads_by_placement_id( $placement_id ): array {
-	return wp_advads_get_ad_repository()->get_ads_by_placement_id( $placement_id );
+	return wp_advads()->ads->repository->get_ads_by_placement_id( $placement_id );
 }
 
 /**
@@ -285,7 +291,7 @@ function wp_advads_get_ads_by_placement_id( $placement_id ): array {
  * @return array
  */
 function wp_advads_get_ads_by_type( $type ): array {
-	return wp_advads_get_ad_repository()->get_ads_by_type( $type );
+	return wp_advads()->ads->repository->get_ads_by_type( $type );
 }
 
 /**
@@ -296,7 +302,7 @@ function wp_advads_get_ads_by_type( $type ): array {
  * @return array<int, Ad>
  */
 function wp_advads_get_ads_by_ids( array $ad_ids ): array {
-	return wp_advads_get_ad_repository()->get_ads_by_ids( $ad_ids );
+	return wp_advads()->ads->repository->get_ads_by_ids( $ad_ids );
 }
 
 /**
@@ -308,5 +314,5 @@ function wp_advads_get_ads_by_ids( array $ad_ids ): array {
  * @return WP_Query The WP_Query object containing the results of the query.
  */
 function wp_advads_ad_query( $args = [], $improve_query = false ): WP_Query {
-	return wp_advads_get_ad_repository()->query( $args, $improve_query );
+	return wp_advads()->ads->repository->query( $args, $improve_query );
 }

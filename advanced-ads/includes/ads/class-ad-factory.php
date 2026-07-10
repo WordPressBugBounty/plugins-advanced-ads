@@ -29,19 +29,7 @@ class Ad_Factory extends Factory {
 	 * @return Ad|bool Ad object or false if the ad type not found.
 	 */
 	public function create_ad( $type = 'dummy' ) {
-		$ad_type = wp_advads_get_ad_type( $type );
-
-		if ( ! $ad_type ) {
-			return false;
-		}
-
-		$classname = $ad_type->get_classname();
-
-		// Create ad.
-		$ad = new $classname( 0 );
-		$ad->set_type( $ad_type->get_id() );
-
-		return $ad;
+		return $this->create_empty_from_type( wp_advads_get_ad_type( $type ) );
 	}
 
 	/**
@@ -59,24 +47,22 @@ class Ad_Factory extends Factory {
 			return false;
 		}
 
-		$cache_key = $this->get_instance_cache_key( (int) $ad_id, $new_type );
-		if ( array_key_exists( $cache_key, $this->instances ) ) {
-			return $this->instances[ $cache_key ];
+		if ( $this->has_cached_instance( (int) $ad_id, $new_type ) ) {
+			return $this->get_cached_instance( (int) $ad_id, $new_type );
 		}
 
 		$ad_type   = '' !== $new_type ? $new_type : $this->get_ad_type( $ad_id );
-		$classname = wp_advads_get_ad_type_manager()->get_classname_for_type( $ad_type, 'dummy' );
-
+		$classname = wp_advads()->ads->types->get_classname_for_type( $ad_type, 'dummy' );
 		try {
 			$ad = new $classname( $ad_id );
-			$ad->set_type( $ad_type );
-
-			$this->instances[ $cache_key ] = $ad;
-
-			return $ad;
 		} catch ( Exception $e ) {
 			return false;
 		}
+
+		$ad->set_type( $ad_type );
+		$this->store_cached_instance( (int) $ad_id, $new_type, $ad );
+
+		return $ad;
 	}
 
 	/**

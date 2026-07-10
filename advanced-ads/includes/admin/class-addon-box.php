@@ -9,6 +9,7 @@
 
 namespace AdvancedAds\Admin;
 
+use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Framework\Utilities\Arr;
 
@@ -30,15 +31,16 @@ class Addon_Box {
 	 *
 	 * @var array
 	 */
-	private $plugins;
+	public $plugins;
 
 	/**
 	 * Constructor
 	 *
 	 * @param bool $hide_activated whether to hide active plugins.
+	 * @param bool $rest_request its rest request or not.
 	 */
-	public function __construct( $hide_activated = false ) {
-		if ( ! is_admin() ) {
+	public function __construct( $hide_activated = false, $rest_request = false ) {
+		if ( ! is_admin() && ! $rest_request ) {
 			return;
 		}
 		$this->hide_activated = (bool) $hide_activated;
@@ -128,7 +130,7 @@ class Addon_Box {
 		];
 		// phpcs:enable WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned,WordPress.Arrays.MultipleStatementAlignment.LongIndexSpaceBeforeDoubleArrow
 
-		$plugins       = get_plugins();
+		$plugins       = Addons::get_plugins();
 		$this->plugins = [
 			'plugins'       => [],
 			'premium_level' => 'free',

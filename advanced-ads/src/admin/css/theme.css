@@ -1,0 +1,6 @@
+@theme extend {
+	--color-border: #d9d9d9;
+	--color-border-old: #c3c4c7;
+	--color-primary: #0474a2;
+	--color-wordpress: #2271b1;
+}

@@ -43,7 +43,7 @@ if ( empty( $wp_list_table->items ) ) : ?>
 			</div>
 		<?php endforeach; ?>
 	</div>
-	<?php if ( wp_advads_get_group_type_manager()->has_premium() ) : ?>
+	<?php if ( wp_advads()->groups->types->has_premium() ) : ?>
 		<div class="advads-form-types">
 			<?php
 			foreach ( $group_types as $group_type ) :

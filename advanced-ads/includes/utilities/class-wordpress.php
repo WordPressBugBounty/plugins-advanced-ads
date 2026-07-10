@@ -202,17 +202,6 @@ class WordPress {
 	}
 
 	/**
-	 * Render icon of the type.
-	 *
-	 * @param string $icon Icon url.
-	 *
-	 * @return void
-	 */
-	public static function render_icon( $icon ): void {
-		printf( '<img src="%s" width="50" height="50" />', esc_url( $icon ) );
-	}
-
-	/**
 	 * Applies image loading optimization attributes to an image HTML tag based on WordPress version.
 	 *
 	 * @param string $img     HTML image tag.
@@ -246,22 +235,6 @@ class WordPress {
 		$args['update_post_term_cache'] = false;
 
 		return $args;
-	}
-
-	/**
-	 * Clean variables using sanitize_text_field. Arrays are cleaned recursively.
-	 * Non-scalar values are ignored.
-	 *
-	 * @param string|array $data Data to sanitize.
-	 *
-	 * @return string|array
-	 */
-	public static function sanitize_clean( $data ) {
-		if ( is_array( $data ) ) {
-			return array_map( __CLASS__ . '::sanitize_clean', $data );
-		}
-
-		return is_scalar( $data ) ? sanitize_text_field( $data ) : $data;
 	}
 
 	/**
@@ -350,21 +323,6 @@ class WordPress {
 	}
 
 	/**
-	 * Renders a setting view.
-	 *
-	 * @param array $args {
-	 *     An array of arguments.
-	 *
-	 *     @type string $view The path to the view file to be included.
-	 * }
-	 *
-	 * @return void
-	 */
-	public static function render_setting_view( $args ): void {
-		include $args['view'];
-	}
-
-	/**
 	 * Create a wrapper for a single option line
 	 *
 	 * @param   string $id     internal id of the option wrapper.
@@ -431,22 +389,6 @@ class WordPress {
 	}
 
 	/**
-	 * Sort visitor and display condition arrays alphabetically by their label.
-	 *
-	 * @param array $a array to be compared.
-	 * @param array $b array to be compared.
-	 *
-	 * @return mixed
-	 */
-	public static function sort_array_by_label( $a, $b ) {
-		if ( ! isset( $a['label'] ) || ! isset( $b['label'] ) ) {
-			return;
-		}
-
-		return strcmp( strtolower( $a['label'] ), strtolower( $b['label'] ) );
-	}
-
-	/**
 	 * Render a manual link
 	 *
 	 * @param string $url           target URL.
@@ -468,30 +410,5 @@ class WordPress {
 		);
 
 		include ADVADS_ABSPATH . 'views/admin/manual-link.php';
-	}
-
-	/**
-	 * Get installed plugins.
-	 *
-	 * @return array
-	 */
-	public static function get_wp_plugins(): array {
-		wp_cache_delete( 'plugins', 'plugins' );
-
-		if ( ! function_exists( 'get_plugins' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
-		$normalized = [];
-		$plugins    = \get_plugins();
-
-		foreach ( $plugins as $plugin_file => $plugin_data ) {
-			$normalized[ $plugin_data['TextDomain'] ] = [
-				'file'    => $plugin_file,
-				'version' => $plugin_data['Version'] ?? '0.0.1',
-			];
-		}
-
-		return $normalized;
 	}
 }

@@ -4,23 +4,23 @@
     "hash": "73f69d273ce2032faa2ca513639b6509"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/advanced-ads.php": {
-    "mtime": 1781649107.8717794,
-    "hash": "98300287955423c1ff8bd84aa92c2abb"
+    "mtime": 1783515386.9060059,
+    "hash": "519873d7e54ea572dace3db2012020b4"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/webpack.config.js": {
-    "mtime": 1781649107.92296,
-    "hash": "ed264b24f511893277a222fb3fe62f0a"
+    "mtime": 1783515409.4930277,
+    "hash": "f33d05172346538d42224a9fe80843d9"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/playwright.config.ts": {
-    "mtime": 1781649107.906131,
-    "hash": "4fd808c106e912ce9914d057452e801e"
+    "mtime": 1783515653.9224327,
+    "hash": "47fd67de09089f3c11b156dae7d7a4a2"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/postcss.config.js": {
     "mtime": 1777281848.6752143,
     "hash": "a3282b033e611294f6c31b18963d8eb1"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/classes/ad-health-notices.php": {
-    "mtime": 1781649107.872081,
+    "mtime": 1783515386.9234765,
     "hash": "8d192676fca2affe8c8f3a638dfc075b"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/classes/inline-css.php": {
@@ -28,11 +28,11 @@
     "hash": "534ae97010c338d621f6c8ebc4400c6d"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/classes/filesystem.php": {
-    "mtime": 1781649107.8725371,
+    "mtime": 1783515386.9245646,
     "hash": "689a6e3890a3c87764df1cbca0d50c56"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/classes/frontend_checks.php": {
-    "mtime": 1781730189.1767988,
+    "mtime": 1783515386.9249802,
     "hash": "4f34381550df4ad84dad6a9b0798ce13"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/classes/checks.php": {
@@ -44,11 +44,11 @@
     "hash": "6f4b47af1f773420c3a1584d74442bbc"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/classes/utils.php": {
-    "mtime": 1781730323.5451224,
+    "mtime": 1783515386.925496,
     "hash": "a3ed9589073fa417bb9c9dad4f7805ee"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/classes/display-conditions.php": {
-    "mtime": 1781649107.8723974,
+    "mtime": 1783515386.9239388,
     "hash": "8050688b077ac5a04b9029855154ac21"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/load_modules.php": {
@@ -56,8 +56,8 @@
     "hash": "d5dcf05a7a7812b726d5c75dcf8ac748"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/functions.php": {
-    "mtime": 1781649107.8897085,
-    "hash": "3cded0e4923f905a7ccf4504fc35b81b"
+    "mtime": 1783515386.9594538,
+    "hash": "bb446122ea9f5524fa574b0969e4cfbf"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/functions-conditional.php": {
     "mtime": 1781649107.8893406,
@@ -68,12 +68,8 @@
     "hash": "55480d82ce4030d48b719875f426bdb2"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-cache-invalidator.php": {
-    "mtime": 1781649107.8860898,
+    "mtime": 1783515386.952989,
     "hash": "f76efd66c7dd227e99203d241585ebdd"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/array_ad_conditions.php": {
-    "mtime": 1781649107.8856947,
-    "hash": "36b4a1c94652f80dbefe58b25e12d516"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-modal.php": {
     "mtime": 1781649107.8869445,
@@ -84,31 +80,31 @@
     "hash": "73f69d273ce2032faa2ca513639b6509"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-shortcodes.php": {
-    "mtime": 1781649107.887423,
-    "hash": "3facb7c2e22a82b1401e21b44d4b8df9"
+    "mtime": 1783515386.954821,
+    "hash": "5bed32df844583bfbd74139abe53980d"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-post-data.php": {
     "mtime": 1781649107.8873177,
     "hash": "e2c3a1ca6a3abc4b9c02be3e33101103"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/functions-ad.php": {
-    "mtime": 1781730097.9021144,
-    "hash": "3f3803a8f3f9b6cc919bd30fdf271be8"
+    "mtime": 1783515386.9581637,
+    "hash": "9d7fa3eda9cfafb4ff64db835c4fd296"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/cap_map.php": {
     "mtime": 1781649107.8857617,
     "hash": "8ed9e31126280f8e18695ae182f5b365"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-plugin.php": {
-    "mtime": 1781649107.887243,
-    "hash": "36edbf746d853afc9e938316f0d8c801"
+    "mtime": 1783515654.412399,
+    "hash": "2a2acd4219f2f6d3b653094426defca2"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-options.php": {
     "mtime": 1781649107.8871086,
     "hash": "61c1d9a27355167fe59e632dbcbcc517"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/functions-placement.php": {
-    "mtime": 1781727010.4435263,
+    "mtime": 1783515386.9590964,
     "hash": "e796e0b3af4f7783630bd11ce8021952"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-entities.php": {
@@ -116,11 +112,11 @@
     "hash": "55ba0d1b94218c3f271df1eb5c960302"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-constants.php": {
-    "mtime": 1781649107.8861926,
-    "hash": "78325f0a016fff844d46a909501828eb"
+    "mtime": 1783515672.9830737,
+    "hash": "b92af789e58bc832be162f7b52669ad3"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-content-injector.php": {
-    "mtime": 1781649107.8867195,
+    "mtime": 1783515386.9536977,
     "hash": "b0f194e9092c72c115cdb7d8e705cf17"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-modules.php": {
@@ -128,8 +124,8 @@
     "hash": "ff29752f1375cc7038a16a73db2deb72"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-upgrades.php": {
-    "mtime": 1781649107.887509,
-    "hash": "a0e1e82e43438796fa5043d9991b0044"
+    "mtime": 1783515672.9832454,
+    "hash": "a3ab64603140f6f596407788bd9089d3"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/default-hooks.php": {
     "mtime": 1781649107.8884764,
@@ -144,59 +140,59 @@
     "hash": "4e456cd0213babda07f4a3745bde1dcf"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-assets-registry.php": {
-    "mtime": 1781649107.8858736,
-    "hash": "3dba7ed68d019f312dd4a6f860ed0253"
+    "mtime": 1783515387.056108,
+    "hash": "178166f110c396149cdb3a219956c40d"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/class-autoloader.php": {
-    "mtime": 1781649107.8859744,
-    "hash": "c394c1af68142b503e2eadd0753b3a49"
+    "mtime": 1783515386.9525862,
+    "hash": "ac70822979bfbae9f1154c852fadbf27"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/functions-group.php": {
-    "mtime": 1781740412.045248,
-    "hash": "3bd39a3246b4f66426f7544932ded019"
+    "mtime": 1783515386.958757,
+    "hash": "02c137889ec4709585993834d555b319"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/compatibility/class-capability-manager.php": {
     "mtime": 1781649107.8879533,
     "hash": "55943e0988140be9cd4e0492e7c9ab00"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/compatibility/class-peepso-ad.php": {
-    "mtime": 1781649107.8882153,
-    "hash": "a1bdf73a00c2cb951ef4952854680256"
+    "mtime": 1783515386.9565866,
+    "hash": "e69012c1a63728e9785d204628ed1d14"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/compatibility/class-aawp.php": {
     "mtime": 1781649107.8877766,
     "hash": "1b4e1f1d89883c9f80be59f82f434b38"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/compatibility/class-compatibility.php": {
-    "mtime": 1781649107.888059,
-    "hash": "6a87c70aced5ea01263f69f4b3166ca2"
+    "mtime": 1783515386.956319,
+    "hash": "06ae51ae499c212418aa896ee0b48d47"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/compatibility/class-aawp-ad.php": {
-    "mtime": 1781649107.887698,
-    "hash": "c8b62e7e7e757e19d8d541ffea3de423"
+    "mtime": 1783515386.9556715,
+    "hash": "39937c311fc0007184e3abf0fbd59910"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/compatibility/class-admin-compatibility.php": {
-    "mtime": 1781649107.8878787,
-    "hash": "dcd8d9bde139bdf1f6d006106118ca15"
+    "mtime": 1783515386.9559817,
+    "hash": "90e14a6b9c71ad2d703532b056a54efa"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/compatibility/class-inline-js.php": {
     "mtime": 1781649107.8881433,
     "hash": "efd2dee7c658a970667dea104a22a992"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/compatibility/class-peepso.php": {
-    "mtime": 1781649107.8883033,
-    "hash": "dbdeb706b547696f37cc958e76d64ebe"
+    "mtime": 1783515386.9570696,
+    "hash": "6cbf0b14dcf4a1f6717c1f455ca5ad39"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/placements/class-placement-factory.php": {
-    "mtime": 1781649107.8948514,
-    "hash": "a14d042223ee20231e7111f8fd570493"
+    "mtime": 1783515386.961971,
+    "hash": "9a6e66590ba98a7b33c9aaf73e32df9c"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/placements/class-placement-sidebar-widget.php": {
     "mtime": 1781649107.8953636,
     "hash": "becd4e6c184abe53d2315f0023bfda99"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/placements/class-placement-repository.php": {
-    "mtime": 1781727004.159724,
+    "mtime": 1783515386.9623532,
     "hash": "912f4fe8ce0c5448be0d4d11ee094872"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/placements/index.php": {
@@ -268,12 +264,12 @@
     "hash": "6e6a7836e976611901fb5ce6aade6cfa"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/ads/class-ad-content.php": {
-    "mtime": 1781651471.865192,
+    "mtime": 1783515386.9507172,
     "hash": "4ab8a449119ef92cf888a3a4f58fdeae"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/ads/class-ad-repository.php": {
-    "mtime": 1781740412.0455117,
-    "hash": "c512313c9c8bd97a0c265d8c8fb8d3fe"
+    "mtime": 1783515386.9518247,
+    "hash": "7cdbf0ff95b372d498a1b6c2b68c308e"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/ads/class-ad-dummy.php": {
     "mtime": 1781649107.8838706,
@@ -288,8 +284,8 @@
     "hash": "6891a87f5ffa4c10eb8053adf837a3d2"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/ads/class-ad-factory.php": {
-    "mtime": 1781848710.2126997,
-    "hash": "b76738681e5c47ed4e5091084233c255"
+    "mtime": 1783515386.9510972,
+    "hash": "e113377b6420bc2001323c2ac9cbbbf7"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/ads/class-ad-image.php": {
     "mtime": 1781649107.8843234,
@@ -300,8 +296,8 @@
     "hash": "6886b95ab6b54ee009ff2d7cf9153701"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/ads/class-ad-plain.php": {
-    "mtime": 1781649107.8844397,
-    "hash": "99a1bbda274d5094fd8b7f3467a2ffec"
+    "mtime": 1783515386.951371,
+    "hash": "b5669c7aa5219edcfccba431efe351cb"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/ads/class-ad-group-relation.php": {
     "mtime": 1781649107.884117,
@@ -356,16 +352,40 @@
     "hash": "b71c994eefaf45474f5efa02477b4b13"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/frontend/class-ad-renderer.php": {
-    "mtime": 1781727031.6239314,
+    "mtime": 1783515386.9576972,
     "hash": "3db752005c1fc9138d897b709b182b8d"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/frontend/class-debug-ads.php": {
     "mtime": 1781649107.8887594,
     "hash": "7102f77766ed6967c35529e61dad630d"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/license/class-license-product-map.php": {
+    "mtime": 1783515577.0521467,
+    "hash": "18b4ce207602bc92ecbd913c572ffe64"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/license/class-license-site-activation.php": {
+    "mtime": 1783515673.0445583,
+    "hash": "c7b065b67232b7af73bc0169600beb54"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/license/class-license-package-installer.php": {
+    "mtime": 1783515673.0437582,
+    "hash": "f89876a93de01eef926ddab96cac7817"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/license/class-license-shop-client.php": {
+    "mtime": 1783515673.0442207,
+    "hash": "44ef0f85c086016cd2982094ee36f370"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/license/class-license-exchange.php": {
+    "mtime": 1783515673.0432522,
+    "hash": "df3edc1fde02961d9f6c63be68109ec7"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/license/class-license.php": {
-    "mtime": 1781649107.8942015,
-    "hash": "97e1d52486167f285e0e4653b1d32fba"
+    "mtime": 1783515673.044945,
+    "hash": "3682ef78525a6c27a53d108446f33ebd"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/license/utils.php": {
+    "mtime": 1783515672.8137515,
+    "hash": "3f93e18de3592405b64454c55c36bae6"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/importers/class-xml-encoder.php": {
     "mtime": 1781649107.8923032,
@@ -396,11 +416,11 @@
     "hash": "fb7c0bb163db701c8e6c1498cef26c30"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/importers/class-wp-quads.php": {
-    "mtime": 1781649107.8921127,
+    "mtime": 1782139968.4000962,
     "hash": "2e0e46c0998853b98a2d9bce2b120157"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/importers/class-plugin-exporter.php": {
-    "mtime": 1781730965.4212956,
+    "mtime": 1783515386.961005,
     "hash": "0f8c5bc3fddd746f3b3cf31e1187cc36"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/importers/abstract-importer.php": {
@@ -412,8 +432,8 @@
     "hash": "b309d045551c6adfe7d19f6ac1203ffa"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/importers/class-xml-importer.php": {
-    "mtime": 1781649107.8924546,
-    "hash": "629e2fafa81faf0b721e77a575c346ed"
+    "mtime": 1783515386.961363,
+    "hash": "c1e5900fb9f2b2789d24f68c3e847364"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/importers/class-api-ads.php": {
     "mtime": 1781649107.8913355,
@@ -424,7 +444,7 @@
     "hash": "73f69d273ce2032faa2ca513639b6509"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/traits/class-entity.php": {
-    "mtime": 1781649107.8973703,
+    "mtime": 1782139968.3997326,
     "hash": "f453c501fce875709f64c3fe2b5ad4f5"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/traits/class-extras.php": {
@@ -432,16 +452,20 @@
     "hash": "cdc77d1a8c7caa734a8be5190bfef307"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/traits/class-wrapper.php": {
-    "mtime": 1781649384.9843132,
+    "mtime": 1783515386.963324,
     "hash": "f608839a2df5ab37210c01487bc8d5e2"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-plugin-installer.php": {
-    "mtime": 1781649107.87978,
-    "hash": "3b6da7306359f837c1f8876b60ce1ad7"
+    "mtime": 1783515673.0429714,
+    "hash": "3191990f7bb9ed77534cec304d7bbe3d"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-app.php": {
+    "mtime": 1783515409.48721,
+    "hash": "26dc3fbf7a39b7ba9a02df1b3b873cac"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-assets.php": {
-    "mtime": 1781649107.8786235,
-    "hash": "fad04017849e6cc7b23881668285f3fe"
+    "mtime": 1783515409.821183,
+    "hash": "1837c7688e718d9d1f3ea8dea00ba11b"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/index.php": {
     "mtime": 1781649107.8817914,
@@ -452,20 +476,24 @@
     "hash": "51bdc0a7a416969e165bdc85bc60ce10"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-ajax.php": {
-    "mtime": 1781649107.8784885,
-    "hash": "51df3eab77eecb547e919c5bf0bd7e67"
+    "mtime": 1783515672.8132024,
+    "hash": "beb787839fcf8f449b5288e5e10f2203"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-plugin-auto-update.php": {
+    "mtime": 1783515577.0513976,
+    "hash": "317c437e76ee54d011ffc27a93b7ffcb"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-page-quick-edit.php": {
     "mtime": 1781649107.879684,
     "hash": "28a2ea2130a91a5c106e9c849ba75776"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-list-filters.php": {
-    "mtime": 1781848710.2279415,
-    "hash": "a43233ff862814d9c4f5b873b7018054"
+    "mtime": 1783515386.9480076,
+    "hash": "6d2c44fc9486e0cc0e0a8f8223be7922"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-admin-menu.php": {
-    "mtime": 1781649107.878267,
-    "hash": "c041b71aeaa24b799b439c1bbbab831b"
+    "mtime": 1783515409.4870842,
+    "hash": "aa42f7117038a99f369b02059cdfdb2b"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-admin-notices.php": {
     "mtime": 1781649107.878358,
@@ -476,8 +504,8 @@
     "hash": "0318d89c360e6776aee75db427583d45"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-addon-box.php": {
-    "mtime": 1781649107.8780274,
-    "hash": "99bdd22e740aaf40d3ebe9bace6ed729"
+    "mtime": 1783515577.0512311,
+    "hash": "2f3ae9d7f29fa3ffdfe82d1e80e36d9c"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-metabox-ad.php": {
     "mtime": 1781649107.8796034,
@@ -488,12 +516,8 @@
     "hash": "ba468c87e1bcce608cd7ffe8678a685e"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-edd-updater.php": {
-    "mtime": 1781649107.8791485,
-    "hash": "c82f0a539b9a08bdab4a3a8550183e04"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-compatibility.php": {
-    "mtime": 1781649107.8788066,
-    "hash": "9cc3844172472fb5af6fa6d1cd93e58f"
+    "mtime": 1783515654.5862868,
+    "hash": "90c666302068442737c8b2e460e2d7cb"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-post-list.php": {
     "mtime": 1781649107.8799086,
@@ -512,11 +536,11 @@
     "hash": "2ffa354fc7b08cb793e2a69846d6cedc"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-addon-updater.php": {
-    "mtime": 1781649107.8781347,
-    "hash": "869166a5799876734fdce29312da6d1f"
+    "mtime": 1783515672.8130653,
+    "hash": "1adc1f3d526ba3fd2a20af9e491128eb"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-action-links.php": {
-    "mtime": 1782132343.9690833,
+    "mtime": 1783515386.9459288,
     "hash": "3d47c3da7454878e71156fe7e8de3f44"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-welcome.php": {
@@ -527,16 +551,20 @@
     "mtime": 1781649107.8808339,
     "hash": "856fdafc3f374075007273d8968a52cc"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-license-admin-post.php": {
+    "mtime": 1783515672.813389,
+    "hash": "bb888812844f13e76cc40119313dc22d"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-settings.php": {
-    "mtime": 1781649107.8802621,
-    "hash": "37ed1874979f3a3e85d0049582eee41a"
+    "mtime": 1783515672.813527,
+    "hash": "1436e3f588ae1f650c2bcca5077558ff"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-system-info.php": {
     "mtime": 1781649107.8805695,
     "hash": "20c95f60117c7944f3cee21c03a8c7eb"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-misc.php": {
-    "mtime": 1781649113.083023,
+    "mtime": 1783515386.9483616,
     "hash": "fae24d632782cca6b119a511d541b08d"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-tinymce.php": {
@@ -544,7 +572,7 @@
     "hash": "9531dfab56e5fbe7cc2497432bd16bd2"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-post-types.php": {
-    "mtime": 1781729270.7139022,
+    "mtime": 1783515386.9491158,
     "hash": "cee456d75feed35950ce15499145c221"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/class-metabox-ad-settings.php": {
@@ -560,8 +588,8 @@
     "hash": "8fc9408da578d15e861c793444d1d9b6"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/placements/class-list-table.php": {
-    "mtime": 1781649107.8835213,
-    "hash": "f338ca87dc4f315472797a6bbcd82db2"
+    "mtime": 1783515386.9501998,
+    "hash": "49e003782edaab96b4ded690b81bf199"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/placements/class-quick-edit.php": {
     "mtime": 1781649107.883625,
@@ -584,8 +612,8 @@
     "hash": "5d4ad39e6c359d4d5e956b30744a6539"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/ads/class-list-table.php": {
-    "mtime": 1781741480.1703403,
-    "hash": "e01f4ca8273742e643db67c1374bb735"
+    "mtime": 1783515386.9455514,
+    "hash": "36fbae5a02bf4abe81de44dd891dbfd8"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/ads/class-quick-bulk-edit.php": {
     "mtime": 1781649107.8777907,
@@ -596,7 +624,7 @@
     "hash": "c4be05810798eeb138cc667e02b003af"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/groups/class-list-table.php": {
-    "mtime": 1781730099.9305933,
+    "mtime": 1783515386.949669,
     "hash": "1fb473f280862cae90abf6324cd421ba"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/groups/class-edit-modal.php": {
@@ -618,10 +646,6 @@
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/pages/class-ads-editing.php": {
     "mtime": 1781649107.8823693,
     "hash": "853f2fbd6f9110280b5f1b0a5395d365"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/pages/class-support.php": {
-    "mtime": 1781649107.8830473,
-    "hash": "35d65663c0a39dbf08eb2f5c09242d5b"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/admin/pages/class-ads.php": {
     "mtime": 1781649107.8824725,
@@ -680,20 +704,20 @@
     "hash": "1d817d54a85d0a4da5f660457d11960b"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/groups/class-group-factory.php": {
-    "mtime": 1781649113.0836732,
-    "hash": "804ef5286e13d08875350f736529454d"
+    "mtime": 1783515386.9601376,
+    "hash": "051b28081c944c5791d351a908c529f3"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/groups/class-group-types.php": {
     "mtime": 1781649107.8903244,
     "hash": "e600b0afab57dc04cc859a64d0e2bd45"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/groups/class-group-ad-relation.php": {
-    "mtime": 1781649107.8898048,
-    "hash": "f59d3acf034c515bbf35eaa5fafa9248"
+    "mtime": 1783515386.9597843,
+    "hash": "65cdefba4bff5e21d1a9e88250374c42"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/groups/class-group-repository.php": {
-    "mtime": 1781729469.1740482,
-    "hash": "907e894ca57f9399e6a9c912eae44400"
+    "mtime": 1783515386.9606192,
+    "hash": "e21fa544892112720b0fbe51fb3d6058"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/groups/class-group-ordered.php": {
     "mtime": 1781649107.8898852,
@@ -724,8 +748,8 @@
     "hash": "6798e30291f86d25a7b4e25103dc17b2"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/installation/class-install.php": {
-    "mtime": 1781649107.892905,
-    "hash": "3b8c8d2af6240ab4c38153d42442530e"
+    "mtime": 1783515577.445302,
+    "hash": "ce5db07911cdb29f4517a150324a0af0"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/installation/index.php": {
     "mtime": 1781649107.8931384,
@@ -756,7 +780,7 @@
     "hash": "ab1455ffda9747e0192f40512c1fac45"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/utilities/class-wordpress.php": {
-    "mtime": 1781730830.7453883,
+    "mtime": 1783515386.9648285,
     "hash": "bea2dc6fe77be4dbdefc881aca467682"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/utilities/class-sanitize.php": {
@@ -768,15 +792,15 @@
     "hash": "d595011291c2e55f3372252e9704d24c"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/utilities/class-cache.php": {
-    "mtime": 1781848710.23998,
-    "hash": "5ceda89bfe6520ff64ae5dfabefb31a2"
+    "mtime": 1783515386.9640198,
+    "hash": "356d9db13cb4612e2a00f7d5b4ec1792"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/utilities/class-data.php": {
-    "mtime": 1781649107.8981826,
-    "hash": "fcf36d7c047821aa1eaab6f6fd86fe05"
+    "mtime": 1783515386.9644113,
+    "hash": "8d104d3bc8125314513ce9061b308c32"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/utilities/class-ad-list-stats.php": {
-    "mtime": 1781742887.809978,
+    "mtime": 1783515386.9635794,
     "hash": "d72cc7c3e81e4eb1e438ca17e7257809"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/utilities/class-validation.php": {
@@ -784,52 +808,56 @@
     "hash": "b1f5a00754fe8d61ad7c526825548677"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-group.php": {
-    "mtime": 1781649389.2764668,
-    "hash": "4dbfe3415f6a340c4ff6d0b8ad1c6b14"
+    "mtime": 1783515386.9441037,
+    "hash": "402a8064aa93ff262fa7f99c91dc2090"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-admin-list-table.php": {
-    "mtime": 1781649107.8764758,
-    "hash": "46ac35caad3f447959215aaaa9a86071"
+    "mtime": 1783515386.94169,
+    "hash": "a0ba7ba9d37c7156d7cc99713eb8961d"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/index.php": {
     "mtime": 1781649107.8774464,
     "hash": "73f69d273ce2032faa2ca513639b6509"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-data.php": {
-    "mtime": 1781711101.1446378,
-    "hash": "2ad51b62567d74b5465ef3eda1760c9a"
+    "mtime": 1783515386.9434254,
+    "hash": "167525267593c3c2c6b551a5fcf0319b"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-placement.php": {
-    "mtime": 1781649107.87719,
-    "hash": "cf4a5fff038f6908c9fb403c59cac086"
+    "mtime": 1783515386.9447558,
+    "hash": "196156cf9741cfdff2cb7c794c5cb1ca"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-placement-type.php": {
-    "mtime": 1781728393.971068,
-    "hash": "b806e3d5c8d219142600dcf319a6d142"
+    "mtime": 1783515386.9445565,
+    "hash": "0b143547edd4a485c9d2d2c536763999"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-ad.php": {
-    "mtime": 1781848710.2279804,
+    "mtime": 1783515386.9412599,
     "hash": "67747c053e871b5d196b6812471bfab5"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-factory.php": {
-    "mtime": 1781649107.8767505,
-    "hash": "c49eabd40410be0012361ad7f1d5822b"
+    "mtime": 1783515386.9439135,
+    "hash": "1184c0520d6e0e5bd31c80d68954efd4"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-screen.php": {
     "mtime": 1781649107.877284,
     "hash": "72caa3f6cf70f22662831196a85a2c63"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/abstracts/abstract-types.php": {
-    "mtime": 1781649720.1906266,
-    "hash": "46637c7405fcbbb101e9bd96127d0e14"
+    "mtime": 1783515386.9450371,
+    "hash": "35b931b15ee73e17d9bd8b4bca960150"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/crons/class-ads.php": {
-    "mtime": 1781649107.8884063,
-    "hash": "146d9aee8a13d5ef03991e4cd64782a8"
+    "mtime": 1783515386.9573994,
+    "hash": "d8a3858d01ce71f46d0f250aa3225a91"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/crons/class-licenses.php": {
+    "mtime": 1783515577.4448886,
+    "hash": "95bc256e232e2c17d21861ac6f9a19c0"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/rest/class-groups.php": {
-    "mtime": 1781649107.896601,
-    "hash": "9a54fdfc0219ccf03f5bad2e38d58e99"
+    "mtime": 1783515386.9628477,
+    "hash": "e061eb3f95555bc1c71268d765a02f39"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/rest/class-placements.php": {
     "mtime": 1781649107.8970618,
@@ -839,13 +867,17 @@
     "mtime": 1781649107.8968017,
     "hash": "cecbc8fbcfb18094ea6df4e77bfb89fb"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/rest/class-licenses.php": {
+    "mtime": 1783515654.5899346,
+    "hash": "4f27a5d060b086d593b75d645ccf2946"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/rest/class-onboarding.php": {
     "mtime": 1781649107.8966966,
     "hash": "c27679c02d78f600242b997fb1dc6f6e"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/rest/class-utilities.php": {
-    "mtime": 1781649107.8972313,
-    "hash": "856bd4add8273fc2c69157f45fa12710"
+    "mtime": 1783515409.4879386,
+    "hash": "17173b125bb9ddb3ea63cab723ba5ecd"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/includes/interfaces/interface-placement.php": {
     "mtime": 1781649107.8941033,
@@ -888,20 +920,20 @@
     "hash": "fb2a4562d7be49e36b17457113374708"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/includes/ad-health-notices.php": {
-    "mtime": 1781649107.8671246,
-    "hash": "06af22c12ac53b9ba3f6a86417ad19af"
+    "mtime": 1783515672.8121448,
+    "hash": "2a307b18ab373e05a000829a2f448a20"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/includes/notices.php": {
-    "mtime": 1781649107.8680358,
-    "hash": "84086b3439cdfd823af3621d60f9537c"
+    "mtime": 1783515672.8126051,
+    "hash": "f338d71e87cf9271eaf7abea998f1cb4"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/includes/class-ad-network-ad-unit.php": {
     "mtime": 1781649107.8672762,
     "hash": "66720d6379df403ae8a9295c474a7e2d"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/includes/class-licenses.php": {
-    "mtime": 1781649107.867529,
-    "hash": "95082c1a6bd8b2295593ae4ad24df337"
+    "mtime": 1783515672.982401,
+    "hash": "36effad06828e61f320045ed47eb9abc"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/includes/class-notices.php": {
     "mtime": 1781649107.8676775,
@@ -936,7 +968,7 @@
     "hash": "ff0224256fe589db328d6320710cada3"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/views/support-callout.php": {
-    "mtime": 1781649107.8713017,
+    "mtime": 1782132978.4585414,
     "hash": "17544da8ce7d789225c36f957b91834b"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/views/ad-conditions-string-operators.php": {
@@ -970,10 +1002,6 @@
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/views/placements-inline-css.php": {
     "mtime": 1781649107.8709505,
     "hash": "7ed578c229048d1e42957e174a9cc6b3"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/views/setting-license.php": {
-    "mtime": 1781649107.8712215,
-    "hash": "dfdee8d4fbc65d6ba0457fc7da82581f"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/views/modal.php": {
     "mtime": 1781649107.8695345,
@@ -1100,8 +1128,8 @@
     "hash": "adea53f9c9420d96074686e2b88c777c"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/assets/js/admin.js": {
-    "mtime": 1781636676.7458513,
-    "hash": "6704f7024bbf3dc90fe2c734a62af167"
+    "mtime": 1783515672.8118386,
+    "hash": "32da6db4aefdaddbceb5699303a7fbd9"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/admin/assets/js/advertisement.js": {
     "mtime": 1777281848.5769796,
@@ -1112,7 +1140,7 @@
     "hash": "52ac28891f5eee24006a2017c67b4c9c"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/public/class-advanced-ads.php": {
-    "mtime": 1781731139.0890498,
+    "mtime": 1783515386.9715395,
     "hash": "628d1ac8d6c273a24caa7149357a3aa1"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/public/includes/index.php": {
@@ -1175,13 +1203,21 @@
     "mtime": 1781649107.9107337,
     "hash": "73f69d273ce2032faa2ca513639b6509"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/upgrades/upgrade-2.0.9.php": {
+    "mtime": 1783515661.1331255,
+    "hash": "dadec27c9f726af4fb0306679c85ee9f"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/upgrades/upgrade-2.0.8.php": {
-    "mtime": 1781731229.4036827,
+    "mtime": 1783515386.9900792,
     "hash": "f8d2d43fb74ef568e858031dc9e2c9b8"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/upgrades/upgrade-2.1.0.php": {
+    "mtime": 1783515672.9841533,
+    "hash": "62ead416ea1a82918adee4d0497fb5ea"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/upgrades/upgrade-1.52.1.php": {
-    "mtime": 1781731226.1932042,
-    "hash": "8f249be8215a5499b1cc5fa4d79de8b6"
+    "mtime": 1783515386.9898174,
+    "hash": "f50c2a2b56b1c0372ef66ef5f14710c0"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/upgrades/upgrade-1.48.5.php": {
     "mtime": 1781649107.9109006,
@@ -1308,7 +1344,7 @@
     "hash": "d630927a5981676b0e1dd6e1b6ba6f0a"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/gadsense/public/public.php": {
-    "mtime": 1781649107.9035478,
+    "mtime": 1783515386.9672885,
     "hash": "c955a2be901bcc01d659588f3cac79ea"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/gadsense/public/templates/page-level.php": {
@@ -1376,11 +1412,11 @@
     "hash": "704152c7b9051bda8145d8b1222c4d7c"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/gutenberg/includes/class-gutenberg.php": {
-    "mtime": 1781727713.8329403,
+    "mtime": 1783515386.9680705,
     "hash": "682605def203756329351bc2d5e71b5d"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/gutenberg/assets/advanced-ads.block.js": {
-    "mtime": 1781649024.682984,
+    "mtime": 1783515386.9676335,
     "hash": "aa3dae2ce91383fa4033b620837a57fe"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/adblock-finder/main.php": {
@@ -1448,15 +1484,15 @@
     "hash": "21d7e156efbabe64640b8480f444856e"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/ads-txt/includes/class-advanced-ads-ads-txt-strategy.php": {
-    "mtime": 1781649107.9006085,
+    "mtime": 1783515386.9669633,
     "hash": "ac63aa6f49c8b0c0040b5d38133f668b"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/ads-txt/admin/class-advanced-ads-ads-txt-admin.php": {
-    "mtime": 1781649107.9000776,
+    "mtime": 1783515386.9662607,
     "hash": "4aa6f1222935644432fbcdcff1c57cfb"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/ads-txt/admin/views/setting-additional-content.php": {
-    "mtime": 1781649107.9002006,
+    "mtime": 1783515386.9665315,
     "hash": "fc717cb205f7f11e79553edb3e083af5"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/modules/ads-txt/admin/views/setting-create.php": {
@@ -1675,14 +1711,6 @@
     "mtime": 1781649107.91143,
     "hash": "71ed4d340f6387cc424b96f9aeb5e7b0"
   },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/settings/license/addon-box.php": {
-    "mtime": 1781649107.9181478,
-    "hash": "8998116b6488fe345ba5564c7b720003"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/settings/license/section-help.php": {
-    "mtime": 1781649107.918215,
-    "hash": "620fac7dd0d23651c542f6f1af992b60"
-  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/settings/general/content-injection-everywhere.php": {
     "mtime": 1781649107.917127,
     "hash": "b8f298dc1daff906e58999165181075d"
@@ -1772,7 +1800,7 @@
     "hash": "89767dbf1b17d115fa331c17a51c7194"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/tables/ads/column-used.php": {
-    "mtime": 1781727268.3782222,
+    "mtime": 1783515386.992813,
     "hash": "b8147756da6c09f930d0a81ae49605d9"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/tables/ads/column-timing.php": {
@@ -1812,8 +1840,8 @@
     "hash": "cef3b1ea3ce2a083b883122dc58a4479"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/tools/other-plugin-importer.php": {
-    "mtime": 1781649107.920758,
-    "hash": "ea9ba19a9e1490e2d2f36fb72c6193a9"
+    "mtime": 1783515386.9930859,
+    "hash": "e0535a0c0f07fa6da00703e98551ab32"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/tools/import-history.php": {
     "mtime": 1781649107.9206855,
@@ -1836,7 +1864,7 @@
     "hash": "e1c0b4dbbac703c5476543d52dcb7b78"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/groups/edit-modal/list-row-option-ads.php": {
-    "mtime": 1781730103.054628,
+    "mtime": 1783515386.990744,
     "hash": "40572ce2e743be5db5dbdf4608e829da"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/groups/edit-modal/form.php": {
@@ -1852,7 +1880,7 @@
     "hash": "69a9fd779302532f6d39f6b868f982d4"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/groups/columns/list-row-loop.php": {
-    "mtime": 1781649107.912127,
+    "mtime": 1783515386.990469,
     "hash": "d1f3e524e11d3871ffcd50d3466780f5"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/groups/columns/usage.php": {
@@ -1872,8 +1900,8 @@
     "hash": "362dccb529e1289c7ebaae0a62a60181"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/screens/settings.php": {
-    "mtime": 1781649113.0843482,
-    "hash": "017217e096508ad85d976a562e3a089e"
+    "mtime": 1783515672.8141131,
+    "hash": "2dd149c7bd759b32223936891a3e71ff"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/screens/onboarding.php": {
     "mtime": 1781649107.9167368,
@@ -1883,85 +1911,9 @@
     "mtime": 1781649107.9168172,
     "hash": "7edbc684a5b5a9c84c5b1449bf0524b0"
   },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs.php": {
-    "mtime": 1781649107.918585,
-    "hash": "e77ad53c2c9bd273b7f8bcf698f3dd24"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/need-help-paid.php": {
-    "mtime": 1781649107.91932,
-    "hash": "2a0e771622a3ad215c4b2a1dab07b59f"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/searchbox.php": {
-    "mtime": 1781649107.9195647,
-    "hash": "26e2dc1b7a1e5327694f0a432a11f4d6"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/create-ticket.php": {
-    "mtime": 1781649107.9184096,
-    "hash": "fc2d200222954a1ed8a35abca823e8e0"
-  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/arrow.php": {
     "mtime": 1777281848.6980693,
     "hash": "2a274efd090ccaea19850e23b32d0300"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/need-help.php": {
-    "mtime": 1781649107.9193852,
-    "hash": "dc4dba0458ecb49e81e92442ee18ce45"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/latest-tutorials.php": {
-    "mtime": 1781649113.0844653,
-    "hash": "4598e842efd39426e378f53a5eedf6a0"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/error.php": {
-    "mtime": 1781649107.9185023,
-    "hash": "32b6d8ef068c2cf2ef25c1b59b1f6d4b"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/videos.php": {
-    "mtime": 1781649107.919641,
-    "hash": "16313e09803334a6b14740fd443243b1"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/articles.php": {
-    "mtime": 1781649107.9183164,
-    "hash": "2bfc9ecc4b50c77ad666885bc233e416"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/page.php": {
-    "mtime": 1781649107.9194696,
-    "hash": "fa8708c7571f42641916a471ebd4e65e"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/getting-started.php": {
-    "mtime": 1781649107.9192405,
-    "hash": "fe3777c39bb97e636994846f86b39b9a"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs/video-ads.php": {
-    "mtime": 1781649107.919177,
-    "hash": "ea5e651b17025a45422f7c7727452ff1"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs/cached-websites.php": {
-    "mtime": 1781649107.918745,
-    "hash": "87552b10d3f9fed0375110be4d27f7d6"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs/subscription-not-working.php": {
-    "mtime": 1781649107.9191036,
-    "hash": "69432a52e9ec6366408822e7f8b2d2dc"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs/manage-ads-across-multiple-installations.php": {
-    "mtime": 1781649107.9188929,
-    "hash": "07f39a7ce683a964f415b5528b5c1c69"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs/activate-license.php": {
-    "mtime": 1781649107.9186726,
-    "hash": "cabcdcee8194a5af3f0c032e6b6cf310"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs/getting-started.php": {
-    "mtime": 1781649107.918816,
-    "hash": "e990b0799ce4aa49688ea86539b6589d"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs/prevent-click-fraud.php": {
-    "mtime": 1781649107.9189641,
-    "hash": "f5447b2ddd1a14f33a430944fdf7408e"
-  },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/support/faqs/share-statistics.php": {
-    "mtime": 1781649107.9190338,
-    "hash": "77d57863d1a99fcacc83c8b707bd52d8"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/upgrades/pro-tab.php": {
     "mtime": 1781649107.9211905,
@@ -2004,7 +1956,7 @@
     "hash": "214be2fe209996745df9cc4d90bfbbfd"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/widgets/aa-dashboard/next-steps/widget.php": {
-    "mtime": 1781651872.8275075,
+    "mtime": 1783515386.9933784,
     "hash": "4f909df991e72a7c9b4da2665c5dfcfc"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/views/admin/metaboxes/ads/ad-usage.php": {
@@ -2287,6 +2239,22 @@
     "mtime": 1777281848.6052158,
     "hash": "0842bb744c70efa9c1847520c5db2566"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/main.js": {
+    "mtime": 1783515387.0590668,
+    "hash": "6eeabf3ec6e39c905e5b7a22c61b669d"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/router.js": {
+    "mtime": 1783515654.3386383,
+    "hash": "c0f845fd80d402ba535726157fb7a49a"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/routes.js": {
+    "mtime": 1783515409.4910626,
+    "hash": "5962dc2856e5658fcdffa8084e26452c"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/utils.js": {
+    "mtime": 1783515409.4251003,
+    "hash": "d33af0b9366593f2ee9be3be9efed14a"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-ads/listing.js": {
     "mtime": 1781649107.9085972,
     "hash": "6159ddaf449c398d1a5811a233dfac2c"
@@ -2308,20 +2276,176 @@
     "hash": "df2b313782415e3be2a2d868a50719cf"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-ads/quick-bulk-edit.js": {
-    "mtime": 1782132343.9694588,
+    "mtime": 1783515386.972772,
     "hash": "85d6446082eda37a2594d9a04394d490"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/License.jsx": {
+    "mtime": 1783515635.4924273,
+    "hash": "e0345f21a6cae73728e3d691c7db83ad"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/addon-catalog.js": {
+    "mtime": 1783515673.1071718,
+    "hash": "2082c13bd297cd7adb6768da80d2eb00"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/route.jsx": {
+    "mtime": 1783515673.1089926,
+    "hash": "7bd36e4ee04794889c0938a0159568de"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/utils.js": {
+    "mtime": 1783515673.1093235,
+    "hash": "c55be12de754dab64bcbcb689ec08cea"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/PricingTable.jsx": {
+    "mtime": 1783515673.108433,
+    "hash": "b8b799cc2d3e0e9249ab9b8d5b6a42e5"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/LicenseField.jsx": {
+    "mtime": 1783515409.55687,
+    "hash": "de3c0f6f839033af390de138a5dcd3ee"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/AutoUpdateModal.jsx": {
+    "mtime": 1783515577.054444,
+    "hash": "0c0f1d3a03c6174381f218e4a7db5edd"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/PricingModal.jsx": {
+    "mtime": 1783515654.136831,
+    "hash": "145e66293a3572ace4d3ae34c141e475"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/DownloadActivateButton.jsx": {
+    "mtime": 1783515673.1075275,
+    "hash": "88f560d9ea7f83058f8ac7b4cdf3d742"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/SitesModal.jsx": {
+    "mtime": 1783515673.1086905,
+    "hash": "b79b7c19178a2bb470b81b16a18e8bda"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/AddonsList.jsx": {
+    "mtime": 1783515577.0541687,
+    "hash": "5ab71c00a26c11350f0e2086fa99ea37"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/FeatureList.jsx": {
+    "mtime": 1783515409.5567908,
+    "hash": "aed64670ce0e3b20d9cee7321c7c638b"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/PricingTableItem.jsx": {
+    "mtime": 1783515654.137244,
+    "hash": "e631dc97ba4a9677ba689d622a5b716b"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/EmptyState.jsx": {
+    "mtime": 1783515673.1078405,
+    "hash": "74de48dba44a60f131444a453e764b06"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/Loader.jsx": {
+    "mtime": 1783515409.8270047,
+    "hash": "229d0839c772724c2448a31836f78c90"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/AddonRowActions.jsx": {
+    "mtime": 1783515654.4964,
+    "hash": "a00aa18135631da2c90bcc72edbf1d21"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/LicenseItem.jsx": {
+    "mtime": 1783515673.1082706,
+    "hash": "1d01af6b8ccfcdc073db4b0b591b810d"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/LicenseStatus.jsx": {
+    "mtime": 1783515577.4502678,
+    "hash": "1b6c3c4de8127446f553c1f2bfa1f2cd"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/LicenseNotices.jsx": {
+    "mtime": 1783515654.4971771,
+    "hash": "aa6533cedd870b4e859b975f26e1934f"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/components/AllAccessAddonsSummary.jsx": {
+    "mtime": 1783515577.0543213,
+    "hash": "4c06ae23abf8d559809d43003b9e215e"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/hooks/licenses-api.js": {
+    "mtime": 1783515673.0492527,
+    "hash": "aed424bf5d7689c15e448804ee564152"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-licenses/hooks/useLicenseData.js": {
+    "mtime": 1783515654.4155715,
+    "hash": "8c15443476e4fbf345384da6e6f016c7"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/route.jsx": {
+    "mtime": 1783515409.4927294,
+    "hash": "b8c06f4e234cf07abd10dddeea95b021"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/submit-ticket.js": {
     "mtime": 1781649107.9097476,
     "hash": "10490ff6d1d4d9d3f0a5a7cae45abef3"
   },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/support.js": {
-    "mtime": 1781649107.9098134,
-    "hash": "4e49152a7d79b37702f1f23c210071b6"
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/Support.jsx": {
+    "mtime": 1783515409.5576012,
+    "hash": "bf9f52d908416563941bb3dd1638eed9"
   },
-  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/autocomplete.js": {
-    "mtime": 1781649107.9096835,
-    "hash": "881fbbc4fbb05d4fe3ec6a673d33d1b6"
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/utils.js": {
+    "mtime": 1783515409.492909,
+    "hash": "7f653f1615da5643e10e156d57674f26"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/manage-ads-across-multiple-installations.jsx": {
+    "mtime": 1783515409.4923482,
+    "hash": "d3585e5619f1d1d246857bb3541a8e6c"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/activate-license.jsx": {
+    "mtime": 1783515409.4920645,
+    "hash": "64904eee684e569eeac1f62150fdeb1d"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/getting-started.jsx": {
+    "mtime": 1783515409.492217,
+    "hash": "6529500b9a741e0d87c48f212ca79829"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/share-statistics.jsx": {
+    "mtime": 1783515409.4925234,
+    "hash": "bbf481b1b5ab83623d31060596567853"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/prevent-click-fraud.jsx": {
+    "mtime": 1783515409.4924445,
+    "hash": "53257bd4ae6090a70ebb8f0aa20e8f41"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/video-ads.jsx": {
+    "mtime": 1783515409.4926639,
+    "hash": "0166cdaeab2248473f79077733724926"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/index.jsx": {
+    "mtime": 1783515409.4922795,
+    "hash": "dee374416f116652164ce4e2272395d6"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/cached-websites.jsx": {
+    "mtime": 1783515409.492143,
+    "hash": "f41ec346245fd6d7304581c329d5af4e"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/faqs/subscription-not-working.jsx": {
+    "mtime": 1783515409.4925947,
+    "hash": "825eec72f1df83c6eac424953f69e239"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/components/TicketModal.jsx": {
+    "mtime": 1783515409.5579178,
+    "hash": "153cc54d5ee7193adcdaa39e2c662cdb"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/components/Videos.jsx": {
+    "mtime": 1783515409.4919546,
+    "hash": "a32ef34c7cb9f35f7ece7f0c4153e119"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/components/FAQs.jsx": {
+    "mtime": 1783515409.491535,
+    "hash": "602bd111224ce1a76226dc474f6b6f61"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/components/SupportForum.jsx": {
+    "mtime": 1783515409.4917295,
+    "hash": "ae57a7a4f3892393ba4aee24f68fec62"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/components/PaidSupport.jsx": {
+    "mtime": 1783515409.4915981,
+    "hash": "551caa41c5efdff7c4dc62697462ef6f"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/components/CategoryCard.jsx": {
+    "mtime": 1783515409.5577312,
+    "hash": "63cafc044a5205624070bcd3570af76c"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-support/components/SearchBox.jsx": {
+    "mtime": 1783515409.4916625,
+    "hash": "4f0066b7c03187e9ee2462c2a06409ef"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-settings/index.js": {
     "mtime": 1781649107.9095805,
@@ -2332,7 +2456,7 @@
     "hash": "5d46f62c7bcc397f0cd82b4c20baa5ac"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-groups/edit-group.js": {
-    "mtime": 1781636676.7892723,
+    "mtime": 1783515386.9731867,
     "hash": "034317054e03a282586457feaf229395"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-groups/delete-group.js": {
@@ -2355,6 +2479,22 @@
     "mtime": 1781649107.9101427,
     "hash": "da96e5aed12bfcd24ce71683a07c45f6"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/layout/Header.jsx": {
+    "mtime": 1783515409.8260293,
+    "hash": "1cdea0c47079fed9488ae94342773baf"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/layout/Layout.jsx": {
+    "mtime": 1783515409.490812,
+    "hash": "5519fe97d43892d433e390986db38cbb"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/layout/AdminNav.jsx": {
+    "mtime": 1783515636.006574,
+    "hash": "cb1555f98075aa8c8e30bc9adabffcf8"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/layout/Content.jsx": {
+    "mtime": 1783515387.0588295,
+    "hash": "aa41e6781e6bddcd99f8e97ed1dd8a8f"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-placements/form-submission.js": {
     "mtime": 1777281848.6823788,
     "hash": "5ff616ed40ba2e7a4af98107dadfe12a"
@@ -2368,12 +2508,32 @@
     "hash": "9ce1dfa56b1efd35f25bd8b5a8bb5aa2"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-placements/frontend-picker.js": {
-    "mtime": 1781649107.9093966,
-    "hash": "41bd7e4cdded7db99ea2af65584c167b"
+    "mtime": 1783515386.9736624,
+    "hash": "f46d543083e491b699f40aa86251b7df"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-placements/item-select.js": {
     "mtime": 1781649107.909459,
     "hash": "a4800d97d9a4aa9039b9a8ed1dad389f"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/components/Card.jsx": {
+    "mtime": 1783515409.4897995,
+    "hash": "964d39418c60346fd0b5464dc2bf8057"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/components/Accordion.jsx": {
+    "mtime": 1783515409.48971,
+    "hash": "59ef8b3344bb202a6e793649652becec"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/components/SearchComboBox.jsx": {
+    "mtime": 1783515409.490048,
+    "hash": "d988ebb4dd941fe21c203be03e01b2f8"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/components/FileUploaderField.jsx": {
+    "mtime": 1783515409.4899728,
+    "hash": "71e60698c6d68eede1752511dcb047e5"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/components/CardSkeleton.jsx": {
+    "mtime": 1783515409.4898863,
+    "hash": "0858e2315fa3712a512caf1985843e75"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/common/toaster.js": {
     "mtime": 1781649107.9075165,
@@ -2398,6 +2558,22 @@
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/common/toggles.js": {
     "mtime": 1781649107.90761,
     "hash": "d139242d31115b9f6c8dec4ac86eff0b"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/hooks/useFetch.js": {
+    "mtime": 1783515635.491905,
+    "hash": "438c3470234973c3e4c45c67654f65b1"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/hooks/useModalState.js": {
+    "mtime": 1783515409.556621,
+    "hash": "53682fa715dd03597ad8f685c51fb292"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/hooks/useSearchCombobox.js": {
+    "mtime": 1783515409.490617,
+    "hash": "74b9a77e83ae058b61b8ab6241c87aa2"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/hooks/useFileUploader.js": {
+    "mtime": 1783515409.490546,
+    "hash": "bb6e8425c68b9b6a2ff6fea7df29b973"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/screen-dashboard/addon-box.js": {
     "mtime": 1777281848.6806839,
@@ -2459,6 +2635,10 @@
     "mtime": 1781649107.9078665,
     "hash": "e86c07436cd61079291ec7b8274d2b79"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/admin/store/index.js": {
+    "mtime": 1783515577.451256,
+    "hash": "4855ff8a9fcb64fcaea3d84fb386ee2d"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/src/public/frontend-picker.js": {
     "mtime": 1781649107.9105034,
     "hash": "f52a9219b678351845883bd2cf64e5bb"
@@ -2468,59 +2648,151 @@
     "hash": "55e8d72ce50b678dd53ca942c636ccd7"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/changelog.txt": {
-    "mtime": 1781636676.7603037,
-    "hash": "4bd69cd241230f9f779a941418472212"
+    "mtime": 1783515386.923121,
+    "hash": "af3e7dbdda14ed4bb757f52cd75680c5"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/readme.txt": {
-    "mtime": 1781636676.7886257,
-    "hash": "bd86b2ad86d4ed2632ac2306bee8c863"
+    "mtime": 1783515386.9719088,
+    "hash": "51637adf0534412640e503ae14406048"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/LICENSE.txt": {
     "mtime": 1777281848.570969,
     "hash": "39bba7d2cf0ba1036f2a6e2be52fe3f0"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/CLAUDE.md": {
-    "mtime": 1781649107.8737252,
+    "mtime": 1783515386.9035184,
     "hash": "d457a48590e24ad67021eaf245c5a223"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/vulberability.md": {
+    "mtime": 1783515386.9304376,
+    "hash": "a6a52239c3727e990ca58436ed326ca5"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/tech-stack.md": {
+    "mtime": 1783515635.491374,
+    "hash": "03073ce2d052ac6d8f37df88995ad26c"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/src-improvements.md": {
+    "mtime": 1783515635.4911404,
+    "hash": "206da167ee3599e8590c18680d4221a9"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/addons.md": {
+    "mtime": 1783515386.926496,
+    "hash": "29249e43d62e88c38e6614b41691ae26"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/artifacts/duplication-notes.md": {
-    "mtime": 1781649107.8756092,
+    "mtime": 1783515386.926826,
     "hash": "a03bd9ffe201ba75523de5b7c6e041ca"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/artifacts/security-checklist-results.md": {
-    "mtime": 1781636676.7644615,
+    "mtime": 1783515386.9277496,
     "hash": "38d63cea91e55a76d7647f2252667d5f"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/artifacts/flow-test-matrix.md": {
-    "mtime": 1781649107.8757188,
+    "mtime": 1783515386.9270852,
     "hash": "913d0e2c7910c52e12581841c546a609"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-06-16-support-page-tests.md": {
+    "mtime": 1783515635.8178914,
+    "hash": "c9a1aa94c349b2cd424306e996d68afc"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-06-30-license-storage-simplification.md": {
+    "mtime": 1783515654.5855033,
+    "hash": "a38972e35cb5d7c00402a147e81af1e7"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-06-28-conditional-post-checkout-notice.md": {
+    "mtime": 1783515654.336728,
+    "hash": "18bcbb1298650dc29ce21d8d181faa66"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-07-01-license-per-product-line-activation.md": {
+    "mtime": 1783515672.8681846,
+    "hash": "e1a0d4560e963c7b8e2849f728e4ed81"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-07-01-license-direct-checkout-upgrade.md": {
+    "mtime": 1783515672.9248781,
+    "hash": "fcb8b7abe7da7d315ec441b310b960e6"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-06-30-license-flat-map-migration.md": {
+    "mtime": 1783515654.5853577,
+    "hash": "fb2e754dc124c61328f05d983863e4e4"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-07-01-remove-settings-licenses-tab.md": {
+    "mtime": 1783515672.812771,
+    "hash": "20fd3525a18289f001db0e1ec312b5ff"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-05-13-codebase-health-audit-execution.md": {
-    "mtime": 1781649107.876023,
+    "mtime": 1783515386.9284816,
     "hash": "3675263a4a4cdaefef16455367f73b6b"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-06-29-license-activate-flow.md": {
+    "mtime": 1783515654.492885,
+    "hash": "e0fbc6d6c9847f70d19db066a432bd1d"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-06-16-license-page-tests.md": {
+    "mtime": 1783515653.9206495,
+    "hash": "67fe247bef08074c8b2fe1661f233312"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/plans/2026-06-18-ad-list-stats-query.md": {
-    "mtime": 1781743958.975773,
+    "mtime": 1783515386.9287329,
     "hash": "ce26ff6debdc2cfb5f01850fafca4d3e"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-18-ad-list-stats-query-design.md": {
-    "mtime": 1781743958.992293,
+    "mtime": 1783515386.9301028,
     "hash": "e258721319ca38e7f060a0cf99794f80"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-17-includes-ads-phpunit-design.md": {
-    "mtime": 1781653686.568343,
+    "mtime": 1783515386.9298372,
     "hash": "3cfb7e0b20878d1f55ff950af61c6606"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-05-06-license-class-design.md": {
+    "mtime": 1783515425.2354827,
+    "hash": "868c78f8f2947120f38145ec4894317c"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-07-01-license-direct-checkout-upgrade-design.md": {
+    "mtime": 1783515672.9250367,
+    "hash": "ef1a6657a0dbdcaa5adf2e05455dab40"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-28-conditional-post-checkout-notice-design.md": {
+    "mtime": 1783515654.3371065,
+    "hash": "994d0775b0c0c712865f0c473f73dd0f"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-30-license-flat-map-migration-design.md": {
+    "mtime": 1783515654.585658,
+    "hash": "07604eb63e04dfa66a9c5d725265a90b"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-16-repository-and-entity-cache-design.md": {
-    "mtime": 1781652687.1227522,
+    "mtime": 1783515386.9294772,
     "hash": "3e03e8e9fa2925b480494f6f125ac7ca"
   },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-07-01-license-per-product-line-activation-design.md": {
+    "mtime": 1783515672.8683424,
+    "hash": "01ca80eec5cdae4a43377f62ac724eaa"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-07-01-remove-settings-licenses-tab-design.md": {
+    "mtime": 1783515672.8129194,
+    "hash": "e6e41bfca866c23eb4a8519eaf34eadd"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-18-pricing-modal-current-plan-design.md": {
+    "mtime": 1783515654.1342704,
+    "hash": "6c7efe5a785fb66c24e761c944de1e3b"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-30-license-storage-simplification-design.md": {
+    "mtime": 1783515654.5857904,
+    "hash": "415ccd974f7351329cbc670dc142463c"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-29-license-activate-flow-design.md": {
+    "mtime": 1783515654.4933884,
+    "hash": "a06c9aed96b11dc60e6e26c4f55f906b"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-06-18-license-post-checkout-notice-design.md": {
+    "mtime": 1783515654.134074,
+    "hash": "15e6a130d9abcc52ff82d577ad20ccf3"
+  },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/specs/2026-05-13-codebase-health-and-regression-confidence-design.md": {
-    "mtime": 1781649107.8761759,
+    "mtime": 1783515386.929113,
     "hash": "9b03eb49e72f146feb8c212fb6fa5f0f"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/docs/superpowers/findings/2026-05-13-codebase-health-report.md": {
-    "mtime": 1781649107.8758624,
+    "mtime": 1783515386.9280858,
     "hash": "29118d8a250743076e50d86b4cb29ad1"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/playwright-report/index.html": {
@@ -3010,6 +3282,10 @@
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/assets/img/icons/trash-bw.svg": {
     "mtime": 1777281848.596254,
     "hash": "3ad97eb9339efcd65462722979f619dd"
+  },
+  "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/assets/img/icons/loader.svg": {
+    "mtime": 1783515654.1338036,
+    "hash": "bc6e35aecd87f637b32a3382de0f915c"
   },
   "/Users/shakeebahmed/Sites/wp-ads/wp-content/plugins/advanced-ads/assets/img/icons/draft.svg": {
     "mtime": 1777281848.5955894,

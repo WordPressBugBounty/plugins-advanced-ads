@@ -13,7 +13,6 @@ use Exception;
 use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Factory;
 use AdvancedAds\Abstracts\Placement;
-use AdvancedAds\Placements\Placement_Standard;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -30,19 +29,7 @@ class Placement_Factory extends Factory {
 	 * @return Placement|bool Placement object or false if the placement type not found.
 	 */
 	public function create_placement( $type = 'default' ) {
-		$placement_type = wp_advads_get_placement_type( $type );
-
-		if ( ! $placement_type ) {
-			return false;
-		}
-
-		$classname = $placement_type->get_classname();
-
-		// Create placement.
-		$placement = new $classname( 0 );
-		$placement->set_type( $placement_type->get_id() );
-
-		return $placement;
+		return $this->create_empty_from_type( wp_advads_get_placement_type( $type ) );
 	}
 
 	/**
@@ -60,25 +47,21 @@ class Placement_Factory extends Factory {
 			return false;
 		}
 
-		$cache_key = $this->get_instance_cache_key( (int) $placement_id, $new_type );
-		if ( array_key_exists( $cache_key, $this->instances ) ) {
-			return $this->instances[ $cache_key ];
+		if ( $this->has_cached_instance( (int) $placement_id, $new_type ) ) {
+			return $this->get_cached_instance( (int) $placement_id, $new_type );
 		}
 
 		$placement_type = '' !== $new_type ? $new_type : $this->get_placement_type( $placement_id );
-		$classname      = wp_advads_get_placement_type_manager()->get_classname_for_type( $placement_type );
-
+		$classname      = wp_advads()->placements->types->get_classname_for_type( $placement_type );
 		try {
 			$placement = new $classname( $placement_id );
-
-			$this->instances[ $cache_key ] = $placement;
-
-			return $placement;
 		} catch ( Exception $e ) {
 			return false;
 		}
 
-		return new Placement_Standard();
+		$this->store_cached_instance( (int) $placement_id, $new_type, $placement );
+
+		return $placement;
 	}
 
 	/**

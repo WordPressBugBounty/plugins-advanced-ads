@@ -1,0 +1,20 @@
+@layer theme, utilities;
+
+/* Disable auto detection */
+@import "tailwindcss/theme.css" layer(theme) source(none);
+
+.advanced-ads_page_advanced-ads-app {
+	@import "tailwindcss/utilities.css" source(none);
+}
+
+@source "./components/**/*.{js,jsx}";
+@source "./layout/**/*.{js,jsx}";
+@source "./screen-licenses/**/*.{js,jsx}";
+@source "./screen-support/**/*.{js,jsx}";
+
+@import "./css/theme.css";
+@import "./css/base.css";
+@import "./css/button.css";
+@import "./css/form.css";
+
+@import "./screen-support/support.css";

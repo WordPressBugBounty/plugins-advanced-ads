@@ -29,19 +29,7 @@ class Group_Factory extends Factory {
 	 * @return Group|bool Group object or false if the group type not found.
 	 */
 	public function create_group( $type = 'default' ) {
-		$group_type = wp_advads_get_group_type( $type );
-
-		if ( ! $group_type ) {
-			return false;
-		}
-
-		$classname = $group_type->get_classname();
-
-		// Create group.
-		$group = new $classname( 0 );
-		$group->set_type( $group_type->get_id() );
-
-		return $group;
+		return $this->create_empty_from_type( wp_advads_get_group_type( $type ) );
 	}
 
 	/**
@@ -59,23 +47,21 @@ class Group_Factory extends Factory {
 			return false;
 		}
 
-		$cache_key = $this->get_instance_cache_key( (int) $group_id, $new_type );
-		if ( array_key_exists( $cache_key, $this->instances ) ) {
-			return $this->instances[ $cache_key ];
+		if ( $this->has_cached_instance( (int) $group_id, $new_type ) ) {
+			return $this->get_cached_instance( (int) $group_id, $new_type );
 		}
 
 		$group_type = '' !== $new_type ? $new_type : $this->get_group_type( $group_id );
-		$classname  = wp_advads_get_group_type_manager()->get_classname_for_type( $group_type );
-
+		$classname  = wp_advads()->groups->types->get_classname_for_type( $group_type );
 		try {
 			$group = new $classname( $group_id );
-
-			$this->instances[ $cache_key ] = $group;
-
-			return $group;
 		} catch ( Exception $e ) {
 			return false;
 		}
+
+		$this->store_cached_instance( (int) $group_id, $new_type, $group );
+
+		return $group;
 	}
 
 	/**

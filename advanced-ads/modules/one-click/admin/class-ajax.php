@@ -56,6 +56,10 @@ class Ajax implements Integration_Interface {
 	 * @return void
 	 */
 	public function init(): void {
+		if ( ! is_admin() || ! current_user_can( 'advanced_ads_manage_options' ) ) {
+			return;
+		}
+
 		if ( Params::get( 'refresh_ads', false, FILTER_VALIDATE_BOOLEAN ) ) {
 			$config = $this->pubguru_api_connect();
 

@@ -91,7 +91,7 @@ class Validation {
 		}
 
 		// Dont' save meta boxes for revisions or autosaves.
-		if ( Conditional::doing_autosave() || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
+		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
 			return false;
 		}
 

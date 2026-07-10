@@ -9,42 +9,38 @@
 
 namespace AdvancedAds\Placements;
 
-use AdvancedAds\Framework\Interfaces\Initializer_Interface;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Placements.
  */
-class Placements implements Initializer_Interface {
+class Placements {
 
 	/**
 	 * Hold factory instance
 	 *
 	 * @var Placement_Factory
 	 */
-	public $factory = null;
+	public $factory;
 
 	/**
 	 * Hold repository instance
 	 *
 	 * @var Placement_Repository
 	 */
-	public $repository = null;
+	public $repository;
 
 	/**
 	 * Hold types manager
 	 *
 	 * @var Placement_Types
 	 */
-	public $types = null;
+	public $types;
 
 	/**
-	 * Runs this initializer.
-	 *
-	 * @return void
+	 * Construct placement services.
 	 */
-	public function initialize(): void {
+	public function __construct() {
 		$this->factory    = new Placement_Factory();
 		$this->types      = new Placement_Types();
 		$this->repository = new Placement_Repository();

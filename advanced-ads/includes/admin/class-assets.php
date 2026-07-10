@@ -9,11 +9,11 @@
 
 namespace AdvancedAds\Admin;
 
-use AdvancedAds\Constants;
 use Advanced_Ads_AdSense_Admin;
 use Advanced_Ads_Display_Conditions;
-use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -96,28 +96,28 @@ class Assets implements Integration_Interface {
 			wp_advads()->registry->enqueue_script( 'notifications-center' );
 
 			$translation_array = [
-				'condition_or'                  => __( 'or', 'advanced-ads' ),
-				'condition_and'                 => __( 'and', 'advanced-ads' ),
-				'after_paragraph_promt'         => __( 'After which paragraph?', 'advanced-ads' ),
-				'page_level_ads_enabled'        => Advanced_Ads_AdSense_Admin::get_auto_ads_messages()['enabled'],
-				'today'                         => __( 'Today', 'advanced-ads' ),
-				'yesterday'                     => __( 'Yesterday', 'advanced-ads' ),
-				'this_month'                    => __( 'This Month', 'advanced-ads' ),
+				'condition_or'                 => __( 'or', 'advanced-ads' ),
+				'condition_and'                => __( 'and', 'advanced-ads' ),
+				'after_paragraph_promt'        => __( 'After which paragraph?', 'advanced-ads' ),
+				'page_level_ads_enabled'       => Advanced_Ads_AdSense_Admin::get_auto_ads_messages()['enabled'],
+				'today'                        => __( 'Today', 'advanced-ads' ),
+				'yesterday'                    => __( 'Yesterday', 'advanced-ads' ),
+				'this_month'                   => __( 'This Month', 'advanced-ads' ),
 				/* translators: 1: The number of days. */
-				'last_n_days'                   => __( 'Last %1$d days', 'advanced-ads' ),
+				'last_n_days'                  => __( 'Last %1$d days', 'advanced-ads' ),
 				/* translators: 1: An error message. */
-				'error_message'                 => __( 'An error occurred: %1$s', 'advanced-ads' ),
-				'all'                           => __( 'All', 'advanced-ads' ),
-				'active'                        => __( 'Active', 'advanced-ads' ),
-				'no_results'                    => __( 'There were no results returned for this ad. Please make sure it is active, generating impressions and double check your ad parameters.', 'advanced-ads' ),
-				'show_inactive_ads'             => __( 'Show inactive ads', 'advanced-ads' ),
-				'hide_inactive_ads'             => __( 'Hide inactive ads', 'advanced-ads' ),
-				'display_conditions_form_name'  => Advanced_Ads_Display_Conditions::FORM_NAME, // not meant for translation.
-				'close'                         => __( 'Close', 'advanced-ads' ),
-				'close_save'                    => __( 'Close and save', 'advanced-ads' ),
-				'confirmation'                  => __( 'Data you have entered has not been saved. Are you sure you want to discard your changes?', 'advanced-ads' ),
-				'admin_page'                    => $screen->id,
-				'placements_allowed_ads'        => [
+				'error_message'                => __( 'An error occurred: %1$s', 'advanced-ads' ),
+				'all'                          => __( 'All', 'advanced-ads' ),
+				'active'                       => __( 'Active', 'advanced-ads' ),
+				'no_results'                   => __( 'There were no results returned for this ad. Please make sure it is active, generating impressions and double check your ad parameters.', 'advanced-ads' ),
+				'show_inactive_ads'            => __( 'Show inactive ads', 'advanced-ads' ),
+				'hide_inactive_ads'            => __( 'Hide inactive ads', 'advanced-ads' ),
+				'display_conditions_form_name' => Advanced_Ads_Display_Conditions::FORM_NAME, // not meant for translation.
+				'close'                        => __( 'Close', 'advanced-ads' ),
+				'close_save'                   => __( 'Close and save', 'advanced-ads' ),
+				'confirmation'                 => __( 'Data you have entered has not been saved. Are you sure you want to discard your changes?', 'advanced-ads' ),
+				'admin_page'                   => $screen->id,
+				'placements_allowed_ads'       => [
 					'action' => 'advads_placements_allowed_ads',
 					'nonce'  => wp_create_nonce( 'advads-create-new-placement' ),
 				],
@@ -162,8 +162,14 @@ class Assets implements Integration_Interface {
 	 */
 	private function enqueue_site_info() {
 		$endpoints = [
-			'blogId'  => get_current_blog_id(),
-			'homeUrl' => get_home_url(),
+			'blogId'             => get_current_blog_id(),
+			'homeUrl'            => get_home_url(),
+			'siteUrl'            => get_site_url(),
+			'phpVersion'         => phpversion(),
+			'wpVersion'          => get_bloginfo( 'version' ),
+			'proVersion'         => defined( 'AAP_VERSION' ),
+			'hasAnyValidLicense' => \Advanced_Ads_Admin_Licenses::get_instance()->any_license_valid(),
+			'currentUserEmail'   => get_current_user_id() ? wp_get_current_user()->user_email : '',
 		];
 
 		wp_advads_json_add( 'siteInfo', $endpoints );
@@ -176,10 +182,13 @@ class Assets implements Integration_Interface {
 	 */
 	private function enqueue_endpoints() {
 		$endpoints = [
-			'adminUrl'  => esc_url( admin_url( '/' ) ),
-			'ajaxUrl'   => esc_url( admin_url( 'admin-ajax.php' ) ),
-			'assetsUrl' => esc_url( ADVADS_BASE_URL ),
-			'editAd'    => esc_url( admin_url( 'post.php?action=edit&post=' ) ),
+			'adminUrl'     => esc_url( admin_url( '/' ) ),
+			'ajaxUrl'      => esc_url( admin_url( 'admin-ajax.php' ) ),
+			'assetsUrl'    => esc_url( ADVADS_BASE_URL ),
+			'dashboardUrl' => esc_url( admin_url( 'admin.php?page=advanced-ads' ) ),
+			'editAd'       => esc_url( admin_url( 'post.php?action=edit&post=' ) ),
+			'shopUrl'      => defined( 'AA_SHOP_URL' ) ? esc_url( AA_SHOP_URL ) : esc_url( 'https://wpadvancedads.com' ), // SHOP_URL define on wp-config.php.
+			'siteUrl'      => esc_url( site_url() ),
 		];
 
 		wp_advads_json_add( 'endpoints', $endpoints );

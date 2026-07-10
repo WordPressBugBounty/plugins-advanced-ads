@@ -9,6 +9,7 @@
 
 namespace AdvancedAds\Installation;
 
+use AdvancedAds\Crons\Licenses as License_Cron;
 use AdvancedAds\Framework\Installation\Install as Base;
 
 defined( 'ABSPATH' ) || exit;
@@ -34,6 +35,8 @@ class Install extends Base {
 	 * @return void
 	 */
 	protected function activate(): void {
+		$this->save_first_activation_time();
+
 		// TODO: inform modules.
 		( new Capabilities() )->create_capabilities();
 
@@ -51,6 +54,7 @@ class Install extends Base {
 	protected function deactivate(): void {
 		// TODO: inform modules.
 		( new Capabilities() )->remove_capabilities();
+		License_Cron::unschedule_all();
 	}
 
 	/**
@@ -60,5 +64,18 @@ class Install extends Base {
 	 */
 	public static function uninstall(): void {
 		( new Uninstall() )->initialize();
+	}
+
+	/**
+	 * Save first activation time
+	 *
+	 * @return void
+	 */
+	private function save_first_activation_time(): void {
+		$first_activation_date = get_option( '_advads_first_activation_time' );
+		if ( ! $first_activation_date ) {
+			update_option( '_advads_first_activation_time', time() );
+			set_transient( '_advads_welcome_page_redirect', true, 2 * MINUTE_IN_SECONDS );
+		}
 	}
 }

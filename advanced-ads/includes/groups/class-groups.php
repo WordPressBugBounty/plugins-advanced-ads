@@ -9,42 +9,38 @@
 
 namespace AdvancedAds\Groups;
 
-use AdvancedAds\Framework\Interfaces\Initializer_Interface;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Groups.
  */
-class Groups implements Initializer_Interface {
+class Groups {
 
 	/**
 	 * Hold factory instance
 	 *
 	 * @var Group_Factory
 	 */
-	public $factory = null;
+	public $factory;
 
 	/**
 	 * Hold repository instance
 	 *
 	 * @var Group_Repository
 	 */
-	public $repository = null;
+	public $repository;
 
 	/**
 	 * Hold types manager
 	 *
 	 * @var Group_Types
 	 */
-	public $types = null;
+	public $types;
 
 	/**
-	 * Runs this initializer.
-	 *
-	 * @return void
+	 * Construct group services.
 	 */
-	public function initialize(): void {
+	public function __construct() {
 		$this->factory    = new Group_Factory();
 		$this->types      = new Group_Types();
 		$this->repository = new Group_Repository();

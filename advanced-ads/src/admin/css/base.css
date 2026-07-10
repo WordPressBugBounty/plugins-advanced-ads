@@ -1,0 +1,31 @@
+.advanced-ads_page_advanced-ads-app {
+	@apply bg-[#f8f9fa];
+
+	#wpcontent {
+		@apply p-0;
+	}
+
+	#wpbody-content > .notice {
+		@apply hidden;
+	}
+}
+
+.advads-modal {
+	margin-top: calc(5vh + var(--wp-admin--admin-bar--height, 0px));
+	max-height: calc(90vh - var(--wp-admin--admin-bar--height, 0px));
+}
+
+.advads-modal .components-modal__content,
+.advads-scrollbar {
+    &::-webkit-scrollbar {
+        @apply w-3;
+    }
+
+    &::-webkit-scrollbar-track {
+        @apply bg-transparent shadow-none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        @apply bg-border rounded-lg border-3 border-transparent bg-clip-content;
+    }
+}

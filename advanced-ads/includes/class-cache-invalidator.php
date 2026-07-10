@@ -45,7 +45,7 @@ class Cache_Invalidator implements Integration_Interface {
 	 */
 	public static function invalidate_ads(): void {
 		Cache::flush_group( Cache::PREFIX_ADS );
-		wp_advads_get_ad_factory()->clear_instance_cache();
+		wp_advads()->ads->factory->clear_instance_cache();
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Cache_Invalidator implements Integration_Interface {
 	 */
 	public static function invalidate_groups(): void {
 		Cache::flush_group( Cache::PREFIX_GROUPS );
-		wp_advads_get_group_factory()->clear_instance_cache();
+		wp_advads()->groups->factory->clear_instance_cache();
 	}
 
 	/**
@@ -65,7 +65,7 @@ class Cache_Invalidator implements Integration_Interface {
 	 */
 	public static function invalidate_placements(): void {
 		Cache::flush_group( Cache::PREFIX_PLACEMENTS );
-		wp_advads_get_placement_factory()->clear_instance_cache();
+		wp_advads()->placements->factory->clear_instance_cache();
 	}
 
 	/**
@@ -75,9 +75,9 @@ class Cache_Invalidator implements Integration_Interface {
 	 */
 	public static function invalidate_all(): void {
 		Cache::flush_all();
-		wp_advads_get_ad_factory()->clear_instance_cache();
-		wp_advads_get_group_factory()->clear_instance_cache();
-		wp_advads_get_placement_factory()->clear_instance_cache();
+		wp_advads()->ads->factory->clear_instance_cache();
+		wp_advads()->groups->factory->clear_instance_cache();
+		wp_advads()->placements->factory->clear_instance_cache();
 	}
 
 	/**

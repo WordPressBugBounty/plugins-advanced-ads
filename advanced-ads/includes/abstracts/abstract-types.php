@@ -22,7 +22,7 @@ abstract class Types implements Integration_Interface {
 	/**
 	 * Hold types.
 	 *
-	 * @var array
+	 * @var array<string, object>
 	 */
 	protected $types = [];
 
@@ -50,7 +50,7 @@ abstract class Types implements Integration_Interface {
 	/**
 	 * Check if has premium types.
 	 *
-	 * @var bool
+	 * @var bool|null
 	 */
 	private $has_premium = null;
 
@@ -62,6 +62,13 @@ abstract class Types implements Integration_Interface {
 	public function hooks(): void {
 		add_action( 'init', [ $this, 'register_types' ], 25 );
 	}
+
+	/**
+	 * Built-in type classes for this manager.
+	 *
+	 * @return string[]
+	 */
+	abstract protected function default_type_classes(): array;
 
 	/**
 	 * Create missing type
@@ -101,9 +108,12 @@ abstract class Types implements Integration_Interface {
 	public function register_types(): void {
 		$this->register_default_types();
 		/**
-		 * Developers can add new types using this filter
+		 * Developers can add new types using this action.
 		 */
 		do_action( $this->hook . '-manager', $this );
+		/**
+		 * Developers can add or replace types using this filter.
+		 */
 		$this->types = apply_filters( $this->hook, $this->types );
 
 		$this->validate_types();
@@ -189,7 +199,11 @@ abstract class Types implements Integration_Interface {
 	 *
 	 * @return void
 	 */
-	abstract protected function register_default_types(): void;
+	protected function register_default_types(): void {
+		foreach ( $this->default_type_classes() as $classname ) {
+			$this->register_type( $classname );
+		}
+	}
 
 	/**
 	 * Validate types by type interface

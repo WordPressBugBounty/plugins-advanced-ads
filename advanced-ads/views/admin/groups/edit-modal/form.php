@@ -64,7 +64,7 @@ $group_id    = $group->get_id();
 				</label>
 			<?php endforeach; ?>
 
-			<?php if ( wp_advads_get_group_type_manager()->has_premium() ) : ?>
+			<?php if ( wp_advads()->groups->types->has_premium() ) : ?>
 				<label>
 					<?php Upgrades::upgrade_link( __( 'Get all group types with All Access', 'advanced-ads' ), 'https://wpadvancedads.com/add-ons/all-access/', 'upgrades-pro-groups' ); ?>
 				</label>

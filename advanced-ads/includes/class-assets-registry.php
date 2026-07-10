@@ -80,6 +80,9 @@ class Assets_Registry extends Framework\Assets_Registry {
 		$this->register_style( 'screen-support', 'assets/dist/screen-support.css' );
 		$this->register_style( 'screen-tools', 'assets/dist/screen-tools.css' );
 		$this->register_style( 'wp-dashboard', 'assets/dist/wp-dashboard.css', [ self::prefix_it( 'common' ) ] );
+
+		// App.
+		$this->register_style( 'app', 'assets/dist/app.css' );
 	}
 
 	/**
@@ -162,5 +165,8 @@ class Assets_Registry extends Framework\Assets_Registry {
 		$this->register_script( 'screen-tools', 'assets/dist/screen-tools.js', [ self::prefix_it( 'find-adblocker' ) ], false, $use_assets );
 		$this->register_script( 'wp-dashboard', 'assets/dist/wp-dashboard.js', null, false, $use_assets );
 		// phpcs:enable
+
+		// App.
+		$this->register_script( 'app', 'assets/dist/app.js', null, false, $use_assets );
 	}
 }

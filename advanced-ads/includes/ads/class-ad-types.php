@@ -49,17 +49,19 @@ class Ad_Types extends Types {
 	protected $type_interface = Ad_Type::class;
 
 	/**
-	 * Register default types.
+	 * Built-in ad type classes.
 	 *
-	 * @return void
+	 * @return string[]
 	 */
-	protected function register_default_types(): void {
-		$this->register_type( Plain::class );
-		$this->register_type( Dummy::class );
-		$this->register_type( Content::class );
-		$this->register_type( Image::class );
-		$this->register_type( Group::class );
-		$this->register_type( GAM::class );
-		$this->register_type( AMP::class );
+	protected function default_type_classes(): array {
+		return [
+			Plain::class,
+			Dummy::class,
+			Content::class,
+			Image::class,
+			Group::class,
+			GAM::class,
+			AMP::class,
+		];
 	}
 }

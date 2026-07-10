@@ -25,7 +25,7 @@ export default defineConfig( {
 		// ----------------------------------------------------
 		{
 			name: 'setup',
-			testMatch: 'tests/Acceptance/fixtures/auth.setup.ts',
+			testMatch: 'tests/Acceptance/Fixtures/auth.setup.ts',
 		},
 
 		// ----------------------------------------------------
@@ -36,6 +36,7 @@ export default defineConfig( {
 			testDir: 'tests/Acceptance/Admin',
 			use: { storageState: 'auth.json' },
 			dependencies: [ 'setup' ],
+			testIgnore: '**/Licenses/**',
 		},
 
 		{
@@ -57,6 +58,20 @@ export default defineConfig( {
 			testDir: 'tests/Acceptance/Admin/Placements',
 			use: { storageState: 'auth.json' },
 			dependencies: [ 'admin-groups' ],
+		},
+
+		{
+			name: 'admin-licenses',
+			testDir: 'tests/Acceptance/Admin/Licenses',
+			use: { storageState: 'auth.json' },
+			dependencies: [ 'setup' ],
+		},
+
+		{
+			name: 'admin-support',
+			testDir: 'tests/Acceptance/Admin/Support',
+			use: { storageState: 'auth.json' },
+			dependencies: [ 'setup' ],
 		},
 
 		// ----------------------------------------------------

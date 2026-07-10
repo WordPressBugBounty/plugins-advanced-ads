@@ -1,0 +1,37 @@
+.advads-modal,
+.advads-layout {
+	.button {
+		@apply inline-flex items-center gap-x-2 cursor-pointer rounded-lg font-normal transition-colors no-underline leading-4 shadow-none! outline-none! border-0;
+	}
+
+	.button.advads-button-primary {
+		@apply bg-primary border-primary text-white;
+		@apply hover:bg-gray-800 hover:border-gray-800;
+	}
+
+	.button.advads-button-secondary {
+		@apply bg-gray-800 border-gray-800 text-white;
+		@apply hover:bg-neutral-200 hover:border-gray-600 hover:text-gray-800;
+	}
+
+	.button.advads-button-neutral {
+		@apply bg-neutral-200 border-gray-600 text-gray-800;
+		@apply hover:bg-neutral-300 hover:border-gray-800;
+	}
+
+	.is-big {
+		@apply text-lg px-4 py-3;
+	}
+
+	.is-small {
+		@apply text-xs px-2 py-0.5 min-h-4;
+	}
+
+	.is-ghost {
+		@apply inline-flex items-center gap-2 cursor-pointer rounded-lg transition-colors no-underline min-h-4 leading-4 border-0 bg-transparent p-0 text-base font-semibold text-gray-700 hover:text-gray-900;
+	}
+
+	.is-block {
+		@apply flex justify-center rounded p-4 leading-0 font-normal;
+	}
+}

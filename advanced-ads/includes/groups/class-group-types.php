@@ -46,14 +46,16 @@ class Group_Types extends Types {
 	protected $type_interface = Group_Type::class;
 
 	/**
-	 * Register default types.
+	 * Built-in group type classes.
 	 *
-	 * @return void
+	 * @return string[]
 	 */
-	protected function register_default_types(): void {
-		$this->register_type( Standard::class );
-		$this->register_type( Ordered::class );
-		$this->register_type( Grid::class );
-		$this->register_type( Slider::class );
+	protected function default_type_classes(): array {
+		return [
+			Standard::class,
+			Ordered::class,
+			Grid::class,
+			Slider::class,
+		];
 	}
 }

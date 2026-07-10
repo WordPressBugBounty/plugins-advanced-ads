@@ -15,6 +15,7 @@ use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Arr;
 use AdvancedAds\Framework\Utilities\Formatting;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Traits\Repository_Helpers;
 use AdvancedAds\Utilities\Cache;
 use AdvancedAds\Cache_Invalidator;
 use AdvancedAds\Utilities\WordPress;
@@ -29,6 +30,7 @@ defined( 'ABSPATH' ) || exit;
  * phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter.Found -- remove it later
  */
 class Ad_Repository {
+	use Repository_Helpers;
 
 	/**
 	 * Ad options metakey
@@ -156,17 +158,7 @@ class Ad_Repository {
 				wp_update_post( array_merge( [ 'ID' => $ad->get_id() ], $post_data ) );
 			}
 		} else { // Only update post modified time to record this save event.
-			$wpdb->update( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$wpdb->posts,
-				[
-					'post_modified'     => current_time( 'mysql' ),
-					'post_modified_gmt' => current_time( 'mysql', 1 ),
-				],
-				[
-					'ID' => $ad->get_id(),
-				]
-			);
-			clean_post_cache( $ad->get_id() );
+			$this->touch_post_modified_time( $ad->get_id() );
 		}
 
 		$this->update_post_meta( $ad );
@@ -224,7 +216,7 @@ class Ad_Repository {
 	 * @return Ad[]|int[]|array
 	 */
 	public function get_ads_by_group_id( $group_id, $output = OBJECT ): array {
-		return wp_advads_get_group_repository()->get_ads_by_group_id( (int) $group_id, $output );
+		return wp_advads()->groups->repository->get_ads_by_group_id( (int) $group_id, $output );
 	}
 
 	/**
@@ -339,13 +331,7 @@ class Ad_Repository {
 	 * @return array<int, string>
 	 */
 	public function get_ads_dropdown(): array {
-		$summaries = $this->get_ad_summaries();
-
-		if ( empty( $summaries ) ) {
-			return [];
-		}
-
-		return wp_list_pluck( $summaries, 'title', 'id' );
+		return $this->summaries_to_dropdown( $this->get_ad_summaries() );
 	}
 
 	/**
@@ -402,18 +388,7 @@ class Ad_Repository {
 	 * @return Ad[]
 	 */
 	private function hydrate_ads( array $post_ids ): array {
-		$post_ids = array_values( array_filter( array_map( 'absint', $post_ids ) ) );
-
-		if ( ! empty( $post_ids ) ) {
-			_prime_post_caches( $post_ids, false, true );
-		}
-
-		$ads = [];
-		foreach ( $post_ids as $post_id ) {
-			$ads[ $post_id ] = wp_advads_get_ad( $post_id );
-		}
-
-		return $ads;
+		return $this->hydrate_post_entities( $post_ids, 'wp_advads_get_ad' );
 	}
 
 	/**

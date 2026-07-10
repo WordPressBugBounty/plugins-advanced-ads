@@ -9,13 +9,12 @@
 
 namespace AdvancedAds\Admin;
 
-use Advanced_Ads_Checks;
 use Advanced_Ads_Ad_Health_Notices;
-use AdvancedAds\Constants;
 use AdvancedAds\Admin\Pages;
-use AdvancedAds\Utilities\WordPress;
-use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -255,17 +254,6 @@ class Admin_Menu implements Integration_Interface {
 			} else {
 				$submenu['advanced-ads'][1][0] .= $notice_alert;
 			}
-
-			// Link to license tab if they are invalid.
-			if ( Advanced_Ads_Checks::licenses_invalid() ) {
-				$submenu['advanced-ads'][] = [
-					__( 'Licenses', 'advanced-ads' )
-						. '&nbsp;<span class="update-plugins count-1"><span class="update-count">!</span></span>',
-					Conditional::user_cap( 'advanced_ads_manage_options' ),
-					admin_url( 'admin.php?page=advanced-ads-settings#top#licenses' ),
-					__( 'Licenses', 'advanced-ads' ),
-				];
-			}
 		}
 		// phpcs:enable
 	}
@@ -284,7 +272,6 @@ class Admin_Menu implements Integration_Interface {
 		$this->add_screen( Pages\Settings::class );
 		$this->add_screen( Pages\Tools::class );
 		$this->add_screen( Pages\Onboarding::class );
-		$this->add_screen( Pages\Support::class );
 	}
 
 	/**

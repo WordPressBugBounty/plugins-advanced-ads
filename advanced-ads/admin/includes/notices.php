@@ -6,6 +6,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  */
 
+use AdvancedAds\License\License_Utils;
 use AdvancedAds\Utilities\WordPress;
 
 if ( ! defined( 'NOTICE_TYPES' ) ) {
@@ -65,7 +66,7 @@ $advanced_ads_admin_notices = [
 		'type' => NOTICE_TYPES['error'],
 		'text' => __( 'One or more license keys for <strong>Advanced Ads add-ons are invalid or missing</strong>.', 'advanced-ads' ) . ' '
 				  /* translators: %s is a target URL. */
-				  . sprintf( __( 'Please add valid license keys <a href="%s">here</a>.', 'advanced-ads' ), get_admin_url( null, 'admin.php?page=advanced-ads-settings#top#licenses' ) ),
+				  . sprintf( __( 'Please add valid license keys <a href="%s">here</a>.', 'advanced-ads' ), License_Utils::admin_screen_url() ),
 	],
 	// please review.
 	'review'          => [

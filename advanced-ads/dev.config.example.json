@@ -5,5 +5,26 @@
 	"credentials": {
 		"username": "admin",
 		"password": "password"
+	},
+	"shop": {
+		"baseURL": "https://wpads.test",
+		"email": "you@example.com",
+		"password": "your-shop-sso-password",
+		"adminUser": "emergency_admin",
+		"adminPassword": "your-shop-admin-password",
+		"card": {
+			"number": "4242 4242 4242 4242",
+			"exp": "04 / 29",
+			"cvc": "999"
+		},
+		"billing": {
+			"fullName": "noman",
+			"country": "PK",
+			"countryLabel": "Pakistan",
+			"city": "Karachi",
+			"state": "Sindh",
+			"address": "123 Test Street",
+			"zip": "75500"
+		}
 	}
 }

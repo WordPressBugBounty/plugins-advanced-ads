@@ -52,25 +52,6 @@ class Conditional {
 	}
 
 	/**
-	 * Checks if the current request is an AJAX request.
-	 * It can be a request to `admin-ajax.php` or to `ajax-handler.php`.
-	 *
-	 * @return bool
-	 */
-	public static function doing_ajax(): bool {
-		return wp_doing_ajax() || 'XMLHttpRequest' === Params::server( 'HTTP_X_REQUESTED_WITH' );
-	}
-
-	/**
-	 * Determines whether the current request is an autosave
-	 *
-	 * @return bool
-	 */
-	public static function doing_autosave(): bool {
-		return defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE;
-	}
-
-	/**
 	 * Check if we have cache enabled on site
 	 *
 	 * @return bool
