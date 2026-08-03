@@ -9,11 +9,11 @@
 
 namespace AdvancedAds\Admin\Pages;
 
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Screen;
 use AdvancedAds\Admin\Groups\Create_Modal;
-use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Admin\Groups\List_Table;
+use AdvancedAds\Constants;
+use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -89,7 +89,7 @@ class Groups extends Screen {
 	public function display(): void {
 		global $wp_list_table;
 
-		$wp_list_table = $this->get_list_table();
+		$wp_list_table = $this->get_list_table(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		( new Create_Modal() )->hooks();
 
 		include_once ADVADS_ABSPATH . 'views/admin/groups/page.php';
@@ -98,16 +98,17 @@ class Groups extends Screen {
 	/**
 	 * Get list table object
 	 *
-	 * @return null|Groups_List_Table
+	 * @return null|List_Table
 	 */
 	public function get_list_table() {
 		$is_screen = wp_advads()->screens->is_screen( $this->get_id() );
 		$wp_screen = get_current_screen();
 		if ( $is_screen && null === $this->list_table ) {
 			wp_advads()->registry->enqueue_script( 'groups' );
+
 			$wp_screen->taxonomy  = Constants::TAXONOMY_GROUP;
 			$wp_screen->post_type = Constants::POST_TYPE_AD;
-			$this->list_table  = new List_Table();
+			$this->list_table     = new List_Table();
 		}
 
 		return $this->list_table;
@@ -137,7 +138,7 @@ class Groups extends Screen {
 	/**
 	 * Get page header arguments
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function define_header_args(): array {
 		return [

@@ -20,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 class Cache {
 
 	/**
-	 * wp_cache group for all Advanced Ads cache entries.
+	 * WP_Cache group for all Advanced Ads cache entries.
 	 *
 	 * @var string
 	 */

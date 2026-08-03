@@ -8,7 +8,7 @@
  *
  * @var string $wrapper_id Wrapper ID.
  * @var string $style      Wrapper style.
- * @var array  $content    Debug content.
+ * @var list<string> $content Debug content.
  */
 
 use AdvancedAds\Utilities\Conditional;

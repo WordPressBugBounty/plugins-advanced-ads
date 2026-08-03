@@ -19,7 +19,7 @@ class Advanced_Ads_Privacy {
 	/**
 	 * Module options
 	 *
-	 * @var null|array
+	 * @var array<string, mixed>|null
 	 */
 	protected $options;
 
@@ -89,7 +89,7 @@ class Advanced_Ads_Privacy {
 		 * Filter the data attributes and allow removing/adding attributes.
 		 * All attributes will be prefix with `data-` on output.
 		 *
-		 * @param array $data_attributes The default data attributes.
+		 * @param array<string, string> $data_attributes The default data attributes.
 		 * @param Ad    $ad              Ad instance.
 		 */
 		$data_attributes = (array) apply_filters( 'advanced-ads-privacy-output-attributes', $data_attributes, $ad );
@@ -139,7 +139,7 @@ class Advanced_Ads_Privacy {
 	/**
 	 * Return module options
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function options() {
 		if ( ! isset( $this->options ) ) {
@@ -155,9 +155,9 @@ class Advanced_Ads_Privacy {
 	/**
 	 * Check if ad can be displayed based on user's consent.
 	 *
-	 * @param bool  $can_display   Whether to display this ad.
-	 * @param Ad    $ad            Ad instance.
-	 * @param array $check_options Additional options passed to can_display.
+	 * @param bool                 $can_display   Whether to display this ad.
+	 * @param Ad                   $ad            Ad instance.
+	 * @param array<string, mixed> $check_options Additional options passed to can_display.
 	 *
 	 * @return bool
 	 */

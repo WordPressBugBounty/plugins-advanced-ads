@@ -35,9 +35,9 @@ class Compatibility implements Integration_Interface {
 	/**
 	 * Check if the plugin was updated and run compatibility checks.
 	 *
-	 * @param bool  $response   Installation response.
-	 * @param array $hook_extra Extra arguments passed to hooked filters.
-	 * @param array $result     Installation result data.
+	 * @param bool                 $response   Installation response.
+	 * @param array<string, mixed> $hook_extra Extra arguments passed to hooked filters.
+	 * @param array<string, mixed> $result     Installation result data.
 	 *
 	 * @return bool
 	 */

@@ -21,9 +21,9 @@ class Options {
 	/**
 	 * Read and Write pubguru config
 	 *
-	 * @param array $data Array of pubguru configuration.
+	 * @param array<string, mixed>|string|null $data Array of pubguru configuration.
 	 *
-	 * @return bool|array
+	 * @return bool|array<string, mixed>
 	 */
 	public static function pubguru_config( $data = null ) {
 		if ( null === $data ) {

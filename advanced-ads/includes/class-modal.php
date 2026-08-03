@@ -18,7 +18,7 @@ class Modal {
 	/**
 	 * Default values for the view file.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $view_arguments = [
 		'modal_slug'             => '',
@@ -37,8 +37,8 @@ class Modal {
 	/**
 	 * Create modal.
 	 *
-	 * @param array $arguments The passed view arguments, overwriting the default values.
-	 * @param bool  $render    Whether to render the modal from the constructor. Defaults to true.
+	 * @param array<string, mixed> $arguments The passed view arguments, overwriting the default values.
+	 * @param bool                 $render    Whether to render the modal from the constructor. Defaults to true.
 	 *
 	 * @return Modal
 	 */
@@ -49,9 +49,9 @@ class Modal {
 	/**
 	 * Create modal from file.
 	 *
-	 * @param array  $arguments The passed view arguments, overwriting the default values.
-	 * @param string $file      File path to include content from.
-	 * @param bool   $render    Whether to render the modal from the constructor. Defaults to true.
+	 * @param array<string, mixed> $arguments The passed view arguments, overwriting the default values.
+	 * @param string               $file      File path to include content from.
+	 * @param bool                 $render    Whether to render the modal from the constructor. Defaults to true.
 	 *
 	 * @return Modal
 	 */
@@ -67,8 +67,8 @@ class Modal {
 	/**
 	 * Modal constructor.
 	 *
-	 * @param array $arguments The passed view arguments, overwriting the default values.
-	 * @param bool  $render    Whether to render the modal from the constructor. Defaults to true.
+	 * @param array<string, mixed> $arguments The passed view arguments, overwriting the default values.
+	 * @param bool                 $render    Whether to render the modal from the constructor. Defaults to true.
 	 */
 	public function __construct( array $arguments, $render = true ) {
 		$this->view_arguments = array_intersect_key(

@@ -36,14 +36,14 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Status messages
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $messages = [];
 
 	/**
 	 * Imported data mapped with previous data, e.g. ['ads'][ new_ad_id => old_ad_id (or null if does not exist) ]
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public $imported_data = [
 		'ads'        => [],
@@ -54,14 +54,14 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Attachments, created for Image Ads and images in ad content
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $created_attachments = [];
 
 	/**
 	 * Post data indexs to set before inserting into the database
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $post_data_index = [];
 
@@ -130,7 +130,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Import data.
 	 *
-	 * @return array|string
+	 * @return array<string, mixed>|string
 	 */
 	public function import() {
 		switch ( Params::post( 'import_type' ) ) {
@@ -203,10 +203,10 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Set the ad data before inserting into the database
 	 *
-	 * @param array $post_data Default post data.
+	 * @param array<string, mixed> $post_data Default post data.
 	 * @param Ad    $ad        Ad object.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function ad_before_inserting( $post_data, $ad ) {
 		foreach ( $this->post_data_index as $index ) {
@@ -303,7 +303,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Create new ads and groups based on import information
 	 *
-	 * @param array $decoded decoded XML.
+	 * @param array<string, mixed> $decoded decoded XML.
 	 */
 	private function import_ads( $decoded ) {
 		// Early bail!!
@@ -436,8 +436,8 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Create new empty groups based on import information
 	 *
-	 * @param array $decoded group related info.
-	 * @param array $ads     ads related info.
+	 * @param array<string, mixed> $decoded group related info.
+	 * @param array<int, \AdvancedAds\Abstracts\Ad> $ads     ads related info.
 	 *
 	 * @return void
 	 */
@@ -494,7 +494,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Create new placements based on import information
 	 *
-	 * @param array $decoded decoded XML.
+	 * @param array<string, mixed> $decoded decoded XML.
 	 */
 	private function import_placements( $decoded ) {
 		// Early bail!!
@@ -696,7 +696,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Create new options based on import information.
 	 *
-	 * @param array $decoded decoded XML.
+	 * @param array<string, mixed> $decoded decoded XML.
 	 */
 	private function import_options( $decoded ) {
 		if ( isset( $decoded['options'] ) && is_array( $decoded['options'] ) ) {
@@ -751,7 +751,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 	 * Upload image from URL and create attachment
 	 *
 	 * @param string $image_url Image url.
-	 * @return array with indices: post_id, attachment_url, false on failure
+	 * @return array<string, mixed> with indices: post_id, attachment_url, false on failure
 	 */
 	private function upload_image_from_url( $image_url ) {
 		$file_name   = basename( current( explode( '?', $image_url ) ) );

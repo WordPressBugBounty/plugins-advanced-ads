@@ -6,12 +6,11 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   1.x.x
  *
- * @var array  $conditions       Visitor conditions.
- * @var string $form_name        Form name.
- * @var string $list_target      Target list.
- * @var array  $set_conditions   Set conditions.
- * @var array  $conditions       Conditions.
- * @var array  $conditions_types Conditions types.
+ * @var array<string, array<string, mixed>> $conditions       Visitor conditions definitions.
+ * @var string                              $form_name        Form name.
+ * @var string                              $list_target      Target list.
+ * @var array<int, array<string, mixed>>    $set_conditions   Set conditions.
+ * @var array<string, mixed>                $conditions_types Conditions types.
  */
 
 ?>

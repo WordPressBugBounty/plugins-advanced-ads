@@ -6,7 +6,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   1.48.2
  *
- * @var array $placement_types types of placements.
+ * @var array<string, array<string, mixed>> $placement_types Types of placements.
  */
 
 ?>

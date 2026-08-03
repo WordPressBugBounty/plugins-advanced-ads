@@ -13,7 +13,7 @@ class Advanced_Ads_Ad_Blocker_Admin {
 	/**
 	 * Module options
 	 *
-	 * @var     array (if loaded)
+	 * @var     array<string, mixed>
 	 */
 	protected $options;
 
@@ -34,7 +34,7 @@ class Advanced_Ads_Ad_Blocker_Admin {
 	/**
 	 * Array, containing path information on the currently configured uploads directory
 	 *
-	 * @var     array
+	 * @var     array{basedir: string, baseurl: string, error?: string|false, url?: string}|false|null
 	 */
 	protected $upload_dir;
 
@@ -185,8 +185,8 @@ class Advanced_Ads_Ad_Blocker_Admin {
 	/**
 	 * Creates dummy plugin and return new options, that need to be stored in database.
 	 *
-	 * @param   array $form_post_fields options, POST data sent by user.
-	 * @return  array $new_options - options, that need to be stored in database.
+	 * @param   array<string, mixed> $form_post_fields options, POST data sent by user.
+	 * @return  array<string, mixed>|false $new_options - options, that need to be stored in database.
 	 */
 	public function create_dummy_plugin( $form_post_fields = [] ) {
 		global $wp_filesystem;
@@ -424,7 +424,7 @@ class Advanced_Ads_Ad_Blocker_Admin {
 	 * This function recursively searches for assets
 	 *
 	 * @param  string $dir The directory to search in.
-	 * @return Array with pairs: abs_filename => mtime.
+	 * @return array<string, int> Absolute filename => mtime.
 	 */
 	public function recursive_search_assets( $dir ) {
 		$assets = [];
@@ -446,7 +446,7 @@ class Advanced_Ads_Ad_Blocker_Admin {
 	/**
 	 * Returns new or modified assets and their mtimes.
 	 *
-	 * @return array
+	 * @return array<string, int>
 	 */
 	public function get_assets() {
 		$new_files_info = $this->recursive_search_assets( trailingslashit( WP_PLUGIN_DIR ) . 'advanced-ads*' );
@@ -510,7 +510,7 @@ class Advanced_Ads_Ad_Blocker_Admin {
 	/**
 	 * Generate unique name
 	 *
-	 * @param    array    $haystack array to check, that the returned string does not exist in this array
+	 * @param    array<int, string>|false $haystack array to check, that the returned string does not exist in this array
 	 * @param    string   $extension Extension to append to the name.
 	 * @return   string   unique name
 	 */

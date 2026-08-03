@@ -22,7 +22,7 @@ class Helpers {
 	/**
 	 * Check if config has traffic cop subscription
 	 *
-	 * @param array $config Config instance.
+	 * @param array<string, mixed>|null $config Config instance.
 	 *
 	 * @return bool
 	 */
@@ -118,7 +118,7 @@ class Helpers {
 	 *   2. Get ads from first config
 	 *   3. Get ads from default config
 	 *
-	 * @return bool|array
+	 * @return bool|array<string, array<string, mixed>>
 	 */
 	public static function get_ads_from_config() {
 		static $pubguru_config_ads;

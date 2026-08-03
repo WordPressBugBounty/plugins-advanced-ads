@@ -82,11 +82,11 @@ class Upgrades implements Integration_Interface {
 	/**
 	 * Show notices in the Ad Parameters meta box
 	 *
-	 * @param array $notices Notices.
-	 * @param array $box current meta box.
-	 * @param Ad    $ad post object.
+	 * @param array<int, array<string, mixed>> $notices Notices.
+	 * @param array<string, mixed>             $box     Current meta box.
+	 * @param Ad                               $ad post object.
 	 *
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function ad_notices( $notices, $box, $ad ) {
 		// Show notice when someone uses an Ad Manager ad in the plain text code field.
@@ -118,10 +118,10 @@ class Upgrades implements Integration_Interface {
 	/**
 	 * Add the link to action list for post_row_actions
 	 *
-	 * @param array   $actions list of existing actions.
-	 * @param WP_Post $post Post object.
+	 * @param array<string, string> $actions List of existing actions.
+	 * @param WP_Post               $post Post object.
 	 *
-	 * @return array with actions.
+	 * @return array<string, string> with actions.
 	 */
 	public function render_duplicate_link( $actions, $post ) {
 		if (
@@ -138,10 +138,10 @@ class Upgrades implements Integration_Interface {
 	/**
 	 * Add the link to action list for placements.
 	 *
-	 * @param array   $actions list of existing actions.
-	 * @param WP_Post $post Post object.
+	 * @param array<string, string> $actions List of existing actions.
+	 * @param WP_Post               $post Post object.
 	 *
-	 * @return array with actions.
+	 * @return array<string, string> with actions.
 	 */
 	public function render_placement_duplicate_link( $actions, $post ) {
 		if (

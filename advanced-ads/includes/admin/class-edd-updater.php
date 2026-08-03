@@ -28,7 +28,7 @@ class EDD_Updater {
 	/**
 	 * Optional data to send with API calls.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $api_data = [];
 
@@ -87,14 +87,13 @@ class EDD_Updater {
 	 * @uses plugin_basename()
 	 * @uses hook()
 	 *
-	 * @param string $_api_url     The URL pointing to the custom API endpoint.
 	 * @param string $_plugin_file Path to the plugin file.
-	 * @param array  $_api_data    Optional data to send with API calls.
+	 * @param array<string, mixed> $_api_data Optional data to send with API calls.
 	 */
-	public function __construct( $_api_url, $_plugin_file, $_api_data = null ) {
+	public function __construct( $_plugin_file, $_api_data = null ) {
 		global $edd_plugin_data;
 
-		$this->api_url                  = trailingslashit( $_api_url );
+		$this->api_url                  = defined( 'AA_SHOP_URL' ) ? esc_url( AA_SHOP_URL . '/license-api/' ) : $this->api_url;
 		$this->api_data                 = $_api_data;
 		$this->plugin_file              = $_plugin_file;
 		$this->name                     = plugin_basename( $_plugin_file );
@@ -144,8 +143,8 @@ class EDD_Updater {
 	 *
 	 * @uses api_request()
 	 *
-	 * @param array $_transient_data Update array build by WordPress.
-	 * @return array Modified update array with custom plugin data.
+	 * @param array<string, mixed>|false $_transient_data Update array build by WordPress.
+	 * @return array<string, mixed>|false Modified update array with custom plugin data.
 	 */
 	public function check_update( $_transient_data ) {
 
@@ -278,7 +277,7 @@ class EDD_Updater {
 	 * Show the update notification on multisite subsites.
 	 *
 	 * @param string $file   The plugin file.
-	 * @param array  $plugin The plugin data.
+	 * @param array<string, mixed> $plugin The plugin data.
 	 */
 	public function show_update_notification( $file, $plugin ) {
 
@@ -389,7 +388,7 @@ class EDD_Updater {
 	/**
 	 * Gets the plugins active in a multisite network.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	private function get_active_plugins() {
 		$active_plugins         = (array) get_option( 'active_plugins' );
@@ -492,7 +491,7 @@ class EDD_Updater {
 	 *
 	 * @param \stdClass $data The object to convert to an array.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function convert_object_to_array( $data ) {
 		if ( ! is_array( $data ) && ! is_object( $data ) ) {
@@ -509,7 +508,7 @@ class EDD_Updater {
 	/**
 	 * Disable SSL verification in order to prevent download update failures
 	 *
-	 * @param array  $args Array of HTTP request arguments.
+	 * @param array<string, mixed> $args Array of HTTP request arguments.
 	 * @param string $url  The request URL.
 	 * @return object $array
 	 */
@@ -552,7 +551,7 @@ class EDD_Updater {
 	 * @uses is_wp_error()
 	 *
 	 * @param string $_action The requested action.
-	 * @param array  $_data   Parameters for the API action.
+	 * @param array<string, mixed> $_data Parameters for the API action.
 	 * @return false|object|void
 	 */
 	private function api_request( $_action, $_data ) {
@@ -652,7 +651,7 @@ class EDD_Updater {
 	/**
 	 * Gets the current version information from the remote site.
 	 *
-	 * @return array|false
+	 * @return array<string, mixed>|false
 	 */
 	private function get_version_from_remote() {
 		$api_params = [
@@ -677,7 +676,6 @@ class EDD_Updater {
 		 * @param string $this->plugin_file The full path and filename of the file.
 		 */
 		$api_params = apply_filters( 'edd_sl_plugin_updater_api_params', $api_params, $this->api_data, $this->plugin_file );
-
 		$request = wp_remote_post(
 			$this->api_url,
 			[

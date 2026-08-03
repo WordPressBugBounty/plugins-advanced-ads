@@ -16,7 +16,7 @@
  * @var Advanced_Ads_Ad_Type_Adsense $ad The AdSense Ad type.
  * @var string $pub_id_errors A string with error messages.
  * @var string $content The content.
- * @var array $extra_params Filterable extra params that can be passed.
+ * @var array{default_width: string, default_height: string, at_media: array<int|string, mixed>} $extra_params Filterable extra params that can be passed.
  */
 
 if ( ! defined( 'WPINC' ) ) {

@@ -166,7 +166,7 @@ abstract class Types implements Integration_Interface {
 	 *
 	 * @param bool $with_unknown Include unknown type placements.
 	 *
-	 * @return array
+	 * @return array<string, object>
 	 */
 	public function get_types( $with_unknown = true ): array {
 		return $with_unknown ? $this->types : array_filter( $this->types, fn( $type ) => ! is_a( $type, $this->type_unknown ) );

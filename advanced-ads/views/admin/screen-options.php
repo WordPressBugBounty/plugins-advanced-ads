@@ -7,7 +7,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   1.47.0
  *
- * @var array $optional_filters All available filters.
+ * @var array<string, string> $optional_filters All available filters.
  */
 
 if ( empty( $optional_filters ) ) {

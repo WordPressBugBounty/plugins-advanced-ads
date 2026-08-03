@@ -64,9 +64,9 @@ class Admin_Compatibility implements Integration_Interface {
 	 * they inject their ad optimization meta box into our ad page, even though it is not a public post type
 	 * using they filter, we remove AA from the list of post types they inject this box into
 	 *
-	 * @param array $allowed_post_types Array of allowed post types.
+	 * @param array<string, mixed> $allowed_post_types Array of allowed post types.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function fix_wpquadspro_issue( $allowed_post_types ): array {
 		unset( $allowed_post_types['advanced_ads'] );
@@ -90,9 +90,9 @@ class Admin_Compatibility implements Integration_Interface {
 	/**
 	 * Show only all languages in language switcher on Advanced Ads pages if ads and groups are translated
 	 *
-	 * @param array $active_languages languages that can be used in language switcher.
+	 * @param array<string, mixed> $active_languages languages that can be used in language switcher.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function wpml_language_switcher( $active_languages ): array {
 		global $sitepress;
@@ -113,9 +113,9 @@ class Admin_Compatibility implements Integration_Interface {
 	/**
 	 * Hide post type from WPML translatable documents.
 	 *
-	 * @param array $documents Array of translatable documents.
+	 * @param array<string, mixed> $documents Array of translatable documents.
 	 *
-	 * @return array Modified array.
+	 * @return array<string, mixed> Modified array.
 	 */
 	public function wpml_hide_from_translation( $documents ): array {
 		if ( isset( $documents[ Constants::POST_TYPE_PLACEMENT ] ) ) {

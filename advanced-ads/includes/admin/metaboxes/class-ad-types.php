@@ -57,7 +57,7 @@ class Ad_Types {
 	/**
 	 * Return manual link
 	 *
-	 * @return array|string
+	 * @return array<string, mixed>|string
 	 */
 	public function get_handle_link() {
 		return '<a href="https://wpadvancedads.com/manual/ad-types?utm_source=advanced-ads&utm_medium=link&utm_campaign=edit-ad-type" target="_blank" class="advads-manual-link">' . __( 'Manual', 'advanced-ads' ) . '</a>';

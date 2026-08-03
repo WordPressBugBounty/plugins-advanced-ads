@@ -24,7 +24,7 @@ class Shortcode_Creator implements Integration_Interface {
 	/**
 	 * Contains ids of the editors that contains the Advanced Ads button.
 	 *
-	 * @var array
+	 * @var array<string, bool>
 	 */
 	private $editors = [];
 
@@ -56,10 +56,10 @@ class Shortcode_Creator implements Integration_Interface {
 	/**
 	 * Add button to tinyMCE window
 	 *
-	 * @param array  $buttons   Array with existing buttons.
-	 * @param string $editor_id Unique editor identifier.
+	 * @param array<int, string> $buttons Array with existing buttons.
+	 * @param string             $editor_id Unique editor identifier.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function register_buttons( $buttons, $editor_id ): array {
 		if ( ! $this->hooks_exist() ) {
@@ -79,9 +79,9 @@ class Shortcode_Creator implements Integration_Interface {
 	/**
 	 * Add the plugin to the array of default TinyMCE plugins.
 	 *
-	 * @param array $plugins An array of default TinyMCE plugins.
+	 * @param array<string, string> $plugins An array of default TinyMCE plugins.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function register_plugin( $plugins ): array {
 		if ( ! $this->hooks_exist() ) {
@@ -96,10 +96,10 @@ class Shortcode_Creator implements Integration_Interface {
 	/**
 	 * Delete the plugin added by the {@see `tiny_mce_plugins`} method when necessary hooks do not exist.
 	 *
-	 * @param array  $mce_init   An array with TinyMCE config.
-	 * @param string $editor_id Unique editor identifier.
+	 * @param array<string, mixed> $mce_init An array with TinyMCE config.
+	 * @param string               $editor_id Unique editor identifier.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function tiny_mce_before_init( $mce_init, $editor_id = '' ): array {
 		// Early bail!!
@@ -123,7 +123,7 @@ class Shortcode_Creator implements Integration_Interface {
 	/**
 	 * Print shortcode plugin inline.
 	 *
-	 * @param array|null $mce_settings TinyMCE settings array.
+	 * @param array<string, mixed>|null $mce_settings TinyMCE settings array.
 	 *
 	 * @return void
 	 */
@@ -170,7 +170,7 @@ class Shortcode_Creator implements Integration_Interface {
 	/**
 	 * Check if needed actions have not been removed by a plugin.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	private function hooks_exist() {
 		if (

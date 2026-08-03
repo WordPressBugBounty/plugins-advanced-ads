@@ -9,12 +9,12 @@
 
 namespace AdvancedAds\Abstracts;
 
-use RuntimeException;
-use AdvancedAds\Traits;
 use AdvancedAds\Constants;
+use AdvancedAds\Framework\Utilities\Formatting;
 use AdvancedAds\Frontend\Stats;
 use AdvancedAds\Interfaces\Entity_Interface;
-use AdvancedAds\Framework\Utilities\Formatting;
+use AdvancedAds\Traits;
+use RuntimeException;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -50,7 +50,7 @@ class Placement extends Data implements Entity_Interface {
 	/**
 	 * Core data for this object. Name value pairs (name + default value).
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected $data = [
 		'title'    => '',
@@ -116,7 +116,7 @@ class Placement extends Data implements Entity_Interface {
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_display_conditions( $context = 'view' ): array {
 		return $this->get_prop( 'display', $context );
@@ -127,7 +127,7 @@ class Placement extends Data implements Entity_Interface {
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_visitor_conditions( $context = 'view' ): array {
 		return $this->get_prop( 'visitors', $context );
@@ -176,11 +176,13 @@ class Placement extends Data implements Entity_Interface {
 	 * @return bool
 	 */
 	public function is_item_allowed(): bool {
-		$item_type   = $this->get_item_type();
 		$item_object = $this->get_item_object();
+		if ( empty( $item_object ) ) {
+			return false;
+		}
 
 		return $this->get_type_object()
-			->is_entity_allowed( $item_object->get_type(), $item_type );
+			->is_entity_allowed( $item_object->get_type(), $this->get_item_type() );
 	}
 
 	/**
@@ -230,7 +232,7 @@ class Placement extends Data implements Entity_Interface {
 	/**
 	 * Get the wrapper attributes.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_wrapper_attributes(): array {
 		$prefix  = wp_advads()->get_frontend_prefix();
@@ -324,6 +326,10 @@ class Placement extends Data implements Entity_Interface {
 			throw new RuntimeException( 'Can\'t update item.' );
 		}
 
+		$this->set_item( $new_item );
+		$this->item_object = null;
+		$this->item_type   = '';
+
 		return $new_item_object;
 	}
 
@@ -373,8 +379,8 @@ class Placement extends Data implements Entity_Interface {
 			$item_id = apply_filters( 'wpml_object_id', $item_id, 'advanced_ads', $sitepress->is_display_as_translated_post_type( 'advanced_ads' ) );
 		}
 
-		$this->item_type   = $item_type;
-		$item_object = 'ad' === $item_type
+		$this->item_type = $item_type;
+		$item_object     = 'ad' === $item_type
 			? wp_advads_get_ad( $item_id )
 			: wp_advads_get_group( $item_id );
 
@@ -406,7 +412,7 @@ class Placement extends Data implements Entity_Interface {
 	 *
 	 * @param string $item Placement item.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	private function get_item_parts( $item ): array {
 		$item_parts = explode( '_', $item );

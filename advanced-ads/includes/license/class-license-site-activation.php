@@ -21,7 +21,7 @@ final class License_Site_Activation {
 	 * @return array<int, array{license: string, status: string}>
 	 */
 	public static function get_list(): array {
-		$raw  = get_option( License::OPTION_LEGACY_MAP, [] );
+		$raw  = get_option( License::OPTION_SITE_ACTIVATION, [] );
 		$list = License_Utils::normalize_site_activation_list( is_array( $raw ) ? $raw : [] );
 
 		if ( License::is_flat_map_retired() && License_Utils::needs_site_activation_compaction( is_array( $raw ) ? $raw : [] ) ) {
@@ -32,13 +32,13 @@ final class License_Site_Activation {
 	}
 
 	/**
-	 * Persist plan-level site activation list to advanced-ads-licenses.
+	 * Persist plan-level site activation licenses to advanced-ads-licenses.
 	 *
-	 * @param array<int, array{license?: string, status?: string}|string> $list Site activation rows.
+	 * @param array<int, array{license?: string, status?: string}|string> $licenses Site activation rows.
 	 * @return void
 	 */
-	public static function persist( array $list ): void {
-		update_option( License::OPTION_LEGACY_MAP, License_Utils::normalize_site_activation_list( $list ), false );
+	public static function persist( array $licenses ): void {
+		update_option( License::OPTION_SITE_ACTIVATION, License_Utils::normalize_site_activation_list( $licenses ), false );
 	}
 
 	/**
@@ -126,7 +126,7 @@ final class License_Site_Activation {
 	 * @return array<int, array{license: string, status: string}>
 	 */
 	public static function build_from_legacy_storage(): array {
-		$raw    = get_option( License::OPTION_LEGACY_MAP, [] );
+		$raw    = get_option( License::OPTION_SITE_ACTIVATION, [] );
 		$flat   = License_Utils::normalize_legacy_map( is_array( $raw ) ? $raw : [] );
 		$by_key = [];
 
@@ -155,45 +155,27 @@ final class License_Site_Activation {
 	}
 
 	/**
-	 * Local-only flat map retirement when rich covers all legacy keys (does not write OPTION_RICH).
+	 * Local-only flat map retirement (does not write OPTION_RICH).
+	 *
+	 * Always converts the flat map to a plan-level site activation list, even when
+	 * rich does not cover every legacy key (shop exchange may have failed).
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list (read only).
 	 * @param array<string, string>            $map  Normalized legacy map.
 	 * @return void
 	 */
 	public static function maybe_retire_legacy_flat_map( array $rich, array $map ): void {
-		if ( License::is_flat_map_retired() || [] === $map || [] === $rich ) {
+		if ( License::is_flat_map_retired() || [] === $map ) {
 			return;
 		}
 
-		if ( ! License_Utils::rich_covers_legacy_keys( $map, $rich ) ) {
-			return;
-		}
-
-		License::bootstrap_aa_activated_addons_from_legacy_map( $map, $rich );
-
-		$derived = License::build_persisted_addon_key_map_from_rich( $rich );
-		$stored  = License_Utils::normalize_legacy_map( get_option( License::OPTION_LEGACY_MAP, [] ) );
-
-		foreach ( $stored as $addon_id => $key ) {
-			if ( ( $derived[ (string) $addon_id ] ?? '' ) !== $key ) {
-				if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-					error_log(
-						sprintf(
-							'advanced-ads: flat map retirement skipped — addon %s key mismatch (stored %s, derived %s).',
-							(string) $addon_id,
-							$key,
-							(string) ( $derived[ (string) $addon_id ] ?? '' )
-						)
-					);
-				}
-			}
+		if ( [] !== $rich ) {
+			License::bootstrap_aa_activated_addons_from_legacy_map( $map, $rich );
 		}
 
 		self::persist( self::build_from_legacy_storage() );
 		License::delete_legacy_addon_mirror_options();
 		delete_option( License::OPTION_AA_ACTIVATED_ADDONS );
 		update_option( License::OPTION_FLAT_MAP_RETIRED, '1', false );
-		delete_option( License::OPTION_MIGRATION_DONE );
 	}
 }

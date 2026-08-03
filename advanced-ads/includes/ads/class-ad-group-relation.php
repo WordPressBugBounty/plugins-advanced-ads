@@ -21,7 +21,7 @@ class Ad_Group_Relation {
 	/**
 	 * Hold groups.
 	 *
-	 * @var array
+	 * @var array<int, \AdvancedAds\Abstracts\Group>
 	 */
 	private $groups = [];
 
@@ -52,8 +52,8 @@ class Ad_Group_Relation {
 	/**
 	 * Handles the removed terms for an ad.
 	 *
-	 * @param array $removed_terms An array of term IDs that have been removed.
-	 * @param int   $ad_id         The ID of the ad.
+	 * @param array<int, int> $removed_terms An array of term IDs that have been removed.
+	 * @param int             $ad_id         The ID of the ad.
 	 *
 	 * @return void
 	 */
@@ -76,8 +76,8 @@ class Ad_Group_Relation {
 	/**
 	 * Handles the added terms for an ad.
 	 *
-	 * @param array $added_terms An array of term IDs that have been added.
-	 * @param int   $ad_id       The ID of the ad.
+	 * @param array<int, int> $added_terms An array of term IDs that have been added.
+	 * @param int             $ad_id       The ID of the ad.
 	 *
 	 * @return void
 	 */

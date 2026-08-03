@@ -4,9 +4,9 @@
  *
  * @package AdvancedAds
  *
- * @var string $name form field name attribute.
- * @var string $operator operator.
- * @var array $type_options additional options for the condition.
+ * @var string                              $name         Form field name attribute.
+ * @var string                              $operator     Operator.
+ * @var array<string, array<string, mixed>> $type_options Additional options for the condition.
  */
 
 ?>

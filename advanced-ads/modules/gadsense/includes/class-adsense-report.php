@@ -1,4 +1,11 @@
-<?php
+<?php // phpcs:ignore WordPress.Files.FileName
+
+/**
+ * AdSense earnings report display.
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ */
 
 /**
  * Class Advanced_Ads_AdSense_Report

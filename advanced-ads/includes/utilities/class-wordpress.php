@@ -9,11 +9,11 @@
 
 namespace AdvancedAds\Utilities;
 
-use DateTimeZone;
-use AdvancedAds\Constants;
 use AdvancedAds\Admin\Upgrades;
-use AdvancedAds\Framework\Utilities\Str;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Framework\Utilities\Str;
+use DateTimeZone;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -76,24 +76,11 @@ class WordPress {
 	 * @return int
 	 */
 	public static function get_count_ads( $status = 'any' ): int {
-		$summaries = wp_advads_get_ad_summaries();
+		$counts = (array) wp_count_posts( Constants::POST_TYPE_AD );
 
 		if ( 'any' === $status ) {
-			return count( $summaries );
+			return array_sum( $counts );
 		}
-
-		$count = 0;
-		foreach ( $summaries as $summary ) {
-			if ( $status === $summary['status'] ) {
-				++$count;
-			}
-		}
-
-		if ( in_array( $status, [ 'publish', 'future', 'draft' ], true ) ) {
-			return $count;
-		}
-
-		$counts = (array) wp_count_posts( Constants::POST_TYPE_AD );
 
 		return $counts[ $status ] ?? 0;
 	}
@@ -225,9 +212,9 @@ class WordPress {
 	/**
 	 * Improve WP_Query performance
 	 *
-	 * @param array $args Query arguments.
+	 * @param array<string, mixed> $args Query arguments.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function improve_wp_query( $args ): array {
 		$args['no_found_rows']          = true;
@@ -240,9 +227,9 @@ class WordPress {
 	/**
 	 * Sanitize conditions
 	 *
-	 * @param array $conditions Conditions to sanitize.
+	 * @param array<int|string, array<string, mixed>> $conditions Conditions to sanitize.
 	 *
-	 * @return array
+	 * @return array<int|string, array<string, mixed>>
 	 */
 	public static function sanitize_conditions( $conditions ): array {
 		foreach ( $conditions as $index => $condition ) {

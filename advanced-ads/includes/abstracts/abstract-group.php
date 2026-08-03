@@ -48,7 +48,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Core data for this object. Name value pairs (name + default value).
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected $data = [
 		'title'      => '',
@@ -85,7 +85,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Wrapper for the group.
 	 *
-	 * @var array|null
+	 * @var array<string, mixed>|null
 	 */
 	private $wrapper = null;
 
@@ -155,7 +155,7 @@ class Group extends Data implements Entity_Interface {
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_options( $context = 'view' ): array {
 		return $this->get_prop( 'options', $context );
@@ -166,11 +166,11 @@ class Group extends Data implements Entity_Interface {
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
-	 * @return array
+	 * @return array<int, int>
 	 */
 	public function get_ad_weights( $context = 'view' ) {
 		if ( is_array( $context ) ) {
-			$weights = $this->_ad_weights( 'view' );
+			$weights = $this->resolve_ad_weights( 'view' );
 			$out     = [];
 			foreach ( $context as $ad_id ) {
 				$out[ $ad_id ] = $weights[ $ad_id ] ?? Constants::GROUP_AD_DEFAULT_WEIGHT;
@@ -179,18 +179,18 @@ class Group extends Data implements Entity_Interface {
 			return $out;
 		}
 
-		return $this->_ad_weights( $context );
+		return $this->resolve_ad_weights( $context );
 	}
 
 
 	/**
-	 * Get ad weights.
+	 * Resolve and cache ad weights for a context.
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
-	 * @return array
+	 * @return array<int, int>
 	 */
-	public function _ad_weights( $context = 'view' ) {
+	private function resolve_ad_weights( $context = 'view' ) {
 		$context = is_string( $context ) ? $context : 'view';
 		if ( isset( $this->ad_weights_cache[ $context ] ) ) {
 			return $this->ad_weights_cache[ $context ] ?? [];
@@ -200,7 +200,7 @@ class Group extends Data implements Entity_Interface {
 
 		$weights = $this->get_prop( 'ad_weights', $context );
 
-		if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
+		if ( defined( 'ICL_SITEPRESS_VERSION' ) && $sitepress ) {
 			foreach ( $weights as $ad_id => $weight ) {
 				/**
 				 * Deliver the translated version of an ad if set up with WPML.
@@ -268,7 +268,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Set options.
 	 *
-	 * @param array $options Group options.
+	 * @param array<string, mixed> $options Group options.
 	 *
 	 * @return void
 	 */
@@ -279,7 +279,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Set ad_weights.
 	 *
-	 * @param array $ad_weights Group ad_weights.
+	 * @param array<int, int> $ad_weights Group ad_weights.
 	 *
 	 * @return void
 	 */
@@ -398,7 +398,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Get the wrapper attributes.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_wrapper_attributes(): array {
 		if ( null !== $this->wrapper ) {
@@ -531,15 +531,12 @@ class Group extends Data implements Entity_Interface {
 			return $this->ads;
 		}
 
-		$this->ads = [];
-		$weights   = $this->get_ad_weights();
+		$weights = $this->get_ad_weights();
 
-		foreach ( $weights as $ad_id => $weight ) {
-			$ad = wp_advads_get_ad( $ad_id );
-			if ( $ad ) {
-				$this->ads[ $ad_id ] = $ad;
-				$ad->set_prop( 'weight', $weight );
-			}
+		$this->ads = wp_advads_get_ads_by_ids( array_keys( $weights ) );
+
+		foreach ( $this->ads as $ad_id => $ad ) {
+			$ad->set_prop( 'weight', $weights[ $ad_id ] );
 		}
 
 		return $this->ads;
@@ -548,7 +545,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Get ads ids attached to the group
 	 *
-	 * @return array
+	 * @return array<int, int>
 	 */
 	public function get_ads_ids(): array {
 		return array_keys( $this->get_ad_weights() );
@@ -601,7 +598,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Get group hints
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function get_hints(): array {
 		$hints = [];
@@ -677,7 +674,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Get ordered ids of the ads that belong to the group
 	 *
-	 * @return array
+	 * @return array<int, int>
 	 */
 	public function get_ordered_ad_ids() {
 		$ordered_ad_ids = $this->is_type( 'ordered' )
@@ -692,7 +689,7 @@ class Group extends Data implements Entity_Interface {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return array
+	 * @return array<int, int>
 	 */
 	public function shuffle_ads(): array {
 		$shuffled_ads = [];
@@ -721,18 +718,19 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Prepare the output for the ads in the group.
 	 *
-	 * @param array $ordered_ad_ids Ordered ad IDs.
+	 * @param array<int, int> $ordered_ad_ids Ordered ad IDs.
 	 *
-	 * @return array Output for each ad.
+	 * @return array<int, string> Output for each ad.
 	 */
 	private function prepare_ad_output( $ordered_ad_ids ): array {
 		$output        = [];
 		$ads_displayed = 0;
 		$ad_count      = apply_filters( 'advanced-ads-group-ad-count', $this->get_ad_count(), $this );
+		$ads           = $this->get_ads();
 
 		if ( is_array( $ordered_ad_ids ) ) {
 			foreach ( $ordered_ad_ids as $ad_id ) {
-				$ad = wp_advads_get_ad( $ad_id );
+				$ad = $ads[ $ad_id ] ?? null;
 				if ( ! $ad ) {
 					continue;
 				}
@@ -761,7 +759,7 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Shuffles the ordered ads based on their weights.
 	 *
-	 * @return array
+	 * @return array<int, int>
 	 */
 	private function shuffle_ordered_ads(): array {
 		$weights = $this->get_ad_weights();
@@ -795,7 +793,8 @@ class Group extends Data implements Entity_Interface {
 	 *
 	 * @source applied with fix for order http://stackoverflow.com/a/11872928/904614
 	 *
-	 * @param array $weights Array of $ad_id => weight pairs.
+	 * @param array<int, int> $weights Array of $ad_id => weight pairs.
+	 * @param int|null        $max     Optional sum of weights; computed from $weights when null.
 	 *
 	 * @return null|int
 	 */
@@ -839,7 +838,7 @@ class Group extends Data implements Entity_Interface {
 	 *
 	 * @deprecated 2.0.0 use get_wrapper_attributes() instead.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function create_wrapper(): array {
 		_deprecated_function( __FUNCTION__, '2.0.0', 'get_wrapper_attributes' );

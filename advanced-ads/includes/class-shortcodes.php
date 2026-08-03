@@ -32,7 +32,7 @@ class Shortcodes implements Integration_Interface {
 	/**
 	 * Renders an ad based on the provided attributes.
 	 *
-	 * @param array $atts The attributes for the ad.
+	 * @param array<string, mixed> $atts The attributes for the ad.
 	 *
 	 * @return string The rendered ad.
 	 */
@@ -60,7 +60,7 @@ class Shortcodes implements Integration_Interface {
 	/**
 	 * Renders a group based on the provided attributes.
 	 *
-	 * @param array $atts The attributes for the group.
+	 * @param array<string, mixed> $atts The attributes for the group.
 	 *
 	 * @return string The rendered group.
 	 */
@@ -82,7 +82,7 @@ class Shortcodes implements Integration_Interface {
 	/**
 	 * Renders a placement based on the provided attributes.
 	 *
-	 * @param array $atts The attributes for the placement.
+	 * @param array<string, mixed> $atts The attributes for the placement.
 	 *
 	 * @return string The rendered placement.
 	 */
@@ -104,9 +104,9 @@ class Shortcodes implements Integration_Interface {
 	/**
 	 * Prepare shortcode attributes.
 	 *
-	 * @param array $atts array with strings.
+	 * @param array<string, mixed> $atts array with strings.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function prepare_shortcode_atts( $atts ): array {
 		$result = [];
@@ -167,14 +167,14 @@ class Shortcodes implements Integration_Interface {
 		}
 
 		if ( isset( $result['override'] ) && is_string( $result['override'] ) ) {
-			$result['override'] = wp_kses_post( $this->sanitize_shortcode_content( $result['override'] ) );
+			$result['override'] = $this->sanitize_shortcode_content( $result['override'] );
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Sanitize shortcode content override by stripping PHP payloads only.
+	 * Sanitize shortcode content by stripping PHP payloads and running wp_kses_post().
 	 *
 	 * @param string $content Content override from shortcode attributes (ad_args, change-ad__, etc.).
 	 *
@@ -188,7 +188,7 @@ class Shortcodes implements Integration_Interface {
 
 		$content = str_replace( '<?', '', (string) $content );
 
-		return '' !== $content ? $content : '';
+		return '' !== $content ? wp_kses_post( $content ) : '';
 	}
 
 	/**
@@ -196,7 +196,7 @@ class Shortcodes implements Integration_Interface {
 	 *
 	 * @param string $ad_args Raw urlencoded ad_args value.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function parse_shortcode_ad_args( string $ad_args ): array {
 		$decoded_ad_args = json_decode( urldecode( $ad_args ), true );
@@ -207,8 +207,8 @@ class Shortcodes implements Integration_Interface {
 	/**
 	 * Set shortcode attributes.
 	 *
-	 * @param object $entity The entity object.
-	 * @param array  $atts   The attributes to set for the entity.
+	 * @param object               $entity The entity object.
+	 * @param array<string, mixed> $atts   The attributes to set for the entity.
 	 *
 	 * @return void
 	 */

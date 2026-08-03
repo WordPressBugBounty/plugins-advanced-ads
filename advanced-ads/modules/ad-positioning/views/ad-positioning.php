@@ -4,8 +4,8 @@
  * Template for ad positioning.
  *
  * @var string $positioning         how should the ad be positioned.
- * @var array  $spacing             the spacing around the ad.
- * @var array  $positioning_options array of positioning options.
+ * @var array{top?: int, right?: int, bottom?: int, left?: int} $spacing the spacing around the ad.
+ * @var array<string, array{title: string, description: string, options: array<string, array{img?: string}>}> $positioning_options array of positioning options.
  */
 
 ?>

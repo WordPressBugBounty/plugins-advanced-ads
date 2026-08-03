@@ -1,9 +1,9 @@
-(() => {
-	window.wp.domReady(() => {
-		init(window.wp);
-	});
+( () => {
+	window.wp.domReady( () => {
+		init( window.wp );
+	} );
 
-	function init(wp) {
+	function init( wp ) {
 		/**
 		 *  Shortcut variables
 		 */
@@ -36,26 +36,23 @@
 			el(
 				'g',
 				{},
-				el('path', {
+				el( 'path', {
 					fill: '#1C1B3A',
 					d: 'M18.602,3286.2v8.53H6.677v-11.925h8.53c-0.355-0.804-0.545-1.684-0.545-2.625s0.205-1.82,0.545-2.625 h-2.57H1.406v18.266l0.6,0.6l-0.6-0.6c0,2.304,1.875,4.179,4.18,4.179l0,0h7.05h11.216v-13.821 c-0.805,0.355-1.705,0.566-2.645,0.566C20.286,3286.745,19.406,3286.541,18.602,3286.2z',
-				}),
-				el('circle', {
+				} ),
+				el( 'circle', {
 					fill: '#0E75A4',
 					cx: '21.206',
 					cy: '3280.179',
 					r: '4.18',
-				})
+				} )
 			)
 		);
 
 		const wpMajorMinor = parseFloat( aaGut.wpVersion || '0' );
 		const apiVersion = wpMajorMinor >= 6.9 ? 3 : 2;
 
-		/**
-		 * Register the single ad block type
-		 */
-		registerBlockType('advads/gblock', {
+		const blockConfig = {
 			apiVersion,
 			title: i18n.advads,
 			icon: advadsIconEl,
@@ -83,8 +80,8 @@
 				},
 			},
 			// todo: make the keywords translatable
-			keywords: ['advert', 'adsense', 'banner'],
-			edit: (props) => {
+			keywords: [ 'advert', 'adsense', 'banner' ],
+			edit: ( props ) => {
 				const itemID = props.attributes.itemID;
 
 				/**
@@ -92,11 +89,11 @@
 				 *
 				 * @param {Event} event change event on the select input.
 				 */
-				function setID(event) {
-					props.setAttributes({
-						itemID: event.target.querySelector('option:checked')
+				function setID( event ) {
+					props.setAttributes( {
+						itemID: event.target.querySelector( 'option:checked' )
 							.value,
-					});
+					} );
 				}
 
 				/**
@@ -104,8 +101,8 @@
 				 *
 				 * @param {Event} event change event on the number input.
 				 */
-				function setWidth(event) {
-					props.setAttributes({ width: event.target.value });
+				function setWidth( event ) {
+					props.setAttributes( { width: event.target.value } );
 				}
 
 				/**
@@ -113,8 +110,8 @@
 				 *
 				 * @param {Event} event change event on the number input.
 				 */
-				function setHeight(event) {
-					props.setAttributes({ height: event.target.value });
+				function setHeight( event ) {
+					props.setAttributes( { height: event.target.value } );
 				}
 
 				/**
@@ -122,70 +119,70 @@
 				 *
 				 * @param {string} ID Item ID.
 				 */
-				function requestHints(ID) {
-					if (!ID || 0 !== ID.indexOf('group_')) {
-						setHints([]);
+				function requestHints( ID ) {
+					if ( ! ID || 0 !== ID.indexOf( 'group_' ) ) {
+						setHints( [] );
 
 						return;
 					}
 
 					const data = new FormData();
-					data.append('action', 'advads-get-block-hints');
-					data.append('nonce', window.advadsglobal.ajax_nonce);
-					data.append('itemID', itemID);
+					data.append( 'action', 'advads-get-block-hints' );
+					data.append( 'nonce', window.advadsglobal.ajax_nonce );
+					data.append( 'itemID', itemID );
 
-					fetch(window.ajaxurl, {
+					fetch( window.ajaxurl, {
 						method: 'POST',
 						credentials: 'same-origin',
 						body: data,
-					})
-						.then((response) => response.json())
-						.then((json) => {
-							if (json.success) {
-								setHints(json.data);
+					} )
+						.then( ( response ) => response.json() )
+						.then( ( json ) => {
+							if ( json.success ) {
+								setHints( json.data );
 							}
-						})
-						.catch((error) => {
+						} )
+						.catch( ( error ) => {
 							// eslint-disable-next-line no-console -- Might help experienced users
-							console.info(error);
-						});
+							console.info( error );
+						} );
 				}
 
-				function createSizeInputs(label, name, onchange) {
+				function createSizeInputs( label, name, onchange ) {
 					const randomID =
 						'advanced-ads-size' +
-						(Math.random() + 1).toString(36).substring(1);
+						( Math.random() + 1 ).toString( 36 ).substring( 1 );
 					return el(
 						'div',
 						{ className: 'size-group' },
 						el(
 							'label',
 							{ htmlFor: randomID },
-							el('span', { className: 'head' }, label)
+							el( 'span', { className: 'head' }, label )
 						),
 						el(
 							'div',
 							{ className: 'size-input' },
-							el('input', {
+							el( 'input', {
 								type: 'number',
 								inputMode: 'numeric',
 								id: randomID,
-								value: props.attributes[name],
+								value: props.attributes[ name ],
 								name,
 								min: 0,
 								max: Infinity,
 								step: 1,
 								onChange: onchange,
-							}),
-							el('span', { className: 'suffix' }, 'px')
+							} ),
+							el( 'span', { className: 'suffix' }, 'px' )
 						)
 					);
 				}
 
-				const [hints, setHints] = window.wp.element.useState([]);
-				window.wp.element.useEffect(() => {
-					requestHints(itemID);
-				}, [itemID]);
+				const [ hints, setHints ] = window.wp.element.useState( [] );
+				window.wp.element.useEffect( () => {
+					requestHints( itemID );
+				}, [ itemID ] );
 
 				// the form children elements
 				const children = [];
@@ -196,65 +193,70 @@
 					groups = [],
 					placements = [];
 
-				args.push('select');
-				args.push({
+				args.push( 'select' );
+				args.push( {
 					value: props.attributes.itemID,
 					onChange: setID,
 					key: 'advads-select-item',
-				});
-				args.push(el('option', { key: 'empty' }, i18n['--empty--']));
+				} );
+				args.push(
+					el( 'option', { key: 'empty' }, i18n[ '--empty--' ] )
+				);
 
-				for (const adID in aaGut.ads) {
-					if (typeof aaGut.ads[adID].id === 'undefined') {
+				for ( const adID in aaGut.ads ) {
+					if ( typeof aaGut.ads[ adID ].id === 'undefined' ) {
 						continue;
 					}
 					ads.push(
 						el(
 							'option',
 							{
-								value: 'ad_' + aaGut.ads[adID].id,
+								value: 'ad_' + aaGut.ads[ adID ].id,
 								key: adID,
 							},
-							aaGut.ads[adID].title
+							aaGut.ads[ adID ].title
 						)
 					);
 				}
 
-				for (const GID in aaGut.groups) {
-					if ('undefined' === typeof aaGut.groups[GID].id) {
+				for ( const GID in aaGut.groups ) {
+					if ( 'undefined' === typeof aaGut.groups[ GID ].id ) {
 						continue;
 					}
 					groups.push(
 						el(
 							'option',
 							{
-								value: 'group_' + aaGut.groups[GID].id,
+								value: 'group_' + aaGut.groups[ GID ].id,
 								key: GID,
 							},
-							aaGut.groups[GID].name
+							aaGut.groups[ GID ].name
 						)
 					);
 				}
 
-				if (aaGut.placements) {
-					for (const pid in aaGut.placements) {
-						if ('undefined' === typeof aaGut.placements[pid].id) {
+				if ( aaGut.placements ) {
+					for ( const pid in aaGut.placements ) {
+						if (
+							'undefined' === typeof aaGut.placements[ pid ].id
+						) {
 							continue;
 						}
 						placements.push(
 							el(
 								'option',
 								{
-									value: 'place_' + aaGut.placements[pid].id,
+									value:
+										'place_' + aaGut.placements[ pid ].id,
 									key: pid,
 								},
-								aaGut.placements[pid].name
+								aaGut.placements[ pid ].name
 							)
 						);
 					}
 				}
 
-				if (aaGut.placements) {
+				if ( aaGut.placements ) {
 					args.push(
 						el(
 							'optgroup',
@@ -278,7 +280,9 @@
 					)
 				);
 
-				args.push(el('optgroup', { label: i18n.ads, key: 'ads' }, ads));
+				args.push(
+					el( 'optgroup', { label: i18n.ads, key: 'ads' }, ads )
+				);
 
 				// add a <label /> first and style it.
 				children.push(
@@ -297,16 +301,16 @@
 					)
 				);
 
-				if (itemID && i18n['--empty--'] !== itemID) {
+				if ( itemID && i18n[ '--empty--' ] !== itemID ) {
 					let url = '#';
-					if (0 === itemID.indexOf('place_')) {
+					if ( 0 === itemID.indexOf( 'place_' ) ) {
 						url = aaGut.editLinks.placement;
-					} else if (0 === itemID.indexOf('group_')) {
+					} else if ( 0 === itemID.indexOf( 'group_' ) ) {
 						url = aaGut.editLinks.group;
-					} else if (0 === itemID.indexOf('ad_')) {
+					} else if ( 0 === itemID.indexOf( 'ad_' ) ) {
 						url = aaGut.editLinks.ad.replace(
 							'%ID%',
-							itemID.substr(3)
+							itemID.substr( 3 )
 						);
 					}
 
@@ -318,8 +322,8 @@
 								key: 'advads-select-wrap',
 							},
 							// then add the <select /> input with its own children
-							el.apply(null, args),
-							el('a', {
+							el.apply( null, args ),
+							el( 'a', {
 								className: 'dashicons dashicons-external',
 								style: {
 									margin: 5,
@@ -327,11 +331,11 @@
 								href: url,
 								target: '_blank',
 								key: 'advads-item-link',
-							})
+							} )
 						)
 					);
 
-					hints.forEach(function (item, index) {
+					hints.forEach( function ( item, index ) {
 						children.push(
 							el(
 								RawHTML,
@@ -340,15 +344,15 @@
 									className:
 										'advads-block-hint advads-notice-inline advads-error',
 								},
-								safeHTML(item)
+								safeHTML( item )
 							)
 						);
-					});
+					} );
 				} else {
-					children.push(el.apply(null, args));
+					children.push( el.apply( null, args ) );
 				}
 
-				if (!aaGut.ads.length) {
+				if ( ! aaGut.ads.length ) {
 					children.push(
 						el(
 							'div',
@@ -380,8 +384,8 @@
 					el(
 						'div',
 						null,
-						createSizeInputs(i18n.width, 'width', setWidth),
-						createSizeInputs(i18n.height, 'height', setHeight)
+						createSizeInputs( i18n.width, 'width', setWidth ),
+						createSizeInputs( i18n.height, 'height', setHeight )
 					)
 				);
 
@@ -398,20 +402,20 @@
 					)
 				);
 
-				children.push(sidebar);
+				children.push( sidebar );
 
 				const alignmentItems = [];
 
-				for (const slug in textFlow) {
+				for ( const slug in textFlow ) {
 					const isSelected = props.attributes.align === slug;
 					alignmentItems.push(
 						el(
 							comp.MenuItem,
 							{
 								key: slug,
-								label: textFlow[slug].label,
+								label: textFlow[ slug ].label,
 								onClick: () =>
-									props.setAttributes({ align: slug }),
+									props.setAttributes( { align: slug } ),
 								isSelected,
 							},
 							el(
@@ -419,33 +423,33 @@
 								{
 									className:
 										'text-flow-wrap' +
-										(isSelected ? ' current' : ''),
+										( isSelected ? ' current' : '' ),
 								},
 								el(
 									'div',
 									{
 										className: 'text-flow-icon',
 									},
-									el('img', {
-										src: `${aaGut.imagesUrl}${slug}.png`,
+									el( 'img', {
+										src: `${ aaGut.imagesUrl }${ slug }.png`,
 										alt: slug,
-										title: textFlow[slug].label,
+										title: textFlow[ slug ].label,
 										className: 'standard',
-									}),
-									el('img', {
-										src: `${aaGut.imagesUrl}${slug}-alt.png`,
+									} ),
+									el( 'img', {
+										src: `${ aaGut.imagesUrl }${ slug }-alt.png`,
 										alt: slug,
-										title: textFlow[slug].label,
+										title: textFlow[ slug ].label,
 										className: 'alternate',
-									})
+									} )
 								),
 								el(
 									'div',
 									{
 										className: 'text-flow-label',
-										title: textFlow[slug].description,
+										title: textFlow[ slug ].description,
 									},
-									el('span', {}, textFlow[slug].label)
+									el( 'span', {}, textFlow[ slug ].label )
 								)
 							)
 						)
@@ -463,7 +467,7 @@
 						{
 							title: 'Alignment',
 						},
-						el(comp.ToolbarDropdownMenu, {
+						el( comp.ToolbarDropdownMenu, {
 							icon: 'editor-alignleft',
 							label: 'Choose an alignment',
 							children: () =>
@@ -472,7 +476,7 @@
 									{ className: 'advads-align-dropdown' },
 									alignmentItems
 								),
-						})
+						} )
 					)
 				);
 
@@ -491,28 +495,23 @@
 				);
 			},
 
-			save: () => {
-				// server side rendering
-				return null;
-			},
-
 			// Transforms legacy widget to Advanced Ads block.
 			transforms: {
 				from: [
 					{
 						type: 'block',
-						blocks: ['core/legacy-widget'],
-						isMatch: (attributes) => {
+						blocks: [ 'core/legacy-widget' ],
+						isMatch: ( attributes ) => {
 							if (
-								!attributes.instance ||
-								!attributes.instance.raw
+								! attributes.instance ||
+								! attributes.instance.raw
 							) {
 								// Can't transform if raw instance is not shown in REST API.
 								return false;
 							}
 							return attributes.idBase === 'advads_ad_widget';
 						},
-						transform: (attributes) => {
+						transform: ( attributes ) => {
 							const instance = attributes.instance.raw;
 							const transformedBlock = wp.blocks.createBlock(
 								'advads/gblock',
@@ -521,19 +520,27 @@
 									itemID: instance.item_id,
 								}
 							);
-							if (!instance.title) {
+							if ( ! instance.title ) {
 								return transformedBlock;
 							}
 							return [
-								wp.blocks.createBlock('core/heading', {
+								wp.blocks.createBlock( 'core/heading', {
 									content: instance.title,
-								}),
+								} ),
 								transformedBlock,
 							];
 						},
 					},
 				],
 			},
-		});
+		};
+
+		if ( apiVersion >= 3 ) {
+			blockConfig.render = () => null;
+		} else {
+			blockConfig.save = () => null;
+		}
+
+		registerBlockType( 'advads/gblock', blockConfig );
 	}
-})();
+} )();

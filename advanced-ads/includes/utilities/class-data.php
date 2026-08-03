@@ -25,7 +25,7 @@ class Data {
 	 *
 	 * @deprecated 2.0.24 Use Addons::get_installed_addons() instead.
 	 *
-	 * @return array
+	 * @return array<string, array{id: string, name: string, version: string, path: string, options_slug: string, uri: string}>
 	 */
 	public static function get_addons(): array {
 		return Addons::get_installed_addons();
@@ -34,7 +34,7 @@ class Data {
 	/**
 	 * Get the admin screen ids.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public static function get_admin_screen_ids(): array {
 		return apply_filters(
@@ -57,7 +57,7 @@ class Data {
 	/**
 	 * Get ad ids
 	 *
-	 * @return array
+	 * @return array<int, int|string>
 	 */
 	public static function get_ads_ids(): array {
 		static $ad_ids = null;
@@ -77,7 +77,7 @@ class Data {
 	 *
 	 * @param bool $filter Whether to apply filters.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public static function get_bots( $filter = true ) {
 		// List of bots and crawlers to exclude from ad impressions.
@@ -219,7 +219,7 @@ class Data {
 	/**
 	 * Get the roles that are allowed to edit ads.
 	 *
-	 * @return array
+	 * @return array<string, \WP_Role>
 	 */
 	public static function get_filtered_roles_by_cap(): array {
 		return array_filter(
@@ -233,7 +233,7 @@ class Data {
 	/**
 	 * Render items dropdown html.
 	 *
-	 * @param array $args Arguments for the dropdown.
+	 * @param array{id?: string, name?: string, class?: string} $args Arguments for the dropdown.
 	 *
 	 * @return void
 	 */
@@ -276,9 +276,9 @@ class Data {
 	/**
 	 * Get items for item select field
 	 *
-	 * @param array $args Arguments for the dropdown.
+	 * @param array{ads?: bool, groups?: bool, placements?: bool} $args Arguments for the dropdown.
 	 *
-	 * @return array
+	 * @return array{ads?: array<string, string>, groups?: array<string, string>, placements?: array<string, string>}
 	 */
 	public static function items_for_select( $args = [] ): array {
 		$select = [];

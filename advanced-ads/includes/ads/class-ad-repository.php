@@ -17,7 +17,6 @@ use AdvancedAds\Framework\Utilities\Formatting;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Traits\Repository_Helpers;
 use AdvancedAds\Utilities\Cache;
-use AdvancedAds\Cache_Invalidator;
 use AdvancedAds\Utilities\WordPress;
 use Exception;
 use WP_Query;
@@ -74,8 +73,6 @@ class Ad_Repository {
 			$this->update_version( $ad );
 
 			$ad->apply_changes();
-
-			Cache_Invalidator::invalidate_ads();
 		}
 
 		return $ad;
@@ -119,8 +116,6 @@ class Ad_Repository {
 	 * @return void
 	 */
 	public function update( &$ad ): void {
-		global $wpdb;
-
 		$changes = $ad->get_changes();
 
 		// Only update the post when the post data changes.
@@ -165,8 +160,6 @@ class Ad_Repository {
 		$this->update_post_term( $ad );
 
 		$ad->apply_changes();
-
-		Cache_Invalidator::invalidate_ads();
 	}
 
 	/**
@@ -190,8 +183,6 @@ class Ad_Repository {
 			wp_trash_post( $ad->get_id() );
 			$ad->set_status( 'trash' );
 		}
-
-		Cache_Invalidator::invalidate_ads();
 	}
 
 	/* Finder Methods ------------------- */
@@ -224,7 +215,7 @@ class Ad_Repository {
 	 *
 	 * @param int $placement_id The ID of the placement.
 	 *
-	 * @return array
+	 * @return array<int, \AdvancedAds\Abstracts\Ad>
 	 */
 	public function get_ads_by_placement_id( $placement_id ): array {
 		$placement = wp_advads_get_placement( $placement_id );
@@ -246,7 +237,7 @@ class Ad_Repository {
 	 *
 	 * @param string $type The type of ads to retrieve.
 	 *
-	 * @return array
+	 * @return array<int, \AdvancedAds\Abstracts\Ad>
 	 */
 	public function get_ads_by_type( $type ): array {
 		$type = sanitize_key( $type );
@@ -337,7 +328,7 @@ class Ad_Repository {
 	/**
 	 * Query lightweight ad summaries without hydrating Ad objects.
 	 *
-	 * @param array|string|null $post_status Post status query arg, or null for repository default.
+	 * @param array<int, string>|string|null $post_status Post status query arg, or null for repository default.
 	 *
 	 * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
 	 */
@@ -394,8 +385,8 @@ class Ad_Repository {
 	/**
 	 * Query ads based on the provided arguments.
 	 *
-	 * @param array $args          The arguments to customize the query.
-	 * @param bool  $improve_query Whether to improve the query speed.
+	 * @param array<string, mixed> $args The arguments to customize the query.
+	 * @param bool                 $improve_query Whether to improve the query speed.
 	 *
 	 * @return WP_Query The WP_Query object containing the results of the query.
 	 */
@@ -551,7 +542,7 @@ class Ad_Repository {
 	/**
 	 * Whether stored meta still uses legacy keys that require migration.
 	 *
-	 * @param array $values Raw meta values.
+	 * @param array<string, mixed> $values Raw meta values.
 	 *
 	 * @return bool
 	 */
@@ -566,9 +557,9 @@ class Ad_Repository {
 	/**
 	 * Migrate values to new version
 	 *
-	 * @param array $values Values to migrate.
+	 * @param array<string, mixed> $values Values to migrate.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function migrate_values( $values ): array {
 		if ( ! $this->needs_meta_migration( $values ) ) {

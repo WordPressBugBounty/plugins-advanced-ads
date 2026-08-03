@@ -7,8 +7,8 @@
  */
 
 use AdvancedAds\Abstracts\Ad;
-use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Interfaces\Ad_Interface;
+use AdvancedAds\Utilities\Conditional;
 
 /**
  * Adsense ad type
@@ -20,7 +20,7 @@ class Advanced_Ads_Ad_Type_Adsense extends Ad implements Ad_Interface {
 	/**
 	 * Return an array with AdSense ad type keys and readable labels
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public static function get_ad_types() {
 		return [
@@ -98,7 +98,6 @@ class Advanced_Ads_Ad_Type_Adsense extends Ad implements Ad_Interface {
 		$use_dashicons       = false;
 		$external_ad_unit_id = '';
 		if ( trim( $content ) !== '' ) {
-
 			$json_content = stripslashes( $content );
 
 			// get json content striped by slashes.

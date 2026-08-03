@@ -10,7 +10,7 @@
 /**
  * Render modal.
  *
- * @param array $args The passed view arguments, overwriting the default values.
+ * @param array<string, mixed> $args The passed view arguments, overwriting the default values.
  *
  * @return void
  */

@@ -15,7 +15,6 @@ function advanced_ads_ads_txt_init(): void {
 		! is_multisite()
 		|| ( function_exists( 'is_site_meta_supported' ) && is_site_meta_supported() )
 	) {
-
 		$public = new Advanced_Ads_Ads_Txt_Public( new Advanced_Ads_Ads_Txt_Strategy() );
 
 		if ( is_admin() ) {

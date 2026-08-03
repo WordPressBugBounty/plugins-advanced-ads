@@ -19,9 +19,61 @@ import { getManualInstallGuideUrl } from '../addon-catalog';
 import {
 	activateAddonFromLicense,
 	deactivateAddonFromLicense,
+	extractApiErrorMessage,
 } from '../hooks/licenses-api';
 import { getAddonInstallState, getAddonRowStatus } from '../utils';
 import { publishLicenseWarningNotice } from './LicenseNotices';
+
+function BusyStatus( { label } ) {
+	return (
+		<span className="inline-flex items-center gap-2 text-sm text-gray-600">
+			<Loader2
+				className="size-4 shrink-0"
+				strokeWidth={ 2 }
+				aria-hidden
+			/>
+			{ label }
+		</span>
+	);
+}
+
+function ActivateButton( { onClick, disabled, isBusy } ) {
+	return (
+		<button
+			type="button"
+			className="button advads-button-neutral is-small"
+			onClick={ onClick }
+			disabled={ disabled }
+			aria-busy={ isBusy }
+		>
+			{ __( 'Activate', 'advanced-ads' ) }
+		</button>
+	);
+}
+
+function ActiveWithDeactivate( { onDeactivate, isBusy, isDeactivating } ) {
+	return (
+		<div className="inline-flex flex-wrap items-center gap-3">
+			<span className="inline-flex items-center gap-2 text-sm text-green-700">
+				<Check
+					className="size-4 shrink-0"
+					strokeWidth={ 2 }
+					aria-hidden
+				/>
+				{ __( 'Active', 'advanced-ads' ) }
+			</span>
+			<button
+				type="button"
+				className="button advads-button-secondary is-small"
+				onClick={ onDeactivate }
+				disabled={ isBusy }
+				aria-busy={ isDeactivating }
+			>
+				{ __( 'Deactivate', 'advanced-ads' ) }
+			</button>
+		</div>
+	);
+}
 
 export function AddonRowActions( {
 	addonId,
@@ -29,12 +81,14 @@ export function AddonRowActions( {
 	licenses,
 	downloadUrl = '',
 	isApplied = false,
+	isActivated = false,
 	disabled = false,
 	managedByOtherLicense = false,
 	addonInstallStates = {},
 	noticesContext,
 	isInstalling = false,
 	installFailed = false,
+	installFailedMessage = '',
 	onInstallStart,
 	onInstallEnd,
 } ) {
@@ -54,10 +108,8 @@ export function AddonRowActions( {
 		isApplied
 	);
 	const { installed } = getAddonInstallState( addonId, addonInstallStates );
-	// Active + Deactivate only when this All Access key owns the add-on (isApplied), not when the plugin is merely running.
-	const isActiveUnderAllAccess = rowStatus === 'installed';
+	const isActiveUnderAllAccess = rowStatus === 'installed' && isActivated;
 	const isBusy = isInstalling || isWorking || isDeactivating;
-	// Install/download requires AA entitled; Activate/Deactivate on a row stay available when entitled.
 	const installActionsDisabled = disabled;
 	const takeOverFromOtherLicense =
 		managedByOtherLicense && ! isApplied && installed;
@@ -79,15 +131,13 @@ export function AddonRowActions( {
 		}
 
 		setIsWorking( true );
-
 		try {
 			await activateAddonFromLicense( licenseKey, addonId, licenseList );
 		} catch ( err ) {
-			const message =
-				err instanceof Error
-					? err.message
-					: __( 'Activation failed.', 'advanced-ads' );
-			showAddonErrorNotice( message );
+			showAddonErrorNotice(
+				extractApiErrorMessage( err ) ||
+					__( 'Activation failed.', 'advanced-ads' )
+			);
 		} finally {
 			setIsWorking( false );
 		}
@@ -106,11 +156,10 @@ export function AddonRowActions( {
 			onInstallEnd?.( addonId, false );
 		} catch ( err ) {
 			const message =
-				err instanceof Error
-					? err.message
-					: __( 'Installation failed.', 'advanced-ads' );
+				extractApiErrorMessage( err ) ||
+				__( 'Installation failed.', 'advanced-ads' );
 			showAddonErrorNotice( message );
-			onInstallEnd?.( addonId, true );
+			onInstallEnd?.( addonId, true, message );
 		} finally {
 			setIsWorking( false );
 		}
@@ -126,11 +175,10 @@ export function AddonRowActions( {
 		try {
 			await deactivateAddonFromLicense( addonId, licenseList );
 		} catch ( err ) {
-			const message =
-				err instanceof Error
-					? err.message
-					: __( 'Deactivation failed.', 'advanced-ads' );
-			showAddonErrorNotice( message );
+			showAddonErrorNotice(
+				extractApiErrorMessage( err ) ||
+					__( 'Deactivation failed.', 'advanced-ads' )
+			);
 		} finally {
 			setIsDeactivating( false );
 		}
@@ -148,108 +196,60 @@ export function AddonRowActions( {
 	}
 
 	if ( isDeactivating ) {
-		return (
-			<span className="inline-flex items-center gap-2 text-sm text-gray-600">
-				<Loader2
-					className="size-4 shrink-0"
-					strokeWidth={ 2 }
-					aria-hidden
-				/>
-				{ __( 'Deactivating…', 'advanced-ads' ) }
-			</span>
-		);
+		return <BusyStatus label={ __( 'Deactivating…', 'advanced-ads' ) } />;
 	}
 
 	if ( isActiveUnderAllAccess ) {
 		return (
-			<div className="inline-flex flex-wrap items-center gap-3">
-				<span className="inline-flex items-center gap-2 text-sm text-green-700">
-					<Check
-						className="size-4 shrink-0"
-						strokeWidth={ 2 }
-						aria-hidden
-					/>
-					{ __( 'Active', 'advanced-ads' ) }
-				</span>
-				<button
-					type="button"
-					className="button advads-button-secondary is-small"
-					onClick={ handleDeactivate }
-					disabled={ isBusy }
-					aria-busy={ isDeactivating }
-				>
-					{ __( 'Deactivate', 'advanced-ads' ) }
-				</button>
-			</div>
+			<ActiveWithDeactivate
+				onDeactivate={ handleDeactivate }
+				isBusy={ isBusy }
+				isDeactivating={ isDeactivating }
+			/>
 		);
 	}
 
 	if ( isInstalling || isWorking ) {
 		return (
-			<span className="inline-flex items-center gap-2 text-sm text-gray-600">
-				<Loader2
-					className="size-4 shrink-0"
-					strokeWidth={ 2 }
-					aria-hidden
-				/>
-				{ isWorking && takeOverFromOtherLicense
-					? __( 'Activating…', 'advanced-ads' )
-					: __( 'Installing…', 'advanced-ads' ) }
-			</span>
+			<BusyStatus
+				label={
+					isWorking && takeOverFromOtherLicense
+						? __( 'Activating…', 'advanced-ads' )
+						: __( 'Installing…', 'advanced-ads' )
+				}
+			/>
 		);
 	}
 
 	if ( takeOverFromOtherLicense ) {
 		return (
 			<div className="inline-flex flex-wrap items-center gap-3">
-				<button
-					type="button"
-					className="button advads-button-neutral is-small"
+				<ActivateButton
 					onClick={ handleActivateUnderAllAccess }
-					disabled={ isBusy }
-					aria-busy={ isWorking }
-				>
-					{ __( 'Activate', 'advanced-ads' ) }
-				</button>
+					disabled={ installActionsDisabled || isBusy }
+					isBusy={ isWorking }
+				/>
 			</div>
 		);
 	}
 
-	if ( rowStatus === 'running' ) {
+	if ( rowStatus === 'running' && isActivated ) {
 		return (
-			<div className="inline-flex flex-wrap items-center gap-3">
-				<span className="inline-flex items-center gap-2 text-sm text-gray-600">
-					<Check
-						className="size-4 shrink-0 text-green-700"
-						strokeWidth={ 2 }
-						aria-hidden
-					/>
-					{ __( 'Plugin active', 'advanced-ads' ) }
-				</span>
-				<button
-					type="button"
-					className="button advads-button-neutral is-small"
-					onClick={ handleActivateUnderAllAccess }
-					disabled={ isBusy }
-					aria-busy={ isWorking }
-				>
-					{ __( 'Activate', 'advanced-ads' ) }
-				</button>
-			</div>
+			<ActiveWithDeactivate
+				onDeactivate={ handleDeactivate }
+				isBusy={ isBusy }
+				isDeactivating={ isDeactivating }
+			/>
 		);
 	}
 
 	if ( rowStatus === 'ready' ) {
 		return (
-			<button
-				type="button"
-				className="button advads-button-neutral is-small"
+			<ActivateButton
 				onClick={ handleActivateUnderAllAccess }
-				disabled={ isBusy }
-				aria-busy={ isWorking }
-			>
-				{ __( 'Activate', 'advanced-ads' ) }
-			</button>
+				disabled={ installActionsDisabled || isBusy }
+				isBusy={ isWorking }
+			/>
 		);
 	}
 
@@ -262,7 +262,8 @@ export function AddonRowActions( {
 						strokeWidth={ 2 }
 						aria-hidden
 					/>
-					{ __( 'Installation failed', 'advanced-ads' ) }
+					{ installFailedMessage ||
+						__( 'Installation failed', 'advanced-ads' ) }
 				</span>
 			) : null }
 			<button

@@ -65,9 +65,9 @@ abstract class Admin_List_Table implements Integration_Interface {
 	/**
 	 * Define which columns to show on this screen.
 	 *
-	 * @param array $columns Existing columns.
+	 * @param array<string, string> $columns Existing columns.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function define_columns( $columns ): array {
 		return $columns;
@@ -76,9 +76,9 @@ abstract class Admin_List_Table implements Integration_Interface {
 	/**
 	 * Define which columns are sortable.
 	 *
-	 * @param array $columns Existing columns.
+	 * @param array<string, string|array<string, mixed>> $columns Existing columns.
 	 *
-	 * @return array
+	 * @return array<string, string|array<string, mixed>>
 	 */
 	public function define_sortable_columns( $columns ): array {
 		return $columns;
@@ -87,7 +87,7 @@ abstract class Admin_List_Table implements Integration_Interface {
 	/**
 	 * Define hidden columns.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	protected function define_hidden_columns(): array {
 		return [];
@@ -96,10 +96,10 @@ abstract class Admin_List_Table implements Integration_Interface {
 	/**
 	 * Adjust which columns are displayed by default.
 	 *
-	 * @param array     $hidden Current hidden columns.
-	 * @param WP_Screen $screen Current screen.
+	 * @param array<int, string> $hidden Current hidden columns.
+	 * @param WP_Screen          $screen Current screen.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function default_hidden_columns( $hidden, $screen ): array {
 		if ( isset( $screen->id ) && 'edit-' . $this->list_table_type === $screen->id ) {
@@ -146,9 +146,9 @@ abstract class Admin_List_Table implements Integration_Interface {
 	 * View mode is seen on posts where you can switch between list or excerpt. Our post types don't support
 	 * it, so we want to hide the useless UI from the screen options tab.
 	 *
-	 * @param array $post_types Array of post types supporting view mode.
+	 * @param array<string, string> $post_types Array of post types supporting view mode.
 	 *
-	 * @return array             Array of post types supporting view mode, without this type.
+	 * @return array<string, string> Array of post types supporting view mode, without this type.
 	 */
 	public function disable_view_mode( $post_types ): array {
 		unset( $post_types[ $this->list_table_type ] );
@@ -179,9 +179,9 @@ abstract class Admin_List_Table implements Integration_Interface {
 	/**
 	 * Handle any filters.
 	 *
-	 * @param array $query_vars Query vars.
+	 * @param array<string, mixed> $query_vars Query vars.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function request_query( $query_vars ): array {
 		global $typenow;
@@ -196,9 +196,9 @@ abstract class Admin_List_Table implements Integration_Interface {
 	/**
 	 * Handle any custom filters.
 	 *
-	 * @param array $query_vars Query vars.
+	 * @param array<string, mixed> $query_vars Query vars.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	protected function query_filters( $query_vars ): array {
 		return $query_vars;

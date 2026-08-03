@@ -21,21 +21,21 @@ class Options {
 	/**
 	 * Hold plugin options.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $options = [];
 
 	/**
 	 * Original DB option values.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $raw_options = [];
 
 	/**
 	 * Map of key to their respective option name.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $options_map = [
 		'advanced-ads' => ADVADS_SLUG,
@@ -88,10 +88,10 @@ class Options {
 	 *
 	 * It checks if the method to set the option exists in the instance of the class and calls it if it does.
 	 *
-	 * @param string $key    Option suffix (advanced-ads-XXX).
-	 * @param array  $value  The value to set.
+	 * @param string               $key    Option suffix (advanced-ads-XXX).
+	 * @param array<string, mixed> $value  The value to set.
 	 *
-	 * @return array The new value of the option.
+	 * @return array<string, mixed> The new value of the option.
 	 */
 	public function set( $key, $value ): array {
 		$keys        = $this->normalize_key( $key );
@@ -118,7 +118,7 @@ class Options {
 	 *
 	 * @param string $key Option name.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_option( $key ): array {
 		// Early bail!!
@@ -149,7 +149,7 @@ class Options {
 	 * @param string $key   Option name.
 	 * @param mixed  $value Option value.
 	 *
-	 * @return array The normalized option value.
+	 * @return array<string, mixed> The normalized option value.
 	 */
 	private function set_option( $key, $value ): array {
 		// Check for setter method.
@@ -172,9 +172,9 @@ class Options {
 	/**
 	 * Normalizes the given options array recursively.
 	 *
-	 * @param array $options Options array to be normalized.
+	 * @param array<string, mixed> $options Options array to be normalized.
 	 *
-	 * @return array The normalized options array.
+	 * @return array<string, mixed> The normalized options array.
 	 */
 	private function normalize_option( $options ): array {
 		if ( ! is_array( $options ) || empty( $options ) ) {
@@ -214,7 +214,7 @@ class Options {
 	 *
 	 * @param string $key Key to be normalized.
 	 *
-	 * @return array The normalized key as an array.
+	 * @return array<string, mixed> The normalized key as an array.
 	 */
 	private function normalize_key( $key ) {
 		$key = trim( $key, '.' );

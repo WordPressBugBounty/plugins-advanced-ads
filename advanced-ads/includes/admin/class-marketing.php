@@ -60,8 +60,8 @@ class Marketing implements Integration_Interface {
 	/**
 	 * Display metaboxes by their id.
 	 *
-	 * @param WP_Post $post WP_Post object.
-	 * @param array   $box  meta box information.
+	 * @param WP_Post              $post WP_Post object.
+	 * @param array<string, mixed> $box Meta box information.
 	 *
 	 * @return void
 	 */

@@ -124,7 +124,15 @@ function openDialogByHash( hash ) {
 	const opener = document.querySelector(
 		`[data-dialog="${ window.CSS.escape( hash ) }"]`
 	);
-	opener?.click();
+	if ( opener ) {
+		opener.click();
+		return;
+	}
+
+	const dialog = document.getElementById( hash );
+	if ( dialog?.tagName === 'DIALOG' ) {
+		openDialog( dialog );
+	}
 }
 
 // ── init ──────────────────────────────────────────────────────────────────────

@@ -86,7 +86,7 @@ class Header extends Base implements Placement_Type {
 	/**
 	 * Get options for this placement type.
 	 *
-	 * @return array The options array.
+	 * @return array<string, mixed> The options array.
 	 */
 	public function get_options(): array {
 		return $this->apply_filter_on_options( [] );

@@ -5,7 +5,7 @@
  * @package AdvancedAds
  * @author  Advanced Ads <info@wpadvancedads.com>
  *
- * @var array  $tabs   Array of screen tabs.
+ * @var array<string, array{label: string}> $tabs Array of screen tabs.
  * @var string $active Active tab id.
  */
 

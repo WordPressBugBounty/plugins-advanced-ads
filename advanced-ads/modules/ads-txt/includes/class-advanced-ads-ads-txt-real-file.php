@@ -1,8 +1,20 @@
 <?php
 /**
+ * Real ads.txt file parser.
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ */
+
+/**
  * Represents a real ads.txt file.
  */
 class Advanced_Ads_Ads_Txt_Real_File {
+	/**
+	 * Parsed ads.txt records as [ data, comments[] ] pairs.
+	 *
+	 * @var list<array{0: string, 1: list<string>}>
+	 */
 	private $records = [];
 
 	/**
@@ -11,13 +23,14 @@ class Advanced_Ads_Ads_Txt_Real_File {
 	 * @param string $file File data.
 	 */
 	public function parse_file( $file ) {
-		$lines = preg_split( '/\r\n|\r|\n/', $file );
 		$comments = [];
+		$lines    = preg_split( '/\r\n|\r|\n/', $file );
 
 		foreach ( $lines as $line ) {
 			$line = explode( '#', $line );
 
-			if ( ! empty( $line[1] ) && $comment = trim( $line[1] ) ) {
+			$comment = isset( $line[1] ) ? trim( $line[1] ) : '';
+			if ( '' !== $comment ) {
 				$comments[] = '# ' . $comment;
 			}
 
@@ -25,8 +38,8 @@ class Advanced_Ads_Ads_Txt_Real_File {
 				continue;
 			}
 
-			$rec = explode( ',', $line[0] );
 			$data = [];
+			$rec  = explode( ',', $line[0] );
 
 			foreach ( $rec as $k => $r ) {
 				$r = trim( $r, " \n\r\t," );
@@ -47,8 +60,8 @@ class Advanced_Ads_Ads_Txt_Real_File {
 	/**
 	 * Add record.
 	 *
-	 * @string $data     Record without comments.
-	 * @array  $comments Comments related to the record.
+	 * @param string       $data     Record without comments.
+	 * @param list<string> $comments Comments related to the record.
 	 */
 	private function add_record( $data, $comments = [] ) {
 		$this->records[] = [ $data, $comments ];
@@ -57,7 +70,7 @@ class Advanced_Ads_Ads_Txt_Real_File {
 	/**
 	 * Get records
 	 *
-	 * @return array
+	 * @return list<array{0: string, 1: list<string>}>
 	 */
 	public function get_records() {
 		return $this->records;
@@ -76,17 +89,20 @@ class Advanced_Ads_Ads_Txt_Real_File {
 			}
 			$r .= $rec[0] . "\n";
 		}
+
 		return $r;
 	}
 
 	/**
 	 * Subtract another ads.txt file.
 	 *
-	 * @return string
+	 * @param Advanced_Ads_Ads_Txt_Real_File $subtrahend File whose records should be removed from this one.
+	 *
+	 * @return void
 	 */
-	public function subtract( Advanced_Ads_Ads_Txt_Real_File $subtrahend ) {
+	public function subtract( Advanced_Ads_Ads_Txt_Real_File $subtrahend ): void {
 		$r1 = $subtrahend->get_records();
-		foreach (  $this->records as $k => $record ) {
+		foreach ( $this->records as $k => $record ) {
 			foreach ( $r1 as $r ) {
 				if ( $record[0] === $r[0] ) {
 					unset( $this->records[ $k ] );

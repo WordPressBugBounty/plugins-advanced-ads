@@ -249,8 +249,8 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 	/**
 	 * Sort by installed add-ons
 	 *
-	 * @param array $a argument a.
-	 * @param array $b argument b.
+	 * @param array{order: int} $a Argument a.
+	 * @param array{order: int} $b Argument b.
 	 *
 	 * @return int
 	 */

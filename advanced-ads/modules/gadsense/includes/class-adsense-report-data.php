@@ -34,7 +34,7 @@ class AdSense_Report_Data implements Serializable {
 	/**
 	 * Daily earnings.
 	 *
-	 * @var null|array
+	 * @var list<object>|null
 	 */
 	private $earnings;
 
@@ -69,7 +69,7 @@ class AdSense_Report_Data implements Serializable {
 	/**
 	 * List of domain names found in the report data.
 	 *
-	 * @var array
+	 * @var list<string>
 	 */
 	private $domains = [];
 
@@ -85,7 +85,7 @@ class AdSense_Report_Data implements Serializable {
 	/**
 	 * Get all domains.
 	 *
-	 * @return array the domain list.
+	 * @return list<string> the domain list.
 	 */
 	public function get_domains() {
 		return $this->domains;
@@ -112,7 +112,7 @@ class AdSense_Report_Data implements Serializable {
 	/**
 	 * Serialize an instance of this class into a string. For PHP version >= 7.4
 	 *
-	 * @return array
+	 * @return array{earnings: list<object>|null, type: string, timestamp: int, currency: string, domains: list<string>}
 	 */
 	public function __serialize() {
 		return [
@@ -127,7 +127,7 @@ class AdSense_Report_Data implements Serializable {
 	/**
 	 * Recreate an instance of this class from a string. For PHP version >= 7.4
 	 *
-	 * @param array $data the array from __serialize.
+	 * @param array{earnings?: list<object>|null, type?: string|null, timestamp?: int, currency?: string, domains?: list<string>} $data the array from __serialize.
 	 *
 	 * @return void
 	 */
@@ -173,7 +173,7 @@ class AdSense_Report_Data implements Serializable {
 	/**
 	 * Update object properties and DB record from a API response.
 	 *
-	 * @param array $response API call response from Google.
+	 * @param array<string, mixed> $response API call response from Google.
 	 */
 	public function update_data_from_response( $response ) {
 		$headers         = [];

@@ -41,9 +41,9 @@ class Peepso implements Integration_Interface {
 	/**
 	 * Add Peepso placement type to Advanced Ads.
 	 *
-	 * @param array $types placement types.
+	 * @param array<string, mixed> $types placement types.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function placement_type( $types ): array {
 		if ( class_exists( 'PeepSoAdvancedAdsPlugin' ) ) {
@@ -61,9 +61,9 @@ class Peepso implements Integration_Interface {
 	/**
 	 * Add Peepso ad type to Advanced Ads.
 	 *
-	 * @param array $types ad types.
+	 * @param array<string, mixed> $types ad types.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function ad_type( $types ): array {
 		if ( class_exists( 'PeepSoAdvancedAdsPlugin' ) && isset( $types['peepso'] ) && 'Advanced_Ads_Ad_Type_Abstract' === get_parent_class( $types['peepso'] ) ) {

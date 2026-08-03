@@ -80,10 +80,10 @@ class Advanced_Ads_Ad_Network_Ad_Unit {
 	/**
 	 * Sort multiple ad units.
 	 *
-	 * @param array  $ad_units array of ad units.
-	 * @param string $selected_id ID of the selected ad. Can be taken from the ad network and therefore also a string.
+	 * @param array<int|string, Advanced_Ads_Ad_Network_Ad_Unit> $ad_units     Array of ad units.
+	 * @param string                                             $selected_id ID of the selected ad. Can be taken from the ad network and therefore also a string.
 	 *
-	 * @return array
+	 * @return array<int|string, Advanced_Ads_Ad_Network_Ad_Unit>
 	 */
 	public static function sort_ad_units( array &$ad_units, $selected_id ) {
 		$selected_id = absint( $selected_id );

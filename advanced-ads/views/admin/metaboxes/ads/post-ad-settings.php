@@ -7,7 +7,7 @@
  * @since   1.48.0
  *
  * @var WP_Post|object $post   Post instance.
- * @var array          $values Setting array.
+ * @var array<string, mixed> $values Setting array.
  */
 
 wp_nonce_field( 'advads_post_meta_box', 'advads_post_meta_box_nonce' );

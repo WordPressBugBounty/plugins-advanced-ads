@@ -21,6 +21,8 @@ export const supportRoute = {
 		headerActions: null,
 		upgradeUrl:
 			'https://wpadvancedads.com/add-ons/?utm_source=advanced-ads&utm_medium=link&utm_campaign=header-upgrade-license',
+		manualUrl:
+			'https://wpadvancedads.com/support/?utm_source=advanced-ads&utm_medium=link&utm_campaign=header-upgrade-license',
 	},
 	areas: {
 		content: () => <Support />,

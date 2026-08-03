@@ -5,6 +5,7 @@ const STORE_NAME = 'advanced-ads/store';
 const DEFAULT_STATE = {
 	licenses: [],
 	appliedAddonKeyMap: {},
+	currentActiveLicenses: '',
 	autoUpdateStates: {},
 	addonInstallStates: {},
 	lastSyncAt: 0,
@@ -18,7 +19,8 @@ const actions = {
 		autoUpdateStates = {},
 		addonInstallStates = {},
 		lastSyncAt = 0,
-		expiryNoticeFlags = {}
+		expiryNoticeFlags = {},
+		currentActiveLicenses = ''
 	) {
 		return {
 			type: 'SET_LICENSES',
@@ -28,6 +30,7 @@ const actions = {
 			addonInstallStates,
 			lastSyncAt,
 			expiryNoticeFlags,
+			currentActiveLicenses,
 		};
 	},
 	setAutoUpdateStates( autoUpdateStates ) {
@@ -58,6 +61,8 @@ function reducer( state = DEFAULT_STATE, action ) {
 				licenses: action.licenses,
 				appliedAddonKeyMap:
 					action.appliedAddonKeyMap ?? state.appliedAddonKeyMap,
+				currentActiveLicenses:
+					action.currentActiveLicenses ?? state.currentActiveLicenses,
 				autoUpdateStates:
 					action.autoUpdateStates ?? state.autoUpdateStates,
 				addonInstallStates:
@@ -94,6 +99,9 @@ const selectors = {
 	},
 	getAppliedAddonKeyMap( state ) {
 		return state.appliedAddonKeyMap;
+	},
+	getCurrentActiveLicenses( state ) {
+		return state.currentActiveLicenses ?? '';
 	},
 	hasLicenses( state ) {
 		return state.licenses.length > 0;

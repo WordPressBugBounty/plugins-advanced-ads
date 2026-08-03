@@ -90,7 +90,7 @@ class Ads_Editing extends Ads {
 	/**
 	 * Define header args.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function define_header_args(): array {
 		return [

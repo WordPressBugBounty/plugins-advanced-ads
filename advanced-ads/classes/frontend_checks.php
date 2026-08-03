@@ -23,14 +23,14 @@ class Advanced_Ads_Frontend_Checks {
 	/**
 	 * Plugin options.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $options = [];
 
 	/**
 	 * Published placements loaded once per request for frontend checks.
 	 *
-	 * @var array|null
+	 * @var array<string, mixed>|null
 	 */
 	private $frontend_placements = null;
 
@@ -79,8 +79,8 @@ class Advanced_Ads_Frontend_Checks {
 	/**
 	 * Notify ads loaded with AJAX.
 	 *
-	 * @param array $args ad arguments.
-	 * @return array $args
+	 * @param array<string, mixed> $args Ad arguments.
+	 * @return array<string, mixed> $args
 	 */
 	public function ad_select_args_callback( $args ) {
 		$args['frontend-check'] = true;
@@ -532,8 +532,8 @@ class Advanced_Ads_Frontend_Checks {
 	/**
 	 * Count visible notices and warnings.
 	 *
-	 * @param array $nodes Nodes to add.
-	 * @param array $types Warning types.
+	 * @param array<int, array<string, mixed>> $nodes Nodes to add.
+	 * @param array<int, string>               $types Warning types.
 	 */
 	private function count_visible_warnings( $nodes, $types = [] ) {
 		$warnings = 0;
@@ -619,8 +619,8 @@ class Advanced_Ads_Frontend_Checks {
 	/**
 	 * Filter out nodes intended to AMP pages only.
 	 *
-	 * @param array $nodes Nodes to add.
-	 * @return array $nodes Nodes to add.
+	 * @param array<int, array<string, mixed>> $nodes Nodes to add.
+	 * @return array<int, array<string, mixed>> $nodes Nodes to add.
 	 */
 	private function filter_nodes( $nodes ) {
 		return $nodes;
@@ -629,8 +629,8 @@ class Advanced_Ads_Frontend_Checks {
 	/**
 	 * Sort nodes.
 	 *
-	 * @param array $a The first node to compare.
-	 * @param array $b The second node to compare.
+	 * @param array<string, mixed> $a The first node to compare.
+	 * @param array<string, mixed> $b The second node to compare.
 	 * @return int Returns -1 if $a is less than $b, 1 if $a is greater than $b, and 0 if they are equal.
 	 */
 	public function sort_nodes( $a, $b ) {
@@ -1193,7 +1193,7 @@ class Advanced_Ads_Frontend_Checks {
 	/**
 	 * Get published placements once per request for frontend checks.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_frontend_placements() {
 		if ( null === $this->frontend_placements ) {
@@ -1209,11 +1209,13 @@ class Advanced_Ads_Frontend_Checks {
 	 * @return bool True/False.
 	 */
 	private function has_the_content_placements() {
-		$placements = $this->get_frontend_placements();
+		foreach ( wp_advads_get_placement_summaries() as $summary ) {
+			if ( 'publish' !== ( $summary['status'] ?? '' ) ) {
+				continue;
+			}
 
-		// Find a placement that depends on 'the_content' filter.
-		foreach ( $placements as $placement ) {
-			if ( $placement->get_type_object()->get_options()['uses_the_content'] ) {
+			$type = wp_advads_get_placement_type( $summary['type'] ?? '' );
+			if ( $type && ! empty( $type->get_options()['uses_the_content'] ) ) {
 				return true;
 			}
 		}

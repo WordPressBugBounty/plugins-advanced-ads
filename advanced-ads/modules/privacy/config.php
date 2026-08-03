@@ -1,6 +1,11 @@
 <?php
+/**
+ * Privacy module configuration.
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ */
 
-// module configuration
 return [
 	'classmap'   => [
 		'Advanced_Ads_Privacy'       => __DIR__ . '/classes/class-privacy.php',

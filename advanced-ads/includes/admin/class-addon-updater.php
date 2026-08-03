@@ -16,6 +16,7 @@ namespace AdvancedAds\Admin;
 
 use AdvancedAds\Constants;
 use AdvancedAds\License\License;
+use AdvancedAds\License\License_Shop_Client;
 use AdvancedAds\License\License_Utils;
 use AdvancedAds\Utilities\Data;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
@@ -34,7 +35,7 @@ class Addon_Updater implements Integration_Interface {
 	 */
 	public function hooks(): void {
 		// Local/dev: WordPress blocks .test shop hosts (127.0.0.1) without this filter.
-		License::register_local_development_shop_http_filters();
+		License_Shop_Client::add_local_development_http_filter();
 
 		if ( ! wp_doing_ajax() ) {
 			add_action( 'load-plugins.php', [ $this, 'plugin_licenses_warning' ] );
@@ -66,7 +67,6 @@ class Addon_Updater implements Integration_Interface {
 			}
 
 			new EDD_Updater(
-				Constants::API_ENDPOINT,
 				$_add_on['path'],
 				[
 					'version' => $_add_on['version'],
@@ -105,8 +105,8 @@ class Addon_Updater implements Integration_Interface {
 	/**
 	 * Add a row below add-ons with an invalid license on the plugin list
 	 *
-	 * @param string $plugin_file Path to the plugin file, relative to the plugins directory.
-	 * @param array  $plugin_data An array of plugin data.
+	 * @param string               $plugin_file Path to the plugin file, relative to the plugins directory.
+	 * @param array<string, mixed> $plugin_data An array of plugin data.
 	 *
 	 * @since 1.7.12
 	 * @todo  make this work on multisite as well

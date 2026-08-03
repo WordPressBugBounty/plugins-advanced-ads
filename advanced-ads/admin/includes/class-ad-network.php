@@ -272,9 +272,9 @@ abstract class Advanced_Ads_Ad_Network {
 	 * This method will be called for the wp action "advanced-ads-settings-tabs" and therefore has to be public.
 	 * it simply adds a tab for this ad type. if you don't want that just override this method with an empty one.
 	 *
-	 * @param array $tabs tabs on Advanced Ads settings page.
+	 * @param array<string, array<string, string>> $tabs Tabs on Advanced Ads settings page.
 	 *
-	 * @return array
+	 * @return array<string, array<string, string>>
 	 */
 	public function register_settings_tabs_callback( $tabs ) {
 		$tab_id          = $this->identifier;
@@ -291,7 +291,7 @@ abstract class Advanced_Ads_Ad_Network {
 	/**
 	 * Callback to sanitize settings
 	 *
-	 * @param array $options options to be sanitized.
+	 * @param array<string, mixed> $options Options to be sanitized.
 	 *
 	 * @return mixed
 	 */
@@ -403,17 +403,17 @@ abstract class Advanced_Ads_Ad_Network {
 	/**
 	 * Sanitize the network specific options
 	 *
-	 * @param array $options the options to sanitize.
+	 * @param array<string, mixed> $options The options to sanitize.
 	 *
-	 * @return mixed the sanitizzed options
+	 * @return mixed The sanitized options.
 	 */
 	abstract protected function sanitize_settings( $options );
 
 	/**
 	 * Sanitize the settings for this ad network
 	 *
-	 * @param Ad    $ad        Ad instance.
-	 * @param array $post_data Post data array.
+	 * @param Ad                   $ad        Ad instance.
+	 * @param array<string, mixed> $post_data Post data array.
 	 *
 	 * @return void
 	 */
@@ -423,7 +423,7 @@ abstract class Advanced_Ads_Ad_Network {
 	/**
 	 * Get external ad units from the given network.
 	 *
-	 * @return array of ad units (Advanced_Ads_Ad_Network_Ad_Unit)
+	 * @return array<int|string, Advanced_Ads_Ad_Network_Ad_Unit> Ad units.
 	 */
 	abstract public function get_external_ad_units();
 
@@ -460,9 +460,9 @@ abstract class Advanced_Ads_Ad_Network {
 	 * Our script might need translations or other variables (llike a nonce, which is included automatically)
 	 * add anything you need in this method and return the array
 	 *
-	 * @param array $data holding the data.
+	 * @param array<string, mixed> $data Holding the data.
 	 *
-	 * @return array the data, that will be passed to the base javascript file containing the AdvancedAdsAdNetwork class
+	 * @return array<string, mixed> Data passed to the base JavaScript file containing the AdvancedAdsAdNetwork class.
 	 */
 	abstract public function append_javascript_data( &$data );
 }

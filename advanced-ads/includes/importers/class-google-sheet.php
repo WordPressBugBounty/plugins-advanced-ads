@@ -23,7 +23,7 @@ class Google_Sheet extends Importer implements Interface_Importer {
 	/**
 	 * Ads from sheets
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $sheet_ads = null;
 
@@ -177,7 +177,7 @@ class Google_Sheet extends Importer implements Interface_Importer {
 	 * @param string $sheet_id   The ID of the Google Sheet.
 	 * @param string $sheet_name The name of the sheet within the Google Sheet.
 	 *
-	 * @return array|WP_Error An array of ads retrieved from the Google Sheet or error if any
+	 * @return array<string, mixed>|WP_Error An array of ads retrieved from the Google Sheet or error if any
 	 */
 	private function get_ads( $sheet_id, $sheet_name ) {
 		$ads           = [];
@@ -220,7 +220,7 @@ class Google_Sheet extends Importer implements Interface_Importer {
 	/**
 	 * Get ads from sheet by device
 	 *
-	 * @param array $ads Ads selected by user.
+	 * @param array<int, \AdvancedAds\Abstracts\Ad> $ads Ads selected by user.
 	 *
 	 * @return string
 	 */
@@ -333,7 +333,7 @@ class Google_Sheet extends Importer implements Interface_Importer {
 	 *
 	 * @param string $term Dictionary term.
 	 *
-	 * @return array|null
+	 * @return array<string, mixed>|null
 	 */
 	private function parse_display_conditions( $term ) {
 		$term = str_replace( ' ', '_', strtolower( $term ) );

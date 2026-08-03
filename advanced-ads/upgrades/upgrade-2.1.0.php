@@ -26,7 +26,7 @@ function advads_upgrade_2_1_0_migrate_legacy_licenses(): void {
 		return;
 	}
 
-	$map = License_Utils::normalize_legacy_map( get_option( License::OPTION_LEGACY_MAP, [] ) );
+	$map = License_Utils::normalize_legacy_map( get_option( License::OPTION_SITE_ACTIVATION, [] ) );
 	if ( [] === $map ) {
 		update_option( License::OPTION_FLAT_MAP_RETIRED, '1', false );
 		return;

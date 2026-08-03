@@ -99,7 +99,7 @@ class Plugin_Installer {
 	/**
 	 * Do the plugin update process
 	 *
-	 * @return array|bool|WP_Error
+	 * @return array<string, mixed>|bool|\WP_Error
 	 */
 	public function install() {
 		self::require_upgrader_dependencies();
@@ -123,7 +123,7 @@ class Plugin_Installer {
 	 *
 	 * @param string $package_url      Package URL or local zip path.
 	 * @param bool   $replace_existing Overwrite an existing plugin directory.
-	 * @return bool|array|WP_Error|null
+	 * @return bool|array<string, mixed>|\WP_Error|null
 	 */
 	public static function install_from_url( string $package_url, bool $replace_existing = false ) {
 		self::require_upgrader_dependencies();

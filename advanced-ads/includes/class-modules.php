@@ -21,14 +21,14 @@ class Modules implements Initializer_Interface {
 	/**
 	 * Modules.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $modules = [];
 
 	/**
 	 * Running modules.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $running = [];
 

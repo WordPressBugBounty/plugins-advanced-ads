@@ -24,7 +24,7 @@ class Advanced_Ads_Select {
 	/**
 	 * Hold methods
 	 *
-	 * @var array
+	 * @var array<string, string>
 	 */
 	protected $methods;
 
@@ -45,7 +45,7 @@ class Advanced_Ads_Select {
 	/**
 	 * Get ad selection methods.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function get_methods() {
 		if ( ! isset( $this->methods ) ) {
@@ -69,9 +69,9 @@ class Advanced_Ads_Select {
 	 *
 	 * @param string $method Ad selection method.
 	 * @param int    $id     Ad ID.
-	 * @param array  $args   Ad selection arguments.
+	 * @param array<string, mixed> $args Ad selection arguments.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_ad_arguments( $method, $id, $args = [] ) {
 		$args = (array) $args;
@@ -95,7 +95,7 @@ class Advanced_Ads_Select {
 	 *
 	 * @param int    $id     Ad ID.
 	 * @param string $method Ad selection method.
-	 * @param array  $args   Ad selection arguments.
+	 * @param array<string, mixed> $args Ad selection arguments.
 	 *
 	 * @return string
 	 */
@@ -118,7 +118,7 @@ class Advanced_Ads_Select {
 	/**
 	 * Get ad by ID.
 	 *
-	 * @param array $args Ad selection arguments.
+	 * @param array<string, mixed> $args Ad selection arguments.
 	 *
 	 * @return string
 	 */
@@ -129,7 +129,7 @@ class Advanced_Ads_Select {
 	/**
 	 * Get ad by group.
 	 *
-	 * @param array $args Ad selection arguments.
+	 * @param array<string, mixed> $args Ad selection arguments.
 	 *
 	 * @return string
 	 */
@@ -140,7 +140,7 @@ class Advanced_Ads_Select {
 	/**
 	 * Get ad by placement.
 	 *
-	 * @param array $args Ad selection arguments.
+	 * @param array<string, mixed> $args Ad selection arguments.
 	 *
 	 * @return string
 	 */

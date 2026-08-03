@@ -2,9 +2,9 @@
 /**
  * Template to select number-based conditions.
  *
- * @var string $name form name attribute.
- * @var string $operator operator.
- * @var array $type_options array with information. We get the description of the condition from here.
+ * @var string                              $name         Form name attribute.
+ * @var string                              $operator     Operator.
+ * @var array<string, array<string, mixed>> $type_options Array with information. We get the description of the condition from here.
  */
 ?>
 <input type="hidden" name="<?php echo esc_attr( $name ); ?>[type]" value="<?php echo esc_attr( $options['type'] ); ?>"/>

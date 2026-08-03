@@ -9,16 +9,16 @@
 
 namespace AdvancedAds\Importers;
 
-use WP_Error;
-use Exception;
-use XML_Encoder;
-use AdvancedAds\Options;
-use Advanced_Ads_Privacy;
-use AdvancedAds\Constants;
 use Advanced_Ads_Ads_Txt_Strategy;
+use Advanced_Ads_Privacy;
 use AdvancedAds\Ads\Ad_Repository;
-use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Options;
+use AdvancedAds\Utilities\Conditional;
+use Exception;
+use WP_Error;
+use XML_Encoder;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -34,21 +34,21 @@ class Plugin_Exporter {
 	/**
 	 * Hold data to make export file
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public $data = [];
 
 	/**
 	 * Types of content to be exported.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public $options = false;
 
 	/**
 	 * Download export file
 	 *
-	 * @return array|string|WP_Error
+	 * @return array<string, mixed>|string|WP_Error
 	 */
 	public function download_file() {
 		if ( ! Conditional::user_can( 'advanced_ads_manage_options' ) ) {
@@ -88,7 +88,6 @@ class Plugin_Exporter {
 				}
 
 				exit();
-
 			} catch ( Exception $e ) {
 				return new WP_Error( 'error', $e->getMessage() );
 			}
@@ -239,7 +238,7 @@ class Plugin_Exporter {
 	 *
 	 * @param int $group_id Group id.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_group( $group_id ): array {
 		static $advads_groups;
@@ -288,7 +287,7 @@ class Plugin_Exporter {
 	 *
 	 * @param string $post_type Post type to fetch.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_posts( $post_type ): array {
 		global $wpdb;
@@ -332,7 +331,7 @@ class Plugin_Exporter {
 	/**
 	 * Get mime types
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_mime_types(): array {
 		static $mime_types;
@@ -352,7 +351,7 @@ class Plugin_Exporter {
 	/**
 	 * Get ads meta
 	 *
-	 * @param array $post Post object array.
+	 * @param array<string, mixed> $post Post object array.
 	 *
 	 * @return void
 	 */

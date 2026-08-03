@@ -54,9 +54,9 @@ class AdsTxt implements Integration_Interface {
 	/**
 	 * Allowed redirect hosts
 	 *
-	 * @param array $hosts Array to hold allowed hosts.
+	 * @param list<string> $hosts Array to hold allowed hosts.
 	 *
-	 * @return array
+	 * @return list<string>
 	 */
 	public function allowed_redirect_hosts( $hosts ): array {
 		$hosts[] = 'adstxt.pubguru.net';

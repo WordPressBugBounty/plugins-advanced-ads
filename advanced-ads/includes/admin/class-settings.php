@@ -28,7 +28,7 @@ class Settings implements Integration_Interface {
 	/**
 	 * Setting options
 	 *
-	 * @var array with plugin options
+	 * @var array<string, mixed> with plugin options
 	 */
 	private $options;
 
@@ -56,9 +56,9 @@ class Settings implements Integration_Interface {
 	/**
 	 * Add tabs to the settings page.
 	 *
-	 * @param array $tabs setting tabs.
+	 * @param array<string, array<string, mixed>> $tabs Setting tabs.
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>>
 	 */
 	public function add_tabs( array $tabs ): array {
 		if ( ! defined( 'AAP_VERSION' ) ) {
@@ -359,9 +359,9 @@ class Settings implements Integration_Interface {
 	/**
 	 * Sanitize plugin settings
 	 *
-	 * @param array $options all the options.
+	 * @param array<string, mixed> $options All the options.
 	 *
-	 * @return array sanitized options.
+	 * @return array<string, mixed> Sanitized options.
 	 */
 	public function sanitize_settings( $options ) {
 		if ( isset( $options['front-prefix'] ) ) {

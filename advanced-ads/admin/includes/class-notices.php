@@ -9,9 +9,8 @@
 
 use AdvancedAds\Abstracts\Ad;
 use AdvancedAds\Utilities\Addons;
-use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Arr;
+use AdvancedAds\Utilities\WordPress;
 
 /**
  * Container class for admin notices
@@ -29,14 +28,14 @@ class Advanced_Ads_Admin_Notices {
 	/**
 	 * Options
 	 *
-	 * @var    array
+	 * @var array<string, mixed>
 	 */
 	protected $options;
 
 	/**
 	 * Notices to be displayed
 	 *
-	 * @var    array
+	 * @var array<int, string>
 	 */
 	public $notices = [];
 
@@ -376,12 +375,12 @@ class Advanced_Ads_Admin_Notices {
 		include_once ADVADS_ABSPATH . '/admin/includes/notices.php';
 
 		// Register Conflict Plugins notice
-		$this->register_plugin_conflict_notices($plugin_conflicts);
+		$this->register_plugin_conflict_notices( $plugin_conflicts );
 
 		// Iterate through notices.
 		$count = 0;
-		foreach ( $this->notices as $_notice ) {
 
+		foreach ( $this->notices as $_notice ) {
 			if ( isset( $advanced_ads_admin_notices[ $_notice ] ) ) {
 				$notice = $advanced_ads_admin_notices[ $_notice ];
 				$text   = $advanced_ads_admin_notices[ $_notice ]['text'];
@@ -424,7 +423,7 @@ class Advanced_Ads_Admin_Notices {
 	/**
 	 * Return notices options
 	 *
-	 * @return array $options
+	 * @return array<string, mixed> $options
 	 */
 	public function options() {
 		if ( ! isset( $this->options ) ) {
@@ -437,7 +436,7 @@ class Advanced_Ads_Admin_Notices {
 	/**
 	 * Update notices options
 	 *
-	 * @param array $options new options.
+	 * @param array<string, mixed> $options New options.
 	 */
 	public function update_options( array $options ) {
 		// do not allow to clear options.
@@ -559,15 +558,14 @@ class Advanced_Ads_Admin_Notices {
 		include ADVADS_ABSPATH . '/admin/views/notices/inline.php';
 	}
 
-
-
 	/**
 	 * Register plugin conflict notices already defined in notices.php
+	 *
+	 * @param array<string, string> $plugin_conflicts Plugin basename => display name map.
 	 */
-	public function register_plugin_conflict_notices($plugin_conflicts) {
-
+	public function register_plugin_conflict_notices( $plugin_conflicts ) {
 		// Early Bail !
-		if (empty($plugin_conflicts)) {
+		if ( empty( $plugin_conflicts ) ) {
 			return;
 		}
 
@@ -575,10 +573,9 @@ class Advanced_Ads_Admin_Notices {
 		$queue   = $options['queue'] ?? [];
 		$closed  = $options['closed'] ?? [];
 
-
-		foreach($plugin_conflicts as $slug => $name){
-			$noticeId = str_replace(' ', '_', strtolower($name));
-			$notice_id = sanitize_title( $noticeId ) . '_active';
+		foreach ( $plugin_conflicts as $slug => $name ) {
+			$notice_id = str_replace( ' ', '_', strtolower( $name ) );
+			$notice_id = sanitize_title( $notice_id ) . '_active';
 			if ( ! is_plugin_active( $slug ) ) {
 				continue;
 			}
@@ -587,5 +584,4 @@ class Advanced_Ads_Admin_Notices {
 			}
 		}
 	}
-
 }

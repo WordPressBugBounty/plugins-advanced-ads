@@ -35,28 +35,28 @@ class Advanced_Ads {
 	 *
 	 * @deprecated 1.48.2
 	 *
-	 * @var array Ad types
+	 * @var array<string, mixed> Ad types
 	 */
 	public $ad_types = [];
 
 	/**
 	 * Plugin options
 	 *
-	 * @var array $options
+	 * @var array<string, mixed> $options
 	 */
 	protected $options;
 
 	/**
 	 * Interal plugin options – set by the plugin
 	 *
-	 * @var     array $internal_options
+	 * @var     array<string, mixed> $internal_options
 	 */
 	protected $internal_options;
 
 	/**
 	 * Adblocker Plugin options
 	 *
-	 * @var array (if loaded)
+	 * @var array<string, mixed>|null
 	 */
 	protected $adblocker_options = null;
 
@@ -175,7 +175,7 @@ class Advanced_Ads {
 	/**
 	 * Compat method
 	 *
-	 * @return array with plugin options
+	 * @return array<string, mixed> with plugin options
 	 */
 	public function options() {
 		// we can’t store options if WPML String Translations is enabled, or it would not translate the "Ad Label" option.
@@ -192,7 +192,7 @@ class Advanced_Ads {
 	/**
 	 * Compat method
 	 *
-	 * @return array with adblocker options
+	 * @return array<string, mixed> with adblocker options
 	 */
 	public function get_adblocker_options() {
 		// we can’t store options if WPML String Translations is enabled, or it would not translate the "Ad Label" option.
@@ -211,7 +211,7 @@ class Advanced_Ads {
 	/**
 	 * Compat method
 	 *
-	 * @return array with internal plugin options
+	 * @return array<string, mixed> with internal plugin options
 	 */
 	public function internal_options() {
 		if ( ! isset( $this->internal_options ) ) {
@@ -412,7 +412,7 @@ class Advanced_Ads {
 		 * Check if ads are disabled on the currently displayed page. Allow user to define their own rules if needed.
 		 *
 		 * @param bool  $ads_disabled whether ads are disabled by the plugin options.
-		 * @param array $options      plugin options.
+		 * @param array<string, mixed> $options      plugin options.
 		 *
 		 * @return bool `true` if ads are disabled
 		 */
@@ -608,27 +608,11 @@ class Advanced_Ads {
 	}
 
 	/**
-	 * Retrieve the number of ads in any status
-	 * excludes trash status by default
-	 *
-	 * @deprecated 1.48.2
-	 *
-	 * @param string|array $post_status default post status.
-	 *
-	 * @return int number of ads.
-	 */
-	public static function get_number_of_ads( $post_status = 'any' ) {
-		_deprecated_function( __METHOD__, '1.48.0', 'AdvancedAds\Utilities\WordPress::get_count_ads()' );
-
-		return WordPress::get_count_ads( $post_status );
-	}
-
-	/**
 	 * Get the array with ad placements
 	 *
 	 * @deprecated 2.0.0 wp_advads_get_placements()
 	 *
-	 * @return array $ad_placements
+	 * @return array<string, mixed> $ad_placements
 	 */
 	public static function get_ad_placements_array() {
 		return wp_advads_get_placements();
@@ -730,7 +714,7 @@ class Advanced_Ads {
 	/**
 	 * Update internal plugin options
 	 *
-	 * @param array $options new internal options.
+	 * @param array<string, mixed> $options new internal options.
 	 */
 	public function update_internal_options( array $options ) {
 		// do not allow to clear options.

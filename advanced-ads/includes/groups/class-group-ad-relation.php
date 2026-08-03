@@ -22,7 +22,7 @@ class Group_Ad_Relation {
 	/**
 	 * Hold ads.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $ads = [];
 
@@ -55,29 +55,30 @@ class Group_Ad_Relation {
 	/**
 	 * Handles the removed ads for a group.
 	 *
-	 * @param array $removed_ads An array of ad IDs that have been removed.
-	 * @param int   $group_id    The ID of the group.
+	 * @param array<int, int> $removed_ads An array of ad IDs that have been removed.
+	 * @param int             $group_id    The ID of the group.
 	 *
 	 * @return void
 	 */
 	private function handle_removed_ads( $removed_ads, $group_id ): void {
 		foreach ( $removed_ads as $ad_id ) {
-			$terms = wp_get_object_terms( $ad_id, Constants::TAXONOMY_GROUP );
+			$terms    = wp_get_object_terms( $ad_id, Constants::TAXONOMY_GROUP );
+			$term_ids = ( is_wp_error( $terms ) || empty( $terms ) )
+				? (array) get_post_meta( $ad_id, Constants::AD_META_GROUP_IDS, true )
+				: wp_list_pluck( $terms, 'term_id' );
 
-			if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
-				$term_ids = wp_list_pluck( $terms, 'term_id' );
-				$term_ids = array_diff( $term_ids, [ $group_id ] );
-				wp_set_object_terms( $ad_id, $term_ids, Constants::TAXONOMY_GROUP );
-				update_post_meta( $ad_id, Constants::AD_META_GROUP_IDS, $term_ids );
-			}
+			$term_ids = array_values( array_diff( array_map( 'intval', $term_ids ), [ (int) $group_id ] ) );
+
+			wp_set_object_terms( $ad_id, $term_ids, Constants::TAXONOMY_GROUP );
+			update_post_meta( $ad_id, Constants::AD_META_GROUP_IDS, $term_ids );
 		}
 	}
 
 	/**
 	 * Handles the added ads for a group.
 	 *
-	 * @param array $added_ads An array of ad IDs that have been added.
-	 * @param Group $group     Group instance.
+	 * @param array<int, int> $added_ads An array of ad IDs that have been added.
+	 * @param Group           $group     Group instance.
 	 *
 	 * @return void
 	 */

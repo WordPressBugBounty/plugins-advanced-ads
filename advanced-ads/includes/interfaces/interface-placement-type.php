@@ -69,7 +69,7 @@ interface Placement_Type {
 	/**
 	 * Get options for this placement type.
 	 *
-	 * @return array The options array.
+	 * @return array<string, mixed> The options array.
 	 */
 	public function get_options(): array;
 }

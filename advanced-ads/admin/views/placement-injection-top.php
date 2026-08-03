@@ -4,8 +4,8 @@
  *
  * @package AdvancedAds
  *
- * @var Ad    $ad         Ad instance.
- * @var array $placements Placements array.
+ * @var Ad                                  $ad         Ad instance.
+ * @var array<string, array<string, mixed>> $placements Placements array.
  */
 
 // show quick injection options.

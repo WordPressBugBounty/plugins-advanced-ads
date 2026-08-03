@@ -15,9 +15,9 @@ class Advanced_Ads_Utils {
 	 * $link_options_2 = array( 'fragment' => 'y', 'class' => array( 'c', 'd' ) );
 	 * // This results in array( 'fragment' => 'y', 'class' => array( 'a', 'b', 'c', 'd' ) ).
 	 *
-	 * @param array $arrays An arrays of arrays to merge.
+	 * @param array<int, array<string|int, mixed>> $arrays An arrays of arrays to merge.
 	 * @param bool  $preserve_integer_keys (optional) If given, integer keys will be preserved and merged instead of appended.
-	 * @return array The merged array.
+	 * @return array<string|int, mixed> The merged array.
 	 * @copyright Copyright 2001 - 2013 Drupal contributors. License: GPL-2.0+. Drupal is a registered trademark of Dries Buytaert.
 	 */
 	public static function merge_deep_array( array $arrays, $preserve_integer_keys = false ) {
@@ -47,7 +47,7 @@ class Advanced_Ads_Utils {
 	/**
 	 * Convert array of html attributes to string.
 	 *
-	 * @param array $data attributes.
+	 * @param array<string, mixed> $data Attributes.
 	 * @return string
 	 * @since untagged
 	 */
@@ -105,7 +105,7 @@ class Advanced_Ads_Utils {
 	 * @param string $id Id.
 	 * @param string $type Type (placement, ad or group).
 	 *
-	 * @return array of Ad objects.
+	 * @return array<int, \AdvancedAds\Abstracts\Ad> of Ad objects.
 	 */
 	public static function get_nested_ads( $id, $type ) {
 		$result = [];
@@ -155,7 +155,7 @@ class Advanced_Ads_Utils {
 	 * Maybe translate a capability to a set of roles.
 	 *
 	 * @param string/array $roles_or_caps A set of roles or capabilities.
-	 * @return array $roles A list of roles.
+	 * @return array<int, string> $roles A list of roles.
 	 */
 	public static function maybe_translate_cap_to_role( $roles_or_caps ) {
 		global $wp_roles;

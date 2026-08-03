@@ -29,8 +29,8 @@ class Manager implements Integration_Interface {
 	/**
 	 * Magic method to handle dynamic method calls.
 	 *
-	 * @param string $name      The name of the method being called.
-	 * @param array  $arguments The arguments passed to the method.
+	 * @param string               $name      The name of the method being called.
+	 * @param array<string, mixed> $arguments The arguments passed to the method.
 	 *
 	 * @return mixed The result of the method call, if the method exists. Otherwise, null is returned.
 	 */

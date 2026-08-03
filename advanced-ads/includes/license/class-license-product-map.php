@@ -9,12 +9,57 @@
 
 namespace AdvancedAds\License;
 
+use AdvancedAds\Utilities\Addons;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Product name ↔ addon id helpers.
  */
 final class License_Product_Map {
+
+	/**
+	 * Add-on manifest for license name resolution (always includes missing add-ons).
+	 *
+	 * @return array<string, array{id: string, name: string, options_slug: string, path: string}>
+	 */
+	public static function addon_manifest(): array {
+		$slug_base = defined( 'ADVADS_SLUG' ) ? ADVADS_SLUG : 'advanced-ads';
+		$names     = [
+			'pro'        => 'Pro',
+			'responsive' => 'AMP Ads',
+			'gam'        => 'Google Ad Manager Integration',
+			'layer'      => 'PopUp and Layer Ads',
+			'selling'    => 'Selling Ads',
+			'sticky'     => 'Sticky Ads',
+			'tracking'   => 'Tracking',
+		];
+		$out       = [];
+
+		foreach ( Addons::plugin_files() as $addon_id => $file ) {
+			$slug         = $slug_base . '-' . $addon_id;
+			$display_name = $names[ $addon_id ] ?? $addon_id;
+			$normalized   = self::normalize_name( $display_name );
+			$out[ $slug ] = [
+				'id'           => $addon_id,
+				'name'         => $display_name,
+				'options_slug' => $slug,
+				'path'         => $file,
+				'aliases'      => array_values(
+					array_unique(
+						array_filter(
+							[
+								$normalized,
+								'' !== $normalized ? 'advanced ads ' . $normalized : '',
+							]
+						)
+					)
+				),
+			];
+		}
+
+		return $out;
+	}
 
 	/**
 	 * Normalize a display name for comparison.
@@ -55,11 +100,11 @@ final class License_Product_Map {
 	/**
 	 * Resolve addon id (e.g. "tracking") from API product name using installed add-on metadata.
 	 *
-	 * @param string               $product_name From exchange payload `name`.
-	 * @param array<string, array> $addons       Output shape from Data::get_addons().
+	 * @param string                                                                                                          $product_name From exchange payload `name`.
+	 * @param array<string, array{id: string, name: string, options_slug: string, path: string, aliases?: list<string>}>|null $addons Manifest rows; defaults to addon_manifest().
 	 * @return string|null Addon id or null if unknown / bundle row.
 	 */
-	public static function addon_id_from_product_name( string $product_name, array $addons ): ?string {
+	public static function addon_id_from_product_name( string $product_name, ?array $addons = null ): ?string {
 		if ( self::is_all_access_bundle_name( $product_name ) ) {
 			return null;
 		}
@@ -74,23 +119,26 @@ final class License_Product_Map {
 			return null;
 		}
 
+		$addons = $addons ?? self::addon_manifest();
+
 		foreach ( $addons as $row ) {
 			if ( empty( $row['id'] ) || empty( $row['name'] ) ) {
 				continue;
 			}
 
 			$addon_name = self::normalize_name( (string) $row['name'] );
+			$aliases    = isset( $row['aliases'] ) && is_array( $row['aliases'] )
+				? $row['aliases']
+				: array_values(
+					array_filter(
+						[
+							$addon_name,
+							'' !== $addon_name ? 'advanced ads ' . $addon_name : '',
+						]
+					)
+				);
 
-			if ( $addon_name === $target ) {
-				return (string) $row['id'];
-			}
-
-			// API often sends "Advanced Ads Pro"; installed add-on label is "Pro".
-			if ( 'advanced ads ' . $addon_name === $target ) {
-				return (string) $row['id'];
-			}
-
-			if ( str_ends_with( $target, ' ' . $addon_name ) ) {
+			if ( in_array( $target, $aliases, true ) || ( '' !== $addon_name && str_ends_with( $target, ' ' . $addon_name ) ) ) {
 				return (string) $row['id'];
 			}
 		}

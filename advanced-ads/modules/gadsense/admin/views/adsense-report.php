@@ -3,9 +3,9 @@
  * AdSense report markup.
  *
  * @var Advanced_Ads_AdSense_Report $this           report instance.
- * @var array                       $report_domains domain names included in the report.
+ * @var array<int, string>           $report_domains domain names included in the report.
  * @var string                      $report_filter  ad unit or domain name to filter the output with.
- * @var array                       $sums           daily sums of earnings.
+ * @var array{today: float|int, yesterday: float|int, 7days: float|int, this_month: float|int, 28days: float|int} $sums daily sums of earnings.
  * @var string                      $earning_cells  markup for each earning period.
  */
 $time_zone      = Advanced_Ads_Utils::get_wp_timezone();

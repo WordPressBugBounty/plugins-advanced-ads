@@ -128,7 +128,7 @@ class Page_Parser implements Integration_Interface {
 	/**
 	 * Get script tags only.
 	 *
-	 * @return array
+	 * @return list<string>
 	 */
 	private function get_script_tags() {
 		$matches = [];

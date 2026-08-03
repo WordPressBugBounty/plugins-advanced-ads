@@ -132,7 +132,7 @@ class Licenses implements Integration_Interface {
 			License_Utils::license_expiry_is_future( $row )
 			&& License_Utils::is_license_expiring_soon( $row )
 		) {
-			License_Utils::set_expiry_notice_flag( $key, $level );
+			License_Utils::update_expiry_notices( $key, $level );
 		}
 	}
 }

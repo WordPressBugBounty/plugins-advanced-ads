@@ -5,7 +5,7 @@
  * @package AdvancedAds
  * @author  Advanced Ads <info@wpadvancedads.com>
  *
- * @var array  $winner the winner feature.
+ * @var array{id: string, weight: int, subheading: string, heading: string, text: string, cta: string, cta_button: string} $winner the winner feature.
  * @var string $screen the screen where it's displayed.
  */
 

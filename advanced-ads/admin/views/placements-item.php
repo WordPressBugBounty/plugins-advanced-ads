@@ -2,11 +2,11 @@
 /**
  * Render item option for placements.
  *
- * @var array  $items               Array of available items.
- * @var string $slug                slug of the current placement.
- * @var array  $placement           information of the current placement.
- * @var string $placement_item_type type of the item currently selected for the placement
- * @var int    $placement_item_id   ID of the item currently selected for the placement
+ * @var array<int, array{label: string, items: array<string, array<string, mixed>>}> $items               Array of available items.
+ * @var string                                                                       $slug                slug of the current placement.
+ * @var array<string, mixed>                                                         $placement           information of the current placement.
+ * @var string                                                                       $placement_item_type type of the item currently selected for the placement
+ * @var int                                                                          $placement_item_id   ID of the item currently selected for the placement
  * @package AdvancedAds
  */
 

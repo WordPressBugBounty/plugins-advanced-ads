@@ -9,13 +9,13 @@
 
 namespace AdvancedAds\Modules\OneClick;
 
-use AdvancedAds\Modules\OneClick\Helpers;
-use AdvancedAds\Modules\OneClick\Options;
+use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Framework\Utilities\Params;
-use AdvancedAds\Modules\OneClick\Traffic_Cop;
 use AdvancedAds\Modules\OneClick\AdsTxt\AdsTxt;
 use AdvancedAds\Modules\OneClick\AdsTxt\Detector;
-use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Modules\OneClick\Helpers;
+use AdvancedAds\Modules\OneClick\Options;
+use AdvancedAds\Modules\OneClick\Traffic_Cop;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -102,11 +102,11 @@ class Workflow implements Integration_Interface {
 	/**
 	 * Handle module status change
 	 *
-	 * @param array  $data   Data to send back to ajax request.
-	 * @param string $module Module name.
-	 * @param bool   $status Module status.
+	 * @param array<string, mixed> $data Data to send back to ajax request.
+	 * @param string               $module Module name.
+	 * @param bool                 $status Module status.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function module_status_changed( $data, $module, $status ): array {
 		if ( 'ads_txt' === $module ) {
@@ -148,11 +148,11 @@ class Workflow implements Integration_Interface {
 	/**
 	 * Get offsets for Content placement.
 	 *
-	 * @param array $offsets        Existing Offsets.
-	 * @param array $options        Injection options.
-	 * @param array $placement_opts Placement options.
+	 * @param list<int>            $offsets Existing Offsets.
+	 * @param array<string, mixed> $options Injection options.
+	 * @param array<string, mixed> $placement_opts Placement options.
 	 *
-	 * @return array $offsets New offsets.
+	 * @return list<int> $offsets New offsets.
 	 */
 	public function placement_content_offsets( $offsets, $options, $placement_opts ) {
 		if ( ! isset( $options['paragraph_count'] ) ) {
@@ -165,7 +165,6 @@ class Workflow implements Integration_Interface {
 			isset( $options['paragraph_id'] ) &&
 			isset( $options['paragraph_select_from_bottom'] )
 		) {
-
 			$offsets = [];
 			for ( $i = $options['paragraph_id'] - 1; $i < $options['paragraph_count']; $i++ ) {
 				// Select every X number.

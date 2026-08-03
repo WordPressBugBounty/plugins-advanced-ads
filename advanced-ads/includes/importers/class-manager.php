@@ -32,7 +32,7 @@ class Manager implements Integration_Interface {
 	/**
 	 * Hold all registered importers
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $importers = [];
 
@@ -56,7 +56,7 @@ class Manager implements Integration_Interface {
 	/**
 	 * Get importers
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_importers(): array {
 		return $this->importers;
@@ -217,7 +217,7 @@ class Manager implements Integration_Interface {
 	 *
 	 * @param string $key Session key.
 	 *
-	 * @return array|bool
+	 * @return array<string, mixed>|bool
 	 */
 	public function delete_session_history( $key ) {
 		$return  = false;

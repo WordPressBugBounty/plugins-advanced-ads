@@ -1,12 +1,51 @@
 /**
  * External Dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { ALL_ACCESS_ADDON_IDS, LICENSE_ADDON_CATALOG } from './addon-catalog';
 import { endpoints } from '@advancedAds';
 
 export const LICENSE_PATH = '/license';
+
+let licensesApiFetchConfigured = false;
+
+/**
+ * Configure apiFetch for any WordPress permalink structure (Plain, Post name, etc.).
+ *
+ * Uses rest_url() from PHP when wpApiSettings is missing or incomplete.
+ */
+function configureLicensesApiFetch() {
+	if ( licensesApiFetchConfigured ) {
+		return;
+	}
+
+	const restRoot = window.wpApiSettings?.root || endpoints?.restUrl;
+	const restNonce = window.wpApiSettings?.nonce || endpoints?.restNonce;
+
+	if ( restRoot && typeof apiFetch.createRootURLMiddleware === 'function' ) {
+		apiFetch.use( apiFetch.createRootURLMiddleware( restRoot ) );
+	}
+
+	if ( restNonce && typeof apiFetch.createNonceMiddleware === 'function' ) {
+		apiFetch.use( apiFetch.createNonceMiddleware( restNonce ) );
+	}
+
+	licensesApiFetchConfigured = true;
+}
+
+/**
+ * Permalink-safe REST request for licenses-screen endpoints only.
+ *
+ * @param {string} path    REST route path (e.g. /advanced-ads/v1/licenses).
+ * @param {Object} options apiFetch options without path/url.
+ * @return {Promise<*>} apiFetch response.
+ */
+export function licensesApiRequest( path, options = {} ) {
+	configureLicensesApiFetch();
+	return apiFetch( { path, ...options } );
+}
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -50,7 +89,7 @@ function hasFutureExpiry( expiryDate ) {
 	return parsed !== null && parsed.getTime() > Date.now();
 }
 
-function getAllAccessSiteContext(
+export function getAllAccessSiteContext(
 	allLicenses,
 	currentHostname,
 	appliedAddonKeyMap
@@ -494,7 +533,7 @@ export function resolveAddonIdForLicense( license, appliedAddonKeyMap = {} ) {
 }
 
 /**
- * Best entitled All Access row (same rule as PHP License::find_entitled_all_access_license).
+ * Best entitled All Access row (same rule as PHP License::find_all_access_row( …, 'entitled' )).
  *
  * @param {Array<{name?: string, status?: string, expiryDate?: string}>} [licenses]
  * @return {object|null} Best matching entitled All Access license or null.
@@ -646,7 +685,7 @@ export function hasActiveAddonUnderAllAccessLicense(
 	return false;
 }
 
-function getDisplayStatusForAllAccessLicense(
+export function getDisplayStatusForAllAccessLicense(
 	license,
 	licenseKey,
 	raw,
@@ -684,7 +723,7 @@ function getDisplayStatusForAllAccessLicense(
 	return 'inactive';
 }
 
-function getDisplayStatusWithAppliedMap(
+export function getDisplayStatusWithAppliedMap(
 	license,
 	licenseKey,
 	raw,
@@ -733,7 +772,7 @@ function getDisplayStatusWithAppliedMap(
 	return raw;
 }
 
-function getDisplayStatusWithoutAppliedMap(
+export function getDisplayStatusWithoutAppliedMap(
 	license,
 	raw,
 	currentHostname,
@@ -758,158 +797,23 @@ function getDisplayStatusWithoutAppliedMap(
 	return raw;
 }
 
-/**
- * Status label for the license card (may differ from shop row when All Access governs this site).
- *
- * @param {Object}        license              License row data.
- * @param {string}        license.name         License product name.
- * @param {string}        license.status       License status.
- * @param {Array<object>} allLicenses          All available licenses.
- * @param {string}        currentHostname      Current site hostname.
- * @param {Object}        [appliedAddonKeyMap] Applied addon-to-license map.
- * @param {Object}        [addonInstallStates] Per-add-on installed/active flags from REST.
- * @return {string} Display status for the license card.
- */
-export function getDisplayLicenseStatus(
-	license,
-	allLicenses,
-	currentHostname,
-	appliedAddonKeyMap = {},
-	addonInstallStates = {}
-) {
-	const raw = normalizeShopRowStatus(
-		license,
-		currentHostname,
-		appliedAddonKeyMap,
-		addonInstallStates
-	);
-	const licenseKey = getLicenseKeyFromRow( license );
-
-	if ( isAllAccessBundleName( license?.name ) ) {
-		return getDisplayStatusForAllAccessLicense(
-			license,
-			licenseKey,
-			raw,
-			currentHostname,
-			appliedAddonKeyMap,
-			addonInstallStates
-		);
-	}
-
-	const appliedKeys = getAppliedLicenseKeys( appliedAddonKeyMap );
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const { aaOnSite } = getAllAccessSiteContext(
-		allLicenses,
-		currentHostname,
-		appliedAddonKeyMap
-	);
-
-	if ( appliedKeys.size === 0 ) {
-		if ( ! isRichLicenseEntitled( license?.status, license?.expiryDate ) ) {
-			return raw;
-		}
-
-		if ( aaOnSite && ! isAllAccessBundleName( license?.name ) ) {
-			return 'inactive';
-		}
-
-		return raw;
-	}
-
-	if ( appliedKeys.size > 0 ) {
-		return getDisplayStatusWithAppliedMap(
-			license,
-			licenseKey,
-			raw,
-			allLicenses,
-			appliedAddonKeyMap,
-			addonInstallStates,
-			aaOnSite
-		);
-	}
-
-	return getDisplayStatusWithoutAppliedMap(
-		license,
-		raw,
-		currentHostname,
-		appliedAddonKeyMap,
-		addonInstallStates,
-		aaOnSite
-	);
-}
-
 export function isLicenseAppliedOnThisSite(
 	license,
-	allLicenses,
-	currentHostname,
-	appliedAddonKeyMap = {},
-	addonInstallStates = {}
+	_allLicenses,
+	_currentHostname,
+	currentActiveLicenses = ''
 ) {
 	const licenseKey = getLicenseKeyFromRow( license );
-	if (
-		! licenseKey ||
-		! isRichLicenseEntitled( license?.status, license?.expiryDate )
-	) {
+	if ( ! licenseKey ) {
 		return false;
 	}
 
-	if ( isAllAccessBundleName( license?.name ) ) {
-		if ( getAppliedLicenseKeys( appliedAddonKeyMap ).size === 0 ) {
-			return false;
-		}
-		if ( ! isLicenseKeyInAppliedMap( licenseKey, appliedAddonKeyMap ) ) {
-			return false;
-		}
+	const active = String( currentActiveLicenses ?? '' )
+		.split( ',' )
+		.map( ( key ) => key.trim() )
+		.filter( Boolean );
 
-		if ( isCurrentSiteActivatedOnLicense( license, currentHostname ) ) {
-			return true;
-		}
-
-		return hasActiveAddonUnderAllAccessLicense(
-			licenseKey,
-			appliedAddonKeyMap,
-			addonInstallStates
-		);
-	}
-
-	const { aaOnSite, aaGoverns } = getAllAccessSiteContext(
-		allLicenses,
-		currentHostname,
-		appliedAddonKeyMap
-	);
-	const addonId = resolveAddonIdForLicense( license, appliedAddonKeyMap );
-
-	if ( ! addonId ) {
-		return aaOnSite || aaGoverns
-			? false
-			: isCurrentSiteActivatedOnLicense( license, currentHostname );
-	}
-
-	const licensedByMap = isAddonLicensedByKey(
-		addonId,
-		licenseKey,
-		appliedAddonKeyMap
-	);
-	const pluginRunning = getAddonInstallState(
-		addonId,
-		addonInstallStates
-	).active;
-
-	if ( licensedByMap ) {
-		return (
-			pluginRunning &&
-			isCurrentSiteActivatedOnLicense( license, currentHostname )
-		);
-	}
-
-	if ( aaOnSite || aaGoverns ) {
-		return false;
-	}
-
-	return (
-		isCurrentSiteActivatedOnLicense( license, currentHostname ) &&
-		pluginRunning
-	);
+	return active.includes( licenseKey );
 }
 
 /**
@@ -960,6 +864,65 @@ export function isAddonManagedByOtherLicense(
 }
 
 /**
+ * Whether a license key belongs to an All Access bundle row.
+ *
+ * @param {string}        licenseKey
+ * @param {Array<object>} allLicenses
+ * @return {boolean} All access key
+ */
+export function isAllAccessLicenseKey( licenseKey, allLicenses ) {
+	const key = toLicenseKey( licenseKey );
+	if ( ! key ) {
+		return false;
+	}
+
+	const row = ( allLicenses ?? [] ).find(
+		( license ) => getLicenseKeyFromRow( license ) === key
+	);
+
+	return row ? isAllAccessBundleName( row?.name ) : false;
+}
+
+/**
+ * Whether bulk Activate all should skip an add-on mapped to another license key.
+ *
+ * When switching to an inactive All Access license, take over add-ons from another
+ * All Access key. Always skip add-ons licensed by a single-product key.
+ *
+ * @param {string}                 addonId
+ * @param {string}                 licenseKey
+ * @param {Object<string, string>} appliedAddonKeyMap
+ * @param {Array<object>}          allLicenses
+ * @param {boolean}                isLicenseActivatedOnSite
+ * @return {boolean} Bulk activate addon check
+ */
+export function shouldSkipAddonForBulkActivate(
+	addonId,
+	licenseKey,
+	appliedAddonKeyMap,
+	allLicenses,
+	isLicenseActivatedOnSite
+) {
+	if (
+		! isAddonManagedByOtherLicense(
+			addonId,
+			licenseKey,
+			appliedAddonKeyMap
+		)
+	) {
+		return false;
+	}
+
+	if ( isLicenseActivatedOnSite ) {
+		return true;
+	}
+
+	const managingKey = getAddonMapKey( appliedAddonKeyMap, addonId );
+
+	return ! isAllAccessLicenseKey( managingKey, allLicenses );
+}
+
+/**
  * Display name for the license row that owns an add-on key on this site.
  *
  * @param {string}        licenseKey
@@ -1006,6 +969,80 @@ export function getAddonRowStatus( addonId, addonInstallStates, isApplied ) {
 	}
 
 	return 'needs_install';
+}
+
+/**
+ * Derive bulk Activate all / Deactivate all mode and target add-on ids.
+ * Skips add-ons managed by another license. Matches AddonRowActions Active UI.
+ *
+ * @param {Object}                 args
+ * @param {string[]}               args.addonIds
+ * @param {Object<string, object>} args.addonInstallStates
+ * @param {Object<string, string>} args.appliedAddonKeyMap
+ * @param {string}                 args.licenseKey
+ * @param {boolean}                args.isLicenseActivatedOnSite
+ * @param {Array<object>}          args.allLicenses
+ * @return {{ mode: 'activate'|'deactivate'|'none', targetIds: string[] }} Bulk action mode and eligible add-on ids.
+ */
+export function getBulkAddonActionPlan( {
+	addonIds,
+	addonInstallStates,
+	appliedAddonKeyMap,
+	licenseKey,
+	isLicenseActivatedOnSite,
+	allLicenses = [],
+} ) {
+	const activateIds = [];
+	const deactivateIds = [];
+
+	for ( const addonId of addonIds ?? [] ) {
+		const isApplied = isAddonLicensedByKey(
+			addonId,
+			licenseKey,
+			appliedAddonKeyMap
+		);
+		const rowStatus = getAddonRowStatus(
+			addonId,
+			addonInstallStates,
+			isApplied
+		);
+		const isActiveRow =
+			( rowStatus === 'installed' && isLicenseActivatedOnSite ) ||
+			( rowStatus === 'running' && isLicenseActivatedOnSite );
+
+		if ( isActiveRow ) {
+			if (
+				isAddonManagedByOtherLicense(
+					addonId,
+					licenseKey,
+					appliedAddonKeyMap
+				)
+			) {
+				continue;
+			}
+			deactivateIds.push( addonId );
+		} else if (
+			! shouldSkipAddonForBulkActivate(
+				addonId,
+				licenseKey,
+				appliedAddonKeyMap,
+				allLicenses,
+				isLicenseActivatedOnSite
+			)
+		) {
+			activateIds.push( addonId );
+		}
+	}
+
+	if ( activateIds.length > 0 ) {
+		return { mode: 'activate', targetIds: activateIds };
+	}
+
+	if ( deactivateIds.length > 0 ) {
+		return { mode: 'deactivate', targetIds: deactivateIds };
+	}
+
+	return { mode: 'none', targetIds: [] };
 }
 
 /**

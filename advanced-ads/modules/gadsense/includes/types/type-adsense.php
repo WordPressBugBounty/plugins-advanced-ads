@@ -147,7 +147,6 @@ class Adsense implements Ad_Type {
 		$use_dashicons       = false;
 		$external_ad_unit_id = '';
 		if ( trim( $content ) !== '' ) {
-
 			$json_content = stripslashes( $content );
 
 			// get json content striped by slashes.

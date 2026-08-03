@@ -24,7 +24,7 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Options
 	 *
-	 * @var    array
+	 * @var array<string, mixed>
 	 */
 	protected $options;
 
@@ -37,28 +37,28 @@ class Advanced_Ads_Ad_Health_Notices {
 	 *        'orig_key'    - original notice key
 	 *  )
 	 *
-	 * @var    array
+	 * @var array<string, array<string, mixed>>
 	 */
 	public $notices = [];
 
 	/**
 	 * All ignored notices
 	 *
-	 * @var    array
+	 * @var array<int, string>
 	 */
 	public $ignore = [];
 
 	/**
 	 * All displayed notices ($notices minus $hidden)
 	 *
-	 * @var    array
+	 * @var array<int, string>
 	 */
 	public $displayed_notices = [];
 
 	/**
 	 * Load default notices
 	 *
-	 * @var    array
+	 * @var array<string, array<string, mixed>>
 	 */
 	public $default_notices = [];
 
@@ -207,8 +207,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Remove query var from URL after notice was updated
 	 *
-	 * @param  array $removable_query_args array with removable query vars.
-	 * @return array updated query vars.
+	 * @param array<int, string> $removable_query_args Array with removable query vars.
+	 * @return array<int, string> Updated query vars.
 	 */
 	public function remove_query_vars_after_notice_update( $removable_query_args ) {
 		$removable_query_args[] = 'advads-show-hidden-notices';
@@ -299,8 +299,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Add a notice to the queue
 	 *
-	 * @param string $notice_key notice key to be added to the notice array.
-	 * @param array  $atts additional attributes.
+	 * @param string               $notice_key Notice key to be added to the notice array.
+	 * @param array<string, mixed> $atts       Additional attributes.
 	 *
 	 *  attributes
 	 *  - append_key        string attached to the key; enables to create multiple messages for one original key
@@ -369,8 +369,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Updating an existing notice or add it, if it doesn’t exist, yet
 	 *
-	 * @param string $notice_key notice key to be added to the notice array.
-	 * @param array  $atts additional attributes.
+	 * @param string               $notice_key Notice key to be added to the notice array.
+	 * @param array<string, mixed> $atts       Additional attributes.
 	 *
 	 *  attributes:
 	 *  - append_text – text added to the default message
@@ -524,7 +524,7 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Update notices list if there is any change
 	 *
-	 * @param array $notices New options.
+	 * @param array<string, array<string, mixed>> $notices New notices map.
 	 *
 	 * @return void
 	 */
@@ -543,20 +543,19 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Hide notices list if there is any change
 	 *
-	 * @param array $notices New options.
+	 * @param array<string, mixed> $notices Hidden notices map.
 	 *
 	 * @return void
 	 */
 	public function hide_notices( $notices ): void {
 		$options = $this->options();
 
-		if ( Arr::get( $options, 'notices', [] ) === $notices ) {
+		if ( Arr::get( $options, 'hide_notices', [] ) === $notices ) {
 			return;
 		}
 
 		$options['hide_notices'] = $notices;
 		$this->update_options( $options );
-		$this->load_notices();
 	}
 
 	/**
@@ -657,7 +656,7 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Return notices option from DB
 	 *
-	 * @return array $options
+	 * @return array<string, mixed> $options
 	 */
 	public function options() {
 		if ( ! isset( $this->options ) ) {
@@ -674,7 +673,7 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Update notice options
 	 *
-	 * @param array $options new options.
+	 * @param array<string, mixed> $options New options.
 	 */
 	public function update_options( array $options ) {
 		// do not allow to clear options.
@@ -739,7 +738,7 @@ class Advanced_Ads_Ad_Health_Notices {
 	 *
 	 * @param string $type type of the notice.
 	 *
-	 * @return  array
+	 * @return array<string, array<string, mixed>>
 	 */
 	public function get_visible_notices_by_type( $type = 'problem' ) {
 		$notices_by_type = [];
@@ -788,7 +787,7 @@ class Advanced_Ads_Ad_Health_Notices {
 	 *
 	 * @param string $notice_key key of the notice.
 	 *
-	 * @return  array    type
+	 * @return array<string, mixed> Notice definition for the key.
 	 */
 	public function get_notice_array_for_key( $notice_key ) {
 		// check if there is an original key.

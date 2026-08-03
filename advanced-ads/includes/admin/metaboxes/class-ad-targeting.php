@@ -57,7 +57,7 @@ class Ad_Targeting {
 	/**
 	 * Return manual link
 	 *
-	 * @return array|string
+	 * @return array<string, mixed>|string
 	 */
 	public function get_handle_link() {
 		return [

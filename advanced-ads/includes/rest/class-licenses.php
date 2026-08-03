@@ -13,6 +13,7 @@ use AdvancedAds\Admin\Plugin_Auto_Update;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Routes_Interface;
 use AdvancedAds\License\License;
+use AdvancedAds\License\License_Site_Activation;
 use AdvancedAds\License\License_Utils;
 use AdvancedAds\Utilities\Conditional;
 use WP_Error;
@@ -119,12 +120,32 @@ class Licenses implements Routes_Interface {
 	/**
 	 * Get persisted licenses.
 	 *
-	 * @return array
+	 * @return array{licenses: array<int, array<string, mixed>>, appliedAddonKeyMap: array<string, string>, currentActiveLicenses: string, autoUpdateStates: array<string, string>, addonInstallStates: array<string, array{installed: bool, active: bool}>, lastSyncAt: mixed, expiryNoticeFlags: mixed}
 	 */
 	public function get_licenses(): array {
 		License::maybe_complete_legacy_license_migration();
 
-		$rich = License::get_licenses();
+		$rich     = License::get_licenses();
+		$hostname = License::get_site_hostname();
+		$before   = wp_json_encode( $rich );
+
+		// Heal Sites count when advanced-ads-licenses marks a key active but sitesActivated is empty.
+		if ( '' !== $hostname ) {
+			foreach ( License_Site_Activation::get_active_license_keys() as $license_key ) {
+				$row = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
+				if ( ! is_array( $row ) ) {
+					continue;
+				}
+				if ( License::is_site_activated_on_license( $row, $hostname ) ) {
+					continue;
+				}
+				$rich = License::ensure_local_site_slot_on_license( $rich, $license_key );
+			}
+
+			if ( wp_json_encode( $rich ) !== $before ) {
+				update_option( License::OPTION_RICH, $rich, false );
+			}
+		}
 
 		// Passive reconcile on read: mirror addon status only; never reshuffle activations.
 		$rich = License::reconcile_persisted_licenses( $rich, false, false );
@@ -138,7 +159,7 @@ class Licenses implements Routes_Interface {
 	 *
 	 * @param WP_REST_Request $request the request object.
 	 *
-	 * @return array|WP_Error
+	 * @return array{licenses: array<int, array<string, mixed>>, appliedAddonKeyMap: array<string, string>, currentActiveLicenses: string, autoUpdateStates: array<string, string>, addonInstallStates: array<string, array{installed: bool, active: bool}>, lastSyncAt: mixed, expiryNoticeFlags: mixed}|WP_Error
 	 */
 	public function set_licenses( WP_REST_Request $request ) {
 		$licenses = $request->get_param( 'licenses' );
@@ -158,12 +179,14 @@ class Licenses implements Routes_Interface {
 
 		$rich = License::save_licenses(
 			$licenses,
-			$activate,
-			$activating_license_key,
-			$activating_addon_id,
-			$install_only,
-			$deactivating_addon_id,
-			$deactivating_license_key
+			[
+				'activate_new'             => $activate,
+				'activating_license_key'   => $activating_license_key,
+				'activating_addon_id'      => $activating_addon_id,
+				'install_only'             => $install_only,
+				'deactivating_addon_id'    => $deactivating_addon_id,
+				'deactivating_license_key' => $deactivating_license_key,
+			]
 		);
 
 		if ( is_wp_error( $rich ) ) {
@@ -177,7 +200,7 @@ class Licenses implements Routes_Interface {
 	 * Toggle per-plugin auto-update (advanced-ads-{addon}-autoupdate).
 	 *
 	 * @param WP_REST_Request $request Request.
-	 * @return array|WP_Error
+	 * @return array{addonId: string, state: string, autoUpdateStates: array<string, string>}|WP_Error
 	 */
 	public function set_plugin_autoupdate( WP_REST_Request $request ) {
 		$addon_id = (string) $request->get_param( 'addonId' );
@@ -203,21 +226,20 @@ class Licenses implements Routes_Interface {
 	}
 
 	/**
-	 * REST payload: rich rows plus legacy addon key map (advanced-ads-licenses).
+	 * REST payload: rich rows plus derived addon key map / site activation state.
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @return array{licenses: array<int, array<string, mixed>>, appliedAddonKeyMap: array<string, string>}
 	 */
 	private function licenses_api_response( array $rich ): array {
-		$rich = License::normalize_rich_license_list( $rich );
-
 		return [
-			'licenses'           => $rich,
-			'appliedAddonKeyMap' => License::get_addon_key_map(),
-			'autoUpdateStates'   => Plugin_Auto_Update::get_all_states(),
-			'addonInstallStates' => License::get_addon_install_states(),
-			'lastSyncAt'         => License_Utils::get_last_sync(),
-			'expiryNoticeFlags'  => License_Utils::get_expiry_notice_flags(),
+			'licenses'              => $rich,
+			'appliedAddonKeyMap'    => License::get_addon_key_map(),
+			'currentActiveLicenses' => implode( ',', License_Site_Activation::get_active_license_keys() ),
+			'autoUpdateStates'      => Plugin_Auto_Update::get_all_states(),
+			'addonInstallStates'    => License::get_addon_install_states(),
+			'lastSyncAt'            => License_Utils::get_last_sync(),
+			'expiryNoticeFlags'     => License_Utils::get_expiry_notice_flags(),
 		];
 	}
 }

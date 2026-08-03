@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal Dependencies
  */
 import { Card } from '@admin/components/Card';
+import { adminUrl } from '@utilities';
 
 export function SupportForum() {
 	const p1 = __(
@@ -46,7 +47,9 @@ export function SupportForum() {
 
 			<div className="mt-auto">
 				<a
-					href="https://wpadvancedads.com/checkout/?edd_action=add_to_cart&download_id=95170&utm_source=advanced-ads&utm_medium=link&utm_campaign=plugin_support_need_help_upgrade"
+					href={ adminUrl(
+						'admin.php?page=advanced-ads-app&path=/license'
+					) }
 					className="button advads-button-secondary is-block mt-6"
 				>
 					{ __( 'Upgrade to Premium', 'advanced-ads' ) }

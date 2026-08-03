@@ -6,7 +6,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   1.x.x
  *
- * @var array $spacings    array with values for top, right, bottom, left spacing pixel values.
+ * @var array<string, array{label: string, value: int}> $spacings Spacing sides with label and pixel value.
  * @var bool  $is_centered Whether the "Block Center" position has been selected.
  */
 

@@ -38,11 +38,11 @@ class Advanced_Ads_Inline_Css {
 	/**
 	 * Adds inline css.
 	 *
-	 * @param array     $wrapper       Add wrapper array.
-	 * @param string    $css           Custom inline css.
-	 * @param bool|null $global_output Whether this ad is using cache-busting.
+	 * @param array<string, mixed> $wrapper       Add wrapper array.
+	 * @param string               $css           Custom inline css.
+	 * @param bool|null            $global_output Whether this ad is using cache-busting.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function add_css( $wrapper, $css, $global_output ) {
 		$this->add_inline_css = $this->add_inline_css && false !== $global_output;
@@ -87,7 +87,7 @@ class Advanced_Ads_Inline_Css {
 	 *
 	 * @param string $string CSS-Style.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	private function get_styles_by_string( string $string ): array { // phpcs:ignore
 		$chunks = array_chunk( preg_split( '/[:;]/', $string ), 2 );

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Ads.txt data management strategy.
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ */
 
 /**
  * Manage the data.
@@ -6,9 +12,23 @@
 class Advanced_Ads_Ads_Txt_Strategy {
 	const OPTION = 'advanced_ads_ads_txt';
 
+	/**
+	 * Current ads.txt options.
+	 *
+	 * @var array<string, mixed>
+	 */
 	private $options;
+
+	/**
+	 * Whether options have changed since last save.
+	 *
+	 * @var bool
+	 */
 	private $changed = false;
 
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
 		$this->options = $this->get_options();
 		$this->changed = false;
@@ -48,9 +68,13 @@ class Advanced_Ads_Ads_Txt_Strategy {
 	}
 
 	/**
-	 * Toggle the file and add additional conent.
+	 * Toggle the file and add additional content.
 	 *
-	 * @return bool.
+	 * @param bool   $is_enabled         Whether ads.txt generation is enabled.
+	 * @param bool   $all_network        Whether to include records from other network sites.
+	 * @param string $additional_content Extra custom ads.txt content.
+	 *
+	 * @return bool
 	 */
 	public function toggle( $is_enabled, $all_network, $additional_content ) {
 		$prev = $this->get_options();
@@ -84,7 +108,6 @@ class Advanced_Ads_Ads_Txt_Strategy {
 		}
 
 		return true;
-
 	}
 
 	/**
@@ -133,7 +156,7 @@ class Advanced_Ads_Ads_Txt_Strategy {
 	/**
 	 * Prepare content of a blog for output.
 	 *
-	 * @param array $options Options.
+	 * @param array<string, mixed> $options Options.
 	 *
 	 * @return string
 	 */
@@ -192,7 +215,7 @@ class Advanced_Ads_Ads_Txt_Strategy {
 	/**
 	 * Get options.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_options() {
 		if ( isset( $this->options ) ) {
@@ -215,9 +238,9 @@ class Advanced_Ads_Ads_Txt_Strategy {
 	/**
 	 * Load default options.
 	 *
-	 * @param array $options Options.
+	 * @param array<string, mixed> $options Options.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function load_default_options( $options ) {
 		if ( ! isset( $options['enabled'] ) ) {
@@ -238,5 +261,4 @@ class Advanced_Ads_Ads_Txt_Strategy {
 
 		return $options;
 	}
-
 }

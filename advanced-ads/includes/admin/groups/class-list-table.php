@@ -9,13 +9,12 @@
 
 namespace AdvancedAds\Admin\Groups;
 
-use stdClass;
+use AdvancedAds\Abstracts\Group;
+use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Constants;
+use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Modal;
 use WP_Terms_List_Table;
-use AdvancedAds\Constants;
-use AdvancedAds\Abstracts\Group;
-use AdvancedAds\Framework\Utilities\Params;
-use AdvancedAds\Admin\Upgrades;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -50,6 +49,13 @@ class List_Table extends WP_Terms_List_Table {
 	 * @var array<int, Group>
 	 */
 	private $groups = [];
+
+	/**
+	 * Cached Pro upsell HTML for the duplicate-group row action.
+	 *
+	 * @var string|null
+	 */
+	private $duplicate_upgrade_link = null;
 
 	/**
 	 * Construct the current list table.
@@ -87,11 +93,11 @@ class List_Table extends WP_Terms_List_Table {
 	public function prepare_items() {
 		$taxonomy = $this->screen->taxonomy;
 		$per_page = (int) $this->get_items_per_page( "edit_{$taxonomy}_per_page" );
-		$search   = ! empty( $_REQUEST['s'] ) ? trim( wp_unslash( $_REQUEST['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$search   = ! empty( $_REQUEST['s'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$orderby  = Params::request( 'orderby', 'name' );
 		$order    = Params::request( 'order', 'ASC' );
-		$summaries = $this->filter_group_summaries( wp_advads_get_group_summaries(), $search );
 
+		$summaries = $this->filter_group_summaries( wp_advads_get_group_summaries(), $search );
 		$summaries = $this->sort_group_summaries( $summaries, $orderby, $order );
 
 		$total  = count( $summaries );
@@ -100,11 +106,11 @@ class List_Table extends WP_Terms_List_Table {
 
 		$this->items = [];
 		foreach ( $page as $summary ) {
-			$term            = new stdClass();
-			$term->term_id   = $summary['id'];
-			$term->name      = $summary['title'];
-			$term->taxonomy  = Constants::TAXONOMY_GROUP;
-			$this->items[]   = $term;
+			$term           = new \stdClass();
+			$term->term_id  = $summary['id'];
+			$term->name     = $summary['title'];
+			$term->taxonomy = Constants::TAXONOMY_GROUP;
+			$this->items[]  = $term;
 		}
 
 		$this->groups = wp_advads_get_groups_by_ids( array_keys( $page ) );
@@ -132,7 +138,7 @@ class List_Table extends WP_Terms_List_Table {
 	 * @return array<int, array<string, mixed>>
 	 */
 	private function filter_group_summaries( array $summaries, $search ): array {
-		$group_type = Params::get( 'group_type' );
+		$group_type = sanitize_text_field( (string) Params::request( 'group_type', '' ) );
 
 		if ( $group_type ) {
 			$summaries = array_filter(
@@ -213,7 +219,7 @@ class List_Table extends WP_Terms_List_Table {
 	/**
 	 * Get columns
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function get_columns(): array {
 		return [
@@ -230,7 +236,7 @@ class List_Table extends WP_Terms_List_Table {
 	 *
 	 * @param string[] $hidden Column list.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function default_hidden_columns( $hidden ): array {
 		$hidden[] = 'date';
@@ -240,7 +246,7 @@ class List_Table extends WP_Terms_List_Table {
 	/**
 	 * Sortable columns
 	 *
-	 * @return array
+	 * @return array<string, string|array<string, mixed>>
 	 */
 	public function get_sortable_columns(): array {
 		return [
@@ -277,7 +283,11 @@ class List_Table extends WP_Terms_List_Table {
 			);
 		}
 
-		echo '<tr id="tag-' . $group->get_id() . '" class="' . $level . '">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		printf(
+			'<tr id="tag-%d" class="%s">',
+			(int) $group->get_id(),
+			esc_attr( (string) $level )
+		);
 		$this->single_row_columns( $group );
 		echo '</tr>';
 	}
@@ -368,21 +378,29 @@ class List_Table extends WP_Terms_List_Table {
 			return '';
 		}
 
+		// Custom groups screen may not set global $tax the way edit-tags.php does.
+		$taxonomy = $tax instanceof \WP_Taxonomy ? $tax : get_taxonomy( Constants::TAXONOMY_GROUP );
+		if ( ! $taxonomy ) {
+			return '';
+		}
+
 		$actions = [];
 
-		if ( ! $this->type_error && current_user_can( $tax->cap->edit_terms ) ) {
+		if ( ! $this->type_error && current_user_can( $taxonomy->cap->edit_terms ) ) {
 			$actions['edit'] = '<a href="#modal-group-edit-' . $group->get_id() . '"
 								class="edits">' . esc_html__( 'Edit', 'advanced-ads' ) . '</a>';
 
-			// duplicate group upgrade link.
 			if ( ! defined( 'AAP_VERSION' ) ) {
-				$actions['duplicate-group'] = ( new Upgrades() )->create_duplicate_link();
+				if ( null === $this->duplicate_upgrade_link ) {
+					$this->duplicate_upgrade_link = ( new Upgrades() )->create_duplicate_link();
+				}
+				$actions['duplicate-group'] = $this->duplicate_upgrade_link;
 			}
 		}
 
 		$actions['usage'] = '<a href="#modal-group-usage-' . $group->get_id() . '" class="edits">' . esc_html__( 'Show Usage', 'advanced-ads' ) . '</a>';
 
-		if ( current_user_can( $tax->cap->delete_terms ) ) {
+		if ( current_user_can( $taxonomy->cap->delete_terms ) ) {
 			$actions['delete'] = sprintf(
 				'<a class="delete-tag" href="%s">%s</a>',
 				wp_nonce_url(

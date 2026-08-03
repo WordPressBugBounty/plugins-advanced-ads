@@ -78,8 +78,9 @@ class Placement_Factory extends Factory {
 			return $override;
 		}
 
-		$options = get_post_meta( $placement_id, 'type', true );
-		return $options['type'] ?? 'default';
+		$type = get_post_meta( $placement_id, 'type', true );
+
+		return is_string( $type ) && '' !== $type ? $type : 'default';
 	}
 
 	/**
@@ -92,7 +93,7 @@ class Placement_Factory extends Factory {
 	private function get_placement_id( $placement ) {
 		global $post;
 
-		if ( false === $placement && isset( $post, $post->ID ) && Constants::POST_TYPE_AD === get_post_type( $post->ID ) ) {
+		if ( false === $placement && isset( $post, $post->ID ) && Constants::POST_TYPE_PLACEMENT === get_post_type( $post->ID ) ) {
 			return absint( $post->ID );
 		}
 

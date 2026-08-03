@@ -3,7 +3,7 @@
  * Ad blocker disguise rebuild template
  *
  * @package       AdvancedAds\Pro
- * @var array     $upload_dir      wp_upload_dir response
+ * @var array{basedir: string, baseurl: string, error?: string|false, url?: string}|false $upload_dir wp_upload_dir response
  * @var string    $message         Response message
  * @var bool|null $success         Whether request was successful
  * @var bool      $button_disabled If button should have disabled attribute.

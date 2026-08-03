@@ -55,8 +55,8 @@ class Advanced_Ads_Ads_Txt_Admin {
 	/**
 	 * Toggle ads.txt and add additional content.
 	 *
-	 * @param array $options Options.
-	 * @return array $options Options.
+	 * @param array<string, mixed> $options Options.
+	 * @return array<string, mixed> $options Options.
 	 */
 	public function toggle( $options ) {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
@@ -91,9 +91,9 @@ class Advanced_Ads_Ads_Txt_Admin {
 	 * The reason for not using `update_option_*` filter is that the function
 	 * should also get called for newly added AdSense options.
 	 *
-	 * @param array $new New options.
-	 * @param array $prev Previous options.
-	 * @return array $new New options.
+	 * @param array<string, mixed> $new New options.
+	 * @param array<string, mixed> $prev Previous options.
+	 * @return array<string, mixed> $new New options.
 	 */
 	public function update_adsense_option( $new, $prev ) {
 		if ( $new === $prev ) {
@@ -164,7 +164,7 @@ class Advanced_Ads_Ads_Txt_Admin {
 		$is_all_network          = $this->strategy->is_all_network();
 
 		$is_enabled = $this->strategy->is_enabled();
-		include dirname( __FILE__ ) . '/views/setting-create.php';
+		include __DIR__ . '/views/setting-create.php';
 	}
 
 	/**
@@ -179,7 +179,7 @@ class Advanced_Ads_Ads_Txt_Admin {
 
 		$adsense_disabled = $this->is_adsense_disabled();
 
-		include dirname( __FILE__ ) . '/views/setting-additional-content.php';
+		include __DIR__ . '/views/setting-additional-content.php';
 	}
 
 	/**
@@ -196,7 +196,7 @@ class Advanced_Ads_Ads_Txt_Admin {
 	/**
 	 * Get notices.
 	 *
-	 * @return array Array of notices.
+	 * @return list<array{0: string, 1: string}> Array of notices.
 	 */
 	public function get_notices() {
 		$url        = home_url( '/' );
@@ -291,7 +291,7 @@ class Advanced_Ads_Ads_Txt_Admin {
 	/**
 	 * Get HTML markup of the notices.
 	 *
-	 * @param array $notices Notices.
+	 * @param list<array{0: string, 1: string}> $notices Notices.
 	 * @return string $r HTML markup.
 	 */
 	private function get_notices_markup( $notices ) {
@@ -351,7 +351,7 @@ class Advanced_Ads_Ads_Txt_Admin {
 	/**
 	 * Get Adsense data.
 	 *
-	 * @param array $new New data.
+	 * @param array<string, mixed>|null $new New data.
 	 *
 	 * @return string
 	 */

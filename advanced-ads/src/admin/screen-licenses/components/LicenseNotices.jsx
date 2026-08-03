@@ -31,6 +31,57 @@ export const LICENSE_NOTICES_CONTEXT = 'advanced-ads/licenses';
 
 const POST_CHECKOUT_NOTICE_ID = 'advanced-ads/post-checkout-success';
 const EXPIRY_NOTICE_ID_PREFIX = 'advanced-ads/license-expiry-';
+const DISMISSED_EXPIRY_STORAGE_KEY =
+	'advanced-ads-license-expiry-notices-dismissed';
+
+function readDismissedExpiryNotices() {
+	try {
+		const raw = globalThis.localStorage?.getItem(
+			DISMISSED_EXPIRY_STORAGE_KEY
+		);
+		const parsed = raw ? JSON.parse( raw ) : {};
+		return parsed && typeof parsed === 'object' ? parsed : {};
+	} catch {
+		return {};
+	}
+}
+
+function writeDismissedExpiryNotices( map ) {
+	try {
+		globalThis.localStorage?.setItem(
+			DISMISSED_EXPIRY_STORAGE_KEY,
+			JSON.stringify( map )
+		);
+	} catch {
+		// Ignore quota / private mode failures.
+	}
+}
+
+function isExpiryNoticeDismissed( noticeId ) {
+	return Boolean( readDismissedExpiryNotices()[ noticeId ] );
+}
+
+function dismissExpiryNotice( noticeId ) {
+	if ( ! noticeId ) {
+		return;
+	}
+	const map = readDismissedExpiryNotices();
+	map[ noticeId ] = Date.now();
+	writeDismissedExpiryNotices( map );
+}
+
+function clearDismissedExpiryNotice( noticeId ) {
+	if ( ! noticeId ) {
+		return;
+	}
+	const map = readDismissedExpiryNotices();
+	if ( ! map[ noticeId ] ) {
+		return;
+	}
+	delete map[ noticeId ];
+	writeDismissedExpiryNotices( map );
+}
+
 const POST_CHECKOUT_URL_OMIT = {
 	token: null,
 	purchase_id: null,
@@ -430,6 +481,13 @@ export function LicenseNotices( {
 			key={ notice.id }
 			notice={ notice }
 			onDismiss={ () => {
+				if (
+					String( notice.id ?? '' ).startsWith(
+						EXPIRY_NOTICE_ID_PREFIX
+					)
+				) {
+					dismissExpiryNotice( notice.id );
+				}
 				clearLicenseNoticeDisplayMeta( notice.id );
 				removeNotice( notice.id, context );
 			} }
@@ -652,13 +710,21 @@ function handleExpiryNotices( {
 		);
 
 		removeNotice( noticeId, LICENSE_NOTICES_CONTEXT );
-		if ( message ) {
-			showLicenseWarningNotice(
-				createErrorNotice,
-				removeNotice,
-				noticeId,
-				message
-			);
+
+		if ( ! message ) {
+			clearDismissedExpiryNotice( noticeId );
+			continue;
 		}
+
+		if ( isExpiryNoticeDismissed( noticeId ) ) {
+			continue;
+		}
+
+		showLicenseWarningNotice(
+			createErrorNotice,
+			removeNotice,
+			noticeId,
+			message
+		);
 	}
 }

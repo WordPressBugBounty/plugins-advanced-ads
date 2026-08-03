@@ -31,7 +31,7 @@ class Content_Injector {
 	/**
 	 * Gather placeholders which later are replaced by the ads.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private static $ads_for_placeholders = [];
 
@@ -39,7 +39,7 @@ class Content_Injector {
 	 * Self-closing HTML tags that cannot have children.
 	 * Hash map for O(1) lookup vs in_array() linear scan.
 	 *
-	 * @var array
+	 * @var array<string, bool>
 	 */
 	private const SELF_CLOSING_TAGS = [
 		'area'     => true,
@@ -66,7 +66,7 @@ class Content_Injector {
 	 * Sort order for ad positions.
 	 * Class constant avoids allocating a new array on every usort() comparison.
 	 *
-	 * @var array
+	 * @var array<string, int>
 	 */
 	private const POSITION_ORDER = [
 		'before'  => 1,
@@ -85,10 +85,10 @@ class Content_Injector {
 	/**
 	 * Inject ads directly into the content.
 	 *
-	 * @param string $placement_id   Id of the placement.
-	 * @param array  $placement_opts Placement options.
-	 * @param string $content        Content to inject placement into.
-	 * @param array  $options        Injection options.
+	 * @param string               $placement_id   Id of the placement.
+	 * @param array<string, mixed> $placement_opts Placement options.
+	 * @param string               $content        Content to inject placement into.
+	 * @param array<string, mixed> $options        Injection options.
 	 *
 	 * @return string $content Content with injected placement.
 	 */
@@ -329,9 +329,9 @@ class Content_Injector {
 	/**
 	 * Resolve the XPath tag expression based on tag option.
 	 *
-	 * @param string $tag_option     Original tag option.
-	 * @param string $tag            Current tag value (may have been filtered).
-	 * @param array  $placement_opts Placement options.
+	 * @param string               $tag_option     Original tag option.
+	 * @param string               $tag            Current tag value (may have been filtered).
+	 * @param array<string, mixed> $placement_opts Placement options.
 	 *
 	 * @return string Resolved XPath expression.
 	 */
@@ -451,10 +451,10 @@ class Content_Injector {
 	 *
 	 * The caller must unset() the ad DOM tree immediately after this call.
 	 *
-	 * @param DOMDocument $dom      Main document.
-	 * @param DOMNode     $node     Reference node.
-	 * @param array       $ad_nodes Snapshot of ad body child nodes.
-	 * @param string      $position One of 'before', 'after', 'append', 'prepend'.
+	 * @param DOMDocument       $dom      Main document.
+	 * @param DOMNode           $node     Reference node.
+	 * @param array<int, mixed> $ad_nodes Snapshot of ad body child nodes.
+	 * @param string            $position One of 'before', 'after', 'append', 'prepend'.
 	 */
 	private static function insert_nodes( DOMDocument $dom, DOMNode $node, array $ad_nodes, $position ) {
 		switch ( $position ) {
@@ -520,9 +520,9 @@ class Content_Injector {
 	/**
 	 * Filter ad content and register it as a placeholder.
 	 *
-	 * @param string $ad_content Ad HTML content.
-	 * @param string $tag_name   Tag name beside which the ad is injected.
-	 * @param array  $options    Injection options.
+	 * @param string               $ad_content Ad HTML content.
+	 * @param string               $tag_name   Tag name beside which the ad is injected.
+	 * @param array<string, mixed> $options    Injection options.
 	 *
 	 * @return string Placeholder token string.
 	 */
@@ -567,9 +567,9 @@ class Content_Injector {
 	 *   we never duplicate $content_orig into another variable.
 	 * - Match arrays are unset immediately after use.
 	 *
-	 * @param string $content              DOM-serialized content with ad placeholders.
-	 * @param string $content_orig         Unmodified original content.
-	 * @param array  $ads_for_placeholders Ad metadata array.
+	 * @param string            $content              DOM-serialized content with ad placeholders.
+	 * @param string            $content_orig         Unmodified original content.
+	 * @param array<int, mixed> $ads_for_placeholders Ad metadata array.
 	 *
 	 * @return string Content with ads injected.
 	 */
@@ -681,8 +681,8 @@ class Content_Injector {
 	 * Callback for usort() — sorts ads by position priority.
 	 * Uses the POSITION_ORDER constant so no array is allocated per comparison.
 	 *
-	 * @param array $first  First ad.
-	 * @param array $second Second ad.
+	 * @param array<string, mixed> $first  First ad.
+	 * @param array<string, mixed> $second Second ad.
 	 *
 	 * @return int
 	 */
@@ -695,9 +695,9 @@ class Content_Injector {
 	/**
 	 * Add a warning node to the Ad Health bar.
 	 *
-	 * @param array $nodes Existing nodes.
+	 * @param array<int, array<string, mixed>> $nodes Existing nodes.
 	 *
-	 * @return array Modified nodes.
+	 * @return array<int, array<string, mixed>> Modified nodes.
 	 */
 	public static function add_ad_health_node( $nodes ) {
 		$nodes[] = [
@@ -725,7 +725,7 @@ class Content_Injector {
 	 *
 	 * @param DOMXPath $xpath DOMXPath object.
 	 *
-	 * @return array Node path strings.
+	 * @return array<string, mixed> Node path strings.
 	 */
 	private static function get_ancestors_to_limit( DOMXPath $xpath ) {
 		$query = self::get_ancestors_to_limit_query();
@@ -753,10 +753,10 @@ class Content_Injector {
 	 * Uses Str::starts_with() from Framework instead of stripos()
 	 * since node paths are case-sensitive.
 	 *
-	 * @param array $paragraphs         Array of DOMNode objects.
-	 * @param array $ancestors_to_limit Node paths of restricted ancestors.
+	 * @param array<int, mixed> $paragraphs         Array of DOMNode objects.
+	 * @param array<int, mixed> $ancestors_to_limit Node paths of restricted ancestors.
 	 *
-	 * @return array Filtered array of DOMNode objects.
+	 * @return array<string, mixed> Filtered array of DOMNode objects.
 	 */
 	private static function filter_by_ancestors_to_limit( $paragraphs, $ancestors_to_limit ) {
 		if ( empty( $ancestors_to_limit ) ) {

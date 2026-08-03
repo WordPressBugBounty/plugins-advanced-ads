@@ -10,6 +10,7 @@
 
 namespace AdvancedAds\License;
 
+use AdvancedAds\Admin\Plugin_Installer;
 use AdvancedAds\Crons\Licenses as License_Cron;
 use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Data;
@@ -20,44 +21,35 @@ defined( 'ABSPATH' ) || exit;
 /**
  * License persistence, shop sync, and add-on install/activation on this site.
  *
- * Implementation is split across focused classes; this file remains the public facade:
- * - {@see License_Shop_Client} — shop REST + local `.test` HTTP bypass
- * - {@see License_Site_Activation} — plan-level site activation list
- * - {@see License_Package_Installer} — add-on zip download/install
- * - {@see License_Exchange} — legacy key / token exchange
- * - {@see License_Product_Map} — product name ↔ add-on id
- * - {@see License_Utils} — stateless helpers
- *
- * Public surface used by {@see \AdvancedAds\Rest\Licenses} and admin flows:
- *
- * - {@see self::get_licenses()} — rich license rows (`OPTION_RICH`).
- * - {@see self::save_licenses()} — merge incoming rows; optional `activating_license_key`,
- *   `activating_addon_id` (per add-on install/activate), `install_only` (download package only),
- *   `deactivating_addon_id`, `deactivating_license_key` (remove site from a license card).
- * - {@see self::get_addon_key_map()} — persisted addon id => license key for REST/UI
- *   (`build_persisted_addon_key_map_from_rich`, user-activated All Access add-ons only).
- * - {@see self::get_addon_install_states()} — per add-on `installed` / `active` for the Licenses UI.
- * - {@see self::get_aa_activated_addon_ids()} — add-ons explicitly activated under All Access on this site.
- * - {@see self::reconcile_persisted_licenses()} — passive on GET (addon mirrors only); mutates assignments on save when appropriate.
+ * Shop HTTP → {@see License_Shop_Client}. Site activation list → {@see License_Site_Activation}.
+ * Call those directly; this class orchestrates install + All-Access rules.
  */
 class License {
 
 	/**
-	 * Legacy flat option: addon id => license key (string) or legacy hybrid array rows.
+	 * Download_url values already installed this request (All Access runs once per URL).
+	 *
+	 * @var array<string, true>
 	 */
-	public const OPTION_LEGACY_MAP = 'advanced-ads-licenses';
+	private static $installed_download_urls = [];
+
+	/**
+	 * Request-local cache for {@see get_addon_key_map()}.
+	 *
+	 * @var array{fp: string, map: array<string, string>}|null
+	 */
+	private static $addon_key_map_cache = null;
+
+	/**
+	 * Site activation list option (`[{ license, status }, …]`).
+	 * Option key reused from the retired addon⇒key flat map.
+	 */
+	public const OPTION_SITE_ACTIVATION = 'advanced-ads-licenses';
 
 	/**
 	 * Rich license records (app / exchange).
 	 */
 	public const OPTION_RICH = 'advanced-ads-app-licenses';
-
-	/**
-	 * Set to '1' when legacy → rich migration finished successfully.
-	 *
-	 * @deprecated Use {@see self::OPTION_FLAT_MAP_RETIRED}.
-	 */
-	public const OPTION_MIGRATION_DONE = 'advanced_ads_licenses_migration';
 
 	/**
 	 * Set to '1' when advanced-ads-licenses flat map has been retired.
@@ -71,34 +63,6 @@ class License {
 
 
 	/**
-	 * Main instance
-	 *
-	 * Ensure only one instance is loaded or can be loaded.
-	 *
-	 * @return License
-	 */
-	public static function get() {
-		static $instance;
-
-		if ( null === $instance ) {
-			$instance = new License();
-		}
-
-		return $instance;
-	}
-
-	/**
-	 * Whether rich migration has completed.
-	 *
-	 * @deprecated Use {@see self::is_flat_map_retired()}.
-	 *
-	 * @return bool
-	 */
-	public static function is_migration_done(): bool {
-		return '1' === (string) get_option( self::OPTION_MIGRATION_DONE, '' );
-	}
-
-	/**
 	 * Whether the legacy addon => key flat map has been retired.
 	 *
 	 * @return bool
@@ -108,60 +72,25 @@ class License {
 	}
 
 	/**
-	 * Shop REST activate endpoint URL.
-	 *
-	 * @return string
-	 */
-	public static function get_shop_activate_endpoint(): string {
-		return License_Shop_Client::get_activate_endpoint();
-	}
-
-	/**
-	 * Shop REST deactivate endpoint URL.
-	 *
-	 * @return string
-	 */
-	public static function get_shop_deactivate_endpoint(): string {
-		return License_Shop_Client::get_deactivate_endpoint();
-	}
-
-	/**
-	 * Shop REST validate endpoint URL (fresh package download URLs for this site).
-	 *
-	 * @return string
-	 */
-	public static function get_shop_validate_endpoint(): string {
-		return License_Shop_Client::get_validate_endpoint();
-	}
-
-	/**
-	 * HTTP args for server-side shop REST calls (activate, validate).
-	 *
-	 * @param array<string, mixed> $args Request args to merge.
-	 * @return array<string, mixed>
-	 */
-	private static function shop_http_request_args( array $args = [] ): array {
-		return License_Shop_Client::http_request_args( $args );
-	}
-
-	/**
-	 * Whether outbound HTTPS to {@see AA_SHOP_URL} should verify certificates.
-	 *
-	 * @return bool
-	 */
-	private static function should_verify_ssl_for_shop_host(): bool {
-		return License_Shop_Client::should_verify_ssl();
-	}
-
-	/**
 	 * Current site hostname for license activation (no scheme).
 	 *
 	 * @return string
 	 */
 	public static function get_site_hostname(): string {
-		$host = wp_parse_url( site_url(), PHP_URL_HOST );
+		$parts = wp_parse_url( site_url() );
+		if ( ! is_array( $parts ) ) {
+			return '';
+		}
 
-		return is_string( $host ) ? $host : '';
+		$host = (string) ( $parts['host'] ?? '' );
+		if ( '' === $host ) {
+			return '';
+		}
+
+		$path = (string) ( $parts['path'] ?? '' );
+		$path = '' !== $path ? untrailingslashit( $path ) : '';
+
+		return $host . $path;
 	}
 
 	/**
@@ -200,7 +129,7 @@ class License {
 			return false;
 		}
 
-		$legacy = get_option( self::OPTION_LEGACY_MAP, false );
+		$legacy = get_option( self::OPTION_SITE_ACTIVATION, false );
 
 		if ( false === $legacy || ! is_array( $legacy ) ) {
 			return false;
@@ -219,7 +148,8 @@ class License {
 	 * @return bool
 	 */
 	public static function is_legacy_license_store(): bool {
-		return self::has_stored_licenses() || self::has_stored_legacy_license_map();
+		return self::has_stored_licenses()
+			|| [] !== License_Site_Activation::get_active_license_keys();
 	}
 
 	/**
@@ -229,11 +159,7 @@ class License {
 	 * @return bool
 	 */
 	public static function should_run_shop_auto_activate( bool $requested ): bool {
-		if ( ! $requested ) {
-			return false;
-		}
-
-		return ! self::has_stored_legacy_license_map();
+		return $requested;
 	}
 
 	/**
@@ -247,6 +173,18 @@ class License {
 	 * @return bool
 	 */
 	public static function has_new_incoming_license_keys( array $existing, array $incoming ): bool {
+		return self::classify_incoming_keys( $existing, $incoming )['has_new_keys'];
+	}
+
+	/**
+	 * Classify keys in $list that are not already in $existing.
+	 *
+	 * @param array<int, array<string, mixed>> $existing Stored licenses.
+	 * @param array<int, array<string, mixed>> $licenses     Incoming or merged list.
+	 * @return array{has_new_keys: bool, needs_shop_activation: bool, has_upgrade_successor: bool}
+	 */
+	private static function classify_incoming_keys( array $existing, array $licenses ): array {
+		$hostname      = self::get_site_hostname();
 		$existing_keys = [];
 
 		foreach ( self::normalize_list( $existing ) as $row ) {
@@ -256,14 +194,37 @@ class License {
 			}
 		}
 
-		foreach ( self::normalize_list( $incoming ) as $row ) {
+		$has_new_keys          = false;
+		$needs_shop_activation = false;
+		$has_upgrade_successor = false;
+
+		foreach ( self::normalize_list( $licenses ) as $row ) {
 			$key = (string) ( $row['licenseKey'] ?? '' );
-			if ( '' !== $key && ! isset( $existing_keys[ $key ] ) ) {
-				return true;
+			if ( '' === $key || isset( $existing_keys[ $key ] ) ) {
+				continue;
+			}
+
+			$has_new_keys = true;
+
+			if ( ! self::is_license_entitled( $row ) ) {
+				continue;
+			}
+
+			if ( 'migrate' === self::successor_shop_action( $licenses, $row ) ) {
+				$has_upgrade_successor = true;
+				continue;
+			}
+
+			if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
+				$needs_shop_activation = true;
 			}
 		}
 
-		return false;
+		return [
+			'has_new_keys'          => $has_new_keys,
+			'needs_shop_activation' => $needs_shop_activation,
+			'has_upgrade_successor' => $has_upgrade_successor,
+		];
 	}
 
 	/**
@@ -281,29 +242,6 @@ class License {
 		}
 
 		return $out;
-	}
-
-	/**
-	 * Whether a rich license row already exists (by licenseId or licenseKey).
-	 *
-	 * @param array<int, array<string, mixed>> $rich       Existing records.
-	 * @param array<string, mixed>             $candidate  Incoming record.
-	 * @return bool
-	 */
-	public static function license_exists( array $rich, array $candidate ): bool {
-		$candidate_id  = isset( $candidate['licenseId'] ) ? (int) $candidate['licenseId'] : 0;
-		$candidate_key = (string) ( $candidate['licenseKey'] ?? '' );
-
-		foreach ( $rich as $row ) {
-			if ( $candidate_id && isset( $row['licenseId'] ) && (int) $row['licenseId'] === $candidate_id ) {
-				return true;
-			}
-			if ( '' !== $candidate_key && (string) ( $row['licenseKey'] ?? '' ) === $candidate_key ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -326,8 +264,12 @@ class License {
 				$match_key = '' !== $license_key && (string) ( $row['licenseKey'] ?? '' ) === $license_key;
 
 				if ( $match_id || $match_key ) {
+					$kept_status    = $row['status'] ?? null;
 					$merged[ $idx ] = array_merge( $row, $license );
-					$updated        = true;
+					if ( null !== $kept_status ) {
+						$merged[ $idx ]['status'] = $kept_status;
+					}
+					$updated = true;
 					break;
 				}
 			}
@@ -372,7 +314,12 @@ class License {
 				continue;
 			}
 
-			$result = License_Exchange::request( [ 'legacy' => $license_key ] );
+			$result = License_Shop_Client::exchange(
+				[
+					'license' => $license_key,
+					'site'    => self::get_site_hostname(),
+				]
+			);
 			if ( is_wp_error( $result ) ) {
 				return $result;
 			}
@@ -391,8 +338,7 @@ class License {
 			);
 		}
 
-		$merged = self::coalesce_all_access_duplicate_rich_rows( $merged );
-		$merged = self::drop_map_stub_duplicate_rows( $merged );
+		$merged = self::dedupe_rich_rows( $merged );
 
 		return $merged;
 	}
@@ -400,11 +346,14 @@ class License {
 	/**
 	 * Finish legacy migration: patch rich from shop if needed, then retire flat map.
 	 *
+	 * Always retires locally after a best-effort exchange, even when the shop fails
+	 * or rich still does not cover every legacy key.
+	 *
 	 * @return void
 	 */
 	public static function maybe_complete_legacy_license_migration(): void {
 
-		$map = License_Utils::normalize_legacy_map( get_option( self::OPTION_LEGACY_MAP, [] ) );
+		$map = License_Utils::normalize_legacy_map( get_option( self::OPTION_SITE_ACTIVATION, [] ) );
 		if ( [] === $map ) {
 			return;
 		}
@@ -413,19 +362,13 @@ class License {
 
 		if ( [] === $rich || ! License_Utils::rich_covers_legacy_keys( $map, $rich ) ) {
 			$patched = self::exchange_legacy_map_for_rich( $map, $rich );
-			if ( is_wp_error( $patched ) ) {
-				return;
+			if ( ! is_wp_error( $patched ) ) {
+				update_option( self::OPTION_RICH, $patched, false );
+				$rich = $patched;
 			}
-
-			update_option( self::OPTION_RICH, $patched, false );
-			$rich = $patched;
 		}
 
-		if ( ! License_Utils::rich_covers_legacy_keys( $map, $rich ) ) {
-			return;
-		}
-
-		self::maybe_retire_legacy_flat_map( $rich, $map );
+		License_Site_Activation::maybe_retire_legacy_flat_map( $rich, $map );
 	}
 
 	/**
@@ -461,67 +404,16 @@ class License {
 			return '' === $raw_expiry || License_Utils::license_expiry_is_future( $row );
 		}
 
-		return self::is_license_effective( $row );
-	}
-
-	/**
-	 * Map entitled, site-activated rows to `active` (shop exchange contract: active|expired).
-	 *
-	 * Renewal can leave legacy `inactive` or stale `expired` while expiryDate is already extended.
-	 *
-	 * @param array<string, mixed> $row Rich license row.
-	 * @return array<string, mixed>
-	 */
-	public static function normalize_rich_license_status( array $row ): array {
-		if ( self::is_license_active( $row ) ) {
-			return $row;
-		}
-
-		if ( self::is_license_entitled( $row ) && self::is_site_activated_on_license( $row, self::get_site_hostname() ) ) {
-			$row['status'] = 'active';
-		}
-
-		return $row;
-	}
-
-	/**
-	 * Whether this rich row is in use on the current site (hostname in sitesActivated or addon map).
-	 *
-	 * @param array<string, mixed> $row Rich license row.
-	 * @return bool
-	 */
-	public static function is_rich_license_applied_on_this_site( array $row ): bool {
-		if ( self::is_site_activated_on_license( $row, self::get_site_hostname() ) ) {
-			return true;
-		}
-
-		$license_key = trim( (string) ( $row['licenseKey'] ?? '' ) );
-		if ( '' === $license_key ) {
-			return false;
-		}
-
-		foreach ( self::get_addon_key_map() as $mapped_key ) {
-			if ( $mapped_key === $license_key ) {
-				return true;
+		if ( in_array( $status, [ 'expired', 'invalid', 'disabled' ], true ) ) {
+			$name = (string) ( $row['name'] ?? '' );
+			if ( License_Product_Map::is_all_access_bundle_name( $name ) ) {
+				return false;
 			}
+
+			return License_Utils::license_expiry_is_future( $row );
 		}
 
 		return false;
-	}
-
-	/**
-	 * Normalize status on each rich license row for REST / admin UI.
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @return array<int, array<string, mixed>>
-	 */
-	public static function normalize_rich_license_list( array $rich ): array {
-		return array_map(
-			static function ( $row ) {
-				return is_array( $row ) ? self::normalize_rich_license_status( $row ) : $row;
-			},
-			$rich
-		);
 	}
 
 	/**
@@ -582,7 +474,7 @@ class License {
 			}
 		}
 
-		$license['sitesActivated'] = $filtered;
+		$license['sitesActivated']  = $filtered;
 		$license['activationCount'] = count( $filtered );
 
 		return $license;
@@ -590,7 +482,7 @@ class License {
 
 	/**
 	 * When the user picks one license on this site:
-	 * - All Access: remove this site from every other license row.
+	 * - All Access: remove this site from every other license row (including singles).
 	 * - Single product: remove this site from All Access only (Pro + Tracking may coexist).
 	 *
 	 * @param array<int, array<string, mixed>> $rich        Rich license list.
@@ -598,6 +490,31 @@ class License {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function apply_manual_license_activation_on_site( array $rich, string $license_key ): array {
+		return self::apply_manual_activation( $rich, $license_key, true );
+	}
+
+	/**
+	 * Add this site to a license row without stripping single-product slots under All Access.
+	 *
+	 * Used when healing sitesActivated from the site-activation list or activating an AA add-on.
+	 *
+	 * @param array<int, array<string, mixed>> $rich        Rich license list.
+	 * @param string                           $license_key License key.
+	 * @return array<int, array<string, mixed>>
+	 */
+	public static function ensure_local_site_slot_on_license( array $rich, string $license_key ): array {
+		return self::apply_manual_activation( $rich, $license_key, false );
+	}
+
+	/**
+	 * Mirror this site onto one license row; optionally strip conflicting singles under All Access.
+	 *
+	 * @param array<int, array<string, mixed>> $rich                  Rich license list.
+	 * @param string                           $license_key           License key.
+	 * @param bool                             $strip_single_products When All Access activates: also strip single-product rows.
+	 * @return array<int, array<string, mixed>>
+	 */
+	private static function apply_manual_activation( array $rich, string $license_key, bool $strip_single_products ): array {
 		$hostname    = self::get_site_hostname();
 		$license_key = trim( $license_key );
 
@@ -637,9 +554,17 @@ class License {
 
 			if ( $activating_all_access ) {
 				if ( ! License_Product_Map::is_all_access_bundle_name( $name ) ) {
-					$rich[ $index ] = self::remove_site_hostname_from_license_row( $row, $hostname );
+					if ( $strip_single_products ) {
+						$rich[ $index ] = self::remove_site_hostname_from_license_row( $row, $hostname );
+						if ( '' !== $key ) {
+							License_Site_Activation::upsert_status( $key, 'inactive' );
+						}
+					}
 				} elseif ( $key !== $license_key ) {
 					$rich[ $index ] = self::remove_site_hostname_from_license_row( $row, $hostname );
+					if ( '' !== $key ) {
+						License_Site_Activation::upsert_status( $key, 'inactive' );
+					}
 				}
 				continue;
 			}
@@ -647,8 +572,11 @@ class License {
 			// Single product: drop All Access and same-line siblings on this site.
 			if ( License_Product_Map::is_all_access_bundle_name( $name ) ) {
 				$rich[ $index ] = self::remove_site_hostname_from_license_row( $row, $hostname );
-			} elseif ( self::is_same_product_line_row( $target_row, $row ) && $key !== $license_key ) {
+			} elseif ( self::product_line_key_for_row( $target_row ) === self::product_line_key_for_row( $row ) && $key !== $license_key ) {
 				$rich[ $index ] = self::remove_site_hostname_from_license_row( $row, $hostname );
+				if ( '' !== $key ) {
+					License_Site_Activation::upsert_status( $key, 'inactive' );
+				}
 			}
 		}
 
@@ -656,80 +584,53 @@ class License {
 			$sites = isset( $target_row['sitesActivated'] ) && is_array( $target_row['sitesActivated'] )
 				? $target_row['sitesActivated']
 				: [];
-			$sites[] = [
-				'domain'    => $hostname,
-				'createdAt' => gmdate( 'd-m-Y' ),
-			];
-			$target_row['sitesActivated']  = $sites;
-			$target_row['activationCount'] = max(
-				(int) ( $target_row['activationCount'] ?? 0 ),
-				count( $sites )
+
+			// $hostname is already get_site_hostname() → e.g. test-setup.com/license6
+			$host_only = strtolower(
+				(string) wp_parse_url( 'https://' . ltrim( $hostname, '/' ), PHP_URL_HOST )
 			);
-			$rich[ $target_index ] = $target_row;
+			$full_site = self::get_site_hostname();
+
+			// Drop shop/local bare host (test-setup.com) so only subdirectory remains.
+			if ( '' !== $host_only && $full_site !== $host_only ) {
+				$sites = array_values(
+					array_filter(
+						$sites,
+						static function ( $site ) use ( $host_only ) {
+							if ( ! is_array( $site ) ) {
+								return false;
+							}
+							$domain = strtolower( untrailingslashit( (string) ( $site['domain'] ?? '' ) ) );
+							return '' !== $domain && $domain !== $host_only;
+						}
+					)
+				);
+			}
+
+			$found = false;
+			foreach ( $sites as &$site ) {
+				if ( isset( $site['domain'] ) && strtolower( untrailingslashit( (string) $site['domain'] ) ) === strtolower( $full_site ) ) {
+					$site['domain']    = $full_site;
+					$site['createdAt'] = gmdate( 'd-m-Y' );
+					$found             = true;
+					break;
+				}
+			}
+			unset( $site );
+
+			if ( ! $found ) {
+				$sites[] = [
+					'domain'    => $full_site,
+					'createdAt' => gmdate( 'd-m-Y' ),
+				];
+			}
+
+			$target_row['sitesActivated']  = $sites;
+			$target_row['activationCount'] = count( $sites );
+			$rich[ $target_index ]         = $target_row;
 		}
 
-		return $rich;
-	}
-
-	/**
-	 * Rich rows of the same product line that already list this site (excluding target key).
-	 *
-	 * @param array<int, array<string, mixed>> $rich        Rich license list.
-	 * @param string                           $license_key Target license key being activated.
-	 * @return array<int, array<string, mixed>>
-	 */
-	public static function find_same_line_site_active_siblings( array $rich, string $license_key ): array {
-		$hostname    = self::get_site_hostname();
-		$license_key = trim( $license_key );
-		$target_row  = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
-
-		if ( '' === $hostname || ! is_array( $target_row ) ) {
-			return [];
-		}
-
-		$out = [];
-		foreach ( self::normalize_list( $rich ) as $row ) {
-			if ( ! is_array( $row ) ) {
-				continue;
-			}
-			$key = (string) ( $row['licenseKey'] ?? '' );
-			if ( '' === $key || $key === $license_key ) {
-				continue;
-			}
-			if ( ! self::is_same_product_line_row( $target_row, $row ) ) {
-				continue;
-			}
-			if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
-				continue;
-			}
-			$out[] = $row;
-		}
-
-		return $out;
-	}
-
-	/**
-	 * Shop-deactivate same-line siblings on this site before activating a new key.
-	 *
-	 * @param array<int, array<string, mixed>> $rich        Rich license list.
-	 * @param string                           $license_key Target license key being activated.
-	 * @return array<int, array<string, mixed>>|WP_Error
-	 */
-	private static function deactivate_same_line_siblings_on_shop( array $rich, string $license_key ) {
-		$siblings = self::find_same_line_site_active_siblings( $rich, $license_key );
-		foreach ( $siblings as $row ) {
-			$sibling_key = trim( (string) ( $row['licenseKey'] ?? '' ) );
-			if ( '' === $sibling_key ) {
-				continue;
-			}
-			$shop = self::request_shop_deactivate( $sibling_key );
-			if ( is_wp_error( $shop ) ) {
-				return $shop;
-			}
-			if ( [] !== $shop ) {
-				$rich = self::merge_license_lists( $rich, $shop );
-			}
-		}
+		License_Site_Activation::upsert_status( $license_key, 'active' );
 
 		return $rich;
 	}
@@ -761,7 +662,7 @@ class License {
 
 			$name = (string) ( $row['name'] ?? '' );
 			if ( ! License_Product_Map::is_all_access_bundle_name( $name ) ) {
-				$manifest = self::build_addon_manifest();
+				$manifest = License_Product_Map::addon_manifest();
 				$addon_id = License_Product_Map::addon_id_from_product_name( $name, $manifest );
 				if ( null !== $addon_id ) {
 					self::remove_aa_activated_addon_id( $addon_id );
@@ -769,6 +670,8 @@ class License {
 			}
 			break;
 		}
+
+		License_Site_Activation::upsert_status( $license_key, 'inactive' );
 
 		return $rich;
 	}
@@ -789,25 +692,12 @@ class License {
 			return true;
 		}
 
-		$used  = (int) ( $license['activationCount'] ?? 0 );
+		$sites = $license['sitesActivated'] ?? [];
+		$list  = is_array( $sites ) ? count( $sites ) : 0;
+		$used  = max( $list, (int) ( $license['activationCount'] ?? 0 ) );
 		$total = (int) ( $license['availableSites'] ?? 0 );
 
-		return $used < $total;
-	}
-
-	/**
-	 * Activate on shop REST (/license/activate) before persisting license options.
-	 *
-	 * @param string $license_key License key string.
-	 * @param int    $license_id  Optional EDD SL license post ID.
-	 * @return array<int, array<string, mixed>>|WP_Error Rich list when shop returns one, else [].
-	 */
-	public static function request_shop_activate( string $license_key, int $license_id = 0 ) {
-		return License_Shop_Client::request_activate(
-			$license_key,
-			self::get_site_hostname(),
-			$license_id
-		);
+		return $total > 0 && $used < $total;
 	}
 
 	/**
@@ -818,6 +708,22 @@ class License {
 	 * @return array<int, array<string, mixed>>|WP_Error
 	 */
 	public static function activate_on_shop_then_local( string $license_key, array $rich ) {
+		$merged = self::shop_activate_and_merge( $license_key, $rich );
+		if ( is_wp_error( $merged ) ) {
+			return $merged;
+		}
+
+		return self::apply_manual_license_activation_on_site( $merged, $license_key );
+	}
+
+	/**
+	 * Shop activate and merge response into the rich list.
+	 *
+	 * @param string                           $license_key License key.
+	 * @param array<int, array<string, mixed>> $rich        Rich license list.
+	 * @return array<int, array<string, mixed>>|WP_Error
+	 */
+	private static function shop_activate_and_merge( string $license_key, array $rich ) {
 		$license_key = trim( $license_key );
 		if ( '' === $license_key ) {
 			return new WP_Error(
@@ -826,13 +732,9 @@ class License {
 			);
 		}
 
-		$rich = self::deactivate_same_line_siblings_on_shop( $rich, $license_key );
-		if ( is_wp_error( $rich ) ) {
-			return $rich;
-		}
-
-		$shop = self::request_shop_activate(
+		$shop = License_Shop_Client::request_activate(
 			$license_key,
+			self::get_site_hostname(),
 			self::resolve_license_id_for_key( $rich, $license_key )
 		);
 		if ( is_wp_error( $shop ) ) {
@@ -843,25 +745,24 @@ class License {
 			$rich = self::merge_license_lists( $rich, $shop );
 		}
 
-		return self::apply_manual_license_activation_on_site( $rich, $license_key );
+		return $rich;
 	}
 
 	/**
-	 * Legacy connect: sync locally-assigned licenses that are not on shop for this site.
+	 * Connect/reconnect: activate site-activation keys (and locally slotted rows) on the shop.
 	 *
 	 * @param array<int, array<string, mixed>> $rich     Rich license list (post-merge).
 	 * @param array<int, array<string, mixed>> $existing Stored licenses before merge.
 	 * @return array<int, array<string, mixed>>|WP_Error
 	 */
-	public static function sync_local_activations_to_shop( array $rich, array $existing = [] ) {
+	private static function sync_active_keys_to_shop( array $rich, array $existing = [] ) {
 		$hostname = self::get_site_hostname();
 		if ( '' === $hostname ) {
 			return $rich;
 		}
 
 		$keys_to_sync = [];
-		$legacy_map   = License_Utils::normalize_legacy_map( get_option( self::OPTION_LEGACY_MAP, [] ) );
-		foreach ( $legacy_map as $key ) {
+		foreach ( License_Site_Activation::get_active_license_keys() as $key ) {
 			$key = trim( (string) $key );
 			if ( '' !== $key ) {
 				$keys_to_sync[ $key ] = true;
@@ -879,13 +780,7 @@ class License {
 		}
 
 		foreach ( array_keys( $keys_to_sync ) as $license_key ) {
-			$row = null;
-			foreach ( self::normalize_list( $rich ) as $candidate ) {
-				if ( (string) ( $candidate['licenseKey'] ?? '' ) === $license_key ) {
-					$row = $candidate;
-					break;
-				}
-			}
+			$row = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
 
 			if ( ! is_array( $row ) || self::is_site_activated_on_license( $row, $hostname ) ) {
 				continue;
@@ -899,43 +794,6 @@ class License {
 		}
 
 		return $rich;
-	}
-
-	/**
-	 * Deactivate a site on the shop REST (/license/deactivate).
-	 *
-	 * @param string $license_key License key string.
-	 * @return array<int, array<string, mixed>>|WP_Error Rich list when shop returns one, else [].
-	 */
-	public static function request_shop_deactivate( string $license_key ) {
-		return License_Shop_Client::request_deactivate( $license_key, self::get_site_hostname() );
-	}
-
-	/**
-	 * Shop deactivate then mirror this site off the license row (never local-only).
-	 *
-	 * @param string                           $license_key License key.
-	 * @param array<int, array<string, mixed>> $rich        Rich license list.
-	 * @return array<int, array<string, mixed>>|WP_Error
-	 */
-	public static function deactivate_on_shop_then_local( string $license_key, array $rich ) {
-		$license_key = trim( $license_key );
-		if ( '' === $license_key ) {
-			return new WP_Error(
-				'advanced_ads_license_deactivate_invalid',
-				__( 'Missing license key.', 'advanced-ads' )
-			);
-		}
-
-		$shop = self::request_shop_deactivate( $license_key );
-		if ( is_wp_error( $shop ) ) {
-			return $shop;
-		}
-		if ( [] !== $shop ) {
-			$rich = self::merge_license_lists( $rich, $shop );
-		}
-
-		return self::apply_manual_license_deactivation_on_site( $rich, $license_key );
 	}
 
 	/**
@@ -974,23 +832,14 @@ class License {
 		if ( count( $shared_with ) > 1 ) {
 			self::remove_aa_activated_addon_id( $addon_id );
 
-			if ( ! self::is_flat_map_retired() ) {
-				$options_slug = License_Utils::options_slug_for_addon_id( $addon_id );
-				delete_option( $options_slug . '-license-status' );
-				delete_option( $options_slug . '-license-expires' );
-			}
-
 			return 1;
 		}
 
 		$result = self::save_licenses(
 			self::get_licenses(),
-			false,
-			'',
-			'',
-			false,
-			'',
-			$license_key
+			[
+				'deactivating_license_key' => $license_key,
+			]
 		);
 
 		if ( is_wp_error( $result ) ) {
@@ -1012,7 +861,7 @@ class License {
 			return $rich;
 		}
 
-		$all_access = self::find_entitled_all_access_license( $rich );
+		$all_access = self::find_all_access_row( $rich, 'entitled' );
 		$rows       = null !== $all_access ? [ $all_access ] : array_values(
 			array_filter(
 				$rich,
@@ -1055,18 +904,16 @@ class License {
 				continue;
 			}
 
-			if ( self::is_upgrade_successor_with_site_already_in_use( $rich, $row ) ) {
-				$rich = self::promote_successor_license_on_shop( $rich, $license_key, true );
+			if ( 'migrate' === self::successor_shop_action( $rich, $row ) ) {
+				$rich = self::promote_upgrade_successor( $rich, $license_key, true );
 				continue;
 			}
 
-			$result = self::request_shop_activate( $license_key );
-			if ( is_wp_error( $result ) ) {
+			$activated = self::activate_on_shop_then_local( $license_key, $rich );
+			if ( is_wp_error( $activated ) ) {
 				continue;
 			}
-			if ( [] !== $result ) {
-				$rich = self::merge_license_lists( $rich, $result );
-			}
+			$rich = $activated;
 		}
 
 		return self::ensure_site_slots_match_active_assignments( $rich );
@@ -1092,13 +939,7 @@ class License {
 		}
 
 		foreach ( array_keys( $keys ) as $license_key ) {
-			$row = null;
-			foreach ( self::normalize_list( $rich ) as $candidate ) {
-				if ( (string) ( $candidate['licenseKey'] ?? '' ) === $license_key ) {
-					$row = $candidate;
-					break;
-				}
-			}
+			$row = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
 
 			if ( ! is_array( $row ) || self::is_site_activated_on_license( $row, $hostname ) ) {
 				continue;
@@ -1111,7 +952,7 @@ class License {
 				if ( '' === $other_key || $other_key === $license_key ) {
 					continue;
 				}
-				if ( ! self::is_same_product_line_row( $row, $other ) ) {
+				if ( self::product_line_key_for_row( $row ) !== self::product_line_key_for_row( $other ) ) {
 					continue;
 				}
 				if ( self::is_site_activated_on_license( $other, $hostname ) ) {
@@ -1135,23 +976,6 @@ class License {
 	}
 
 	/**
-	 * Whether any rich row lists the current site in sitesActivated.
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @param string                           $site_hostname Site hostname.
-	 * @return bool
-	 */
-	public static function is_site_on_any_license_row( array $rich, string $site_hostname ): bool {
-		foreach ( self::normalize_list( $rich ) as $row ) {
-			if ( self::is_site_activated_on_license( $row, $site_hostname ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * After upgrade, move this site's slot from a predecessor row to the entitled successor.
 	 *
 	 * Updates local sitesActivated and syncs the successor key on the shop so EDD SL
@@ -1161,8 +985,7 @@ class License {
 	 * @return array<int, array<string, mixed>>
 	 */
 	public static function migrate_site_activation_to_successor_licenses( array $rich ): array {
-		$hostname = self::get_site_hostname();
-		if ( '' === $hostname ) {
+		if ( '' === self::get_site_hostname() ) {
 			return $rich;
 		}
 
@@ -1174,32 +997,21 @@ class License {
 			}
 
 			$key = (string) ( $successor['licenseKey'] ?? '' );
-			if ( '' === $key || self::is_site_activated_on_license( $successor, $hostname ) ) {
+			if ( '' === $key ) {
 				continue;
 			}
 
-			if ( ! self::is_upgrade_successor_with_site_already_in_use( $rich, $successor ) ) {
+			$action = self::successor_shop_action( $rich, $successor );
+			if ( '' === $action ) {
 				continue;
 			}
 
-			$rich = self::promote_successor_license_on_shop( $rich, $key, true, $legacy_migrations );
-		}
-
-		foreach ( self::normalize_list( $rich ) as $successor ) {
-			if ( ! self::is_license_entitled( $successor ) ) {
-				continue;
-			}
-
-			$key = (string) ( $successor['licenseKey'] ?? '' );
-			if ( '' === $key || ! self::is_site_activated_on_license( $successor, $hostname ) ) {
-				continue;
-			}
-
-			if ( ! self::should_sync_successor_activation_to_shop( $rich, $successor ) ) {
-				continue;
-			}
-
-			$rich = self::promote_successor_license_on_shop( $rich, $key, false, $legacy_migrations );
+			$rich = self::promote_upgrade_successor(
+				$rich,
+				$key,
+				'migrate' === $action,
+				$legacy_migrations
+			);
 		}
 
 		$rich = self::ensure_site_slots_match_active_assignments( $rich );
@@ -1212,15 +1024,15 @@ class License {
 	}
 
 	/**
-	 * Deactivate the predecessor on the shop, activate the successor, then mirror locally.
+	 * Activate the upgrade successor on the shop; optionally mirror the local site slot.
 	 *
-	 * @param array<int, array<string, mixed>> $rich             Rich license list.
-	 * @param string                           $successor_key    Successor license key.
-	 * @param bool                             $apply_local_slot When true, move the site slot locally after shop success.
+	 * @param array<int, array<string, mixed>>            $rich             Rich license list.
+	 * @param string                                      $successor_key    Successor license key.
+	 * @param bool                                        $apply_local_slot When true, move the site slot locally after shop success.
 	 * @param array<int, array{from: string, to: string}> $legacy_migrations Collect predecessor → successor map updates (applied after ensure).
 	 * @return array<int, array<string, mixed>>
 	 */
-	private static function promote_successor_license_on_shop( array $rich, string $successor_key, bool $apply_local_slot, array &$legacy_migrations = [] ): array {
+	private static function promote_upgrade_successor( array $rich, string $successor_key, bool $apply_local_slot, array &$legacy_migrations = [] ): array {
 		$successor_key = trim( $successor_key );
 		$hostname      = self::get_site_hostname();
 
@@ -1228,29 +1040,14 @@ class License {
 			return $rich;
 		}
 
-		\delete_transient( 'advads_shop_successor_' . \md5( $successor_key . '|' . $hostname ) );
-
-		$successor = null;
-		foreach ( self::normalize_list( $rich ) as $row ) {
-			if ( is_array( $row ) && (string) ( $row['licenseKey'] ?? '' ) === $successor_key ) {
-				$successor = $row;
-				break;
-			}
-		}
-
+		$successor = License_Utils::get_rich_license_row_by_key( $rich, $successor_key );
 		if ( null === $successor ) {
 			return $rich;
 		}
 
 		$predecessor_key = self::find_predecessor_license_key_for_successor( $rich, $successor );
-		if ( '' !== $predecessor_key ) {
-			$deactivated = self::request_shop_deactivate( $predecessor_key );
-			if ( ! is_wp_error( $deactivated ) && [] !== $deactivated ) {
-				$rich = self::merge_license_lists( $rich, $deactivated );
-			}
-		}
 
-		$activated = self::request_shop_activate( $successor_key );
+		$activated = License_Shop_Client::request_activate( $successor_key, $hostname );
 		if ( is_wp_error( $activated ) ) {
 			return $rich;
 		}
@@ -1263,18 +1060,94 @@ class License {
 			$rich = self::apply_manual_license_activation_on_site( $rich, $successor_key );
 		}
 
-		if ( ! is_wp_error( $activated ) && '' !== $predecessor_key ) {
+		if ( '' !== $predecessor_key ) {
 			$legacy_migrations[] = [
 				'from' => $predecessor_key,
 				'to'   => $successor_key,
 			];
 		}
 
-		if ( self::shop_response_confirms_site_activation( $activated, $hostname ) ) {
-			self::mark_successor_shop_synced( $successor_key, $hostname );
+		return $rich;
+	}
+
+	/**
+	 * Whether an entitled row needs shop successor handling: migrate slot or sync shop only.
+	 *
+	 * @param array<int, array<string, mixed>> $rich Rich license list.
+	 * @param array<string, mixed>             $row  Candidate successor row.
+	 * @return string '' | 'migrate' | 'sync'
+	 */
+	private static function successor_shop_action( array $rich, array $row ): string {
+		$hostname = self::get_site_hostname();
+		if ( '' === $hostname ) {
+			return '';
 		}
 
-		return $rich;
+		$on_site = self::is_site_activated_on_license( $row, $hostname );
+
+		if ( ! $on_site ) {
+			if ( self::has_predecessor_addon_assignment_for_successor( $row ) ) {
+				return 'migrate';
+			}
+
+			$row_key = (string) ( $row['licenseKey'] ?? '' );
+			foreach ( self::normalize_list( $rich ) as $other ) {
+				if ( (string) ( $other['licenseKey'] ?? '' ) === $row_key ) {
+					continue;
+				}
+
+				if ( ! self::is_site_activated_on_license( $other, $hostname ) ) {
+					continue;
+				}
+
+				if ( self::product_line_key_for_row( $row ) !== self::product_line_key_for_row( $other ) ) {
+					continue;
+				}
+
+				if ( self::is_predecessor_license_row( $other, $row ) ) {
+					return 'migrate';
+				}
+			}
+
+			return '';
+		}
+
+		if ( ! self::is_license_entitled( $row ) ) {
+			return '';
+		}
+
+		if ( self::has_predecessor_addon_assignment_for_successor( $row ) ) {
+			return 'sync';
+		}
+
+		$row_key = (string) ( $row['licenseKey'] ?? '' );
+		if ( '' === $row_key ) {
+			return '';
+		}
+
+		foreach ( self::normalize_list( $rich ) as $other ) {
+			if ( self::product_line_key_for_row( $row ) !== self::product_line_key_for_row( $other ) ) {
+				continue;
+			}
+
+			$other_key = (string) ( $other['licenseKey'] ?? '' );
+			if ( '' === $other_key || $other_key === $row_key ) {
+				continue;
+			}
+
+			if ( self::is_license_active( $row ) && ! self::is_license_active( $other ) ) {
+				return 'sync';
+			}
+
+			$row_is_aa   = License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) );
+			$other_is_aa = License_Product_Map::is_all_access_bundle_name( (string) ( $other['name'] ?? '' ) );
+
+			if ( self::license_priority_score( $row, $row_is_aa ) > self::license_priority_score( $other, $other_is_aa ) ) {
+				return 'sync';
+			}
+		}
+
+		return '';
 	}
 
 	/**
@@ -1314,191 +1187,18 @@ class License {
 	}
 
 	/**
-	 * Whether a shop activate/deactivate response lists the current site.
+	 * Stable product-line id for mutual exclusion (All Access or single add-on).
 	 *
-	 * @param array<int, array<string, mixed>>|WP_Error $result   Shop response rows.
-	 * @param string                                      $hostname Site hostname.
-	 * @return bool
+	 * @param array<string, mixed> $row Rich license row.
+	 * @return string|null `all-access`, add-on id, or null when unrecognized.
 	 */
-	private static function shop_response_confirms_site_activation( $result, string $hostname ): bool {
-		if ( is_wp_error( $result ) || ! is_array( $result ) ) {
-			return false;
+	private static function product_line_key_for_row( array $row ): ?string {
+		$name = (string) ( $row['name'] ?? '' );
+		if ( License_Product_Map::is_all_access_bundle_name( $name ) ) {
+			return 'all-access';
 		}
 
-		foreach ( self::normalize_list( $result ) as $row ) {
-			if ( self::is_site_activated_on_license( $row, $hostname ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param string $license_key License key.
-	 * @param string $hostname    Site hostname.
-	 * @return void
-	 */
-	private static function mark_successor_shop_synced( string $license_key, string $hostname ): void {
-		\set_transient( 'advads_shop_successor_' . \md5( $license_key . '|' . $hostname ), 1, DAY_IN_SECONDS );
-	}
-
-	/**
-	 * @param string $license_key License key.
-	 * @param string $hostname    Site hostname.
-	 * @return bool
-	 */
-	private static function is_successor_shop_sync_cached( string $license_key, string $hostname ): bool {
-		return (bool) \get_transient( 'advads_shop_successor_' . \md5( $license_key . '|' . $hostname ) );
-	}
-
-	/**
-	 * @param array<int, array<string, mixed>> $rich        Rich license list.
-	 * @param string                           $license_key Successor license key.
-	 * @return array<int, array<string, mixed>>
-	 */
-	private static function sync_successor_activation_to_shop( array $rich, string $license_key ): array {
-		return self::promote_successor_license_on_shop( $rich, $license_key, false );
-	}
-
-	/**
-	 * Whether a new entitled row replaces a license this site already uses (upgrade / renew).
-	 *
-	 * @param array<int, array<string, mixed>> $rich      Rich license list.
-	 * @param array<string, mixed>             $successor Entitled incoming row.
-	 * @return bool
-	 */
-	private static function is_upgrade_successor_with_site_already_in_use( array $rich, array $successor ): bool {
-		$hostname = self::get_site_hostname();
-		if ( '' === $hostname ) {
-			return false;
-		}
-
-		if ( self::is_site_activated_on_license( $successor, $hostname ) ) {
-			return false;
-		}
-
-		if ( self::has_superseded_site_activation_for_product( $rich, $successor, $hostname ) ) {
-			return true;
-		}
-
-		return self::has_predecessor_addon_assignment_for_successor( $successor );
-	}
-
-	/**
-	 * Whether a successor row with a local site slot still needs shop /license/activate.
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @param array<string, mixed>             $row  Entitled row with sitesActivated on this site.
-	 * @return bool
-	 */
-	private static function should_sync_successor_activation_to_shop( array $rich, array $row ): bool {
-		$hostname = self::get_site_hostname();
-		if ( '' === $hostname || ! self::is_license_entitled( $row ) ) {
-			return false;
-		}
-
-		if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
-			return false;
-		}
-
-		if ( self::has_predecessor_addon_assignment_for_successor( $row ) ) {
-			return true;
-		}
-
-		$row_key = (string) ( $row['licenseKey'] ?? '' );
-		if ( '' === $row_key ) {
-			return false;
-		}
-
-		foreach ( self::normalize_list( $rich ) as $other ) {
-			if ( ! self::is_same_product_line_row( $row, $other ) ) {
-				continue;
-			}
-
-			$other_key = (string) ( $other['licenseKey'] ?? '' );
-			if ( '' === $other_key || $other_key === $row_key ) {
-				continue;
-			}
-
-			if ( self::is_license_active( $row ) && ! self::is_license_active( $other ) ) {
-				return true;
-			}
-
-			$row_is_aa   = License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) );
-			$other_is_aa = License_Product_Map::is_all_access_bundle_name( (string) ( $other['name'] ?? '' ) );
-			$row_score   = self::license_priority_score( $row, $row_is_aa );
-			$other_score = self::license_priority_score( $other, $other_is_aa );
-
-			if ( $row_score > $other_score ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Whether two rich rows cover the same product line (All Access or single add-on).
-	 *
-	 * @param array<string, mixed> $a First row.
-	 * @param array<string, mixed> $b Second row.
-	 * @return bool
-	 */
-	private static function is_same_product_line_row( array $a, array $b ): bool {
-		$a_name = (string) ( $a['name'] ?? '' );
-		$b_name = (string) ( $b['name'] ?? '' );
-		$a_is_aa = License_Product_Map::is_all_access_bundle_name( $a_name );
-		$b_is_aa = License_Product_Map::is_all_access_bundle_name( $b_name );
-
-		if ( $a_is_aa && $b_is_aa ) {
-			return true;
-		}
-
-		if ( $a_is_aa || $b_is_aa ) {
-			return false;
-		}
-
-		$manifest = self::build_addon_manifest();
-
-		return License_Product_Map::addon_id_from_product_name( $a_name, $manifest )
-			=== License_Product_Map::addon_id_from_product_name( $b_name, $manifest );
-	}
-
-	/**
-	 * Another row of the same product line still lists this site (typical upgrade exchange).
-	 *
-	 * @param array<int, array<string, mixed>> $rich      Rich license list.
-	 * @param array<string, mixed>             $successor Entitled successor row.
-	 * @param string                           $hostname  Site hostname.
-	 * @return bool
-	 */
-	private static function has_superseded_site_activation_for_product(
-		array $rich,
-		array $successor,
-		string $hostname
-	): bool {
-		$successor_key = (string) ( $successor['licenseKey'] ?? '' );
-
-		foreach ( self::normalize_list( $rich ) as $row ) {
-			if ( (string) ( $row['licenseKey'] ?? '' ) === $successor_key ) {
-				continue;
-			}
-
-			if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
-				continue;
-			}
-
-			if ( ! self::is_same_product_line_row( $successor, $row ) ) {
-				continue;
-			}
-
-			if ( self::is_predecessor_license_row( $row, $successor ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		return License_Product_Map::addon_id_from_product_name( $name );
 	}
 
 	/**
@@ -1516,7 +1216,7 @@ class License {
 			return false;
 		}
 
-		if ( ! self::is_same_product_line_row( $predecessor, $successor ) ) {
+		if ( self::product_line_key_for_row( $predecessor ) !== self::product_line_key_for_row( $successor ) ) {
 			return false;
 		}
 
@@ -1548,83 +1248,16 @@ class License {
 			return false;
 		}
 
-		foreach ( self::get_addon_key_map() as $mapped_key ) {
+		foreach ( License_Site_Activation::get_active_license_keys() as $mapped_key ) {
+			$mapped_key = trim( (string) $mapped_key );
 			if ( '' !== $mapped_key && $mapped_key !== $new_key ) {
 				return true;
 			}
 		}
 
-		return false;
-	}
-
-	/**
-	 * Whether any incoming new key still needs a shop /license/activate call on this site.
-	 *
-	 * @param array<int, array<string, mixed>> $existing Stored licenses.
-	 * @param array<int, array<string, mixed>> $merged   Merged list after exchange.
-	 * @return bool
-	 */
-	private static function incoming_new_keys_need_shop_activation( array $existing, array $merged ): bool {
-		$hostname      = self::get_site_hostname();
-		$existing_keys = [];
-
-		foreach ( self::normalize_list( $existing ) as $row ) {
-			$key = (string) ( $row['licenseKey'] ?? '' );
-			if ( '' !== $key ) {
-				$existing_keys[ $key ] = true;
-			}
-		}
-
-		foreach ( self::normalize_list( $merged ) as $row ) {
-			$key = (string) ( $row['licenseKey'] ?? '' );
-			if ( '' === $key || isset( $existing_keys[ $key ] ) ) {
-				continue;
-			}
-
-			if ( ! self::is_license_entitled( $row ) ) {
-				continue;
-			}
-
-			if ( self::is_upgrade_successor_with_site_already_in_use( $merged, $row ) ) {
-				continue;
-			}
-
-			if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Whether exchange rows include a new entitled license replacing one already used on site.
-	 *
-	 * @param array<int, array<string, mixed>> $existing Stored licenses.
-	 * @param array<int, array<string, mixed>> $merged   Merged list after exchange.
-	 * @return bool
-	 */
-	private static function incoming_has_upgrade_successor_with_site_in_use( array $existing, array $merged ): bool {
-		$existing_keys = [];
-
-		foreach ( self::normalize_list( $existing ) as $row ) {
-			$key = (string) ( $row['licenseKey'] ?? '' );
-			if ( '' !== $key ) {
-				$existing_keys[ $key ] = true;
-			}
-		}
-
-		foreach ( self::normalize_list( $merged ) as $row ) {
-			$key = (string) ( $row['licenseKey'] ?? '' );
-			if ( '' === $key || isset( $existing_keys[ $key ] ) ) {
-				continue;
-			}
-
-			if ( ! self::is_license_entitled( $row ) ) {
-				continue;
-			}
-
-			if ( self::is_upgrade_successor_with_site_already_in_use( $merged, $row ) ) {
+		foreach ( self::get_addon_key_map() as $mapped_key ) {
+			$mapped_key = trim( (string) $mapped_key );
+			if ( '' !== $mapped_key && $mapped_key !== $new_key ) {
 				return true;
 			}
 		}
@@ -1635,16 +1268,27 @@ class License {
 	/**
 	 * Mirror rich licenses to per-addon options; optionally install only one license's add-on(s).
 	 *
-	 * @param array<int, array<string, mixed>> $rich                     Rich license list.
-	 * @param string                           $install_only_license_key When set (licenses UI activate), only that row's package is installed.
-	 * @param bool                             $install_packages         When false, only update option mirrors (no zip download).
-	 * @param string                           $install_only_addon_id    installed addon id.
-	 * @param bool                             $install_only             install only.
+	 * @param array<int, array<string, mixed>> $rich Rich license list.
+	 * @param array<string, mixed>             $args {
+	 *     Optional. Sync options.
+	 *
+	 *     @type string $install_only_license_key License key to install packages for.
+	 *     @type bool   $install_packages         When false, only update option mirrors.
+	 *     @type string $install_only_addon_id    Scoped add-on id for All Access.
+	 *     @type bool   $install_only             Download package only (no plugin activation).
+	 *     @type bool   $update_legacy_map        Whether to update site-activation / legacy map.
+	 * }
 	 * @return WP_Error|null Null on success, error when package install fails during scoped activation.
 	 */
-	public static function sync_addon_options_from_rich( array $rich, string $install_only_license_key = '', bool $install_packages = true, string $install_only_addon_id = '', bool $install_only = false, bool $update_legacy_map = true ): ?WP_Error {
+	public static function sync_addon_options_from_rich( array $rich, array $args = [] ): ?WP_Error {
+		$install_only_license_key = (string) ( $args['install_only_license_key'] ?? '' );
+		$install_packages         = (bool) ( $args['install_packages'] ?? true );
+		$install_only_addon_id    = (string) ( $args['install_only_addon_id'] ?? '' );
+		$install_only             = (bool) ( $args['install_only'] ?? false );
+		$update_legacy_map        = (bool) ( $args['update_legacy_map'] ?? true );
+
 		$assignments = self::resolve_addon_license_assignments( $rich );
-		$addons      = self::get_addons_for_license_map( null );
+		$addons      = License_Product_Map::addon_manifest();
 
 		$install_only_license_key = trim( $install_only_license_key );
 		$install_only_addon_id    = sanitize_key( trim( $install_only_addon_id ) );
@@ -1653,24 +1297,17 @@ class License {
 
 		if ( '' !== $install_only_license_key ) {
 			$install_addon_ids = [];
-			foreach ( $rich as $license_row ) {
-				if ( ! is_array( $license_row ) ) {
-					continue;
-				}
-				if ( (string) ( $license_row['licenseKey'] ?? '' ) !== $install_only_license_key ) {
-					continue;
-				}
-				$activating_row = $license_row;
+			$activating_row    = License_Utils::get_rich_license_row_by_key( $rich, $install_only_license_key );
 
+			if ( is_array( $activating_row ) ) {
 				if ( '' !== $install_only_addon_id ) {
 					$install_addon_ids = [ $install_only_addon_id ];
-				} elseif ( License_Product_Map::is_all_access_bundle_name( (string) ( $license_row['name'] ?? '' ) ) ) {
+				} elseif ( License_Product_Map::is_all_access_bundle_name( (string) ( $activating_row['name'] ?? '' ) ) ) {
 					// All Access: install each add-on from the Licenses UI (one request per package).
 					$install_addon_ids = [];
 				} else {
-					$install_addon_ids = self::get_addon_ids_for_license_row( $license_row );
+					$install_addon_ids = self::get_addon_ids_for_license_row( $activating_row );
 				}
-				break;
 			}
 		}
 
@@ -1709,21 +1346,25 @@ class License {
 				! isset( $assignments[ $addon_id ] )
 				|| ! self::is_license_entitled( $assignments[ $addon_id ]['row'] )
 			) {
-				self::clear_addon_license_mirror( $addon_id );
 				continue;
 			}
 
 			$row         = $assignments[ $addon_id ]['row'];
 			$license_key = (string) $assignments[ $addon_id ]['licenseKey'];
 			$expires     = ! empty( $row['expiryDate'] ) ? (string) $row['expiryDate'] : false;
-			$aa_on_site  = self::find_all_access_license_active_on_site( $rich );
+			$aa_on_site  = self::find_all_access_row( $rich, 'on_site' );
+
+			$mirror_aa = in_array( $addon_id, self::get_aa_activated_addon_ids(), true );
+			if ( ! $mirror_aa && '' !== $install_only_addon_id && $install_only_addon_id === $addon_id && ! $install_only ) {
+				self::add_aa_activated_addon_id( $addon_id );
+				$mirror_aa = true;
+			}
 
 			if (
 				null !== $aa_on_site
 				&& (string) ( $aa_on_site['licenseKey'] ?? '' ) === $license_key
-				&& ! self::should_mirror_all_access_addon_on_site( $addon_id, $install_only_addon_id, $install_only )
+				&& ! $mirror_aa
 			) {
-				self::clear_addon_license_mirror( $addon_id );
 				continue;
 			}
 
@@ -1761,10 +1402,7 @@ class License {
 			);
 		}
 
-		$addon_id = License_Product_Map::addon_id_from_product_name(
-			(string) ( $row['name'] ?? '' ),
-			self::build_addon_manifest()
-		);
+		$addon_id = License_Product_Map::addon_id_from_product_name( (string) ( $row['name'] ?? '' ) );
 
 		return null !== $addon_id ? [ $addon_id ] : [];
 	}
@@ -1783,28 +1421,7 @@ class License {
 			return true;
 		}
 
-		return License_Product_Map::addon_id_from_product_name( $name, self::build_addon_manifest() ) === $addon_id;
-	}
-
-	/**
-	 * Catalog entries relevant to installing one add-on (not filtered by installed plugins).
-	 *
-	 * @param array<string, mixed> $row      Assigned license row.
-	 * @param string               $addon_id Add-on being installed (e.g. tracking).
-	 * @return array<string, array<string, mixed>>
-	 */
-	private static function get_licenses_catalogs( array $row, string $addon_id ): array {
-		$catalog = self::get_addon_plugin_catalog();
-
-		if ( License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) ) ) {
-			return $catalog;
-		}
-
-		if ( ! isset( $catalog[ $addon_id ] ) ) {
-			return [];
-		}
-
-		return [ $addon_id => $catalog[ $addon_id ] ];
+		return License_Product_Map::addon_id_from_product_name( $name ) === $addon_id;
 	}
 
 	/**
@@ -1815,12 +1432,16 @@ class License {
 	 * @return array<string, mixed>
 	 */
 	private static function resolve_install_license_row( string $addon_id, array $assignment_row ): array {
+		if ( '' !== self::get_download_url_for_addon( $assignment_row, $addon_id ) ) {
+			return $assignment_row;
+		}
+
 		$rich = self::get_licenses();
 		if ( ! is_array( $rich ) || [] === $rich ) {
 			return $assignment_row;
 		}
 
-		$manifest   = self::build_addon_manifest();
+		$manifest   = License_Product_Map::addon_manifest();
 		$best       = null;
 		$best_score = -1;
 
@@ -1829,8 +1450,7 @@ class License {
 				continue;
 			}
 
-			$download_url = trim( (string) ( $license_row['download_url'] ?? '' ) );
-			if ( '' === $download_url ) {
+			if ( '' === self::get_download_url_for_addon( $license_row, $addon_id ) ) {
 				continue;
 			}
 
@@ -1862,46 +1482,19 @@ class License {
 	 * @return array<string, array{id: string, file: string, title: string}>
 	 */
 	private static function get_addon_plugin_catalog(): array {
-		$titles = [
-			'pro'        => 'Advanced Ads Pro',
-			'responsive' => 'AMP Ads',
-			'gam'        => 'Google Ad Manager Integration',
-			'layer'      => 'PopUp and Layer Ads',
-			'selling'    => 'Selling Ads',
-			'sticky'     => 'Sticky Ads',
-			'tracking'   => 'Tracking',
-		];
-
 		$catalog = [];
-		foreach ( Addons::plugin_files() as $addon_id => $file ) {
-			$catalog[ $addon_id ] = [
-				'id'    => $addon_id,
-				'file'  => $file,
-				'title' => $titles[ $addon_id ] ?? $addon_id,
+		foreach ( License_Product_Map::addon_manifest() as $row ) {
+			if ( empty( $row['id'] ) ) {
+				continue;
+			}
+			$catalog[ (string) $row['id'] ] = [
+				'id'    => (string) $row['id'],
+				'file'  => (string) $row['path'],
+				'title' => (string) $row['name'],
 			];
 		}
 
 		return $catalog;
-	}
-
-	/**
-	 * Plugin bootstrap file for an add-on id.
-	 *
-	 * @param string $addon_id Short add-on id.
-	 * @return string|null
-	 */
-	private static function get_plugin_file_for_addon_id( string $addon_id ): ?string {
-		return License_Package_Installer::plugin_file_for_addon_id( $addon_id );
-	}
-
-	/**
-	 * Whether the add-on plugin directory / bootstrap file is already on disk.
-	 *
-	 * @param string $addon_id Short add-on id.
-	 * @return bool
-	 */
-	private static function is_addon_plugin_on_disk( string $addon_id ): bool {
-		return License_Package_Installer::is_addon_on_disk( $addon_id );
 	}
 
 	/**
@@ -1934,64 +1527,6 @@ class License {
 	}
 
 	/**
-	 * Whether an All Access row lists different download_url values per add-on.
-	 *
-	 * @param array<string, mixed> $row License row.
-	 * @return bool
-	 */
-	private static function license_row_has_distinct_addon_download_urls( array $row ): bool {
-		$addons = $row['addons'] ?? [];
-		if ( ! is_array( $addons ) || [] === $addons ) {
-			return false;
-		}
-
-		$urls = [];
-		foreach ( $addons as $entry ) {
-			if ( ! is_array( $entry ) ) {
-				continue;
-			}
-
-			$url = trim( (string) ( $entry['download_url'] ?? '' ) );
-			if ( '' !== $url ) {
-				$urls[] = $url;
-			}
-		}
-
-		return count( array_unique( $urls ) ) > 1;
-	}
-
-	/**
-	 * Add-on manifest for license name resolution (always includes missing add-ons).
-	 *
-	 * @return array<string, array{id: string, name: string, options_slug: string}>
-	 */
-	private static function build_addon_manifest(): array {
-		$slug_base = defined( 'ADVADS_SLUG' ) ? ADVADS_SLUG : 'advanced-ads';
-		$names     = [
-			'pro'        => 'Pro',
-			'responsive' => 'AMP Ads',
-			'gam'        => 'Google Ad Manager Integration',
-			'layer'      => 'PopUp and Layer Ads',
-			'selling'    => 'Selling Ads',
-			'sticky'     => 'Sticky Ads',
-			'tracking'   => 'Tracking',
-		];
-		$out       = [];
-
-		foreach ( Addons::plugin_files() as $addon_id => $file ) {
-			$slug         = $slug_base . '-' . $addon_id;
-			$out[ $slug ] = [
-				'id'           => $addon_id,
-				'name'         => $names[ $addon_id ] ?? $addon_id,
-				'options_slug' => $slug,
-				'path'         => $file,
-			];
-		}
-
-		return $out;
-	}
-
-	/**
 	 * Ensure the license is activated on the shop and return a row with fresh package URLs.
 	 *
 	 * Package downloads are validated by EDD SL on the shop. Local sitesActivated rows alone are not enough.
@@ -2007,112 +1542,48 @@ class License {
 
 		$hostname = self::get_site_hostname();
 		$rich     = self::get_licenses();
-
-		if ( '' !== $hostname ) {
-			foreach ( $rich as $stored ) {
-				if ( ! is_array( $stored ) || (string) ( $stored['licenseKey'] ?? '' ) !== $license_key ) {
-					continue;
-				}
-				if ( self::is_site_activated_on_license( $stored, $hostname ) ) {
-					if ( self::should_sync_successor_activation_to_shop( $rich, $stored ) ) {
-						$rich = self::sync_successor_activation_to_shop( $rich, $license_key );
-						update_option( self::OPTION_RICH, $rich, false );
-
-						foreach ( $rich as $fresh ) {
-							if ( is_array( $fresh ) && (string) ( $fresh['licenseKey'] ?? '' ) === $license_key ) {
-								return $fresh;
-							}
-						}
-					}
-
-					return $stored;
-				}
-			}
-
-			if ( self::is_site_activated_on_license( $row, $hostname ) ) {
-				return $row;
-			}
+		$stored   = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
+		if ( is_array( $stored ) ) {
+			$row = $stored;
 		}
 
-		if ( self::is_upgrade_successor_with_site_already_in_use( $rich, $row ) ) {
-			$rich = self::promote_successor_license_on_shop( $rich, $license_key, true );
-			update_option( self::OPTION_RICH, $rich, false );
+		if ( '' !== $hostname && self::is_site_activated_on_license( $row, $hostname ) ) {
+			if ( is_array( $stored ) && 'sync' === self::successor_shop_action( $rich, $stored ) ) {
+				$rich = self::promote_upgrade_successor( $rich, $license_key, false );
+				update_option( self::OPTION_RICH, $rich, false );
+				$fresh = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
 
-			foreach ( $rich as $fresh ) {
-				if ( is_array( $fresh ) && (string) ( $fresh['licenseKey'] ?? '' ) === $license_key ) {
-					return $fresh;
-				}
+				return is_array( $fresh ) ? $fresh : $stored;
 			}
 
 			return $row;
 		}
 
-		$activated = self::request_shop_activate( $license_key );
+		if ( 'migrate' === self::successor_shop_action( $rich, $row ) ) {
+			$rich = self::promote_upgrade_successor( $rich, $license_key, true );
+			update_option( self::OPTION_RICH, $rich, false );
+			$fresh = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
+
+			return is_array( $fresh ) ? $fresh : $row;
+		}
+
+		$activated = self::activate_on_shop_then_local( $license_key, $rich );
 		if ( is_wp_error( $activated ) ) {
 			return $activated;
 		}
 
-		if ( [] !== $activated ) {
-			foreach ( $activated as $fresh ) {
-				if ( is_array( $fresh ) && (string) ( $fresh['licenseKey'] ?? '' ) === $license_key ) {
-					$row = $fresh;
-					break;
-				}
-			}
+		update_option( self::OPTION_RICH, $activated, false );
+		$fresh_row = License_Utils::get_rich_license_row_by_key( $activated, $license_key );
+		if ( ! is_array( $fresh_row ) ) {
+			$fresh_row = $row;
 		}
 
-		$refreshed = self::fetch_license_row_from_shop( $row );
+		$refreshed = License_Shop_Client::fetch_license_row( $fresh_row );
 		if ( is_wp_error( $refreshed ) ) {
-			if ( [] !== $activated ) {
-				return $row;
-			}
-
-			return $refreshed;
+			return $fresh_row;
 		}
 
-		return is_array( $refreshed ) ? $refreshed : $row;
-	}
-
-	/**
-	 * Validate all persisted licenses against the shop and refresh local rows + mirrors.
-	 *
-	 * @return array<int, array<string, mixed>>
-	 */
-	public static function validate_persisted_licenses_from_shop(): array {
-		$rich = self::get_licenses();
-		if ( [] === $rich ) {
-			return [];
-		}
-
-		foreach ( $rich as $index => $row ) {
-			if ( ! is_array( $row ) ) {
-				continue;
-			}
-
-			$license_key = trim( (string) ( $row['licenseKey'] ?? '' ) );
-			if ( '' === $license_key ) {
-				continue;
-			}
-
-			$fresh = self::fetch_license_row_from_shop( $row );
-			if ( is_wp_error( $fresh ) ) {
-				if ( self::is_shop_validate_not_found_error( $fresh ) ) {
-					$row['status'] = 'expired';
-					$rich[ $index ] = $row;
-				}
-				continue;
-			}
-
-			if ( is_array( $fresh ) ) {
-				$rich[ $index ] = $fresh;
-			}
-		}
-
-		update_option( self::OPTION_RICH, $rich, false );
-
-		$rich = self::reconcile_persisted_licenses( $rich, false, false );
-
-		return self::finalize_license_sync( $rich );
+		return is_array( $refreshed ) ? $refreshed : $fresh_row;
 	}
 
 	/**
@@ -2146,12 +1617,12 @@ class License {
 		}
 
 		$row   = $rich[ $index ];
-		$fresh = self::fetch_license_row_from_shop( $row );
+		$fresh = License_Shop_Client::fetch_license_row( $row );
 
 		if ( is_wp_error( $fresh ) ) {
-			if ( self::is_shop_validate_not_found_error( $fresh ) ) {
-				$row['status']    = 'expired';
-				$rich[ $index ]   = $row;
+			if ( License_Shop_Client::is_validate_not_found_error( $fresh ) ) {
+				$row['status']  = 'expired';
+				$rich[ $index ] = $row;
 				update_option( self::OPTION_RICH, $rich, false );
 				$rich = self::reconcile_persisted_licenses( $rich, false, false );
 
@@ -2173,26 +1644,6 @@ class License {
 	}
 
 	/**
-	 * Whether a shop validate error means the license key no longer exists.
-	 *
-	 * @param WP_Error $error Error from {@see self::fetch_license_row_from_shop()}.
-	 * @return bool
-	 */
-	private static function is_shop_validate_not_found_error( WP_Error $error ): bool {
-		return License_Shop_Client::is_validate_not_found_error( $error );
-	}
-
-	/**
-	 * Fetch one license row from the shop validate endpoint (fresh status, URLs, activations).
-	 *
-	 * @param array<string, mixed> $row License row containing licenseKey.
-	 * @return array<string, mixed>|WP_Error Updated row or error.
-	 */
-	public static function fetch_license_row_from_shop( array $row ) {
-		return License_Shop_Client::fetch_license_row( $row );
-	}
-
-	/**
 	 * Download add-on zip from license row, install into wp-content/plugins, activate when valid.
 	 *
 	 * Target path comes from the static add-on catalog ($addon_id), not from get_plugins().
@@ -2205,11 +1656,15 @@ class License {
 	 * @return bool|WP_Error
 	 */
 	public static function install_addon_from_download_url( array $row, string $addon_id, bool $force_install = false, bool $skip_activation = false ) {
+		if ( class_exists( \ActionScheduler_QueueRunner::class, false ) ) {
+			\ActionScheduler_QueueRunner::instance()->unhook_dispatch_async_request();
+		}
+
 		if ( ! self::is_license_entitled( $row ) ) {
 			return true;
 		}
 
-		$plugin_file = self::get_plugin_file_for_addon_id( $addon_id );
+		$plugin_file = self::plugin_file_for_addon_id( $addon_id );
 		if ( null === $plugin_file ) {
 			return true;
 		}
@@ -2250,7 +1705,7 @@ class License {
 			);
 		}
 
-		$is_on_disk = self::is_addon_plugin_on_disk( $addon_id );
+		$is_on_disk = Addons::is_addon_on_disk( $addon_id );
 
 		if ( ! $is_on_disk ) {
 			$installed = self::install_addon_package( $download_url, $addon_id, $row, ! $force_install );
@@ -2259,11 +1714,17 @@ class License {
 			}
 		}
 
-		if ( $skip_activation || ! self::is_license_active( $row ) || ! $can_activate ) {
+		$hostname            = self::get_site_hostname();
+		$same_site_entitled  = self::is_license_entitled( $row )
+			&& '' !== $hostname
+			&& self::is_site_activated_on_license( $row, $hostname );
+		$may_activate_plugin = self::is_license_active( $row ) || $same_site_entitled;
+
+		if ( $skip_activation || ! $may_activate_plugin || ! $can_activate ) {
 			return true;
 		}
 
-		if ( ! self::is_addon_plugin_on_disk( $addon_id ) ) {
+		if ( ! Addons::is_addon_on_disk( $addon_id ) ) {
 			return true;
 		}
 
@@ -2281,6 +1742,21 @@ class License {
 	}
 
 	/**
+	 * Plugin bootstrap file for an add-on id, or null when unknown.
+	 *
+	 * @param string $addon_id Short add-on id.
+	 * @return string|null
+	 */
+	private static function plugin_file_for_addon_id( string $addon_id ): ?string {
+		$addon_id = sanitize_key( $addon_id );
+		if ( ! Addons::is_known_addon( $addon_id ) ) {
+			return null;
+		}
+
+		return Addons::resolve_installed_plugin_file( $addon_id ) ?? Addons::plugin_file( $addon_id );
+	}
+
+	/**
 	 * Download and install an add-on package.
 	 *
 	 * @param string               $download_url       Package URL.
@@ -2290,147 +1766,101 @@ class License {
 	 * @return true|false|WP_Error True when install ran, false when skipped.
 	 */
 	private static function install_addon_package( string $download_url, string $addon_id, array $row, bool $skip_if_cached_url = true ) {
-		return License_Package_Installer::install_package(
-			$download_url,
-			$addon_id,
-			self::package_download_cache_key( $download_url, $addon_id, $row ),
-			$skip_if_cached_url,
-			static function () use ( $row, $addon_id, $download_url ): string {
-				$ready = self::ensure_shop_license_ready_for_package_download( $row );
-				if ( is_wp_error( $ready ) || ! is_array( $ready ) ) {
-					return '';
-				}
+		$cache_key = md5( $download_url . '|' . $addon_id );
 
-				$fresh_url = self::get_download_url_for_addon( $ready, $addon_id );
+		if ( $skip_if_cached_url && ! empty( self::$installed_download_urls[ $cache_key ] ) ) {
+			return Addons::is_addon_on_disk( $addon_id ) ? false : self::run_package_install( $download_url, $addon_id );
+		}
 
-				return ( '' !== $fresh_url && $fresh_url !== $download_url ) ? $fresh_url : '';
-			}
-		);
-	}
-
-	/**
-	 * Cache key so All Access shares one zip per request, single products do not block each other.
-	 *
-	 * @param string               $download_url Package URL.
-	 * @param string               $addon_id     Add-on id.
-	 * @param array<string, mixed> $row          License row.
-	 * @return string
-	 */
-	private static function package_download_cache_key( string $download_url, string $addon_id, array $row ): string {
+		$result = self::run_package_install( $download_url, $addon_id );
 		if (
-			License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) )
-			&& ! self::license_row_has_distinct_addon_download_urls( $row )
+			is_wp_error( $result )
+			&& in_array( $result->get_error_code(), [ 'advanced_ads_install_failed', 'advanced_ads_install_wrong_package', 'http_request_failed' ], true )
 		) {
-			return md5( $download_url );
+			$ready = self::ensure_shop_license_ready_for_package_download( $row );
+			if ( ! is_wp_error( $ready ) && is_array( $ready ) ) {
+				$fresh_url = self::get_download_url_for_addon( $ready, $addon_id );
+				if ( '' !== $fresh_url && $fresh_url !== $download_url ) {
+					$result = self::run_package_install( $fresh_url, $addon_id );
+				}
+			}
 		}
 
-		return md5( $download_url . '|' . $addon_id );
-	}
-
-	/**
-	 * Whether the configured shop/API host is a local or development environment.
-	 *
-	 * Laragon, Valet, and similar setups use `.test` / `.local` hosts that resolve to
-	 * 127.0.0.1. WordPress then rejects outbound requests via {@see wp_http_validate_url()}
-	 * unless the host is treated as external.
-	 *
-	 * @return bool
-	 */
-	public static function shop_uses_local_development_host(): bool {
-		return License_Shop_Client::uses_local_development_host();
-	}
-
-	/**
-	 * Mark the configured shop host as external for local/development HTTP requests.
-	 *
-	 * @param bool   $is_external Whether WordPress considers the host external.
-	 * @param string $host        Request host.
-	 * @param string $url         Request URL.
-	 * @return bool
-	 */
-	public static function allow_local_development_shop_http_request( $is_external, string $host, string $url ) {
-		return License_Shop_Client::allow_local_development_http_request( $is_external, $host, $url );
-	}
-
-	/**
-	 * Register the local/development shop HTTP bypass for admin add-on updates.
-	 *
-	 * @return void
-	 */
-	public static function register_local_development_shop_http_filters(): void {
-		License_Shop_Client::register_local_development_http_filters();
-	}
-
-	/**
-	 * Shop hosts from {@see AA_SHOP_URL} and {@see Constants::API_ENDPOINT}.
-	 *
-	 * @return string[]
-	 */
-	public static function get_configured_shop_api_hosts(): array {
-		return License_Shop_Client::get_configured_api_hosts();
-	}
-
-	/**
-	 * Temporarily allow shop HTTP during a single license API or download request.
-	 *
-	 * @return void
-	 */
-	private static function add_local_development_shop_http_filter(): void {
-		License_Shop_Client::add_local_development_http_filter();
-	}
-
-	/**
-	 * Remove the temporary local/development shop HTTP bypass.
-	 *
-	 * @return void
-	 */
-	private static function remove_local_development_shop_http_filter(): void {
-		License_Shop_Client::remove_local_development_http_filter();
-	}
-
-	/**
-	 * Whether a package download URL targets the configured shop host (local/staging).
-	 *
-	 * @param string $download_url Package download URL from the shop.
-	 * @return bool
-	 */
-	private static function is_shop_download_url( string $download_url ): bool {
-		return License_Shop_Client::is_shop_download_url( $download_url );
-	}
-
-	/**
-	 * Mark per-addon EDD mirror options as expired (no valid license for this add-on).
-	 *
-	 * @param string $addon_id Short addon id.
-	 * @return void
-	 */
-	private static function clear_addon_license_mirror( string $addon_id ): void {
-		if ( self::is_flat_map_retired() ) {
-			return;
+		if ( is_wp_error( $result ) ) {
+			return $result;
 		}
 
-		$options_slug = License_Utils::options_slug_for_addon_id( $addon_id );
+		self::$installed_download_urls[ $cache_key ] = true;
 
-		update_option( $options_slug . '-license-status', 'expired', false );
-		update_option( $options_slug . '-license-expires', '', false );
+		return true;
 	}
 
 	/**
-	 * Save rich licenses like legacy save_licenses: option + addon map + status mirrors.
-	 * Auto shop activate only when advanced-ads-licenses is empty (first setup). Otherwise use the UI button.
-	 * Shop connect/buy passes $preserve_legacy_map so advanced-ads-licenses is not rebuilt from rich rows.
+	 * Download and unpack a plugin package into wp-content/plugins.
 	 *
-	 * @param array<int, array<string, mixed>> $licenses              Incoming rich licenses.
-	 * @param bool                             $activate_new          Whether exchange/connect asked for activation.
-	 * @param string                           $activating_license_key License key the user activated on the licenses UI.
-	 * @param string                           $activating_addon_id    When set with All Access, install only this add-on.
-	 * @param bool                             $install_only           When true, download package only (no license mirror / plugin activation).
-	 * @param string                           $deactivating_addon_id    When set, deactivate this add-on plugin on the site.
-	 * @param string                           $deactivating_license_key When set, remove this site from that license row.
-	 * @param bool                             $preserve_legacy_map      When true (shop connect/buy), do not overwrite advanced-ads-licenses.
+	 * @param string $download_url Signed shop package URL.
+	 * @param string $addon_id     Expected add-on id (validates extracted folder).
+	 * @return true|WP_Error
+	 */
+	private static function run_package_install( string $download_url, string $addon_id ) {
+		$result = Plugin_Installer::install_from_url( $download_url, true );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		if ( false === $result || null === $result ) {
+			return new WP_Error(
+				'advanced_ads_install_failed',
+				__( 'Add-on install failed. Check that wp-content/plugins is writable and the download URL is reachable from this site.', 'advanced-ads' )
+			);
+		}
+
+		wp_clean_plugins_cache();
+		Addons::get_plugins( true );
+
+		if ( ! Addons::is_addon_on_disk( $addon_id ) ) {
+			$plugin_file = Addons::plugin_file( sanitize_key( $addon_id ) ) ?? '';
+
+			return new WP_Error(
+				'advanced_ads_install_wrong_package',
+				sprintf(
+					/* translators: %s: expected plugin folder, e.g. advanced-ads-tracking */
+					__( 'Downloaded package did not install the expected add-on (%s).', 'advanced-ads' ),
+					'' !== $plugin_file ? dirname( $plugin_file ) : $addon_id
+				)
+			);
+		}
+
+		return true;
+	}
+
+	/**
+	 * Save rich licenses: option + addon map + status mirrors.
+	 *
+	 * @param array<int, array<string, mixed>> $licenses Incoming rich licenses.
+	 * @param array<string, mixed>             $args {
+	 *     Optional. Save options.
+	 *
+	 *     @type bool   $activate_new             Whether exchange/connect asked for activation.
+	 *     @type string $activating_license_key   License key activated on the licenses UI.
+	 *     @type string $activating_addon_id      When set with All Access, install only this add-on.
+	 *     @type bool   $install_only             Download package only (no plugin activation).
+	 *     @type string $deactivating_addon_id    Deactivate this add-on plugin on the site.
+	 *     @type string $deactivating_license_key Remove this site from that license row.
+	 *     @type bool   $preserve_legacy_map      Shop connect/buy: do not overwrite site activation list.
+	 * }
 	 * @return array<int, array<string, mixed>>|WP_Error
 	 */
-	public static function save_licenses( array $licenses, bool $activate_new = false, string $activating_license_key = '', string $activating_addon_id = '', bool $install_only = false, string $deactivating_addon_id = '', string $deactivating_license_key = '', bool $preserve_legacy_map = false ) {
+	public static function save_licenses( array $licenses, array $args = [] ) {
+		$activate_new             = (bool) ( $args['activate_new'] ?? false );
+		$activating_license_key   = (string) ( $args['activating_license_key'] ?? '' );
+		$activating_addon_id      = (string) ( $args['activating_addon_id'] ?? '' );
+		$install_only             = (bool) ( $args['install_only'] ?? false );
+		$deactivating_addon_id    = (string) ( $args['deactivating_addon_id'] ?? '' );
+		$deactivating_license_key = (string) ( $args['deactivating_license_key'] ?? '' );
+		$preserve_legacy_map      = (bool) ( $args['preserve_legacy_map'] ?? false );
+
 		$incoming  = self::normalize_list( $licenses );
 		$existing  = self::get_licenses();
 		$was_empty = [] === $existing;
@@ -2452,6 +1882,9 @@ class License {
 					trim( $activating_license_key ),
 					$activating_addon_id_scoped
 				);
+				if ( is_wp_error( $merged ) ) {
+					return $merged;
+				}
 
 				$merged = self::ensure_all_access_site_slot_for_addon_activation(
 					$merged,
@@ -2471,18 +1904,12 @@ class License {
 		if ( '' !== $deactivating_license_key ) {
 			$deactivated_row = License_Utils::get_rich_license_row_by_key( $merged, $deactivating_license_key );
 
-			$merged = self::deactivate_on_shop_then_local( $deactivating_license_key, $merged );
-			if ( is_wp_error( $merged ) ) {
-				return $merged;
-			}
+			$merged = self::apply_manual_license_deactivation_on_site( $merged, $deactivating_license_key );
 
 			if ( is_array( $deactivated_row ) ) {
 				$name = (string) ( $deactivated_row['name'] ?? '' );
 				if ( ! License_Product_Map::is_all_access_bundle_name( $name ) ) {
-					$addon_id = License_Product_Map::addon_id_from_product_name(
-						$name,
-						self::build_addon_manifest()
-					);
+					$addon_id = License_Product_Map::addon_id_from_product_name( $name );
 
 					$still_active = false;
 					$hostname     = self::get_site_hostname();
@@ -2490,7 +1917,7 @@ class License {
 						if ( ! is_array( $row ) ) {
 							continue;
 						}
-						if ( ! self::is_same_product_line_row( $row, $deactivated_row ) ) {
+						if ( self::product_line_key_for_row( $row ) !== self::product_line_key_for_row( $deactivated_row ) ) {
 							continue;
 						}
 						if ( self::is_site_activated_on_license( $row, $hostname ) ) {
@@ -2509,8 +1936,8 @@ class License {
 			}
 
 			update_option( self::OPTION_RICH, $merged, false );
-			self::sync_addon_options_from_rich( $merged, '', false );
-			self::persist_addon_key_map( self::build_persisted_addon_key_map_from_rich( $merged ) );
+			self::sync_addon_options_from_rich( $merged, [ 'install_packages' => false ] );
+			self::persist_derived_addon_key_map( $merged );
 
 			return self::finalize_license_sync( $merged );
 		}
@@ -2522,18 +1949,19 @@ class License {
 				return $deactivate_error;
 			}
 
-			self::sync_addon_options_from_rich( $merged, '', false );
-			self::persist_addon_key_map( self::build_persisted_addon_key_map_from_rich( $merged ) );
+			self::sync_addon_options_from_rich( $merged, [ 'install_packages' => false ] );
+			self::persist_derived_addon_key_map( $merged );
 
 			return self::finalize_license_sync( $merged );
 		}
 
-		$has_new_keys      = $activate_new && self::has_new_incoming_license_keys( $existing, $incoming );
+		$incoming_flags    = self::classify_incoming_keys( $existing, $merged );
+		$has_new_keys      = $activate_new && $incoming_flags['has_new_keys'];
 		$try_shop_activate = self::should_run_shop_auto_activate( $was_empty || $activate_new );
 		if ( ! $try_shop_activate && $has_new_keys ) {
-			$try_shop_activate = self::incoming_new_keys_need_shop_activation( $existing, $merged );
+			$try_shop_activate = $incoming_flags['needs_shop_activation'];
 		}
-		if ( $has_new_keys && self::incoming_has_upgrade_successor_with_site_in_use( $existing, $merged ) ) {
+		if ( $has_new_keys && $incoming_flags['has_upgrade_successor'] ) {
 			$try_shop_activate = false;
 		}
 
@@ -2544,7 +1972,7 @@ class License {
 			&& '' === trim( $activating_license_key )
 			&& ! $has_new_keys
 		) {
-			$synced = self::sync_local_activations_to_shop( $merged, $existing );
+			$synced = self::sync_active_keys_to_shop( $merged, $existing );
 			if ( is_wp_error( $synced ) ) {
 				return $synced;
 			}
@@ -2556,7 +1984,7 @@ class License {
 		$merged = self::reconcile_persisted_licenses(
 			$merged,
 			$try_shop_activate,
-			'' === trim( $activating_license_key )
+			trim( $activating_license_key ) === ''
 				&& '' === trim( $deactivating_license_key )
 				&& '' === trim( $deactivating_addon_id )
 				&& ! $try_shop_activate
@@ -2564,18 +1992,20 @@ class License {
 
 		$sync_error = self::sync_addon_options_from_rich(
 			$merged,
-			trim( $activating_license_key ),
-			true,
-			trim( $activating_addon_id ),
-			$install_only,
-			! $preserve_legacy_map
+			[
+				'install_only_license_key' => trim( $activating_license_key ),
+				'install_packages'         => true,
+				'install_only_addon_id'    => trim( $activating_addon_id ),
+				'install_only'             => $install_only,
+				'update_legacy_map'        => ! $preserve_legacy_map,
+			]
 		);
 		if ( is_wp_error( $sync_error ) ) {
 			return $sync_error;
 		}
 
-		if ( ! $install_only && ! $preserve_legacy_map && ! self::has_stored_legacy_license_map() ) {
-			self::persist_addon_key_map( self::build_persisted_addon_key_map_from_rich( $merged ) );
+		if ( ! $install_only && ! $preserve_legacy_map ) {
+			self::persist_derived_addon_key_map( $merged );
 		}
 
 		return self::finalize_license_sync( $merged );
@@ -2604,21 +2034,14 @@ class License {
 	}
 
 	/**
-	 * Drop an add-on from the All Access UI list when a single-product license takes over on site.
-	 *
-	 * @param array<int, array<string, mixed>> $rich                  Rich license list.
-	 * @param string                           $activating_license_key License key the user activated.
-	 * @return void
-	 */
-	/**
-	 * When one add-on is activated under All Access, drop that product's single license on this site.
+	 * When one add-on is activated under All Access, deactivate that product's single license on this site.
 	 *
 	 * @param array<int, array<string, mixed>> $rich                  Rich license list.
 	 * @param string                           $all_access_license_key All Access license key from the UI.
 	 * @param string                           $addon_id               Short add-on id (pro, tracking, …).
-	 * @return array<int, array<string, mixed>>
+	 * @return array<int, array<string, mixed>>|WP_Error
 	 */
-	private static function detach_single_product_license_from_site_for_addon( array $rich, string $all_access_license_key, string $addon_id ): array {
+	private static function detach_single_product_license_from_site_for_addon( array $rich, string $all_access_license_key, string $addon_id ) {
 		$addon_id = sanitize_key( $addon_id );
 		$hostname = self::get_site_hostname();
 
@@ -2627,7 +2050,7 @@ class License {
 		}
 
 		$all_access_license_key = trim( $all_access_license_key );
-		$manifest               = self::build_addon_manifest();
+		$manifest               = License_Product_Map::addon_manifest();
 		$is_all_access          = false;
 
 		foreach ( $rich as $row ) {
@@ -2647,7 +2070,8 @@ class License {
 			return $rich;
 		}
 
-		foreach ( $rich as $index => $row ) {
+		$keys_to_detach = [];
+		foreach ( $rich as $row ) {
 			if ( ! is_array( $row ) ) {
 				continue;
 			}
@@ -2662,11 +2086,22 @@ class License {
 				continue;
 			}
 
-			if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
+			$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
+			if ( '' === $key ) {
 				continue;
 			}
 
-			$rich[ $index ] = self::remove_site_hostname_from_license_row( $row, $hostname );
+			$on_site = self::is_site_activated_on_license( $row, $hostname )
+				|| License_Site_Activation::is_license_active_on_site( $key );
+			if ( ! $on_site ) {
+				continue;
+			}
+
+			$keys_to_detach[ $key ] = true;
+		}
+
+		foreach ( array_keys( $keys_to_detach ) as $license_key ) {
+			$rich = self::apply_manual_license_deactivation_on_site( $rich, $license_key );
 		}
 
 		return $rich;
@@ -2684,7 +2119,7 @@ class License {
 			return;
 		}
 
-		$manifest = self::build_addon_manifest();
+		$manifest = License_Product_Map::addon_manifest();
 
 		foreach ( $rich as $row ) {
 			if ( ! is_array( $row ) ) {
@@ -2774,7 +2209,7 @@ class License {
 			);
 		}
 
-		$plugin_file = self::get_plugin_file_for_addon_id( $addon_id );
+		$plugin_file = self::plugin_file_for_addon_id( $addon_id );
 		if ( null === $plugin_file ) {
 			return true;
 		}
@@ -2784,60 +2219,51 @@ class License {
 		}
 
 		self::remove_aa_activated_addon_id( $addon_id );
-		self::clear_addon_license_mirror( $addon_id );
 
 		return true;
 	}
 
 	/**
-	 * Entitled All Access row activated for the current site hostname.
+	 * Best All Access row for the given selection mode.
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
+	 * @param string                           $mode `entitled`, `on_site`, or `aa_addons`.
 	 * @return array<string, mixed>|null
 	 */
-	private static function find_all_access_license_active_on_site( array $rich ): ?array {
-		$hostname = self::get_site_hostname();
-		$best     = null;
-		$score    = 0;
+	public static function find_all_access_row( array $rich, string $mode = 'on_site' ): ?array {
+		if ( 'entitled' === $mode ) {
+			$best       = null;
+			$best_score = 0;
 
-		foreach ( self::normalize_list( $rich ) as $row ) {
-			if ( ! is_array( $row ) || empty( $row['licenseKey'] ) || empty( $row['name'] ) ) {
-				continue;
-			}
-			if ( ! License_Product_Map::is_all_access_bundle_name( (string) $row['name'] ) ) {
-				continue;
-			}
-			if ( ! self::is_license_entitled( $row ) ) {
-				continue;
-			}
-			if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
-				continue;
+			foreach ( self::normalize_list( $rich ) as $row ) {
+				if ( ! is_array( $row ) || empty( $row['licenseKey'] ) || empty( $row['name'] ) ) {
+					continue;
+				}
+				if ( ! License_Product_Map::is_all_access_bundle_name( (string) $row['name'] ) ) {
+					continue;
+				}
+				if ( ! self::is_license_entitled( $row ) ) {
+					continue;
+				}
+
+				$score = self::license_priority_score( $row, true );
+				if ( $score > $best_score ) {
+					$best_score = $score;
+					$best       = $row;
+				}
 			}
 
-			$row_score = self::license_priority_score( $row, true );
-			if ( $row_score > $score ) {
-				$score = $row_score;
-				$best  = $row;
-			}
-		}
-
-		if ( null !== $best ) {
 			return $best;
 		}
 
-		$map_keys = [];
-		foreach ( License_Utils::normalize_legacy_map( get_option( self::OPTION_LEGACY_MAP, [] ) ) as $mapped_key ) {
-			$mapped_key = trim( (string) $mapped_key );
-			if ( '' !== $mapped_key ) {
-				$map_keys[ $mapped_key ] = true;
-			}
-		}
+		$hostname = self::get_site_hostname();
+		$map_keys = array_fill_keys( License_Site_Activation::get_active_license_keys(), true );
 
-		if ( [] === $map_keys ) {
-			return null;
-		}
+		$best_on_site  = null;
+		$score_on_site = 0;
+		$best_mapped   = null;
+		$score_mapped  = 0;
 
-		$score = 0;
 		foreach ( self::normalize_list( $rich ) as $row ) {
 			if ( ! is_array( $row ) || empty( $row['licenseKey'] ) || empty( $row['name'] ) ) {
 				continue;
@@ -2849,19 +2275,29 @@ class License {
 				continue;
 			}
 
-			$key = (string) $row['licenseKey'];
-			if ( ! isset( $map_keys[ $key ] ) ) {
-				continue;
+			$row_score = self::license_priority_score( $row, true );
+			$key       = (string) $row['licenseKey'];
+
+			if ( self::is_site_activated_on_license( $row, $hostname ) && $row_score > $score_on_site ) {
+				$score_on_site = $row_score;
+				$best_on_site  = $row;
 			}
 
-			$row_score = self::license_priority_score( $row, true );
-			if ( $row_score > $score ) {
-				$score = $row_score;
-				$best  = $row;
+			if ( isset( $map_keys[ $key ] ) && $row_score > $score_mapped ) {
+				$score_mapped = $row_score;
+				$best_mapped  = $row;
 			}
 		}
 
-		return $best;
+		if ( null !== $best_on_site ) {
+			return $best_on_site;
+		}
+
+		if ( 'aa_addons' === $mode ) {
+			return [] !== self::get_aa_activated_addon_ids() ? $best_mapped : null;
+		}
+
+		return $best_mapped;
 	}
 
 	/**
@@ -2879,28 +2315,20 @@ class License {
 			return $rich;
 		}
 
-		foreach ( self::normalize_list( $rich ) as $row ) {
-			if ( (string) ( $row['licenseKey'] ?? '' ) !== $license_key ) {
-				continue;
-			}
-			if ( ! License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) ) ) {
-				return $rich;
-			}
-
-			if ( self::is_site_activated_on_license( $row, $hostname ) ) {
-				return $rich;
-			}
-
-			foreach ( (array) ( $row['addons'] ?? [] ) as $addon ) {
-				if ( is_array( $addon ) && '' !== trim( (string) ( $addon['download_url'] ?? '' ) ) ) {
-					return $rich;
-				}
-			}
-
-			return self::activate_on_shop_then_local( $license_key, $rich );
+		$row = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
+		if ( ! is_array( $row ) ) {
+			return $rich;
+		}
+		if ( ! License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) ) ) {
+			return $rich;
 		}
 
-		return $rich;
+		$merged = self::shop_activate_and_merge( $license_key, $rich );
+		if ( is_wp_error( $merged ) ) {
+			return $merged;
+		}
+
+		return self::ensure_local_site_slot_on_license( $merged, $license_key );
 	}
 
 	/**
@@ -2916,15 +2344,9 @@ class License {
 			return 0;
 		}
 
-		foreach ( self::normalize_list( $rich ) as $row ) {
-			if ( (string) ( $row['licenseKey'] ?? '' ) !== $license_key ) {
-				continue;
-			}
+		$row = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
 
-			return (int) ( $row['licenseId'] ?? 0 );
-		}
-
-		return 0;
+		return is_array( $row ) ? (int) ( $row['licenseId'] ?? 0 ) : 0;
 	}
 
 	/**
@@ -2955,8 +2377,8 @@ class License {
 			return $rich;
 		}
 
+		// One winner license key per product line (higher priority score wins).
 		$line_winners = [];
-		$line_scores  = [];
 
 		foreach ( self::normalize_list( $rich ) as $row ) {
 			$key = (string) ( $row['licenseKey'] ?? '' );
@@ -2967,21 +2389,17 @@ class License {
 				continue;
 			}
 
-			$is_bundle = License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) );
-			$score     = self::license_priority_score( $row, $is_bundle );
+			$line  = (string) ( self::product_line_key_for_row( $row ) ?? '' );
+			$score = self::license_priority_score(
+				$row,
+				License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) )
+			);
 
-			$rep_key = $key;
-			foreach ( array_keys( $line_winners ) as $existing_rep ) {
-				$rep_row = License_Utils::get_rich_license_row_by_key( $rich, $existing_rep );
-				if ( is_array( $rep_row ) && self::is_same_product_line_row( $row, $rep_row ) ) {
-					$rep_key = $existing_rep;
-					break;
-				}
-			}
-
-			if ( ! isset( $line_winners[ $rep_key ] ) || $score > $line_scores[ $rep_key ] ) {
-				$line_winners[ $rep_key ] = $key;
-				$line_scores[ $rep_key ]  = $score;
+			if ( ! isset( $line_winners[ $line ] ) || $score > $line_winners[ $line ]['score'] ) {
+				$line_winners[ $line ] = [
+					'key'   => $key,
+					'score' => $score,
+				];
 			}
 		}
 
@@ -2991,21 +2409,9 @@ class License {
 			}
 
 			$key  = (string) ( $row['licenseKey'] ?? '' );
-			$drop = ! isset( $allowed[ $key ] );
-
-			if ( ! $drop ) {
-				$winner = $key;
-				foreach ( $line_winners as $rep => $winner_key ) {
-					$rep_row = License_Utils::get_rich_license_row_by_key( $rich, $rep );
-					if ( is_array( $rep_row ) && self::is_same_product_line_row( $row, $rep_row ) ) {
-						$winner = $winner_key;
-						break;
-					}
-				}
-				if ( $key !== $winner ) {
-					$drop = true;
-				}
-			}
+			$line = (string) ( self::product_line_key_for_row( $row ) ?? '' );
+			$drop = ! isset( $allowed[ $key ] )
+				|| ( isset( $line_winners[ $line ] ) && $key !== $line_winners[ $line ]['key'] );
 
 			if ( $drop ) {
 				$rich[ $index ] = self::remove_site_hostname_from_license_row( $row, $hostname );
@@ -3016,21 +2422,13 @@ class License {
 	}
 
 	/**
-	 * License keys that may hold this site's activation slot (flat map + entitled rows with site).
+	 * License keys that may hold this site's activation slot (site-activation list + entitled rows with site).
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @return array<string, bool>
 	 */
 	public static function resolve_allowed_site_license_keys( array $rich ): array {
-		$allowed    = [];
-		$stored_map = License_Utils::normalize_legacy_map( get_option( self::OPTION_LEGACY_MAP, [] ) );
-
-		foreach ( $stored_map as $key ) {
-			$key = trim( (string) $key );
-			if ( '' !== $key ) {
-				$allowed[ $key ] = true;
-			}
-		}
+		$allowed = array_fill_keys( License_Site_Activation::get_active_license_keys(), true );
 
 		$hostname = self::get_site_hostname();
 		foreach ( self::normalize_list( $rich ) as $row ) {
@@ -3048,44 +2446,28 @@ class License {
 	}
 
 	/**
-	 * Whether an All Access add-on should receive license mirror options on this site.
-	 *
-	 * @param string $addon_id              Short add-on id.
-	 * @param string $install_only_addon_id Add-on from the current Licenses UI request.
-	 * @param bool   $install_only          Download-only request (no activation).
-	 * @return bool
-	 */
-	private static function should_mirror_all_access_addon_on_site( string $addon_id, string $install_only_addon_id, bool $install_only ): bool {
-		if ( in_array( $addon_id, self::get_aa_activated_addon_ids(), true ) ) {
-			return true;
-		}
-
-		if ( '' !== $install_only_addon_id && $install_only_addon_id === $addon_id && ! $install_only ) {
-			self::add_aa_activated_addon_id( $addon_id );
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Remove add-ons from the All Access UI list when another license owns them on site.
+	 * AA add-on ids still valid for this rich list (pure; does not write options).
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @return void
+	 * @return string[]
 	 */
-	public static function sync_aa_activated_addon_ids_with_assignments( array $rich ): void {
-		$aa          = self::find_all_access_license_active_on_site( $rich );
+	private static function prune_aa_activated_addon_ids( array $rich ): array {
+		$aa          = self::find_all_access_row( $rich, 'on_site' );
 		$aa_key      = null !== $aa ? (string) ( $aa['licenseKey'] ?? '' ) : '';
 		$assignments = self::resolve_addon_license_assignments( $rich );
-		$stored_map  = License_Utils::normalize_legacy_map( get_option( self::OPTION_LEGACY_MAP, [] ) );
-		$pruned      = array_values(
+		$active_keys = array_flip( License_Site_Activation::get_active_license_keys() );
+
+		return array_values(
 			array_filter(
 				self::get_aa_activated_addon_ids(),
-				static function ( string $addon_id ) use ( $assignments, $aa_key, $stored_map, $rich ): bool {
-					if ( isset( $stored_map[ $addon_id ] ) ) {
-						$mapped_key = trim( (string) $stored_map[ $addon_id ] );
-						if ( '' !== $mapped_key && License::license_row_exists_for_key( $rich, $mapped_key ) ) {
+				static function ( string $addon_id ) use ( $assignments, $aa_key, $active_keys, $rich ): bool {
+					if ( isset( $assignments[ $addon_id ] ) ) {
+						$mapped_key = trim( (string) $assignments[ $addon_id ]['licenseKey'] );
+						if (
+							'' !== $mapped_key
+							&& isset( $active_keys[ $mapped_key ] )
+							&& null !== License_Utils::get_rich_license_row_by_key( $rich, $mapped_key )
+						) {
 							return true;
 						}
 					}
@@ -3099,28 +2481,38 @@ class License {
 				}
 			)
 		);
+	}
 
-		update_option( self::OPTION_AA_ACTIVATED_ADDONS, $pruned, false );
+	/**
+	 * Persist pruned All Access UI list when another license owns add-ons on site.
+	 *
+	 * @param array<int, array<string, mixed>> $rich Rich license list.
+	 * @return void
+	 */
+	public static function sync_aa_activated_addon_ids_with_assignments( array $rich ): void {
+		update_option( self::OPTION_AA_ACTIVATED_ADDONS, self::prune_aa_activated_addon_ids( $rich ), false );
+		self::$addon_key_map_cache = null;
 	}
 
 	/**
 	 * Legacy addon map to persist: All Access only includes user-activated add-ons.
 	 *
+	 * Pure derive — does not write options. Call {@see sync_aa_activated_addon_ids_with_assignments()}
+	 * on write paths before persisting the map.
+	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @return array<string, string>
 	 */
 	public static function build_persisted_addon_key_map_from_rich( array $rich ): array {
-		self::sync_aa_activated_addon_ids_with_assignments( $rich );
-
 		$full = self::get_active_addon_key_map_from_rich( $rich );
-		$aa   = self::find_all_access_license_active_on_site( $rich );
+		$aa   = self::find_all_access_row( $rich, 'on_site' );
 
 		if ( null === $aa ) {
 			return $full;
 		}
 
 		$aa_key    = (string) ( $aa['licenseKey'] ?? '' );
-		$activated = self::get_aa_activated_addon_ids();
+		$activated = self::prune_aa_activated_addon_ids( $rich );
 		$map       = [];
 
 		foreach ( $full as $addon_id => $key ) {
@@ -3137,17 +2529,45 @@ class License {
 	}
 
 	/**
+	 * Sync AA activated list then persist the derived addon⇒key map.
+	 *
+	 * @param array<int, array<string, mixed>> $rich Rich license list.
+	 * @return void
+	 */
+	private static function persist_derived_addon_key_map( array $rich ): void {
+		self::sync_aa_activated_addon_ids_with_assignments( $rich );
+		self::persist_addon_key_map( self::build_persisted_addon_key_map_from_rich( $rich ) );
+	}
+
+	/**
 	 * Whether each add-on package is on disk and the plugin is active.
 	 *
 	 * @return array<string, array{installed: bool, active: bool}>
 	 */
 	public static function get_addon_install_states(): array {
 		$out = [];
-		foreach ( Addons::plugin_files() as $addon_id => $plugin_file ) {
-			$installed        = self::is_addon_plugin_on_disk( $addon_id );
+		foreach ( Addons::plugin_files() as $addon_id => $canonical_file ) {
+			// Same as before — do not change installed detection.
+			$installed = Addons::is_addon_on_disk( $addon_id );
+
+			$active = false;
+			if ( $installed ) {
+				$resolved = Addons::resolve_installed_plugin_file( $addon_id );
+
+				// Case 1: alternate / resolved path (TextDomain, different folder).
+				if ( null !== $resolved && is_plugin_active( $resolved ) ) {
+					$active = true;
+				}
+
+				// Case 2: canonical path (advanced-ads-tracking/tracking.php, etc.).
+				if ( ! $active && is_plugin_active( $canonical_file ) ) {
+					$active = true;
+				}
+			}
+
 			$out[ $addon_id ] = [
 				'installed' => $installed,
-				'active'    => $installed && is_plugin_active( $plugin_file ),
+				'active'    => $active,
 			];
 		}
 
@@ -3176,15 +2596,14 @@ class License {
 			update_option( self::OPTION_RICH, $rich, false );
 		}
 
-		self::sync_addon_options_from_rich( $rich, '', false );
+		self::sync_addon_options_from_rich( $rich, [ 'install_packages' => false ] );
 
 		if ( ! $mutate_activation_state ) {
 			return self::get_licenses();
 		}
 
 		$rich      = self::get_licenses();
-		$coalesced = self::coalesce_all_access_duplicate_rich_rows( $rich );
-		$coalesced = self::drop_map_stub_duplicate_rows( $coalesced );
+		$coalesced = self::dedupe_rich_rows( $rich );
 		if ( wp_json_encode( $coalesced ) !== wp_json_encode( $rich ) ) {
 			$rich = $coalesced;
 			update_option( self::OPTION_RICH, $rich, false );
@@ -3200,47 +2619,74 @@ class License {
 	}
 
 	/**
-	 * Whether a rich license row should grant addon access (status or future expiry).
+	 * Drop duplicate rich rows (All Access coalesce + map stub cleanup).
 	 *
-	 * @param array<string, mixed> $row Rich license row.
-	 * @return bool
+	 * @param array<int, array<string, mixed>> $rich Rich license list.
+	 * @return array<int, array<string, mixed>>
 	 */
-	public static function is_license_effective( array $row ): bool {
-		if ( self::is_license_active( $row ) ) {
-			return true;
+	public static function dedupe_rich_rows( array $rich ): array {
+		$rich = self::normalize_list( $rich );
+		if ( [] === $rich ) {
+			return [];
 		}
 
-		$status = strtolower( (string) ( $row['status'] ?? '' ) );
-		$name   = (string) ( $row['name'] ?? '' );
-
-		// Inactive with valid subscription still grants access until truly expired.
-		if ( 'inactive' === $status ) {
-			return self::is_license_entitled( $row );
-		}
-
-		// Expired All Access must not override per-addon active licenses.
-		if ( in_array( $status, [ 'expired', 'invalid', 'disabled' ], true ) ) {
-			if ( License_Product_Map::is_all_access_bundle_name( $name ) ) {
-				return false;
+		$all_access_keys = [];
+		foreach ( $rich as $row ) {
+			if ( ! License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) ) ) {
+				continue;
 			}
-
-			return License_Utils::license_expiry_is_future( $row );
+			$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
+			if ( '' !== $key ) {
+				$all_access_keys[ $key ] = true;
+			}
 		}
 
-		return false;
+		if ( [] !== $all_access_keys ) {
+			$rich = array_values(
+				array_filter(
+					$rich,
+					static function ( array $row ) use ( $all_access_keys ): bool {
+						$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
+						if ( '' === $key || ! isset( $all_access_keys[ $key ] ) ) {
+							return true;
+						}
+
+						return License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) );
+					}
+				)
+			);
+		}
+
+		$full_keys = [];
+		foreach ( $rich as $row ) {
+			$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
+			if ( '' !== $key && ! empty( $row['licenseId'] ) ) {
+				$full_keys[ $key ] = true;
+			}
+		}
+
+		if ( [] === $full_keys ) {
+			return $rich;
+		}
+
+		return array_values(
+			array_filter(
+				$rich,
+				static function ( array $row ) use ( $full_keys ): bool {
+					$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
+					if ( '' === $key || ! isset( $full_keys[ $key ] ) ) {
+						return true;
+					}
+
+					return ! empty( $row['licenseId'] );
+				}
+			)
+		);
 	}
 
 	/**
-	 * @param int $min_interval Minimum seconds since last sync.
-	 * @return bool
-	 */
-	public static function should_skip_shop_sync( int $min_interval = DAY_IN_SECONDS ): bool {
-		$last = License_Utils::get_last_sync();
-
-		return $last > 0 && ( time() - $last ) < $min_interval;
-	}
-
-	/**
+	 *  Sync expiry
+	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @param string|null                      $only_key When set, update only this license key.
 	 * @param bool                             $clear_future_notices Clear notice flags for renewed licenses.
@@ -3279,7 +2725,7 @@ class License {
 		}
 
 		update_option( self::OPTION_RICH, $rich, false );
-		self::sync_addon_options_from_rich( $rich, '', false );
+		self::sync_addon_options_from_rich( $rich, [ 'install_packages' => false ] );
 
 		if ( null !== $only_key ) {
 			License_Utils::update_expiry_notices( $only_key, null );
@@ -3289,6 +2735,8 @@ class License {
 	}
 
 	/**
+	 *  Finalized The License sync
+	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @return array<int, array<string, mixed>>
 	 */
@@ -3331,37 +2779,6 @@ class License {
 	}
 
 	/**
-	 * Best entitled All Access row, if any.
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @return array<string, mixed>|null
-	 */
-	public static function find_entitled_all_access_license( array $rich ): ?array {
-		$best       = null;
-		$best_score = 0;
-
-		foreach ( $rich as $row ) {
-			if ( ! is_array( $row ) || empty( $row['licenseKey'] ) || empty( $row['name'] ) ) {
-				continue;
-			}
-			if ( ! License_Product_Map::is_all_access_bundle_name( (string) $row['name'] ) ) {
-				continue;
-			}
-			if ( ! self::is_license_entitled( $row ) ) {
-				continue;
-			}
-
-			$score = self::license_priority_score( $row, true );
-			if ( $score > $best_score ) {
-				$best_score = $score;
-				$best       = $row;
-			}
-		}
-
-		return $best;
-	}
-
-	/**
 	 * Addon id => licenseKey for active/valid rich licenses only.
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
@@ -3380,20 +2797,6 @@ class License {
 		}
 
 		return $out;
-	}
-
-	/**
-	 * Installed add-ons or static fallback when plugins are not loaded (e.g. unit tests).
-	 *
-	 * @param array<string, array>|null $addons Explicit list for tests.
-	 * @return array<string, array>
-	 */
-	private static function get_addons_for_license_map( ?array $addons = null ): array {
-		if ( null !== $addons ) {
-			return $addons;
-		}
-
-		return self::build_addon_manifest();
 	}
 
 	/**
@@ -3419,169 +2822,83 @@ class License {
 	/**
 	 * Pick the best license per addon when several rich rows overlap.
 	 *
-	 * @param array<int, array<string, mixed>> $rich   Records from app/exchange.
-	 * @param array<string, array>|null        $addons Optional; defaults to Data::get_addons().
+	 * @param array<int, array<string, mixed>>                                                                                $rich   Records from app/exchange.
+	 * @param array<string, array{id: string, name: string, options_slug: string, path: string, aliases?: list<string>}>|null $addons Optional; defaults to Data::get_addons().
 	 * @return array<string, array{licenseKey: string, row: array<string, mixed>, score: int}>
 	 */
 	public static function resolve_addon_license_assignments( array $rich, ?array $addons = null ): array {
-		$hostname = self::get_site_hostname();
-
-		if ( '' !== $hostname && self::has_site_activation_rows( $rich ) ) {
-			return self::resolve_addon_license_assignments_per_site( $rich, $addons );
-		}
-
-		return self::resolve_addon_license_assignments_legacy( $rich, $addons );
-	}
-
-	/**
-	 * Per-site: All Access on this site covers all add-ons; otherwise only activated single licenses apply.
-	 *
-	 * @param array<int, array<string, mixed>> $rich   Rich license list.
-	 * @param array<string, array>|null        $addons Optional add-on manifest.
-	 * @return array<string, array{licenseKey: string, row: array<string, mixed>, score: int}>
-	 */
-	private static function resolve_addon_license_assignments_per_site( array $rich, ?array $addons = null ): array {
-		$addons     = self::get_addons_for_license_map( $addons );
 		$hostname   = self::get_site_hostname();
+		$addons     = $addons ?? License_Product_Map::addon_manifest();
 		$candidates = [];
 
-		$all_access_on_site = self::find_all_access_license_active_on_site( $rich );
-		if ( null !== $all_access_on_site ) {
-			$key   = (string) $all_access_on_site['licenseKey'];
-			$score = self::license_priority_score( $all_access_on_site, true );
+		if ( '' !== $hostname && self::has_site_activation_rows( $rich ) ) {
+			$all_access_on_site = self::find_all_access_row( $rich, 'on_site' );
+			if ( null !== $all_access_on_site ) {
+				$key   = (string) $all_access_on_site['licenseKey'];
+				$score = self::license_priority_score( $all_access_on_site, true );
 
-			foreach ( $addons as $addon_row ) {
-				if ( empty( $addon_row['id'] ) || 'slider-ads' === $addon_row['id'] ) {
+				foreach ( $addons as $addon_row ) {
+					if ( empty( $addon_row['id'] ) || 'slider-ads' === $addon_row['id'] ) {
+						continue;
+					}
+					self::offer_addon_license_candidate(
+						$candidates,
+						(string) $addon_row['id'],
+						$key,
+						$score,
+						$all_access_on_site
+					);
+				}
+			}
+
+			foreach ( $rich as $row ) {
+				if ( ! is_array( $row ) || empty( $row['licenseKey'] ) || empty( $row['name'] ) ) {
 					continue;
 				}
-				self::offer_addon_license_candidate(
-					$candidates,
-					(string) $addon_row['id'],
-					$key,
-					$score,
-					$all_access_on_site
-				);
-			}
-		}
 
-		foreach ( $rich as $row ) {
-			if ( ! is_array( $row ) || empty( $row['licenseKey'] ) || empty( $row['name'] ) ) {
-				continue;
-			}
-
-			$name = (string) $row['name'];
-			if ( License_Product_Map::is_all_access_bundle_name( $name ) ) {
-				continue;
-			}
-
-			if ( ! self::is_license_entitled( $row ) ) {
-				continue;
-			}
-
-			if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
-				continue;
-			}
-
-			$addon_id = License_Product_Map::addon_id_from_product_name( $name, $addons );
-			if ( null === $addon_id ) {
-				continue;
-			}
-
-			$key   = (string) $row['licenseKey'];
-			$score = self::license_priority_score( $row, false );
-			self::offer_addon_license_candidate( $candidates, $addon_id, $key, $score, $row );
-		}
-
-		$aa_for_addons = self::find_all_access_row_for_aa_addon_assignments( $rich );
-		if ( null !== $aa_for_addons ) {
-			$aa_key  = (string) $aa_for_addons['licenseKey'];
-			$aa_take = self::license_priority_score( $aa_for_addons, true ) + 500;
-
-			foreach ( self::get_aa_activated_addon_ids() as $addon_id ) {
-				self::offer_addon_license_candidate(
-					$candidates,
-					$addon_id,
-					$aa_key,
-					$aa_take,
-					$aa_for_addons
-				);
-			}
-		}
-
-		return $candidates;
-	}
-
-	/**
-	 * All Access row that owns explicitly activated add-ons on this site (not highest-score bundle only).
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @return array<string, mixed>|null
-	 */
-	private static function find_all_access_row_for_aa_addon_assignments( array $rich ): ?array {
-		$on_site = self::find_all_access_license_active_on_site( $rich );
-		if ( null !== $on_site ) {
-			return $on_site;
-		}
-
-		$stored_map = License_Utils::normalize_legacy_map( get_option( self::OPTION_LEGACY_MAP, [] ) );
-		foreach ( self::get_aa_activated_addon_ids() as $addon_id ) {
-			$mapped_key = isset( $stored_map[ $addon_id ] ) ? trim( (string) $stored_map[ $addon_id ] ) : '';
-			if ( '' === $mapped_key ) {
-				continue;
-			}
-
-			foreach ( self::normalize_list( $rich ) as $row ) {
-				if ( (string) ( $row['licenseKey'] ?? '' ) !== $mapped_key ) {
+				$name = (string) $row['name'];
+				if ( License_Product_Map::is_all_access_bundle_name( $name ) ) {
 					continue;
 				}
-				if ( ! License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) ) ) {
-					continue;
-				}
+
 				if ( ! self::is_license_entitled( $row ) ) {
 					continue;
 				}
 
-				return $row;
+				if ( ! self::is_site_activated_on_license( $row, $hostname ) ) {
+					continue;
+				}
+
+				$addon_id = License_Product_Map::addon_id_from_product_name( $name, $addons );
+				if ( null === $addon_id ) {
+					continue;
+				}
+
+				$key   = (string) $row['licenseKey'];
+				$score = self::license_priority_score( $row, false );
+				self::offer_addon_license_candidate( $candidates, $addon_id, $key, $score, $row );
 			}
-		}
 
-		return null;
-	}
+			$aa_for_addons = self::find_all_access_row( $rich, 'aa_addons' );
+			if ( null !== $aa_for_addons ) {
+				$aa_key  = (string) $aa_for_addons['licenseKey'];
+				$aa_take = self::license_priority_score( $aa_for_addons, true ) + 500;
 
-	/**
-	 * Whether a rich row exists for a license key.
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @param string                           $license_key License key.
-	 * @return bool
-	 */
-	public static function license_row_exists_for_key( array $rich, string $license_key ): bool {
-		$license_key = trim( $license_key );
-		if ( '' === $license_key ) {
-			return false;
-		}
-
-		foreach ( self::normalize_list( $rich ) as $row ) {
-			if ( (string) ( $row['licenseKey'] ?? '' ) === $license_key ) {
-				return true;
+				foreach ( self::get_aa_activated_addon_ids() as $addon_id ) {
+					self::offer_addon_license_candidate(
+						$candidates,
+						$addon_id,
+						$aa_key,
+						$aa_take,
+						$aa_for_addons
+					);
+				}
 			}
+
+			return $candidates;
 		}
 
-		return false;
-	}
-
-	/**
-	 * Legacy assignment when rich data has no sitesActivated rows (score / All Access bundle).
-	 *
-	 * @param array<int, array<string, mixed>> $rich   Rich license list.
-	 * @param array<string, array>|null        $addons Optional add-on manifest.
-	 * @return array<string, array{licenseKey: string, row: array<string, mixed>, score: int}>
-	 */
-	private static function resolve_addon_license_assignments_legacy( array $rich, ?array $addons = null ): array {
-		$addons     = self::get_addons_for_license_map( $addons );
-		$candidates = [];
-
-		$all_access = self::find_entitled_all_access_license( $rich );
+		$all_access = self::find_all_access_row( $rich, 'entitled' );
 		if ( null !== $all_access ) {
 			$key   = (string) $all_access['licenseKey'];
 			$score = self::license_priority_score( $all_access, true );
@@ -3657,208 +2974,49 @@ class License {
 	}
 
 	/**
-	 * Flatten rich list to addon_id => licenseKey (best effective license per addon).
-	 *
-	 * @param array<int, array<string, mixed>> $rich   Records from app/exchange.
-	 * @param array<string, array>|null        $addons Optional; defaults to Data::get_addons().
-	 * @return array<string, string>
-	 */
-	public static function flatten_to_addon_keys( array $rich, ?array $addons = null ): array {
-		return self::get_active_addon_key_map_from_rich( $rich, $addons );
-	}
-
-	/**
 	 * Effective addon_id => license_key map for admin and EDD persistence.
+	 *
+	 * Request-local cache keyed by rich + activation options (no writes).
 	 *
 	 * @return array<string, string>
 	 */
 	public static function get_addon_key_map(): array {
-		$derived = self::build_persisted_addon_key_map_from_rich( self::get_licenses() );
+		$rich = self::get_licenses();
+		$fp   = md5(
+			(string) wp_json_encode(
+				[
+					$rich,
+					get_option( self::OPTION_AA_ACTIVATED_ADDONS, [] ),
+					get_option( self::OPTION_SITE_ACTIVATION, [] ),
+				]
+			)
+		);
 
-		if ( self::is_flat_map_retired() ) {
-			$list        = self::get_site_activation_list();
-			$active_keys = array_flip( self::get_active_site_license_keys() );
+		if ( null !== self::$addon_key_map_cache && self::$addon_key_map_cache['fp'] === $fp ) {
+			return self::$addon_key_map_cache['map'];
+		}
 
-			if ( [] === $list ) {
-				return $derived;
-			}
+		$derived     = self::build_persisted_addon_key_map_from_rich( $rich );
+		$list        = License_Site_Activation::get_list();
+		$active_keys = array_flip( License_Site_Activation::get_active_license_keys() );
 
-			return array_filter(
+		if ( [] !== $list ) {
+			$derived = array_filter(
 				$derived,
 				static fn( string $key ): bool => isset( $active_keys[ $key ] )
 			);
 		}
 
-		if ( ! self::has_stored_legacy_license_map() ) {
-			return $derived;
-		}
+		self::$addon_key_map_cache = [
+			'fp'  => $fp,
+			'map' => $derived,
+		];
 
-		$legacy = get_option( self::OPTION_LEGACY_MAP, [] );
-
-		return is_array( $legacy ) ? License_Utils::normalize_legacy_map( $legacy ) : [];
+		return $derived;
 	}
 
 	/**
-	 * Drop per-addon rich rows that duplicate an All Access row with the same key.
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @return array<int, array<string, mixed>>
-	 */
-	public static function coalesce_all_access_duplicate_rich_rows( array $rich ): array {
-		$rich = self::normalize_list( $rich );
-		if ( [] === $rich ) {
-			return [];
-		}
-
-		$all_access_keys = [];
-		foreach ( $rich as $row ) {
-			if ( ! License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) ) ) {
-				continue;
-			}
-			$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
-			if ( '' !== $key ) {
-				$all_access_keys[ $key ] = true;
-			}
-		}
-
-		if ( [] === $all_access_keys ) {
-			return $rich;
-		}
-
-		return array_values(
-			array_filter(
-				$rich,
-				static function ( array $row ) use ( $all_access_keys ): bool {
-					$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
-					if ( '' === $key || ! isset( $all_access_keys[ $key ] ) ) {
-						return true;
-					}
-
-					return License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) );
-				}
-			)
-		);
-	}
-
-	/**
-	 * Drop stub rows left in advanced-ads-app-licenses when a full row exists for the same key.
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @return array<int, array<string, mixed>>
-	 */
-	public static function drop_map_stub_duplicate_rows( array $rich ): array {
-		$rich = self::normalize_list( $rich );
-		if ( [] === $rich ) {
-			return [];
-		}
-
-		$full_keys = [];
-		foreach ( $rich as $row ) {
-			$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
-			if ( '' !== $key && ! empty( $row['licenseId'] ) ) {
-				$full_keys[ $key ] = true;
-			}
-		}
-
-		if ( [] === $full_keys ) {
-			return $rich;
-		}
-
-		return array_values(
-			array_filter(
-				$rich,
-				static function ( array $row ) use ( $full_keys ): bool {
-					$key = trim( (string) ( $row['licenseKey'] ?? '' ) );
-					if ( '' === $key || ! isset( $full_keys[ $key ] ) ) {
-						return true;
-					}
-
-					return ! empty( $row['licenseId'] );
-				}
-			)
-		);
-	}
-
-	/**
-	 * Whether a rich row is All Access entitled to the given license key.
-	 *
-	 * @param array<int, array<string, mixed>> $rich        Rich license list.
-	 * @param string                           $license_key License key.
-	 * @return bool
-	 */
-	private static function rich_has_all_access_for_key( array $rich, string $license_key ): bool {
-		$license_key = trim( $license_key );
-		if ( '' === $license_key ) {
-			return false;
-		}
-
-		foreach ( $rich as $row ) {
-			if ( ! is_array( $row ) ) {
-				continue;
-			}
-			if (
-				License_Product_Map::is_all_access_bundle_name( (string) ( $row['name'] ?? '' ) )
-				&& trim( (string) ( $row['licenseKey'] ?? '' ) ) === $license_key
-			) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Merge addon keys into rich records, preserving unrelated rows and fields.
-	 *
-	 * @param array<int, array<string, mixed>> $rich Existing rich list.
-	 * @param array<string, string>            $map  Addon id => key.
-	 * @return array<int, array<string, mixed>>
-	 */
-	public static function merge_map_into_rich( array $rich, array $map ): array {
-		$addons       = Data::get_addons();
-		$by_name_norm = [];
-		foreach ( $rich as $idx => $row ) {
-			if ( empty( $row['name'] ) ) {
-				continue;
-			}
-			$by_name_norm[ License_Product_Map::normalize_name( (string) $row['name'] ) ] = (int) $idx;
-		}
-
-		foreach ( $map as $addon_id => $key ) {
-			if ( '' === (string) $key ) {
-				continue;
-			}
-			$name = '';
-			foreach ( $addons as $row ) {
-				if ( isset( $row['id'] ) && (string) $row['id'] === (string) $addon_id ) {
-					$name = (string) $row['name'];
-					break;
-				}
-			}
-			if ( '' === $name ) {
-				$name = (string) $addon_id;
-			}
-			$norm = License_Product_Map::normalize_name( $name );
-			if ( isset( $by_name_norm[ $norm ] ) ) {
-				$idx                        = $by_name_norm[ $norm ];
-				$rich[ $idx ]['licenseKey'] = (string) $key;
-			} elseif ( self::rich_has_all_access_for_key( $rich, (string) $key ) ) {
-				continue;
-			} else {
-				$rich[]                = [
-					'name'       => $name,
-					'licenseKey' => (string) $key,
-					'status'     => 'active',
-				];
-				$by_name_norm[ $norm ] = count( $rich ) - 1;
-			}
-		}
-
-		return self::coalesce_all_access_duplicate_rich_rows( $rich );
-	}
-
-	/**
-	 * Replace predecessor license keys in advanced-ads-licenses after an upgrade successor is promoted.
+	 * Replace predecessor license keys in the site-activation list after an upgrade successor is promoted.
 	 *
 	 * @param string $from_key Predecessor license key.
 	 * @param string $to_key   Successor license key.
@@ -3872,18 +3030,20 @@ class License {
 			return;
 		}
 
-		$map     = License_Utils::normalize_legacy_map( get_option( self::OPTION_LEGACY_MAP, [] ) );
+		$list    = License_Site_Activation::get_list();
 		$changed = false;
 
-		foreach ( $map as $addon_id => $key ) {
-			if ( $key === $from_key ) {
-				$map[ (string) $addon_id ] = $to_key;
-				$changed                   = true;
+		foreach ( $list as $index => $entry ) {
+			if ( trim( (string) ( $entry['license'] ?? '' ) ) !== $from_key ) {
+				continue;
 			}
+			$list[ $index ]['license'] = $to_key;
+			$changed                   = true;
 		}
 
 		if ( $changed ) {
-			self::persist_addon_key_map( $map );
+			License_Site_Activation::persist( $list );
+			self::$addon_key_map_cache = null;
 		}
 	}
 
@@ -3912,82 +3072,13 @@ class License {
 	}
 
 	/**
-	 * Local-only flat map retirement when rich covers all legacy keys (does not write OPTION_RICH).
-	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list (read only).
-	 * @param array<string, string>            $map  Normalized legacy map.
-	 * @return void
-	 */
-	public static function maybe_retire_legacy_flat_map( array $rich, array $map ): void {
-		License_Site_Activation::maybe_retire_legacy_flat_map( $rich, $map );
-	}
-
-	/**
-	 * Plan-level site activation list from advanced-ads-licenses (one row per license key).
-	 *
-	 * @return array<int, array{license: string, status: string}>
-	 */
-	public static function get_site_activation_list(): array {
-		return License_Site_Activation::get_list();
-	}
-
-	/**
-	 * License keys marked active on this site.
-	 *
-	 * @return string[]
-	 */
-	public static function get_active_site_license_keys(): array {
-		return License_Site_Activation::get_active_license_keys();
-	}
-
-	/**
-	 * Whether a license key is active on this site.
-	 *
-	 * @param string $license_key License key.
-	 * @return bool
-	 */
-	public static function is_license_active_on_site( string $license_key ): bool {
-		return License_Site_Activation::is_license_active_on_site( $license_key );
-	}
-
-	/**
-	 * Persist plan-level site activation list to advanced-ads-licenses.
-	 *
-	 * @param array<int, array{license?: string, status?: string}|string> $list Site activation rows.
-	 * @return void
-	 */
-	public static function persist_site_activation_list( array $list ): void {
-		License_Site_Activation::persist( $list );
-	}
-
-	/**
-	 * Upsert one license key in the site activation list.
-	 *
-	 * @param string $license_key License key.
-	 * @param string $status      active|inactive.
-	 * @return void
-	 */
-	public static function upsert_site_activation_status( string $license_key, string $status ): void {
-		License_Site_Activation::upsert_status( $license_key, $status );
-	}
-
-	/**
-	 * Build site activation list from legacy flat keys and per-addon mirror status options.
-	 *
-	 * @return array<int, array{license: string, status: string}>
-	 */
-	public static function build_site_activation_list_from_legacy_storage(): array {
-		return License_Site_Activation::build_from_legacy_storage();
-	}
-
-	/**
 	 * Delete all legacy per-addon EDD mirror options.
 	 *
 	 * @return void
 	 */
 	public static function delete_legacy_addon_mirror_options(): void {
 		$slugs = [];
-		foreach ( self::get_addons_for_license_map( null ) as $row ) {
+		foreach ( License_Product_Map::addon_manifest() as $row ) {
 			if ( ! empty( $row['options_slug'] ) ) {
 				$slugs[] = (string) $row['options_slug'];
 			}
@@ -4004,30 +3095,13 @@ class License {
 	}
 
 	/**
-	 * Resolve short add-on id from options slug (advanced-ads-pro → pro).
-	 *
-	 * @param string $options_slug Options slug.
-	 * @return string
-	 */
-	public static function addon_id_from_options_slug( string $options_slug ): string {
-		$options_slug = trim( $options_slug );
-		if ( str_starts_with( $options_slug, 'advanced-ads-' ) ) {
-			return substr( $options_slug, strlen( 'advanced-ads-' ) );
-		}
-
-		return $options_slug;
-	}
-
-	/**
 	 * License key assigned to one add-on from rich rows (post-migration).
 	 *
 	 * @param string $addon_id Short add-on id.
 	 * @return string
 	 */
 	private static function derived_license_key_for_addon_id( string $addon_id ): string {
-		$derived = self::build_persisted_addon_key_map_from_rich( self::get_licenses() );
-
-		return trim( (string) ( $derived[ $addon_id ] ?? '' ) );
+		return trim( (string) ( self::get_addon_key_map()[ $addon_id ] ?? '' ) );
 	}
 
 	/**
@@ -4037,19 +3111,9 @@ class License {
 	 * @return string|false
 	 */
 	public static function get_mirror_status_for_options_slug( string $options_slug ) {
-		if ( ! self::is_flat_map_retired() ) {
-			return get_option( $options_slug . '-license-status', false );
-		}
-
-		$addon_id    = self::addon_id_from_options_slug( $options_slug );
-		$license_key = self::derived_license_key_for_addon_id( $addon_id );
-
-		if ( '' === $license_key || ! self::is_license_active_on_site( $license_key ) ) {
-			return false;
-		}
-
-		$row = License_Utils::get_rich_license_row_by_key( self::get_licenses(), $license_key );
-		if ( ! is_array( $row ) ) {
+		$addon_id = License_Utils::addon_id_from_options_slug( $options_slug );
+		$row      = self::resolve_mirror_license_row_for_addon( $addon_id );
+		if ( null === $row ) {
 			return false;
 		}
 
@@ -4068,19 +3132,9 @@ class License {
 	 * @return string|false
 	 */
 	public static function get_mirror_expires_for_options_slug( string $options_slug ) {
-		if ( ! self::is_flat_map_retired() ) {
-			return get_option( $options_slug . '-license-expires', '' );
-		}
-
-		$addon_id    = self::addon_id_from_options_slug( $options_slug );
-		$license_key = self::derived_license_key_for_addon_id( $addon_id );
-
-		if ( '' === $license_key ) {
-			return '';
-		}
-
-		$row = License_Utils::get_rich_license_row_by_key( self::get_licenses(), $license_key );
-		if ( ! is_array( $row ) ) {
+		$addon_id = License_Utils::addon_id_from_options_slug( $options_slug );
+		$row      = self::resolve_mirror_license_row_for_addon( $addon_id );
+		if ( null === $row ) {
 			return '';
 		}
 
@@ -4090,171 +3144,81 @@ class License {
 	}
 
 	/**
-	 * Persist addon key map to advanced-ads-licenses (legacy flat map).
+	 * Rich license row used for EDD mirror status/expiry for one add-on.
+	 *
+	 * @param string $addon_id Short add-on id.
+	 * @return array<string, mixed>|null
+	 */
+	private static function resolve_mirror_license_row_for_addon( string $addon_id ): ?array {
+		$license_key = self::derived_license_key_for_addon_id( $addon_id );
+		$rich        = self::get_licenses();
+
+		if ( '' !== $license_key && License_Site_Activation::is_license_active_on_site( $license_key ) ) {
+			$row = License_Utils::get_rich_license_row_by_key( $rich, $license_key );
+			if ( is_array( $row ) ) {
+				return $row;
+			}
+		}
+
+		$manifest = License_Product_Map::addon_manifest();
+		foreach ( License_Site_Activation::get_active_license_keys() as $key ) {
+			$row = License_Utils::get_rich_license_row_by_key( $rich, $key );
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+
+			$name = (string) ( $row['name'] ?? '' );
+			if ( License_Product_Map::is_all_access_bundle_name( $name ) ) {
+				if ( in_array( $addon_id, self::get_aa_activated_addon_ids(), true ) ) {
+					return $row;
+				}
+				continue;
+			}
+
+			if ( License_Product_Map::addon_id_from_product_name( $name, $manifest ) === $addon_id ) {
+				return $row;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Ensure license keys from an addon⇒key map exist in the site-activation list.
 	 * Listing uses advanced-ads-app-licenses only — do not merge map rows into rich list.
 	 *
 	 * @param array<string, string> $map Addon id => key.
 	 * @return void
 	 */
 	public static function persist_addon_key_map( array $map ): void {
-		if ( self::is_flat_map_retired() ) {
-			$keys = [];
-			foreach ( $map as $key ) {
-				$key = is_string( $key ) ? trim( $key ) : '';
-				if ( '' !== $key ) {
-					$keys[ $key ] = true;
-				}
-			}
-			foreach ( array_keys( $keys ) as $license_key ) {
-				if ( ! self::is_license_active_on_site( $license_key ) ) {
-					self::upsert_site_activation_status( $license_key, 'inactive' );
-				}
-			}
-			return;
-		}
+		self::$addon_key_map_cache = null;
 
-		$clean = [];
-		foreach ( $map as $id => $key ) {
+		$keys = [];
+		foreach ( $map as $key ) {
 			$key = is_string( $key ) ? trim( $key ) : '';
 			if ( '' !== $key ) {
-				$clean[ (string) $id ] = $key;
+				$keys[ $key ] = true;
 			}
 		}
-
-		update_option( self::OPTION_LEGACY_MAP, $clean, false );
-	}
-
-	/**
-	 * Whether options mirror indicates a valid license for one addon (aligned with admin checks).
-	 *
-	 * @param string $addon_id Short addon id.
-	 * @return bool
-	 */
-	public static function addon_license_valid_by_options( string $addon_id ): bool {
-		if ( self::is_flat_map_retired() ) {
-			$license_key = self::derived_license_key_for_addon_id( $addon_id );
-			if ( '' === $license_key || ! self::is_license_active_on_site( $license_key ) ) {
-				return false;
+		foreach ( array_keys( $keys ) as $license_key ) {
+			if ( ! License_Site_Activation::is_license_active_on_site( $license_key ) ) {
+				License_Site_Activation::upsert_status( $license_key, 'inactive' );
 			}
-			$row = License_Utils::get_rich_license_row_by_key( self::get_licenses(), $license_key );
-
-			return is_array( $row ) && self::is_license_entitled( License_Utils::apply_local_expiry_to_row( $row ) );
 		}
-
-		$options_slug = License_Utils::options_slug_for_addon_id( $addon_id );
-
-		if ( class_exists( 'Advanced_Ads_Admin_Licenses' ) ) {
-			$admin       = \Advanced_Ads_Admin_Licenses::get_instance();
-			$status      = $admin->get_license_status( $options_slug );
-			$expiry_date = $admin->get_license_expires( $options_slug );
-		} else {
-			$status      = get_option( $options_slug . '-license-status', false );
-			$expiry_date = get_option( $options_slug . '-license-expires', '' );
-		}
-
-		return (
-			( $expiry_date && strtotime( $expiry_date ) > time() )
-			|| 'valid' === $status
-			|| 'lifetime' === $expiry_date
-		);
 	}
 
 	/**
-	 * Get license details for UI (single addon id, e.g. pro).
+	 * Mark a license key active on this site (site-activation list).
 	 *
-	 * @param string $slug Add-on id.
-	 * @return array<string, mixed>
-	 */
-	public static function get_license_details( $slug ): array {
-		$map = self::get_addon_key_map();
-		$key = $map[ $slug ] ?? '';
-
-		if ( '' === $key ) {
-			return [];
-		}
-
-		if ( self::is_flat_map_retired() ) {
-			$options_slug = License_Utils::options_slug_for_addon_id( $slug );
-
-			return [
-				'license' => $key,
-				'status'  => self::get_mirror_status_for_options_slug( $options_slug ) ?: 'invalid',
-				'expires' => self::get_mirror_expires_for_options_slug( $options_slug ),
-			];
-		}
-
-		$options_slug = License_Utils::options_slug_for_addon_id( $slug );
-
-		return [
-			'license' => $key,
-			'status'  => get_option( $options_slug . '-license-status', 'invalid' ),
-			'expires' => get_option( $options_slug . '-license-expires', false ),
-		];
-	}
-
-	/**
-	 * Save license key and options mirror for one addon.
-	 *
-	 * @param string       $slug        Add-on id.
+	 * @param string       $slug        Add-on id (unused; kept for call-site compatibility).
 	 * @param string       $license_key License key.
-	 * @param string       $status      License status.
-	 * @param string|false $expires     License expires.
-	 * @param bool         $update_map  When true, also write advanced-ads-licenses (activation flows only).
+	 * @param string       $status      Unused; activation is always active.
+	 * @param string|false $expires     Unused.
+	 * @param bool         $update_map  Unused.
 	 * @return void
 	 */
 	public static function update_license_details( $slug, $license_key, $status = 'valid', $expires = false, bool $update_map = false ): void {
-		if ( self::is_flat_map_retired() ) {
-			self::upsert_site_activation_status(
-				(string) $license_key,
-				'valid' === $status ? 'active' : 'inactive'
-			);
-			return;
-		}
-
-		if ( 'lifetime' === $expires ) {
-			$expires = time() + YEAR_IN_SECONDS * 200;
-		}
-
-		if ( $update_map && ! self::is_flat_map_retired() ) {
-			$map          = self::get_addon_key_map();
-			$map[ $slug ] = $license_key;
-			self::persist_addon_key_map( $map );
-		}
-
-		$options_slug = License_Utils::options_slug_for_addon_id( $slug );
-		update_option( $options_slug . '-license-status', $status, false );
-		update_option( $options_slug . '-license-expires', $expires, false );
-	}
-
-	/**
-	 * Whether one addon has a valid license by stored options.
-	 *
-	 * @param string $slug Add-on id.
-	 * @return bool
-	 */
-	public static function has_valid_license( $slug ): bool {
-		return self::addon_license_valid_by_options( (string) $slug );
-	}
-
-	/**
-	 * Check if any installed add-on has valid license options.
-	 *
-	 * @return bool
-	 */
-	public static function has_any_valid_license(): bool {
-		if ( [] !== Data::get_addons() && class_exists( 'Advanced_Ads_Admin_Licenses' ) ) {
-			return \Advanced_Ads_Admin_Licenses::any_license_valid();
-		}
-
-		foreach ( Addons::known_addon_ids() as $addon_id ) {
-			if ( 'slider-ads' === $addon_id ) {
-				continue;
-			}
-			if ( self::addon_license_valid_by_options( $addon_id ) ) {
-				return true;
-			}
-		}
-
-		return false;
+		unset( $slug, $status, $expires, $update_map );
+		License_Site_Activation::upsert_status( (string) $license_key, 'active' );
 	}
 }

@@ -12,9 +12,9 @@ use AdvancedAds\Constants;
 /**
  * Check for existing placements in posts.
  *
- * @param array $slugs Slugs to check.
+ * @param list<string> $slugs Slugs to check.
  *
- * @return array
+ * @return array<string, int>
  */
 function advads_get_existing_placement_posts( $slugs ): array {
 	global $wpdb;
@@ -47,7 +47,7 @@ function advads_get_existing_placement_posts( $slugs ): array {
 /**
  * Save a placement as post.
  *
- * @param array $data Placement data array.
+ * @param array<string, mixed> $data Placement data array.
  *
  * @return int|WP_Error
  */
@@ -82,7 +82,7 @@ function advads_save_new_placement( $data ) {
 /**
  * Backup old Placements
  *
- * @param array $placements Placements.
+ * @param array<string, mixed> $placements Placements.
  *
  * @return void
  */

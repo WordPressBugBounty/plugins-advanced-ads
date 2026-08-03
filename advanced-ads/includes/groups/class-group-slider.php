@@ -45,7 +45,7 @@ class Group_Slider extends Group implements Group_Interface {
 	/**
 	 * Get ordered ids of the ads that belong to the group
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_ordered_ad_ids() {
 		$ordered_ad_ids = [];

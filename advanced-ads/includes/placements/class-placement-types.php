@@ -79,7 +79,7 @@ class Placement_Types extends Types {
 	/**
 	 * Get type dropdown options
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function get_dropdown_options(): array {
 		$options = [];

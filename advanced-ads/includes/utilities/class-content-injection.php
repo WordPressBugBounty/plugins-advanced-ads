@@ -21,7 +21,7 @@ class Content_Injection {
 	 *
 	 * @since 1.3.5
 	 *
-	 * @return array Tags that can be used for content injection
+	 * @return array<string, string> Tags that can be used for content injection
 	 */
 	public static function get_tags(): array {
 		$headline_tags = apply_filters( 'advanced-ads-headlines-for-ad-injection', [ 'h2', 'h3', 'h4' ] );

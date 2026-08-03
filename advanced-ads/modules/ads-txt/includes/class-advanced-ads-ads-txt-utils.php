@@ -1,15 +1,27 @@
 <?php
 /**
+ * Ads.txt utility helpers.
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ */
+
+/**
  * User interface for managing the 'ads.txt' file.
  */
 class Advanced_Ads_Ads_Txt_Utils {
+	/**
+	 * Last redirect location collected during HTTP requests.
+	 *
+	 * @var string|null
+	 */
 	private static $location;
 
 	/**
 	 * Get file info.
 	 *
 	 * @param string $url Url to retrieve the file.
-	 * @return array/WP_Error An array containing 'exists', 'is_third_party'.
+	 * @return array{exists: bool, is_third_party: bool}|\WP_Error An array containing 'exists', 'is_third_party'.
 	 *                        A WP_Error upon error.
 	 */
 	public static function get_file_info( $url = null ) {
@@ -36,29 +48,25 @@ class Advanced_Ads_Ads_Txt_Utils {
 			return $response;
 		}
 
-		$file_exists = ! is_wp_error( $response )
-			&& 404 !== $code
+		$file_exists   = ! is_wp_error( $response ) && 404 !== $code
 			&& ( false !== stripos( $content_type, 'text/plain' ) );
 		$header_exists = false !== strpos( $content, Advanced_Ads_Ads_Txt_Public::TOP );
 
-		$r = [
-			'exists'      => $file_exists && $header_exists,
-			'is_third_party' => $file_exists && ! $header_exists
+		return [
+			'exists'         => $file_exists && $header_exists,
+			'is_third_party' => $file_exists && ! $header_exists,
 		];
-
-		return $r;
 	}
-
-
 
 	/**
 	 * Check if the another 'ads.txt' file should be hosted on the root domain.
+	 *
+	 * @param string|null $url Optional site URL; defaults to home_url( '/' ).
 	 *
 	 * @return bool
 	 */
 	public static function need_file_on_root_domain( $url = null ) {
 		$url = $url ? $url : home_url( '/' );
-
 
 		$parsed_url = wp_parse_url( $url );
 		if ( ! isset( $parsed_url['host'] ) ) {
@@ -79,14 +87,14 @@ class Advanced_Ads_Ads_Txt_Utils {
 
 		if ( 3 === $count ) {
 			// Example: `http://one.{net/org/gov/edu/co}.two`.
-			$suffixes = [ 'net', 'org', 'gov', 'edu', 'co'  ];
+			$suffixes = [ 'net', 'org', 'gov', 'edu', 'co' ];
 			if ( in_array( $host_parts[ $count - 2 ], $suffixes, true ) ) {
 				return false;
 			}
 
 			// Example: `one.com.au'.
 			$suffix_and_tld = implode( '.', array_slice( $host_parts, 1 ) );
-			if ( in_array( $suffix_and_tld, [ 'com.au', 'com.br', 'com.pl' ] ) ) {
+			if ( in_array( $suffix_and_tld, [ 'com.au', 'com.br', 'com.pl' ], true ) ) {
 				return false;
 			}
 
@@ -115,7 +123,9 @@ class Advanced_Ads_Ads_Txt_Utils {
 	/**
 	 * Collect last location.
 	 *
-	 * @return string $location An URL.
+	 * @param string $location An URL.
+	 *
+	 * @return void
 	 */
 	public static function collect_locations( $location ) {
 		self::$location = $location;
@@ -123,6 +133,8 @@ class Advanced_Ads_Ads_Txt_Utils {
 
 	/**
 	 * Check if the site is in a subdirectory, for example 'http://one.two/three'.
+	 *
+	 * @param string|null $url Optional site URL; defaults to home_url( '/' ).
 	 *
 	 * @return bool
 	 */
@@ -139,13 +151,13 @@ class Advanced_Ads_Ads_Txt_Utils {
 	/**
 	 * Remove duplicate lines.
 	 *
-	 * @param array $blog_data Array of arrays of blog options, keyed by by blog IDs.
-	 * @param array $options {
-	 *     Options.
+	 * @param array<int, array<string, mixed>> $blog_data Array of arrays of blog options, keyed by by blog IDs.
+	 * @param array{to_comments?: bool}        $options {
+	 *            Options.
 	 *
 	 *     @type string    $to_comments    Whether to convert duplicate records to comments.
 	 * }
-	 * @return array $blog_data Array of arrays of blog options, keyed by by blog IDs.
+	 * @return array<int, array<string, mixed>> $blog_data Array of arrays of blog options, keyed by by blog IDs.
 	 */
 	public static function remove_duplicate_lines( $blog_data, $options = [] ) {
 		$to_comments = ! empty( $options['to_comments'] );
@@ -181,8 +193,8 @@ class Advanced_Ads_Ads_Txt_Utils {
 				$added_records[] = $rec;
 			}
 			$blog_options['custom'] = implode( "\n", $blog_options['custom'] );
-
 		}
+
 		return $blog_data;
 	}
 }

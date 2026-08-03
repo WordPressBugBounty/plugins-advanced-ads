@@ -1,6 +1,7 @@
 <?php // phpcs:ignoreFile
 
 use AdvancedAds\Constants;
+use AdvancedAds\License\License_Site_Activation;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\Data;
 
@@ -89,6 +90,16 @@ class Advanced_Ads_Checks {
 		$add_ons = Data::get_addons();
 
 		if ( [] === $add_ons ) {
+			Advanced_Ads_Ad_Health_Notices::get_instance()->remove( 'license_invalid' );
+			return false;
+		}
+
+		// If at least one license key is active on this site, suppress the legacy
+		// "invalid or missing license keys" notice. This health check historically
+		// validated *all* installed paid add-ons (including those not activated yet)
+		// which can produce false positives even though the customer has at least
+		// one valid plan/license active.
+		if ( ! empty( License_Site_Activation::get_active_license_keys() ) ) {
 			Advanced_Ads_Ad_Health_Notices::get_instance()->remove( 'license_invalid' );
 			return false;
 		}
@@ -209,7 +220,7 @@ class Advanced_Ads_Checks {
 	/**
 	 * Check for additional conflicting plugins
 	 *
-	 * @return array $plugins names of conflicting plugins
+	 * @return array<int, string> Names of conflicting plugins.
 	 */
 	public static function conflicting_plugins() {
 		$conflicting_plugins = [];
@@ -253,7 +264,7 @@ class Advanced_Ads_Checks {
 	/**
 	 * Check for required php extensions
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public static function php_extensions() {
 
@@ -273,7 +284,7 @@ class Advanced_Ads_Checks {
 	/**
 	 * Get the list of Advanced Ads constant defined by the user.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public static function get_defined_constants() {
 		$constants = apply_filters(
@@ -337,7 +348,7 @@ class Advanced_Ads_Checks {
 	/**
 	 * Check for other ads.txt plugins
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public static function ads_txt_plugins() {
 
@@ -361,7 +372,7 @@ class Advanced_Ads_Checks {
 	/**
 	 * Check for activated plugins that manage header or footer code
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public static function header_footer_plugins() {
 

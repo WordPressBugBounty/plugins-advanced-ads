@@ -14,14 +14,13 @@ use Advanced_Ads_Utils;
 use Advanced_Ads_Visitor_Conditions;
 use Advanced_Ads;
 use AdvancedAds\Compatibility\Compatibility;
-use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Formatting;
 use AdvancedAds\Framework\Utilities\Str;
 use AdvancedAds\Frontend\Stats;
 use AdvancedAds\Interfaces\Entity_Interface;
 use AdvancedAds\Traits;
-use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\Ad_List_Stats;
+use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
@@ -58,14 +57,14 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Wrapper for the ad.
 	 *
-	 * @var array|null
+	 * @var array<string, mixed>|null
 	 */
 	protected $wrapper = null;
 
 	/**
 	 * Core data for this object. Name value pairs (name + default value).
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected $data = [
 		'title'            => '',
@@ -196,7 +195,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_display_conditions( $context = 'view' ): array {
 		return $this->get_prop( 'conditions', $context );
@@ -207,7 +206,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
-	 * @return array
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function get_visitor_conditions( $context = 'view' ): array {
 		return array_filter(
@@ -245,7 +244,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
 	 *
-	 * @return array
+	 * @return array<string, int|string>
 	 */
 	public function get_margin( $context = 'view' ): array {
 		return $this->get_prop( 'margin', $context );
@@ -365,7 +364,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Set margin.
 	 *
-	 * @param array $margin Ad margin.
+	 * @param array<string, int|string> $margin Ad margin.
 	 *
 	 * @return void
 	 */
@@ -384,7 +383,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Set expiry date.
 	 *
-	 * @param array|string $expiry_date Ad expiry date.
+	 * @param array<string, mixed>|string $expiry_date Ad expiry date.
 	 *
 	 * @return void
 	 */
@@ -399,7 +398,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Set weekdays.
 	 *
-	 * @param array $weekdays Ad weekdays.
+	 * @param array<int, int|string> $weekdays Ad weekdays.
 	 *
 	 * @return void
 	 */
@@ -626,7 +625,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Determines whether the ad can be displayed.
 	 *
-	 * @param array $check_options check options.
+	 * @param array<string, mixed> $check_options Check options.
 	 *
 	 * @return bool True if the ad can be displayed, false otherwise.
 	 */
@@ -653,7 +652,7 @@ abstract class Ad extends Data implements Entity_Interface {
 		/**
 		 * Allows bypassing server side visitor conditions checks or ignoring debug mode
 		 *
-		 * @param array $check_options can display check options.
+		 * @param array<string, mixed> $check_options Can display check options.
 		 */
 		$check_options = apply_filters( 'advanced-ads-can-display-ad-check-options', $check_options );
 
@@ -715,7 +714,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Get the wrapper attributes.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_wrapper_attributes(): array {
 		// Early bail!!
@@ -832,7 +831,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Get groups
 	 *
-	 * @return bool|array
+	 * @return bool|array<int|string, mixed>
 	 */
 	public function get_groups() {
 		if ( null === $this->groups ) {
@@ -858,7 +857,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Get ad schedule details
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_ad_schedule_details(): array {
 		$status_strings     = [];
@@ -945,7 +944,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Normalize expiry date
 	 *
-	 * @param array $expiry_date Expiry date.
+	 * @param array<string, mixed> $expiry_date Expiry date.
 	 *
 	 * @return int
 	 */
@@ -1054,7 +1053,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	 *
 	 * @deprecated 2.0.0 use get_wrapper_attributes() instead.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function create_wrapper(): array {
 		_deprecated_function( __FUNCTION__, '2.0.0', 'get_wrapper_attributes' );
@@ -1100,6 +1099,7 @@ abstract class Ad extends Data implements Entity_Interface {
 
 		$has_mobile_legacy = array_key_exists( 'mobile', $conditions );
 		$mobile_legacy     = $has_mobile_legacy ? $conditions['mobile'] : null;
+
 		$indexed     = array_values( $conditions );
 		$last_result = false;
 

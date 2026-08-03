@@ -12,7 +12,7 @@ final class Advanced_Ads_ModuleLoader {
 	/**
 	 * Hold modules instances.
 	 *
-	 * @var array
+	 * @var array<string, string>
 	 */
 	protected static $modules = [];
 
@@ -32,8 +32,8 @@ final class Advanced_Ads_ModuleLoader {
 	 * Module loader options:
 	 * - array 'disabled': Pretty name by (module) dirname
 	 *
-	 * @param string $path    Path to modules.
-	 * @param array  $options Optional. Module loader options.
+	 * @param string               $path    Path to modules.
+	 * @param array<string, mixed> $options Optional. Module loader options.
 	 */
 	public static function loadModules( $path, $options = [] ) {
 		$loader = Autoloader::get()->get_autoloader();

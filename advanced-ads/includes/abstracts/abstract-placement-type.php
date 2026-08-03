@@ -19,23 +19,23 @@ class Placement_Type {
 	/**
 	 * Hold allowed ads for cache purpose.
 	 *
-	 * @var array
+	 * @var array<string, mixed>|null
 	 */
 	private $allowed_ads = null;
 
 	/**
 	 * Hold allowed groups for cache purpose.
 	 *
-	 * @var array
+	 * @var array<string, mixed>|null
 	 */
 	private $allowed_groups = null;
 
 	/**
 	 * Apply filters on options by type id.
 	 *
-	 * @param array $options Options array.
+	 * @param array<string, mixed> $options Options array.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	protected function apply_filter_on_options( $options ): array {
 		$defaults = [
@@ -57,7 +57,7 @@ class Placement_Type {
 	 *
 	 * @param string $add_empty Add empty option.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_allowed_items( $add_empty = '' ): array {
 
@@ -86,7 +86,7 @@ class Placement_Type {
 	/**
 	 * Get all allowed ads for this placement type.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_allowed_ads(): array {
 		if ( null !== $this->allowed_ads ) {
@@ -108,7 +108,7 @@ class Placement_Type {
 	/**
 	 * Get all allowed groups for this placement type.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_allowed_groups(): array {
 		if ( null !== $this->allowed_groups ) {

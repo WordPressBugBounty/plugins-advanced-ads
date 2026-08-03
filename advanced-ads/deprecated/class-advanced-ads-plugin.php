@@ -23,7 +23,7 @@ class Advanced_Ads_Plugin {
 	/**
 	 * Plugin options
 	 *
-	 * @var array $options
+	 * @var array<string, mixed> $options
 	 */
 	protected $options;
 
@@ -46,7 +46,7 @@ class Advanced_Ads_Plugin {
 	 *
 	 * @deprecated 2.0 Use AdvancedAds\Options class instead.
 	 *
-	 * @return array $options
+	 * @return array<string, mixed> $options
 	 */
 	public function options() {
 		_deprecated_function( __METHOD__, '2.0', "AdvancedAds\Options::get_instance()->get_options('advanced-ads')" );

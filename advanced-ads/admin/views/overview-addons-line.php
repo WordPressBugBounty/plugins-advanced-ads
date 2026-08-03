@@ -5,7 +5,7 @@
  * @package AdvancedAds
  * @author  Advanced Ads <info@wpadvancedads.com>
  *
- * @var array $_addon add-on information.
+ * @var array<string, mixed> $_addon Add-on information.
  */
 
 ?>

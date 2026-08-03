@@ -226,7 +226,7 @@ class Ajax implements Integration_Interface {
 	/**
 	 * Fetch config from PubGuru api
 	 *
-	 * @return WP_Error|array
+	 * @return WP_Error|array<string, mixed>
 	 */
 	private function pubguru_api_connect() {
 		$domain   = Params::post( 'testDomain' ) ? Params::post( 'testDomain' ) : WordPress::get_site_domain();

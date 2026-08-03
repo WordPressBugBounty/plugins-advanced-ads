@@ -19,7 +19,7 @@ class Stats {
 	/**
 	 * Array with ads currently delivered in the frontend
 	 *
-	 * @var array Ads already loaded in the frontend
+	 * @var array<string, mixed> Ads already loaded in the frontend
 	 */
 	public $entities = [];
 

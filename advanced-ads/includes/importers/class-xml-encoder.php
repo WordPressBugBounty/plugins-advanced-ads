@@ -110,7 +110,7 @@ class XML_Encoder
 	 * Selects the type of node to create and appends it to the parent.
 	 *
 	 * @param DOMNode     $parentNode
-	 * @param array|object $data
+	 * @param array<string, mixed>|object $data
 	 * @param string       $nodeName
 	 * @param string       $key
 	 *
@@ -194,7 +194,7 @@ class XML_Encoder
 	 * @throws UnexpectedValueException If XML data is invalid.
 	 *
 	 * @param string $data XML data.
-	 * @return array Decoded XML data.
+	 * @return array<string, mixed> Decoded XML data.
 	 */
 	public function decode( $data ) {
 		if ( ! extension_loaded( 'simplexml' ) ) {
@@ -260,7 +260,7 @@ class XML_Encoder
 	 *
 	 * @param DOMNode $node xml to parse
 	 *
-	 * @return array|string
+	 * @return array<string, mixed>|string
 	 */
 	private function parseXml(DOMNode $node) {
 		// Parse the input DOMNode value (content and children) into an array or a string

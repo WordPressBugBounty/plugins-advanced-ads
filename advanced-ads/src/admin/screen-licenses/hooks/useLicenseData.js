@@ -10,17 +10,16 @@ export function useLicenseData() {
 	const onLicenseScreen = path === LICENSE_PATH;
 	const isInitialLoad = useRef( true );
 
-	const { licenses, appliedAddonKeyMap, hasLicenses } = useSelect(
-		( select ) => {
+	const { licenses, appliedAddonKeyMap, currentActiveLicenses, hasLicenses } =
+		useSelect( ( select ) => {
 			const store = select( STORE_NAME );
 			return {
 				licenses: store.getLicenses(),
 				appliedAddonKeyMap: store.getAppliedAddonKeyMap(),
+				currentActiveLicenses: store.getCurrentActiveLicenses(),
 				hasLicenses: store.hasLicenses(),
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error ] = useState( null );
@@ -33,7 +32,14 @@ export function useLicenseData() {
 		return bindLicenseRefresh( { isInitialLoad, setIsLoading } );
 	}, [ path, onLicenseScreen ] );
 
-	return { licenses, appliedAddonKeyMap, hasLicenses, isLoading, error };
+	return {
+		licenses,
+		appliedAddonKeyMap,
+		currentActiveLicenses,
+		hasLicenses,
+		isLoading,
+		error,
+	};
 }
 
 function bindLicenseRefresh( { isInitialLoad, setIsLoading } ) {

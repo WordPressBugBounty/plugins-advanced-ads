@@ -18,14 +18,14 @@ class Advanced_Ads_AdSense_Data {
 	/**
 	 * Hold options
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $options;
 
 	/**
 	 * Hold resizing data
 	 *
-	 * @var array
+	 * @var array<string, string>
 	 */
 	private $resizing;
 
@@ -98,7 +98,7 @@ class Advanced_Ads_AdSense_Data {
 	/**
 	 * Get responsive sizing
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function get_responsive_sizing() {
 		$this->resizing = apply_filters( 'advanced-ads-gadsense-responsive-sizing', $this->resizing );

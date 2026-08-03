@@ -116,7 +116,7 @@ class Advanced_Ads_AdSense_Public {
 			 * The Pro add-on uses this filter to inject a drop-in replacement for the page-level header code.
 			 *
 			 * @param string $code Existing page level code.
-			 * @param array $parameters {
+			 * @param array{client_id: string, top_anchor: bool, top_anchor_code: string, script_src: string} $parameters {
 			 *    Parameters of the AdSense code.
 			 *
 			 *    @type string $client_id       The Google AdSense client ID.
@@ -199,7 +199,7 @@ class Advanced_Ads_AdSense_Public {
 	/**
 	 * Add AdSense AMP Auto ads code to the header.
 	 *
-	 * @param array $data AMP components.
+	 * @param array<string, mixed> $data AMP components.
 	 */
 	public function add_auto_ads_amp_head_script( $data ) {
 		$data['amp_component_scripts']['amp-auto-ads'] = 'https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js';

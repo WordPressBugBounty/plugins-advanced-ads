@@ -79,7 +79,7 @@ class Page_Quick_Edit implements Routes_Interface {
 	 *
 	 * @param WP_REST_Request $request the request.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_disable_ads( WP_REST_Request $request ) {
 		$nonce = sanitize_text_field( $request->get_param( 'nonce' ) );

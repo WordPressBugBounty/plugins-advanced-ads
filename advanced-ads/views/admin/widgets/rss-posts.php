@@ -4,7 +4,7 @@
  *
  * @package AdvancedAds
  *
- * @var array $rss_posts RSS posts.
+ * @var list<array{link: string, title: array{rendered: string}}> $rss_posts RSS posts.
  */
 
 ?>

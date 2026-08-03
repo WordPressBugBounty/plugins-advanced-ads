@@ -29,7 +29,7 @@ class Addon_Box {
 	/**
 	 * Internal plugins data
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	public $plugins;
 
@@ -183,7 +183,7 @@ class Addon_Box {
 	 *
 	 * @param string $id add-on internal ID.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_grid_data( $id ) {
 		if ( 'pro' === $id ) {
@@ -220,8 +220,8 @@ class Addon_Box {
 	/**
 	 * Sort plugins by status (missing|installed|enabled)
 	 *
-	 * @param array $a plugin data.
-	 * @param array $b plugin data.
+	 * @param array<string, mixed> $a Plugin data.
+	 * @param array<string, mixed> $b Plugin data.
 	 *
 	 * @return int
 	 */
@@ -255,7 +255,7 @@ class Addon_Box {
 	 *
 	 * @param string $section section slug (installed|available|special).
 	 *
-	 * @return array[]
+	 * @return array<string, array<string, mixed>>
 	 */
 	private function get_displayable_items( $section ) {
 		switch ( $section ) {
@@ -349,7 +349,7 @@ class Addon_Box {
 	/**
 	 * Get list of plugins of the "special" section
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>>
 	 */
 	private function get_special_add_ons() {
 		return Arr::where(
@@ -363,8 +363,8 @@ class Addon_Box {
 	/**
 	 * Print output for a single add-on (not in bundle)
 	 *
-	 * @param array  $item    plugin data.
-	 * @param string $section section slug.
+	 * @param array<string, mixed> $item Plugin data.
+	 * @param string               $section section slug.
 	 *
 	 * @return void
 	 */

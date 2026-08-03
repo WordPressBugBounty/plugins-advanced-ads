@@ -278,9 +278,9 @@ class AJAX implements Integration_Interface {
 	/**
 	 * Provides a single ad (ad, group, placement) given ID and selection method.
 	 *
-	 * @param array $request Request.
+	 * @param array<string, mixed> $request Request.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function select_one( $request ) {
 		$method = (string) $request['ad_method'] ?? null;

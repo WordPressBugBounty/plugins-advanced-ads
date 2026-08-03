@@ -12,11 +12,11 @@ use AdvancedAds\Framework\Utilities\Params;
 /**
  * Returns the default arguments for an entity.
  *
- * @param string     $method The method to get the entity.
- * @param int|string $id     The ID of the entity.
- * @param array      $args   Additional arguments for the entity.
+ * @param string               $method The method to get the entity.
+ * @param int|string           $id     The ID of the entity.
+ * @param array<string, mixed> $args   Additional arguments for the entity.
  *
- * @return array The default arguments for the entity.
+ * @return array<string, mixed> The default arguments for the entity.
  */
 function wp_advads_default_entity_arguments( $method, $id, $args ): array {
 	$args = (array) $args;
@@ -36,8 +36,8 @@ function wp_advads_default_entity_arguments( $method, $id, $args ): array {
 /**
  * Sets additional arguments for an entity.
  *
- * @param object $entity The entity object.
- * @param array  $args   The additional arguments to set for the entity.
+ * @param object               $entity The entity object.
+ * @param array<string, mixed> $args   The additional arguments to set for the entity.
  *
  * @return void
  */
@@ -93,13 +93,16 @@ function get_user_ip_address() {
 
 /**
  * Returns an empty array if the value is null.
- *
- * @param mixed $value The value to check.
- *
- * @return array
  */
 if ( ! function_exists( '__return_array_if_null' ) ) {
 	// phpcs:disable
+	/**
+	 * Returns an empty array if the value is null.
+	 *
+	 * @param mixed $value The value to check.
+	 *
+	 * @return array<string, mixed>
+	 */
 	function __return_array_if_null( $value ): array {
 		return $value ?? [];
 	}

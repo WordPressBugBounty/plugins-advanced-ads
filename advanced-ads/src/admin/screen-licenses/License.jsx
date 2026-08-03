@@ -11,8 +11,14 @@ import {
 import { useLicenseData } from './hooks/useLicenseData';
 
 export function License() {
-	const { licenses, appliedAddonKeyMap, hasLicenses, isLoading, error } =
-		useLicenseData();
+	const {
+		licenses,
+		appliedAddonKeyMap,
+		currentActiveLicenses,
+		hasLicenses,
+		isLoading,
+		error,
+	} = useLicenseData();
 
 	if ( isLoading ) {
 		return (
@@ -50,6 +56,7 @@ export function License() {
 						{ ...license }
 						allLicenses={ licenses }
 						appliedAddonKeyMap={ appliedAddonKeyMap }
+						currentActiveLicenses={ currentActiveLicenses }
 						noticesContext={ LICENSE_NOTICES_CONTEXT }
 					/>
 				) ) }

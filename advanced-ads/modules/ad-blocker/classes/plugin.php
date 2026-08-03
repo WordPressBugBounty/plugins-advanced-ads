@@ -14,7 +14,7 @@ class Advanced_Ads_Ad_Blocker {
 	/**
 	 * Module options
 	 *
-	 * @var     array (if loaded)
+	 * @var     array<string, mixed>
 	 */
 	protected $options;
 
@@ -113,7 +113,7 @@ class Advanced_Ads_Ad_Blocker {
 	 *
 	 * @param bool $force Whether the options should be fetched regardless if it has already been done. Is needed in AJAX calls.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function options( $force = false ) {
 		if ( ! isset( $this->options ) || $force ) {
@@ -154,7 +154,7 @@ class Advanced_Ads_Ad_Blocker {
 	/**
 	 * Update module options.
 	 *
-	 * @param array $new_options New options.
+	 * @param array<string, mixed> $new_options New options.
 	 */
 	public function update_options( $new_options ) {
 		if ( ! is_array( $new_options ) ) {

@@ -1,9 +1,9 @@
 /**
  * External Dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Modal } from '@wordpress/components';
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useState, createInterpolateElement } from '@wordpress/element';
 
 /**
  * Internal Dependencies
@@ -28,15 +28,28 @@ export function TicketModal( { closeModal } ) {
 	const [ errors, setErrors ] = useState( {} );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 
-	const p2 = sprintf(
-		/* translators: 1: opening a tag, 2: opening a tag, 3: closing a tag */
+	// createInterpolateElement
+	const p2 = createInterpolateElement(
 		__(
-			'By submitting this form, I accept the %1$sTerms%3$s and %2$sPrivacy Policy%3$s and consent that my personal information in this form will be stored and processed for the purposes of providing support.',
+			'By submitting this form, I accept the <terms>Terms</terms> and <privacy>Privacy Policy</privacy> and consent that my personal information in this form will be stored and processed for the purposes of providing support.',
 			'advanced-ads'
 		),
-		'<a href="https://wpadvancedads.com/terms/" target="_blank">',
-		'<a href="https://wpadvancedads.com/privacy-policy/" target="_blank">',
-		'</a>'
+		{
+			terms: (
+				<a
+					href="https://wpadvancedads.com/terms/"
+					target="_blank"
+					rel="noreferrer"
+				/>
+			),
+			privacy: (
+				<a
+					href="https://wpadvancedads.com/privacy-policy/"
+					target="_blank"
+					rel="noreferrer"
+				/>
+			),
+		}
 	);
 
 	async function handleSubmit( e ) {
@@ -350,11 +363,9 @@ export function TicketModal( { closeModal } ) {
 									errors.terms ? 'terms-error' : undefined
 								}
 							/>
-							<label
-								htmlFor="terms"
-								id="terms-consent-label"
-								dangerouslySetInnerHTML={ { __html: p2 } }
-							/>
+							<label htmlFor="terms" id="terms-consent-label">
+								{ p2 }
+							</label>
 						</div>
 						{ errors.terms && (
 							<p

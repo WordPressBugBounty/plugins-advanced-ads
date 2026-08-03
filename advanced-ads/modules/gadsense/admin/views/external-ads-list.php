@@ -5,7 +5,7 @@
  * @var bool $closeable
  * @var bool $use_dashicons
  * @var Advanced_Ads_Network_Adsense $network
- * @var array $ad_units
+ * @var array<int, \Advanced_Ads_Ad_Network_Ad_Unit> $ad_units
  * @var bool $display_slot_id
  * @var string $pub_id
  *

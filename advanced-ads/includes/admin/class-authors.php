@@ -36,9 +36,9 @@ class Authors implements Integration_Interface {
 	/**
 	 * Ensure that users cannot assign ads to users with unfiltered_html if they don't have the capability themselves.
 	 *
-	 * @param array $query_args WP_User_Query args.
+	 * @param array<string, mixed> $query_args WP_User_Query args.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function filter_ad_authors( $query_args ) {
 		$screen = get_current_screen();
@@ -60,9 +60,9 @@ class Authors implements Integration_Interface {
 	/**
 	 * Ensure that users cannot assign ads to users who have more rights on multisite.
 	 *
-	 * @param array $query_args WP_User_Query args.
+	 * @param array<string, mixed> $query_args WP_User_Query args.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function multisite_filter_ad_authors( $query_args ) {
 		if ( is_super_admin() ) {
@@ -102,8 +102,8 @@ class Authors implements Integration_Interface {
 	 * Prevent users from editing the form data and assign ads to users they're not allowed to.
 	 * Wp_die() if tampering detected.
 	 *
-	 * @param int   $post_id The current post id.
-	 * @param array $data    The post data to be saved.
+	 * @param int                  $post_id The current post id.
+	 * @param array<string, mixed> $data The post data to be saved.
 	 *
 	 * @return void
 	 */
@@ -127,12 +127,12 @@ class Authors implements Integration_Interface {
 	/**
 	 * Prevent users from editing posts of users with more rights than themselves.
 	 *
-	 * @param array  $caps    Needed capabilities.
-	 * @param string $cap     Requested capability.
-	 * @param int    $user_id The user_id for the cap check.
-	 * @param array  $args    Arguments array for checking primitive capabilities.
+	 * @param array<int, string> $caps Needed capabilities.
+	 * @param string             $cap     Requested capability.
+	 * @param int                $user_id The user_id for the cap check.
+	 * @param array<int, mixed>  $args Arguments array for checking primitive capabilities.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function filter_editable_posts( $caps, $cap, $user_id, $args ) {
 		if ( 'advanced_ads_edit_ads' !== $cap || empty( $args ) ) {
@@ -177,7 +177,7 @@ class Authors implements Integration_Interface {
 	/**
 	 * Get the user roles that are allowed to edit ads.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	private function filtered_user_roles(): array {
 		$current_user_has_unfiltered_html = current_user_can( 'unfiltered_html' );

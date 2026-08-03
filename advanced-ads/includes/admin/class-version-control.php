@@ -139,9 +139,9 @@ class Version_Control implements Integration_Interface {
 	 * - all updates until the last three minor updates
 	 * - the last version before the last major update
 	 *
-	 * @param array $versions all version the info API.
+	 * @param array<string, mixed> $versions All version the info API.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function filter_version_number( $versions ) {
 		$results = [];
@@ -200,7 +200,7 @@ class Version_Control implements Integration_Interface {
 	/**
 	 * Get all version from the info API
 	 *
-	 * @return array|\WP_Error
+	 * @return array<string, mixed>|\WP_Error
 	 */
 	private function get_version_from_api() {
 		$aa_info = wp_remote_get( 'https://api.wordpress.org/plugins/info/1.0/advanced-ads.json' );

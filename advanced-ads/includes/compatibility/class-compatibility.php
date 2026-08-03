@@ -47,11 +47,11 @@ class Compatibility implements Integration_Interface {
 	/**
 	 * WordPress SEO: remove attachments attached to ads from `/attachment-sitemap.xml`.
 	 *
-	 * @param array  $url  Array of URL parts.
-	 * @param string $type URL type.
-	 * @param object $post WP_Post object of attachment.
+	 * @param array<string, mixed> $url  Array of URL parts.
+	 * @param string               $type URL type.
+	 * @param object               $post WP_Post object of attachment.
 	 *
-	 * @return array|bool Unmodified array of URL parts or false to remove URL.
+	 * @return array<string, mixed>|bool Unmodified array of URL parts or false to remove URL.
 	 */
 	public function wpseo_noindex_ad_attachments( $url, $type, $post ) {
 		if ( 'post' !== $type ) {
@@ -197,7 +197,7 @@ class Compatibility implements Integration_Interface {
 	/**
 	 * Get cookies from borlabs plugin
 	 *
-	 * @return bool|array
+	 * @return list<object>|false
 	 */
 	private static function borlabs_get_cookies() {
 		// Early bail!!

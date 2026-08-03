@@ -96,7 +96,7 @@ class Module {
 	/**
 	 * Get a random feature based on weights and a random number
 	 *
-	 * @return array
+	 * @return array{id: string, weight: int, subheading: string, heading: string, text: string, cta: string, cta_button: string}
 	 */
 	public function get_winner_feature(): array {
 		$random_weight  = wp_rand( 1, $this->weight_sum );
@@ -146,8 +146,8 @@ class Module {
 	/**
 	 * Build the link for the winner feature with all its utm parameters
 	 *
-	 * @param array  $winner the winner feature.
-	 * @param string $screen the screen on which it was displayed.
+	 * @param array{id: string, weight: int, subheading?: string, heading?: string, text?: string, cta?: string, cta_button?: string} $winner the winner feature.
+	 * @param string                                                                                                                  $screen the screen on which it was displayed.
 	 *
 	 * @return string
 	 */
@@ -176,7 +176,7 @@ class Module {
 	/**
 	 * Set the features/banners
 	 *
-	 * @return array
+	 * @return array<string, array{subheading: string, heading: string, weight: int, text: string, cta: string, cta_button: string}>
 	 */
 	public function get_features(): array {
 		return [

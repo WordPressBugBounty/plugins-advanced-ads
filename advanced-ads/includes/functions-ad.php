@@ -26,9 +26,9 @@ use AdvancedAds\Interfaces\Ad_Type;
 /**
  * Get the ad object.
  *
- * @param Ad|WP_Post|int|bool $ad_id    Ad instance, post instance, numeric or false to use global $post.
- * @param string              $new_type Change type of ad.
- * @param array               $args     Additional arguments.
+ * @param Ad|WP_Post|int|bool  $ad_id    Ad instance, post instance, numeric or false to use global $post.
+ * @param string               $new_type Change type of ad.
+ * @param array<string, mixed> $args     Additional arguments.
  *
  * @return string|mixed The ad content or whatever entity or string that is overriding the return value.
  */
@@ -69,8 +69,8 @@ function get_the_ad( $ad_id = 0, $new_type = '', $args = [] ) {
  *
  * @since 1.0.0
  *
- * @param int   $id   Id of the ad (post).
- * @param array $args Additional arguments.
+ * @param int                  $id   Id of the ad (post).
+ * @param array<string, mixed> $args Additional arguments.
  *
  * @return void
  */
@@ -220,7 +220,7 @@ function wp_advads_get_all_statuses(): array {
 /**
  * Get all ads.
  *
- * @return array
+ * @return array<string, mixed>
  */
 function wp_advads_get_ads_dropdown(): array {
 	return wp_advads()->ads->repository->get_ads_dropdown();
@@ -277,7 +277,7 @@ function wp_advads_get_ads_by_group_id( $group_id, $output = OBJECT ): array {
  *
  * @param int $placement_id The ID of the placement.
  *
- * @return array
+ * @return array<string, mixed>
  */
 function wp_advads_get_ads_by_placement_id( $placement_id ): array {
 	return wp_advads()->ads->repository->get_ads_by_placement_id( $placement_id );
@@ -288,7 +288,7 @@ function wp_advads_get_ads_by_placement_id( $placement_id ): array {
  *
  * @param string $type The type of ads to retrieve.
  *
- * @return array
+ * @return array<string, mixed>
  */
 function wp_advads_get_ads_by_type( $type ): array {
 	return wp_advads()->ads->repository->get_ads_by_type( $type );
@@ -308,8 +308,8 @@ function wp_advads_get_ads_by_ids( array $ad_ids ): array {
 /**
  * Query ads based on the provided arguments.
  *
- * @param array $args          The arguments to customize the query.
- * @param bool  $improve_query Whether to improve the query speed.
+ * @param array<string, mixed> $args          The arguments to customize the query.
+ * @param bool                 $improve_query Whether to improve the query speed.
  *
  * @return WP_Query The WP_Query object containing the results of the query.
  */

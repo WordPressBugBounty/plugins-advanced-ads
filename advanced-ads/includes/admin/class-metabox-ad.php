@@ -35,7 +35,7 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Our boxes ids.
 	 *
-	 * @var array
+	 * @var array<int, string>
 	 */
 	protected $meta_box_ids = [
 		'advads-pro-pitch',
@@ -47,7 +47,7 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Hold metaboxes objects
 	 *
-	 * @var array
+	 * @var array<string, object>
 	 */
 	protected $metaboxes = [];
 
@@ -84,9 +84,9 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Add "close" class to collapse the ad-type metabox after ad was saved first
 	 *
-	 * @param array $classes Metabox classes.
+	 * @param array<int, string> $classes Metabox classes.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function add_classes_ad_type( $classes = [] ): array {
 		global $post;
@@ -105,10 +105,10 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Force all AA related meta boxes to stay visible
 	 *
-	 * @param array     $hidden An array of hidden meta boxes.
-	 * @param WP_Screen $screen Current screen instance.
+	 * @param array<int, string> $hidden An array of hidden meta boxes.
+	 * @param WP_Screen          $screen Current screen instance.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function unhide_meta_boxes( $hidden, $screen ): array {
 		if ( ! isset( $screen->id ) || 'advanced_ads' !== $screen->id ) {
@@ -134,8 +134,8 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Display metaboxes by their id.
 	 *
-	 * @param WP_Post $post Post instance.
-	 * @param array   $box  Meta box information.
+	 * @param WP_Post              $post Post instance.
+	 * @param array<string, mixed> $box Meta box information.
 	 *
 	 * @return void
 	 */
@@ -157,8 +157,8 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Remove parent group dropdown from ad group taxonomy
 	 *
-	 * @param string $output    Parent group dropdown HTML.
-	 * @param array  $arguments Additional parameters.
+	 * @param string               $output    Parent group dropdown HTML.
+	 * @param array<string, mixed> $arguments Additional parameters.
 	 *
 	 * @return string
 	 */
@@ -220,9 +220,9 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Prepare main post data for ads when being saved.
 	 *
-	 * @param array $data An array of slashed post data.
+	 * @param array<string, mixed> $data An array of slashed post data.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function set_post_title( $data ): array {
 		if (
@@ -276,7 +276,7 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Get posted data for ad.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function get_post_data(): array {
 		$data = Params::post( 'advanced_ad', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
@@ -347,7 +347,7 @@ class Metabox_Ad implements Integration_Interface {
 	/**
 	 * Render links for handles
 	 *
-	 * @param array $box Meta box information.
+	 * @param array<string, mixed> $box Meta box information.
 	 *
 	 * @return void
 	 */

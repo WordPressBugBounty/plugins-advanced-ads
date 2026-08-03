@@ -109,9 +109,9 @@ class Capability_Manager implements Integration_Interface {
 	/**
 	 * Register URE groups.
 	 *
-	 * @param array $groups Groups.
+	 * @param array<string, mixed> $groups Groups.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function register_ure_groups( array $groups ): array {
 		$groups = (array) $groups;
@@ -128,10 +128,10 @@ class Capability_Manager implements Integration_Interface {
 	/**
 	 * Register URE capabilities.
 	 *
-	 * @param array  $groups Current capability groups.
-	 * @param string $cap_id Capability identifier.
+	 * @param array<string, mixed> $groups Current capability groups.
+	 * @param string               $cap_id Capability identifier.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function register_ure_caps( $groups, $cap_id ): array {
 		if ( array_key_exists( $cap_id, $this->capability_manager->get_capabilities() ) ) {
@@ -145,9 +145,9 @@ class Capability_Manager implements Integration_Interface {
 	/**
 	 * Register PublishPress capabilities.
 	 *
-	 * @param array $caps Capabilities.
+	 * @param array<string, mixed> $caps Capabilities.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function register_publishpress_caps( array $caps ): array {
 		$caps[ $this->get_name() ] = array_keys( $this->capability_manager->get_capabilities() );

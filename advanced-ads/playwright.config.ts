@@ -36,7 +36,7 @@ export default defineConfig( {
 			testDir: 'tests/Acceptance/Admin',
 			use: { storageState: 'auth.json' },
 			dependencies: [ 'setup' ],
-			testIgnore: '**/Licenses/**',
+			testIgnore: [ '**/Licenses/**', '**/Ads/**', '**/Groups/**', '**/Placements/**', '**/Support/**' ],
 		},
 
 		{
@@ -51,6 +51,7 @@ export default defineConfig( {
 			testDir: 'tests/Acceptance/Admin/Groups',
 			use: { storageState: 'auth.json' },
 			dependencies: [ 'admin-ads' ],
+			fullyParallel: false,
 		},
 
 		{
@@ -58,6 +59,8 @@ export default defineConfig( {
 			testDir: 'tests/Acceptance/Admin/Placements',
 			use: { storageState: 'auth.json' },
 			dependencies: [ 'admin-groups' ],
+			fullyParallel: false,
+			workers: 1,
 		},
 
 		{

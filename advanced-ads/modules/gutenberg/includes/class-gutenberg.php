@@ -56,7 +56,7 @@ class Advanced_Ads_Gutenberg {
 		 *
 		 * @param string[] $widget_types An array of excluded widget-type IDs.
 		 *
-		 * @return array
+		 * @return string[]
 		 */
 		add_filter(
 			'widget_types_to_hide_from_legacy_widget_block',
@@ -195,7 +195,7 @@ class Advanced_Ads_Gutenberg {
 	/**
 	 * Server side rendering for single ad block
 	 *
-	 * @param array $attr Block's attributes.
+	 * @param array<string, mixed> $attr Block's attributes.
 	 */
 	public static function render_ad_selector( $attr ) {
 		ob_start();

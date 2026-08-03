@@ -13,7 +13,7 @@ class Advanced_Ads_Network_Adsense extends Advanced_Ads_Ad_Network {
 	 * An array containing all the AdSense status codes that flag an {$link Advanced_Ads_Ad_Network_Ad_Unit} ad unit as active
 	 * for downward compatibility with PHP < 5.6 the const had to be changed to static field. you can revert to const when PHP5 support is FINALLY dropped
 	 *
-	 * @var array
+	 * @var list<string>
 	 */
 	private static $status_codes_active = [ 'ACTIVE', 'NEW' ];
 
@@ -67,7 +67,7 @@ class Advanced_Ads_Network_Adsense extends Advanced_Ads_Ad_Network {
 	 * Render before form.
 	 *
 	 * @param string $tab_id the ID of the current tab.
-	 * @param array  $tab    the current tab.
+	 * @param array<string, mixed> $tab the current tab.
 	 */
 	public function render_before_form( $tab_id, $tab ) {
 		if ( 'adsense' === $tab_id && ! empty( $this->data->get_adsense_id() ) ) {
@@ -366,7 +366,7 @@ class Advanced_Ads_Network_Adsense extends Advanced_Ads_Ad_Network {
 	/**
 	 * Sanitize AdSense settings
 	 *
-	 * @param array $options all the options.
+	 * @param array<string, mixed> $options all the options.
 	 */
 	protected function sanitize_settings( $options ) {
 		// Sanitize whatever option one wants to sanitize.
@@ -386,7 +386,7 @@ class Advanced_Ads_Network_Adsense extends Advanced_Ads_Ad_Network {
 	 * Save publisher id from new ad unit if not given in main options
 	 *
 	 * @param Ad    $ad        Ad instance.
-	 * @param array $post_data Post data array.
+	 * @param array<string, mixed> $post_data Post data array.
 	 *
 	 * @return void
 	 */
@@ -411,7 +411,7 @@ class Advanced_Ads_Network_Adsense extends Advanced_Ads_Ad_Network {
 	/**
 	 * Return ad units loaded through the API.
 	 *
-	 * @return array
+	 * @return array<int|string, \Advanced_Ads_Ad_Network_Ad_Unit>
 	 */
 	public function get_external_ad_units() {
 		$db         = Advanced_Ads_AdSense_Data::get_instance();
@@ -514,8 +514,8 @@ class Advanced_Ads_Network_Adsense extends Advanced_Ads_Ad_Network {
 	 *
 	 * @inheritDoc
 	 *
-	 * @param array $data data to be printed.
-	 * @return array
+	 * @param array<string, mixed> $data data to be printed.
+	 * @return array<string, mixed>
 	 */
 	public function append_javascript_data( &$data ) {
 		$pub_id            = Advanced_Ads_AdSense_Data::get_instance()->get_adsense_id();

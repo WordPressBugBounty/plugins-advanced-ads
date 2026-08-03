@@ -33,7 +33,7 @@ class Api_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Hold slot ids from database.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $slots = [];
 
@@ -147,7 +147,7 @@ class Api_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Get ads from sheet by device
 	 *
-	 * @param array $ads Ads selected by user.
+	 * @param array<int, \AdvancedAds\Abstracts\Ad> $ads Ads selected by user.
 	 *
 	 * @return string
 	 */
@@ -300,9 +300,9 @@ class Api_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Normalize ads
 	 *
-	 * @param array $ads Ads from api.
+	 * @param array<int, \AdvancedAds\Abstracts\Ad> $ads Ads from api.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function normalize_ads( $ads ): array {
 		$normalized = [];
@@ -382,9 +382,9 @@ class Api_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Parse display conditions
 	 *
-	 * @param array|string $terms Dictionary term.
+	 * @param array<int, mixed>|string $terms Dictionary term.
 	 *
-	 * @return array|null
+	 * @return array<string, mixed>|null
 	 */
 	private function parse_display_conditions( $terms ) {
 		// Return for debugging.

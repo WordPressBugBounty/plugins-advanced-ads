@@ -4,11 +4,11 @@
  *
  * @package AdvancedAds
  *
- * @var string $name         Form name attribute.
- * @var string $operator     The operator, should be one of `is` or `is_not`.
- * @var array  $type_options Array with additional information.
- * @var array  $options      The options for the current condition.
- * @var int    $index        The zero-based index for the current condition.
+ * @var string                              $name         Form name attribute.
+ * @var string                              $operator     The operator, should be one of `is` or `is_not`.
+ * @var array<string, array<string, mixed>> $type_options Array with additional information.
+ * @var array<string, mixed>                $options      The options for the current condition.
+ * @var int                                 $index        The zero-based index for the current condition.
  */
 
 ?>

@@ -60,14 +60,14 @@ class Advanced_Ads_AdSense_MAPI {
 	/**
 	 * Default options.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private static $default_options = [];
 
 	/**
 	 * Default account options.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private static $empty_account_data = [
 		'default_app' => [
@@ -308,7 +308,7 @@ class Advanced_Ads_AdSense_MAPI {
 	 *
 	 * @param string $ad_unit the ad unit to get the ad code for.
 	 *
-	 * @return array response to send back to the browser.
+	 * @return array<string, mixed>|string response to send back to the browser.
 	 */
 	public function get_ad_code( $ad_unit ) {
 		$options       = self::get_option();
@@ -391,9 +391,9 @@ class Advanced_Ads_AdSense_MAPI {
 	/**
 	 * Convert ad unit data to v1.4 format to match the current UI and logics
 	 *
-	 * @param array $ad_unit ad unit in MAPI v2 format.
+	 * @param array<string, mixed> $ad_unit ad unit in MAPI v2 format.
 	 *
-	 * @return array the ad unit in MAPI v1.4 format.
+	 * @return array<string, mixed> the ad unit in MAPI v1.4 format.
 	 */
 	public static function convert_ad_unit_format( $ad_unit ) {
 		$chunks = explode( '/', $ad_unit['name'] );
@@ -414,7 +414,7 @@ class Advanced_Ads_AdSense_MAPI {
 	 *
 	 * @param string $account publisher ID.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function get_ad_units( $account ) {
 		$url          = 'https://adsense.googleapis.com/v2/accounts/' . $account . '/adclients/ca-' . $account . '/adunits?pageSize=350';
@@ -555,7 +555,7 @@ class Advanced_Ads_AdSense_MAPI {
 	 *
 	 * @param string $account publisher ID.
 	 *
-	 * @return array|string the access token on success, error info (as array) if an error occurred.
+	 * @return array<string, mixed>|string the access token on success, error info (as array) if an error occurred.
 	 */
 	public static function get_access_token( $account ) {
 		$options = self::get_option();
@@ -608,7 +608,7 @@ class Advanced_Ads_AdSense_MAPI {
 	/**
 	 *  Renew the current access token.
 	 *
-	 * @param array $account AdSense account ID.
+	 * @param string $account AdSense account ID.
 	 */
 	public static function renew_access_token( $account ) {
 		$cid           = self::CID;
@@ -1358,9 +1358,9 @@ class Advanced_Ads_AdSense_MAPI {
 	/**
 	 * Sort ad units list alphabetically
 	 *
-	 * @param array $adunits The array of ad units to be sorted.
+	 * @param array<string, array<string, mixed>> $adunits The array of ad units to be sorted.
 	 *
-	 * @return array The sorted array of ad units.
+	 * @return array<string, array<string, mixed>> The sorted array of ad units.
 	 */
 	public static function get_sorted_adunits( $adunits ): array {
 		$units_sorted_by_name = [];
@@ -1494,7 +1494,7 @@ class Advanced_Ads_AdSense_MAPI {
 	 * Save token obtained from confirmation code
 	 *
 	 * @param string $token   access token data.
-	 * @param array  $details selected account details.
+	 * @param array<string, mixed> $details selected account details.
 	 */
 	public static function save_token_from_data( $token, $details ) {
 		$options    = self::get_option();
@@ -1535,7 +1535,7 @@ class Advanced_Ads_AdSense_MAPI {
 	 *  Get a list of stored alerts for a given AdSense account.
 	 *
 	 *  @param string $pub_id the publisher account.
-	 *  @return array $alerts
+	 *  @return array<string, mixed>|false $alerts
 	 */
 	public static function get_stored_account_alerts( $pub_id = '' ) {
 		if ( empty( $pub_id ) ) {
@@ -1562,9 +1562,9 @@ class Advanced_Ads_AdSense_MAPI {
 	 * - duplicates
 	 * - irrelevant when placing ads in the frontend
 	 *
-	 * @param array      $alert_items alerts.
-	 * @param null|array $disabled_alerts additional disabled alerts.
-	 * @return array filtered alert items.
+	 * @param array<int|string, array<string, mixed>> $alert_items alerts.
+	 * @param list<string>|null $disabled_alerts additional disabled alerts.
+	 * @return array<int|string, array<string, mixed>> filtered alert items.
 	 */
 	public static function filter_account_alerts( array $alert_items, $disabled_alerts = null ) {
 		if ( empty( $alert_items ) || ! is_array( $alert_items ) ) {
@@ -1599,8 +1599,8 @@ class Advanced_Ads_AdSense_MAPI {
 	 * Remove alerts dynamically when showing them.
 	 * only applies to stored alerts and not when they are loaded directly from AdSense
 	 *
-	 * @param array $alerts Alert options.
-	 * @return array $alerts Modified alert options.
+	 * @param array<string, mixed> $alerts Alert options.
+	 * @return array<string, mixed> $alerts Modified alert options.
 	 */
 	public static function filter_stored_account_alerts( array $alerts ) {
 		if ( empty( $alerts['items'] ) || ! is_array( $alerts['items'] ) ) {
@@ -1626,9 +1626,9 @@ class Advanced_Ads_AdSense_MAPI {
 	/**
 	 * Checks if there is any AdSense warning for the currently connected AdSense account.
 	 *
-	 * @param array $messages The array of messages.
+	 * @param list<string> $messages The array of messages.
 	 *
-	 * @return array The modified array.
+	 * @return list<string> The modified array.
 	 */
 	public static function adsense_warnings_check( $messages ) {
 		$data       = Advanced_Ads_AdSense_Data::get_instance();
@@ -1728,9 +1728,9 @@ class Advanced_Ads_AdSense_MAPI {
 	/**
 	 * Extract basic account info from the data sent by Google
 	 *
-	 * @param array $account account data from Google.
+	 * @param array{name: string, displayName: string} $account account data from Google.
 	 *
-	 * @return array
+	 * @return array{id: string, name: string}
 	 */
 	private static function get_account_details( $account ) {
 		return [

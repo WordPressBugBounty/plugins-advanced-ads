@@ -22,7 +22,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Cached AMP options from the database.
 	 *
-	 * @var array|null
+	 * @var array<string, mixed>|null
 	 */
 	private $amp_options = null;
 
@@ -263,7 +263,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Return the cached AMP for WP option array.
 	 *
-	 * @return array|false
+	 * @return array<string, mixed>|false
 	 */
 	private function get_amp_options() {
 		if ( null !== $this->amp_options ) {
@@ -282,7 +282,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Count how many ads of each group are importable.
 	 *
-	 * @return array { basic, incontent, standard, featured }
+	 * @return array<string, mixed> { basic, incontent, standard, featured }
 	 */
 	private function count_importable_ads(): array {
 		$amp    = $this->get_amp_options();
@@ -620,9 +620,9 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	 * Resolve ad type, title, and raw data for a basic ad slot.
 	 * Returns visibility rules for slot i (slot 3 is configurable).
 	 *
-	 * @param array $amp AMP options.
-	 * @param int   $i   Slot index.
-	 * @return array Visibility condition array.
+	 * @param array<string, mixed> $amp AMP options.
+	 * @param int                  $i   Slot index.
+	 * @return array<string, mixed> Visibility condition array.
 	 */
 	private function build_basic_visibility( array $amp, int $i ): array {
 		if ( 3 !== $i ) {
@@ -686,10 +686,10 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Resolve ad type label, title, and raw data for an in-content slot.
 	 *
-	 * @param array  $amp         AMP options.
-	 * @param int    $i           Slot index.
-	 * @param string $ad_type_raw Numeric ad-type string from AMP options.
-	 * @return array { aa_type, title, raw_data, position_raw }
+	 * @param array<string, mixed> $amp         AMP options.
+	 * @param int                  $i           Slot index.
+	 * @param string               $ad_type_raw Numeric ad-type string from AMP options.
+	 * @return array<string, mixed> { aa_type, title, raw_data, position_raw }
 	 */
 	private function resolve_incontent_slot( array $amp, int $i, string $ad_type_raw ): array {
 		switch ( $ad_type_raw ) {
@@ -756,7 +756,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	 * Resolve placement type and paragraph props from a raw in-content position string.
 	 *
 	 * @param string $position_raw Raw position value from AMP options.
-	 * @return array { placement_type, paragraph_props }
+	 * @return array<string, mixed> { placement_type, paragraph_props }
 	 */
 	private function resolve_incontent_position( string $position_raw ): array {
 		// Percentage-based positions.
@@ -789,10 +789,10 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Resolve ad type label, title, and raw data for a standard ad slot.
 	 *
-	 * @param array  $amp         AMP options.
-	 * @param int    $i           Slot index.
-	 * @param string $ad_type_raw Numeric ad-type string from AMP options.
-	 * @return array { aa_type, title, raw_data }
+	 * @param array<string, mixed> $amp         AMP options.
+	 * @param int                  $i           Slot index.
+	 * @param string               $ad_type_raw Numeric ad-type string from AMP options.
+	 * @return array<string, mixed> { aa_type, title, raw_data }
 	 */
 	private function resolve_standard_slot( array $amp, int $i, string $ad_type_raw ): array {
 		switch ( $ad_type_raw ) {
@@ -855,9 +855,9 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Resolve ad type label, title, and raw data for the after-featured-image slot.
 	 *
-	 * @param array  $amp         AMP options.
-	 * @param string $ad_type_raw Numeric ad-type string from AMP options.
-	 * @return array { aa_type, title, raw_data }
+	 * @param array<string, mixed> $amp         AMP options.
+	 * @param string               $ad_type_raw Numeric ad-type string from AMP options.
+	 * @return array<string, mixed> { aa_type, title, raw_data }
 	 */
 	private function resolve_featured_image_slot( array $amp, string $ad_type_raw ): array {
 		switch ( $ad_type_raw ) {
@@ -924,14 +924,14 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Create an Advanced Ads ad and (optionally) a placement, then track history.
 	 *
-	 * @param string $title           Human-readable ad title.
-	 * @param string $aa_type         Advanced Ads ad type slug ('adsense', 'plain', 'image').
-	 * @param array  $raw_data        Structured data resolved from AMP options.
-	 * @param string $placement_type  Advanced Ads placement type slug (or 'manual').
-	 * @param array  $visibility      Display / visitor conditions array.
-	 * @param array  $paragraph_props Extra placement props for post_content placements.
-	 * @param string $history_key     Session key for rollback.
-	 * @param int    $count           Running import counter (passed by reference).
+	 * @param string               $title           Human-readable ad title.
+	 * @param string               $aa_type         Advanced Ads ad type slug ('adsense', 'plain', 'image').
+	 * @param array<string, mixed> $raw_data        Structured data resolved from AMP options.
+	 * @param string               $placement_type  Advanced Ads placement type slug (or 'manual').
+	 * @param array<string, mixed> $visibility      Display / visitor conditions array.
+	 * @param array<string, mixed> $paragraph_props Extra placement props for post_content placements.
+	 * @param string               $history_key     Session key for rollback.
+	 * @param int                  $count           Running import counter (passed by reference).
 	 * @return void
 	 */
 	private function create_ad_and_placement(
@@ -989,8 +989,8 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Apply AdSense-specific data to an ad object.
 	 *
-	 * @param object $ad       Advanced Ads ad object.
-	 * @param array  $raw_data Resolved AdSense data.
+	 * @param object               $ad       Advanced Ads ad object.
+	 * @param array<string, mixed> $raw_data Resolved AdSense data.
 	 * @return void
 	 */
 	private function apply_adsense_data( $ad, array $raw_data ): void {
@@ -1023,8 +1023,8 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	 * DoubleClick is not a native Advanced Ads type, so we store it as plain
 	 * HTML and preserve the slot / dimensions in options for reference.
 	 *
-	 * @param object $ad       Advanced Ads ad object.
-	 * @param array  $raw_data Resolved DoubleClick data.
+	 * @param object               $ad       Advanced Ads ad object.
+	 * @param array<string, mixed> $raw_data Resolved DoubleClick data.
 	 * @return void
 	 */
 	private function apply_doubleclick_data( $ad, array $raw_data ): void {
@@ -1052,8 +1052,8 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Apply MGID network data as plain HTML to an ad object.
 	 *
-	 * @param object $ad       Advanced Ads ad object.
-	 * @param array  $raw_data Resolved MGID data.
+	 * @param object               $ad       Advanced Ads ad object.
+	 * @param array<string, mixed> $raw_data Resolved MGID data.
 	 * @return void
 	 */
 	private function apply_mgid_data( $ad, array $raw_data ): void {
@@ -1079,10 +1079,10 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Create an Advanced Ads placement.
 	 *
-	 * @param int    $ad_id           The ID of the newly-created ad.
-	 * @param string $title           Human-readable title for the placement.
-	 * @param string $placement_type  Advanced Ads placement type slug.
-	 * @param array  $paragraph_props Extra props for post_content placements.
+	 * @param int                  $ad_id           The ID of the newly-created ad.
+	 * @param string               $title           Human-readable title for the placement.
+	 * @param string               $placement_type  Advanced Ads placement type slug.
+	 * @param array<string, mixed> $paragraph_props Extra props for post_content placements.
 	 * @return object|null
 	 */
 	private function create_placement( int $ad_id, string $title, string $placement_type, array $paragraph_props ) {

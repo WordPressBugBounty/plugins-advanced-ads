@@ -67,7 +67,7 @@ class Ad_Image extends Ad implements Ad_Interface {
 	/**
 	 * Pre save
 	 *
-	 * @param array $post_data Post data.
+	 * @param array<string, mixed> $post_data Post data.
 	 *
 	 * @return void
 	 */

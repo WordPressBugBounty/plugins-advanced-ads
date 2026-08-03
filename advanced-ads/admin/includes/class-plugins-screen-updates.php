@@ -35,14 +35,14 @@ class Advanced_Ads_Plugins_Screen_Updates {
 	public function __construct() {
 		$this->current_version = defined( 'ADVADS_VERSION' ) ? ADVADS_VERSION : '0.0.0';
 
-		add_action( "in_plugin_update_message-advanced-ads/advanced-ads.php", array( $this, 'in_plugin_update_message' ), 20, 2 );
+		add_action( 'in_plugin_update_message-advanced-ads/advanced-ads.php', [ $this, 'in_plugin_update_message' ], 20, 2 );
 	}
 
 	/**
 	 * Show plugin changes on the plugins screen.
 	 *
-	 * @param array    $args     Unused parameter.
-	 * @param stdClass $response Plugin update response.
+	 * @param array<string, mixed> $args     Unused parameter.
+	 * @param stdClass             $response Plugin update response.
 	 */
 	public function in_plugin_update_message( $args, $response ) {
 		$new_version = $response->new_version;
@@ -104,12 +104,12 @@ class Advanced_Ads_Plugins_Screen_Updates {
 	 */
 	private function parse_update_notice( $content, $new_version ) {
 		$version_parts     = explode( '.', $new_version );
-		$check_for_notices = array(
+		$check_for_notices = [
 			$version_parts[0] . '.0', // Major.
 			$version_parts[0] . '.0.0', // Major.
 			$version_parts[0] . '.' . $version_parts[1], // Minor.
 			$version_parts[0] . '.' . $version_parts[1] . '.' . $version_parts[2], // Patch.
-		);
+		];
 
 		$notice_regexp  = '~==\s*Upgrade Notice\s*==\s*=\s*(.*)\s*=(.*)(?===|$)~Uis';
 		$upgrade_notice = '';

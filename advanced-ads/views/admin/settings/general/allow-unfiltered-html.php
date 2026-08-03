@@ -7,7 +7,7 @@
  * @since   1.48.2
  *
  * @var WP_Role[] $user_roles_to_display Array of user roles that are allowed to edit ads.
- * @var array     $allowed_roles         Array of user role names that are allowed to use unfiltered_html on ads.
+ * @var list<string> $allowed_roles Array of user role names that are allowed to use unfiltered_html on ads.
  */
 
 ?>

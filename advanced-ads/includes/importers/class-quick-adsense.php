@@ -89,230 +89,328 @@ class Quick_Adsense extends Importer implements Interface_Importer {
 		return '';
 	}
 
-	public function adsforwp_import_all_quick_adsense_ads(){
+	/**
+	 * Import all Quick Adsense ads into adsforwp post type.
+	 *
+	 * @return array|void
+	 */
+	public function adsforwp_import_all_quick_adsense_ads() {
 		global $wpdb;
+
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
 		$nonce = Params::get( 'adsforwp_security_nonce', '' );
-		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'adsforwp_ajax_check_nonce' ) ){
-				return;
+		if ( ! $nonce || ! wp_verify_nonce( $nonce, 'adsforwp_ajax_check_nonce' ) ) {
+			return;
 		}
 
-		$wpdb->query('START TRANSACTION');
-		$result = array();
-		$user_id = get_current_user_id();
-		global $quickAdsenseAdsDisplayed;
-		global $ampfowpAdsenseAdsId;
-		global $quickAdsenseBeginEnd;
-		$ampfowpAdsenseAdsId = array();
-		$settings = get_option('quick_adsense_settings');
+		$wpdb->query( 'START TRANSACTION' );
+		$result   = [];
+		$user_id  = get_current_user_id();
+		$settings = get_option( 'quick_adsense_settings' );
 
-		for($i = 1; $i <= 10; $i++) {
-			if(isset($settings['onpost_ad_'.$i.'_content']) && !empty($settings['onpost_ad_'.$i.'_content'])) {
-			$ads_post = array(
-						'post_author' => $user_id,
-						'post_title'  => 'Custom Ad '.$i.' (Migrated from Quick Adsense)',
-						'post_status' => 'publish',
-						'post_name'   => 'Custom Ad '.$i.' (Migrated from Quick Adsense)',
-						'post_type'   => 'adsforwp',
+		$this->import_onpost_ads( $settings, $user_id, $result );
+		$this->import_widget_ads( $settings, $user_id, $result );
 
-						);
-			$post_id = wp_insert_post($ads_post);
-			$ads_content = $settings['onpost_ad_'.$i.'_content'];
-			$ads_alignment = $settings['onpost_ad_'.$i.'_alignment'];
-			$ads_margin = $settings['onpost_ad_'.$i.'_margin'];
-
-				$wheretodisplay = '';
-				$ad_align       = '';
-				$pragraph_no    = '';
-				$adposition     = '';
-
-
-				if($ads_alignment == 1){
-				$ad_align ='left';
-				if(!empty($ads_margin)){
-					$ads_align_margin = array('ad_margin_top' => $ads_margin,'ad_margin_bottom' => $ads_margin,'ad_margin_left' => 0,'ad_margin_right' => $ads_margin);
-				}
-				}elseif($ads_alignment == 2){
-				$ad_align ='center';
-				if(!empty($ads_margin)){
-					$ads_align_margin = array('ad_margin_top' => $ads_margin,'ad_margin_bottom' => $ads_margin,'ad_margin_left' => 0,'ad_margin_right' => 0);
-				}
-				}elseif($ads_alignment == 3){
-				$ad_align ='right';
-				if(!empty($ads_margin)){
-					$ads_align_margin = array('ad_margin_top' => $ads_margin,'ad_margin_bottom' => $ads_margin,'ad_margin_left' => $ads_margin,'ad_margin_right' => 0);
-				}
-				}elseif($ads_alignment == 4){
-				$ad_align = 'none';
-				if(!empty($ads_margin)){
-					$ads_align_margin = array('ad_margin_top' => 0,'ad_margin_bottom' => 0,'ad_margin_left' => 0,'ad_margin_right' => 0);
-				}
-				}
-				if( isset($settings['enable_on_posts']) && $settings['enable_on_posts'] == 1){
-				$data_group_array['group-0'] = array(
-										'data_array' => array(
-												array(
-													'key_1' => 'post_type',
-													'key_2' => 'equal',
-													'key_3' => 'post',
-												)
-											)
-										);
-				}
-				if( isset($settings['enable_on_pages']) && $settings['enable_on_pages'] == 1){
-				$data_group_array['group-1'] = array(
-										'data_array' => array(
-												array(
-													'key_1' => 'post_type',
-													'key_2' => 'equal',
-													'key_3' => 'page',
-												)
-											)
-										);
-				}
-
-				//enable_position_before_last_para, ad_before_last_para
-
-
-				if($settings['ad_beginning_of_post'] == $i){
-				if($settings['enable_position_beginning_of_post'] == 1){
-					$wheretodisplay = 'before_the_content';
-				}
-				}elseif($settings['ad_end_of_post'] == $i){
-				if( $settings['enable_position_end_of_post'] == 1){
-					$wheretodisplay = 'after_the_content';
-				}
-				}elseif($settings['ad_middle_of_post'] == $i){
-				if($settings['enable_position_middle_of_post'] == 1 ){
-					$wheretodisplay = 'between_the_content';
-				}
-				}
-
-				for($j = 1; $j <= 3; $j++) {
-				if($settings['ad_after_para_option_'.$j] == $i){
-					if($settings['enable_position_after_para_option_'.$j] == 1){
-					$wheretodisplay = 'between_the_content';
-					$numberofparas = 'number_of_paragraph';
-					$display_tag_name = 'p_tag';
-					$paragraph_number = $settings['position_after_para_option_'.$j];
-					if($settings['enable_jump_position_after_para_option_'.$j] == 1){
-						$ads_on_every_paras = 1;
-					}
-					}elseif($settings['enable_position_after_image_option_'.$j] == 1){
-					$wheretodisplay = 'between_the_content';
-					$numberofparas = 'number_of_paragraph';
-					$display_tag_name = 'img_tag';
-					$paragraph_number = $settings['position_after_para_option_'.$j];
-					if($settings['enable_jump_position_after_para_option_'.$j] == 1){
-						$ads_on_every_paras = 1;
-					}
-					}
-				}
-				}
-
-				//enable_on_posts
-				//enable_on_pages
-				//enable_on_homepage
-				$adforwp_meta_key = array(
-					'select_adtype'     => 'custom',
-					'custom_code'       => $ads_content,
-					'adposition'        => $adposition,
-					'paragraph_number'  => $pragraph_no,
-					'adsforwp_ad_align' => $ad_align,
-					'adsforwp_ad_margin'=> $ads_align_margin,
-					'imported_from'     => 'quick_adsense',
-					'wheretodisplay'    => $wheretodisplay,
-					'display_tag_name'  => $display_tag_name,
-					'adposition'        => $numberofparas,
-					'paragraph_number'  => $paragraph_number,
-					'ads_on_every_paragraphs_number' => $ads_on_every_paras,
-					'data_group_array'  => $data_group_array
-				);
-
-				foreach ($adforwp_meta_key as $key => $val){
-				$result[] =  update_post_meta($post_id, $key, $val);
-				}
-			}
-			}
-			for($i = 1; $i <= 10; $i++) {
-			if(isset($settings['widget_ad_'.$i.'_content']) && !empty($settings['widget_ad_'.$i.'_content'])) {
-			$ads_post = array(
-						'post_author' => $user_id,
-						'post_title'  => 'Custom widget Ad '.$i.' (Migrated from Quick Adsense)',
-						'post_status' => 'publish',
-						'post_name'   => 'Custom widget Ad '.$i.' (Migrated from Quick Adsense)',
-						'post_type'   => 'adsforwp',
-
-						);
-			$post_id = wp_insert_post($ads_post);
-			$ads_content = $settings['widget_ad_'.$i.'_content'];
-			$ads_alignment = $settings['onpost_ad_'.$i.'_alignment'];
-			$ads_margin = $settings['onpost_ad_'.$i.'_margin'];
-
-				$wheretodisplay = '';
-				$ad_align       = '';
-				$pragraph_no    = '';
-				$adposition     = '';
-
-
-				if($ads_alignment == 1){
-				$ad_align ='left';
-				if(!empty($ads_margin)){
-					$ads_align_margin = array('ad_margin_top' => $ads_margin,'ad_margin_bottom' => $ads_margin,'ad_margin_left' => 0,'ad_margin_right' => $ads_margin);
-				}
-				}elseif($ads_alignment == 2){
-				$ad_align ='center';
-				if(!empty($ads_margin)){
-					$ads_align_margin = array('ad_margin_top' => $ads_margin,'ad_margin_bottom' => $ads_margin,'ad_margin_left' => 0,'ad_margin_right' => 0);
-				}
-				}elseif($ads_alignment == 3){
-				$ad_align ='right';
-				if(!empty($ads_margin)){
-					$ads_align_margin = array('ad_margin_top' => $ads_margin,'ad_margin_bottom' => $ads_margin,'ad_margin_left' => $ads_margin,'ad_margin_right' => 0);
-				}
-				}elseif($ads_alignment == 4){
-				$ad_align = 'none';
-				if(!empty($ads_margin)){
-					$ads_align_margin = array('ad_margin_top' => 0,'ad_margin_bottom' => 0,'ad_margin_left' => 0,'ad_margin_right' => 0);
-				}
-				}
-
-				$data_group_array['group-0'] = array(
-										'data_array' => array(
-												array(
-													'key_1' => 'show_globally',
-													'key_2' => 'equal',
-													'key_3' => 'post',
-												)
-											)
-										);
-
-				$adforwp_meta_key = array(
-				'select_adtype'     => 'custom',
-				'custom_code'       => $ad_code,
-				'adposition'        => $adposition,
-				'paragraph_number'  => $pragraph_no,
-				'adsforwp_ad_align' => $ad_align,
-				'imported_from'     => 'quick_adsense',
-				'wheretodisplay'    => $wheretodisplay,
-				'data_group_array'  => $data_group_array
-				);
-
-				foreach ($adforwp_meta_key as $key => $val){
-				$result[] =  update_post_meta($post_id, $key, $val);
-				}
-			}
-		}
-		//die;
-		if (is_wp_error($result) ){
+		if ( is_wp_error( $result ) ) {
 			echo $result->get_error_message();
-			$wpdb->query('ROLLBACK');
-		}else{
-		$wpdb->query('COMMIT');
-		return $result;
+			$wpdb->query( 'ROLLBACK' );
+		} else {
+			$wpdb->query( 'COMMIT' );
+			return $result;
 		}
+	}
+
+	/**
+	 * Import on-post ads (slots 1–10).
+	 *
+	 * @param array $settings Quick Adsense settings.
+	 * @param int   $user_id  Current user ID.
+	 * @param array $result   Accumulated update_post_meta results.
+	 *
+	 * @return void
+	 */
+	private function import_onpost_ads( $settings, $user_id, array &$result ): void {
+		for ( $i = 1; $i <= 10; $i++ ) {
+			$content_key = 'onpost_ad_' . $i . '_content';
+			if ( empty( $settings[ $content_key ] ) ) {
+				continue;
+			}
+
+			$post_id = $this->insert_migrated_ad(
+				$user_id,
+				'Custom Ad ' . $i . ' (Migrated from Quick Adsense)'
+			);
+
+			$alignment = $this->get_alignment_data(
+				$settings[ 'onpost_ad_' . $i . '_alignment' ] ?? null,
+				$settings[ 'onpost_ad_' . $i . '_margin' ] ?? null
+			);
+			$display   = $this->resolve_onpost_display( $settings, $i );
+
+			$this->save_ad_meta(
+				$post_id,
+				[
+					'select_adtype'                  => 'custom',
+					'custom_code'                    => $settings[ $content_key ],
+					'adposition'                     => $display['numberofparas'],
+					'paragraph_number'               => $display['paragraph_number'],
+					'adsforwp_ad_align'              => $alignment['align'],
+					'adsforwp_ad_margin'             => $alignment['margin'],
+					'imported_from'                  => 'quick_adsense',
+					'wheretodisplay'                 => $display['wheretodisplay'],
+					'display_tag_name'               => $display['display_tag_name'],
+					'ads_on_every_paragraphs_number' => $display['ads_on_every_paras'],
+					'data_group_array'               => $this->build_post_page_targeting( $settings ),
+				],
+				$result
+			);
+		}
+	}
+
+	/**
+	 * Import widget ads (slots 1–10).
+	 *
+	 * @param array $settings Quick Adsense settings.
+	 * @param int   $user_id  Current user ID.
+	 * @param array $result   Accumulated update_post_meta results.
+	 *
+	 * @return void
+	 */
+	private function import_widget_ads( $settings, $user_id, array &$result ): void {
+		for ( $i = 1; $i <= 10; $i++ ) {
+			$content_key = 'widget_ad_' . $i . '_content';
+			if ( empty( $settings[ $content_key ] ) ) {
+				continue;
+			}
+
+			$post_id = $this->insert_migrated_ad(
+				$user_id,
+				'Custom widget Ad ' . $i . ' (Migrated from Quick Adsense)'
+			);
+
+			// Legacy source used onpost alignment/margin keys for widget ads.
+			$alignment = $this->get_alignment_data(
+				$settings[ 'onpost_ad_' . $i . '_alignment' ] ?? null,
+				$settings[ 'onpost_ad_' . $i . '_margin' ] ?? null
+			);
+
+			$this->save_ad_meta(
+				$post_id,
+				[
+					'select_adtype'     => 'custom',
+					'custom_code'       => $settings[ $content_key ],
+					'adposition'        => '',
+					'paragraph_number'  => '',
+					'adsforwp_ad_align' => $alignment['align'],
+					'imported_from'     => 'quick_adsense',
+					'wheretodisplay'    => '',
+					'data_group_array'  => [
+						'group-0' => $this->build_condition_group( 'show_globally', 'post' ),
+					],
+				],
+				$result
+			);
+		}
+	}
+
+	/**
+	 * Create a migrated adsforwp post.
+	 *
+	 * @param int    $user_id Author ID.
+	 * @param string $title   Post title / slug.
+	 *
+	 * @return int Post ID.
+	 */
+	private function insert_migrated_ad( $user_id, $title ): int {
+		return (int) wp_insert_post(
+			[
+				'post_author' => $user_id,
+				'post_title'  => $title,
+				'post_status' => 'publish',
+				'post_name'   => $title,
+				'post_type'   => 'adsforwp',
+			]
+		);
+	}
+
+	/**
+	 * Persist ad meta keys and collect results.
+	 *
+	 * @param int   $post_id Post ID.
+	 * @param array $meta    Meta key => value map.
+	 * @param array $result  Accumulated results.
+	 *
+	 * @return void
+	 */
+	private function save_ad_meta( $post_id, array $meta, array &$result ): void {
+		foreach ( $meta as $key => $val ) {
+			$result[] = update_post_meta( $post_id, $key, $val );
+		}
+	}
+
+	/**
+	 * Map Quick Adsense alignment/margin to adsforwp meta values.
+	 *
+	 * @param mixed $alignment Alignment setting (1–4).
+	 * @param mixed $margin    Margin setting.
+	 *
+	 * @return array{align: string, margin: array}
+	 */
+	private function get_alignment_data( $alignment, $margin ): array {
+		$map = [
+			1 => [
+				'align'  => 'left',
+				'margin' => [
+					'ad_margin_top'    => $margin,
+					'ad_margin_bottom' => $margin,
+					'ad_margin_left'   => 0,
+					'ad_margin_right'  => $margin,
+				],
+			],
+			2 => [
+				'align'  => 'center',
+				'margin' => [
+					'ad_margin_top'    => $margin,
+					'ad_margin_bottom' => $margin,
+					'ad_margin_left'   => 0,
+					'ad_margin_right'  => 0,
+				],
+			],
+			3 => [
+				'align'  => 'right',
+				'margin' => [
+					'ad_margin_top'    => $margin,
+					'ad_margin_bottom' => $margin,
+					'ad_margin_left'   => $margin,
+					'ad_margin_right'  => 0,
+				],
+			],
+			4 => [
+				'align'  => 'none',
+				'margin' => [
+					'ad_margin_top'    => 0,
+					'ad_margin_bottom' => 0,
+					'ad_margin_left'   => 0,
+					'ad_margin_right'  => 0,
+				],
+			],
+		];
+
+		$alignment = (int) $alignment;
+		if ( ! isset( $map[ $alignment ] ) ) {
+			return [
+				'align'  => '',
+				'margin' => [],
+			];
+		}
+
+		$data = $map[ $alignment ];
+		if ( empty( $margin ) && 4 !== $alignment ) {
+			$data['margin'] = [];
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Build post/page targeting groups from settings.
+	 *
+	 * @param array $settings Quick Adsense settings.
+	 *
+	 * @return array
+	 */
+	private function build_post_page_targeting( $settings ): array {
+		$data_group_array = [];
+
+		if ( ! empty( $settings['enable_on_posts'] ) && (int) $settings['enable_on_posts'] === 1 ) {
+			$data_group_array['group-0'] = $this->build_condition_group( 'post_type', 'post' );
+		}
+
+		if ( ! empty( $settings['enable_on_pages'] ) && (int) $settings['enable_on_pages'] === 1 ) {
+			$data_group_array['group-1'] = $this->build_condition_group( 'post_type', 'page' );
+		}
+
+		return $data_group_array;
+	}
+
+	/**
+	 * Build a single condition group.
+	 *
+	 * @param string $key_1 Condition key.
+	 * @param string $key_3 Condition value.
+	 *
+	 * @return array
+	 */
+	private function build_condition_group( $key_1, $key_3 ): array {
+		return [
+			'data_array' => [
+				[
+					'key_1' => $key_1,
+					'key_2' => 'equal',
+					'key_3' => $key_3,
+				],
+			],
+		];
+	}
+
+	/**
+	 * Resolve where/how an on-post ad should display.
+	 *
+	 * @param array $settings Quick Adsense settings.
+	 * @param int   $i        Ad slot index (1–10).
+	 *
+	 * @return array{wheretodisplay: string, display_tag_name: string, numberofparas: string, paragraph_number: mixed, ads_on_every_paras: mixed}
+	 */
+	private function resolve_onpost_display( $settings, $i ): array {
+		$display = [
+			'wheretodisplay'     => '',
+			'display_tag_name'   => '',
+			'numberofparas'      => '',
+			'paragraph_number'   => '',
+			'ads_on_every_paras' => '',
+		];
+
+		if ( isset( $settings['ad_beginning_of_post'] ) && (int) $settings['ad_beginning_of_post'] === $i
+			&& ! empty( $settings['enable_position_beginning_of_post'] ) ) {
+			$display['wheretodisplay'] = 'before_the_content';
+		} elseif ( isset( $settings['ad_end_of_post'] ) && (int) $settings['ad_end_of_post'] === $i
+			&& ! empty( $settings['enable_position_end_of_post'] ) ) {
+			$display['wheretodisplay'] = 'after_the_content';
+		} elseif ( isset( $settings['ad_middle_of_post'] ) && (int) $settings['ad_middle_of_post'] === $i
+			&& ! empty( $settings['enable_position_middle_of_post'] ) ) {
+			$display['wheretodisplay'] = 'between_the_content';
+		}
+
+		for ( $j = 1; $j <= 3; $j++ ) {
+			if ( ! isset( $settings[ 'ad_after_para_option_' . $j ] )
+				|| (int) $settings[ 'ad_after_para_option_' . $j ] !== $i ) {
+				continue;
+			}
+
+			$tag = null;
+			if ( ! empty( $settings[ 'enable_position_after_para_option_' . $j ] ) ) {
+				$tag = 'p_tag';
+			} elseif ( ! empty( $settings[ 'enable_position_after_image_option_' . $j ] ) ) {
+				$tag = 'img_tag';
+			}
+
+			if ( null === $tag ) {
+				continue;
+			}
+
+			$display['wheretodisplay']   = 'between_the_content';
+			$display['numberofparas']    = 'number_of_paragraph';
+			$display['display_tag_name'] = $tag;
+			$display['paragraph_number'] = $settings[ 'position_after_para_option_' . $j ] ?? '';
+
+			if ( ! empty( $settings[ 'enable_jump_position_after_para_option_' . $j ] ) ) {
+				$display['ads_on_every_paras'] = 1;
+			}
+		}
+
+		return $display;
 	}
 }

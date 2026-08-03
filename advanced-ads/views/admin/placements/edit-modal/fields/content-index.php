@@ -9,9 +9,9 @@
  * @var object $placement         Placement instance.
  * @var string $xpath             xpath option.
  * @var string $selected_tag      The currently selected tag.
- * @var array  $tags              Array of tags; indexded by tag value is label. cf. Content_Injection::get_tags().
+ * @var array<string, string> $tags Array of tags; indexded by tag value is label. cf. Content_Injection::get_tags().
  * @var string $index             The currently selected index.
- * @var array  $positions         Available positions.
+ * @var array<string, string> $positions Available positions.
  * @var string $selected_position The currently selected position, defaults to 'after'.
  * @var bool   $start_from_bottom Whether to start counting from bottom.
  */

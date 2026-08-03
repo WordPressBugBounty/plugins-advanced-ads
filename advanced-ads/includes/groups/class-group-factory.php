@@ -88,22 +88,7 @@ class Group_Factory extends Factory {
 			}
 		}
 
-		return $this->normalize_group_type( $type );
-	}
-
-	/**
-	 * Normalize stored group type to a registered type slug.
-	 *
-	 * @param string $type Raw type from meta or legacy storage.
-	 *
-	 * @return string
-	 */
-	private function normalize_group_type( string $type ): string {
-		if ( empty( $type ) || 'refresh' === $type ) {
-			return 'default';
-		}
-
-		return $type;
+		return Group_Repository::normalize_group_type( $type );
 	}
 
 	/**

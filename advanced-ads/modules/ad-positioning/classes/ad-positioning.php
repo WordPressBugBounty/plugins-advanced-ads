@@ -16,7 +16,7 @@ class Advanced_Ads_Ad_Positioning {
 	/**
 	 * The structure of these output options.
 	 *
-	 * @var array
+	 * @var array{position: string, clearfix: bool, margin: array{top: int, left: int, bottom: int, right: int}}
 	 */
 	private $positioning = [
 		'position' => 'none',
@@ -106,7 +106,7 @@ class Advanced_Ads_Ad_Positioning {
 	/**
 	 * Set up the positioning options with title, description and icon.
 	 *
-	 * @return array
+	 * @return array<string, array{title: string, description: string, options: array<string, array{img?: string}>}>
 	 */
 	private function setup_positioning_options() {
 		return [
@@ -201,7 +201,7 @@ class Advanced_Ads_Ad_Positioning {
 	/**
 	 * Get a well-formed array to work with.
 	 *
-	 * @return array
+	 * @return array{position: string, clearfix: bool, margin: array{top: int, left: int, bottom: int, right: int}}
 	 */
 	private function get_options() {
 		$options = [

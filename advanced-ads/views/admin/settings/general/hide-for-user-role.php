@@ -6,8 +6,8 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   1.48.2
  *
- * @var array $roles Array of user roles.
- * @var array $hide_for_roles Array of roles that should not see ads.
+ * @var array<string, string> $roles Array of user roles.
+ * @var list<string> $hide_for_roles Array of roles that should not see ads.
  */
 
 ?>

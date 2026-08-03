@@ -65,7 +65,7 @@ class Advanced_Ads_AdSense_Admin {
 	 * Save ad options.
 	 *
 	 * @param Ad    $ad        Ad instance.
-	 * @param array $post_data Post data array.
+	 * @param array<string, mixed> $post_data Post data array.
 	 *
 	 * @return void
 	 */
@@ -173,7 +173,7 @@ class Advanced_Ads_AdSense_Admin {
 	/**
 	 * Show AdSense ad specific notices in parameters box
 	 *
-	 * @param array  $notices some notices to show in the parameters box.
+	 * @param array<int, array{text: string, class: string}> $notices some notices to show in the parameters box.
 	 * @param string $box     ID of the meta box.
 	 */
 	public function ad_notices( $notices, $box ) {

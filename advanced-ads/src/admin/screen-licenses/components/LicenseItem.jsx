@@ -26,7 +26,6 @@ import {
 	getAutoUpdateDisplayLabel,
 	getAutoUpdateScopeLabel,
 	getAddonInstallState,
-	getDisplayLicenseStatus,
 	getHostnameFromUrl,
 	getLicenseSitesUsedCount,
 	getTypeLabel,
@@ -36,6 +35,7 @@ import {
 	isLicenseExpiredForDisplay,
 	isLicenseExpiringSoon,
 	isRichLicenseEntitled,
+	normalizeShopRowStatus,
 	resolvePlanLabelForLicense,
 	resolvePlanIdForLicense,
 	startShopRenewalForLicense,
@@ -44,7 +44,6 @@ import {
 import { LICENSE_ADDON_CATALOG } from '../addon-catalog';
 import { togglePluginAutoUpdate } from '../hooks/licenses-api';
 import { AddonsList } from './AddonsList';
-import { AllAccessAddonsSummary } from './AllAccessAddonsSummary';
 import { LicenseStatus } from './LicenseStatus';
 import { LicenseField } from './LicenseField';
 import { AutoUpdateModal } from './AutoUpdateModal';
@@ -70,6 +69,7 @@ export function LicenseItem( {
 	noticesContext,
 	allLicenses = [],
 	appliedAddonKeyMap = {},
+	currentActiveLicenses = '',
 } ) {
 	const hasAutoRenew = Boolean( autoRenew );
 	const autoUpdateStates = useSelect(
@@ -135,23 +135,15 @@ export function LicenseItem( {
 	};
 	const currentPlanId = resolvePlanIdForLicense( licenseRow );
 	const showUpgradePlan = canUpgradeLicensePlan( currentPlanId );
-	let displayStatus = getDisplayLicenseStatus(
-		licenseRow,
-		allLicenses,
-		currentHostname,
-		appliedAddonKeyMap,
-		addonInstallStates
-	);
-
-	displayStatus =
-		paymentStatus === 'failed' ? 'Payment Failed' : displayStatus;
 	const isActivated = isLicenseAppliedOnThisSite(
 		licenseRow,
 		allLicenses,
 		currentHostname,
-		appliedAddonKeyMap,
-		addonInstallStates
+		currentActiveLicenses
 	);
+	let displayStatus = normalizeShopRowStatus( licenseRow, currentHostname );
+	displayStatus =
+		paymentStatus === 'failed' ? 'Payment Failed' : displayStatus;
 	const isLicenseEntitled = isRichLicenseEntitled( status, expiryDate );
 	const productAddonId = resolveAddonIdForLicense(
 		licenseRow,
@@ -160,9 +152,10 @@ export function LicenseItem( {
 	const mappedAddonKey = productAddonId
 		? String( appliedAddonKeyMap?.[ productAddonId ] ?? '' )
 		: '';
-	const pluginActive = productAddonId
-		? getAddonInstallState( productAddonId, addonInstallStates ).active
-		: true;
+	const { installed: pluginInstalled, active: pluginActive } =
+		productAddonId
+			? getAddonInstallState( productAddonId, addonInstallStates )
+			: { installed: false, active: true };
 	const licensedUnderThisKey =
 		productAddonId && licenseKey && mappedAddonKey === String( licenseKey );
 	const canUseDownloadActivate =
@@ -252,29 +245,6 @@ export function LicenseItem( {
 							}
 						/>
 						<LicenseField
-							label={ __( 'License key:', 'advanced-ads' ) }
-							value={
-								<code className="break-all text-sm font-normal text-gray-800 p-1">
-									{ licenseKey }
-								</code>
-							}
-						/>
-						<LicenseField
-							label={ __( 'Purchase date:', 'advanced-ads' ) }
-							value={ formatLicenseDate( purchaseDate ) }
-						/>
-						<LicenseField
-							label={
-								hasAutoRenew
-									? __( 'Renews:', 'advanced-ads' )
-									: __(
-											'License expiration:',
-											'advanced-ads'
-									  )
-							}
-							value={ formatLicenseDate( expiryDate ) }
-						/>
-						<LicenseField
 							label={ __( 'Auto-updates:', 'advanced-ads' ) }
 							value={
 								<span className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -295,23 +265,29 @@ export function LicenseItem( {
 								</span>
 							}
 						/>
-						{ isAllAccess && isActivated ? (
-							<LicenseField
-								label={ __( 'Add-ons:', 'advanced-ads' ) }
-								value={
-									<AllAccessAddonsSummary
-										addonIds={ allAccessAddonIds }
-										addonInstallStates={
-											addonInstallStates
-										}
-										appliedAddonKeyMap={
-											appliedAddonKeyMap
-										}
-										licenseKey={ licenseKey }
-									/>
-								}
-							/>
-						) : null }
+						<LicenseField
+							label={ __( 'Purchase date:', 'advanced-ads' ) }
+							value={ formatLicenseDate( purchaseDate ) }
+						/>
+						<LicenseField
+							label={
+								hasAutoRenew
+									? __( 'Renews:', 'advanced-ads' )
+									: __(
+											'License expiration:',
+											'advanced-ads'
+									  )
+							}
+							value={ formatLicenseDate( expiryDate ) }
+						/>
+						<LicenseField
+							label={ __( 'License key:', 'advanced-ads' ) }
+							value={
+								<code className="break-all text-sm font-normal text-gray-800 p-1">
+									{ licenseKey }
+								</code>
+							}
+						/>
 					</div>
 				</div>
 
@@ -325,6 +301,7 @@ export function LicenseItem( {
 								noticesContext={ noticesContext }
 								downloadUrl={ downloadUrl }
 								addonId={ productAddonId ?? '' }
+								isInstalled={ pluginInstalled }
 							/>
 						</div>
 					) : null }
@@ -376,7 +353,7 @@ export function LicenseItem( {
 				license={ licenseRow }
 				allLicenses={ allLicenses }
 				appliedAddonKeyMap={ appliedAddonKeyMap }
-				currentHostname={ currentHostname }
+				isActivated={ isActivated }
 				noticesContext={ noticesContext }
 				canUseAddonActions={ canUseAllAccessAddons }
 			/>

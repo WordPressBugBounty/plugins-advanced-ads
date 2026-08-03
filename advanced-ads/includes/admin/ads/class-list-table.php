@@ -9,8 +9,6 @@
 
 namespace AdvancedAds\Admin\Ads;
 
-defined( 'ABSPATH' ) || exit;
-
 use AdvancedAds\Abstracts\Ad;
 use AdvancedAds\Abstracts\Admin_List_Table;
 use AdvancedAds\Constants;
@@ -54,17 +52,27 @@ class List_Table extends Admin_List_Table {
 		parent::hooks();
 		add_filter( 'pre_get_posts', [ $this, 'posts_ordering' ] );
 		add_filter( 'views_edit-' . $this->list_table_type, [ $this, 'add_views' ] );
+		add_filter( 'disable_months_dropdown', [ $this, 'disable_months_dropdown' ], 10, 2 );
+	}
 
-		// Filters.
-		add_filter( 'disable_months_dropdown', '__return_true' );
+	/**
+	 * Disable the months dropdown on the ads list table only.
+	 *
+	 * @param bool   $disable   Whether to disable the dropdown.
+	 * @param string $post_type Current post type.
+	 *
+	 * @return bool
+	 */
+	public function disable_months_dropdown( $disable, $post_type ): bool {
+		return Constants::POST_TYPE_AD === $post_type ? true : (bool) $disable;
 	}
 
 	/**
 	 * Define which columns to show on this screen.
 	 *
-	 * @param array $columns Existing columns.
+	 * @param array<string, string> $columns Existing columns.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function define_columns( $columns ): array {
 		// Remove the group taxonomy column as we have custom 'Used' column.
@@ -77,7 +85,6 @@ class List_Table extends Admin_List_Table {
 
 			if ( 'cb' === $key ) {
 				$new_columns['ad_type'] = __( 'Type', 'advanced-ads' );
-				continue;
 			}
 
 			if ( 'title' === $key ) {
@@ -107,9 +114,9 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Define which columns are sortable.
 	 *
-	 * @param array $columns Existing columns.
+	 * @param array<string, string|array<string, mixed>> $columns Existing columns.
 	 *
-	 * @return array
+	 * @return array<string, string|array<string, mixed>>
 	 */
 	public function define_sortable_columns( $columns ): array {
 		$columns['ad_date'] = 'ad_date';
@@ -120,20 +127,20 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Define hidden columns.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	protected function define_hidden_columns(): array {
-		$hidden[] = 'ad_description';
-		$hidden[] = 'author';
-		$hidden[] = 'ad_size';
-		$hidden[] = 'ad_shortcode';
-		$hidden[] = 'ad_date';
-		$hidden[] = 'ad_preview';
-		$hidden[] = 'ad_adsense_id';
-		$hidden[] = 'ad_debugmode';
-		$hidden[] = 'ad_privacyignore';
-
-		return $hidden;
+		return [
+			'ad_description',
+			'author',
+			'ad_size',
+			'ad_shortcode',
+			'ad_date',
+			'ad_preview',
+			'ad_adsense_id',
+			'ad_debugmode',
+			'ad_privacyignore',
+		];
 	}
 
 	/**
@@ -148,9 +155,9 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Add expiring and expired ads view.
 	 *
-	 * @param array $views Available list table views.
+	 * @param array<string, string> $views Available list table views.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function add_views( $views ): array {
 		global $wp_list_table;
@@ -158,6 +165,12 @@ class List_Table extends Admin_List_Table {
 		$counts   = wp_count_posts( $this->list_table_type, 'readable' );
 		$expired  = $counts->{Constants::AD_STATUS_EXPIRED};
 		$expiring = $counts->{Constants::AD_STATUS_EXPIRING};
+
+		// Exclude expired and expiring ads all.
+		$total_ads = array_sum( (array) $counts ) - $counts->{'auto-draft'};
+		$all_ads   = $total_ads - $expired - $expiring;
+
+		$views['all'] = str_replace( $total_ads, $all_ads, $views['all'] );
 
 		if ( $expiring > 0 ) {
 			$views[ Constants::AD_STATUS_EXPIRING ] = sprintf(
@@ -200,7 +213,7 @@ class List_Table extends Admin_List_Table {
 
 		$is_all = $this->is_all_filters_applied();
 
-		include_once ADVADS_ABSPATH . 'views/admin/table-views-list.php';
+		include ADVADS_ABSPATH . 'views/admin/table-views-list.php';
 
 		return [];
 	}
@@ -208,9 +221,9 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Query filters.
 	 *
-	 * @param array $query_vars Query vars.
+	 * @param array<string, mixed> $query_vars Query vars.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	protected function query_filters( $query_vars ): array {
 		// Early bail!!
@@ -246,22 +259,31 @@ class List_Table extends Admin_List_Table {
 	public function posts_ordering( $query ): void {
 		global $typenow;
 
-		// Early bail!!
-		if ( ! $query->is_main_query() ) {
+		if ( ! $query->is_main_query() || $this->list_table_type !== $typenow ) {
 			return;
 		}
 
-		if ( $this->list_table_type === $typenow ) {
-			$orderby = Params::get( 'orderby', 'title' );
-			$order   = strtoupper( Params::get( 'order', 'ASC' ) );
+		$orderby = Params::get( 'orderby', 'title' );
 
-			if ( 'ad_date' === $orderby ) {
-				$orderby = 'post_modified';
-			}
-
-			$query->set( 'orderby', $orderby );
-			$query->set( 'order', $order );
+		// Expiry views are remapped to meta sorting in query_filters; do not overwrite.
+		if (
+			'expiry_date' === $orderby
+			|| (
+				'meta_value' === $query->get( 'orderby' )
+				&& Constants::AD_META_EXPIRATION_TIME === $query->get( 'meta_key' )
+			)
+		) {
+			return;
 		}
+
+		if ( 'ad_date' === $orderby ) {
+			$orderby = 'post_modified';
+		}
+
+		$order = strtoupper( Params::get( 'order', 'ASC' ) );
+
+		$query->set( 'orderby', $orderby );
+		$query->set( 'order', 'DESC' === $order ? 'DESC' : 'ASC' );
 	}
 
 	/**
@@ -395,11 +417,20 @@ class List_Table extends Admin_List_Table {
 	 * @return void
 	 */
 	protected function render_ad_adsense_id_column(): void {
-		if ( null === $this->object->get_content() ) {
+		if ( ! $this->object->is_type( 'adsense' ) ) {
 			return;
 		}
 
-		$content = json_decode( $this->object->get_content() );
+		$raw = $this->object->get_content();
+		if ( null === $raw || '' === $raw ) {
+			return;
+		}
+
+		$content = json_decode( $raw );
+		if ( ! is_object( $content ) ) {
+			return;
+		}
+
 		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		$slotid = $content->slotId ?? null;
 
@@ -407,16 +438,16 @@ class List_Table extends Admin_List_Table {
 	}
 
 	/**
-	 * Cached group/placement usage maps for the ads list table.
+	 * Cached group/placement usage maps (once per request).
 	 *
-	 * @var array{groups_by_ad: array<int, array<int, array{id: int, title: string, edit_link: string}>>, placements_by_item: array<string, array<int, array{id: int, title: string, edit_link: string}>>}|null
+	 * @var array{groups_by_ad: array<int, array<int, mixed>>, placements_by_item: array<string, array<int, mixed>>}|null
 	 */
 	private static $ad_usage_maps = null;
 
 	/**
 	 * Build group and placement usage maps once per list table request.
 	 *
-	 * @return array{groups_by_ad: array<int, array<int, array{id: int, title: string, edit_link: string}>>, placements_by_item: array<string, array<int, array{id: int, title: string, edit_link: string}>>}
+	 * @return array{groups_by_ad: array<int, array<int, mixed>>, placements_by_item: array<string, array<int, mixed>>}
 	 */
 	private function get_ad_usage_maps(): array {
 		if ( null !== self::$ad_usage_maps ) {
@@ -424,12 +455,10 @@ class List_Table extends Admin_List_Table {
 		}
 
 		$placements_by_item = [];
-
 		foreach ( wp_advads_get_placement_summaries() as $id => $summary ) {
 			if ( '' === $summary['item'] ) {
 				continue;
 			}
-
 			$placements_by_item[ $summary['item'] ][] = [
 				'id'        => $id,
 				'title'     => $summary['title'],
@@ -441,9 +470,8 @@ class List_Table extends Admin_List_Table {
 		}
 
 		$groups_by_ad = [];
-
 		foreach ( wp_advads_get_group_summaries() as $group_id => $summary ) {
-			foreach ( wp_advads_get_ads_by_group_id( $group_id, 'ids' ) as $ad_id ) {
+			foreach ( array_keys( $summary['ad_weights'] ?? [] ) as $ad_id ) {
 				$groups_by_ad[ (int) $ad_id ][] = [
 					'id'        => $group_id,
 					'title'     => $summary['title'],
@@ -458,10 +486,7 @@ class List_Table extends Admin_List_Table {
 			}
 		}
 
-		self::$ad_usage_maps = [
-			'groups_by_ad'       => $groups_by_ad,
-			'placements_by_item' => $placements_by_item,
-		];
+		self::$ad_usage_maps = compact( 'groups_by_ad', 'placements_by_item' );
 
 		return self::$ad_usage_maps;
 	}

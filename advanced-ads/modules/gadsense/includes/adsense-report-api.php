@@ -36,7 +36,7 @@ class Advanced_Ads_AdSense_Report_Api {
 	/**
 	 * The API access token or an error array.
 	 *
-	 * @var array|string
+	 * @var array<string, mixed>|string
 	 */
 	private $access_token;
 
@@ -85,7 +85,7 @@ class Advanced_Ads_AdSense_Report_Api {
 	/**
 	 * Get access token related error message.
 	 *
-	 * @return array Array of error messages.
+	 * @return array<string, mixed> Array of error messages.
 	 */
 	public function get_token_error() {
 		return is_string( $this->access_token ) ? [] : $this->access_token;
@@ -103,7 +103,7 @@ class Advanced_Ads_AdSense_Report_Api {
 	/**
 	 * Perform the actual call to Google for fresh data.
 	 *
-	 * @return array associative array with the response or with error data in case of failure.
+	 * @return array<string, mixed> associative array with the response or with error data in case of failure.
 	 */
 	public function call_google() {
 		$dimension  = 'unit' === $this->type ? 'AD_UNIT_ID' : 'DOMAIN_NAME';

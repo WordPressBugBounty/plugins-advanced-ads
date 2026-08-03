@@ -19,14 +19,14 @@ class Capabilities {
 	/**
 	 * Registered capabilities.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $capabilities = [];
 
 	/**
 	 * Registered capabilities by role.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $role_capabilities = [];
 
@@ -77,9 +77,9 @@ class Capabilities {
 	/**
 	 * Register a capability.
 	 *
-	 * @param string       $capability Capability slug.
-	 * @param string       $title      Capability title.
-	 * @param array|string $roles      Roles to assigned.
+	 * @param string                    $capability Capability slug.
+	 * @param string                    $title      Capability title.
+	 * @param array<int, string>|string $roles      Roles to assigned.
 	 *
 	 * @return void
 	 */
@@ -95,7 +95,7 @@ class Capabilities {
 	/**
 	 * Get capabilities.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_capabilities(): array {
 		return $this->capabilities;
@@ -136,7 +136,7 @@ class Capabilities {
 	/**
 	 * Get roles names
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_roles(): array {
 		$roles = wp_roles();

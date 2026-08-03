@@ -81,7 +81,7 @@ export function AdminNav() {
 		return () => {
 			document.removeEventListener( 'click', handler );
 		};
-	}, [ navigate ] );
+	}, [] );
 
 	return null;
 }

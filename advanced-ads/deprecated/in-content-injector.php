@@ -21,9 +21,9 @@ class Advanced_Ads_In_Content_Injector {
 	 * @deprecated 2.0.20 Use {@see Content_Injector::inject_in_content()}.
 	 *
 	 * @param string $placement_id   Id of the placement.
-	 * @param array  $placement_opts Placement options.
+	 * @param array<string, mixed> $placement_opts Placement options.
 	 * @param string $content        Content to inject placement into.
-	 * @param array  $options        Injection options.
+	 * @param array<string, mixed> $options Injection options.
 	 * @return string
 	 */
 	public static function &inject_in_content( $placement_id, $placement_opts, &$content, $options = [] ) {
@@ -33,8 +33,8 @@ class Advanced_Ads_In_Content_Injector {
 	/**
 	 * Callback function for usort() to sort ads for placeholders.
 	 *
-	 * @param array $first  The first array to compare.
-	 * @param array $second The second array to compare.
+	 * @param array<string, mixed> $first  The first array to compare.
+	 * @param array<string, mixed> $second The second array to compare.
 	 * @return int
 	 */
 	public static function sort_ads_for_placehoders( $first, $second ) {
@@ -44,8 +44,8 @@ class Advanced_Ads_In_Content_Injector {
 	/**
 	 * Add a warning to 'Ad health'.
 	 *
-	 * @param array $nodes Nodes.
-	 * @return array
+	 * @param array<int, array<string, mixed>> $nodes Nodes.
+	 * @return array<int, array<string, mixed>>
 	 */
 	public static function add_ad_health_node( $nodes ) {
 		return Content_Injector::add_ad_health_node( $nodes );

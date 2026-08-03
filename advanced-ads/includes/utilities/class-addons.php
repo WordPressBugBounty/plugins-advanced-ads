@@ -35,7 +35,7 @@ final class Addons {
 	/**
 	 * Cached get_plugins() result for the current request.
 	 *
-	 * @var array<string, array>|null
+	 * @var array<string, array<string, mixed>>|null
 	 */
 	private static $plugins = null;
 
@@ -86,7 +86,7 @@ final class Addons {
 	 *
 	 * @param bool $refresh When true, bust the plugins object cache first.
 	 *
-	 * @return array<string, array> Plugin bootstrap path => plugin header data.
+	 * @return array<string, array<string, mixed>> Plugin bootstrap path => plugin header data.
 	 */
 	public static function get_plugins( bool $refresh = false ): array {
 		if ( $refresh ) {

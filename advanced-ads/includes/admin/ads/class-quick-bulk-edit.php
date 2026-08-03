@@ -9,33 +9,46 @@
 
 namespace AdvancedAds\Admin\Ads;
 
-use Exception;
-use Advanced_Ads_Privacy;
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Ad;
-use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Options;
+use AdvancedAds\Utilities\WordPress;
+use DateTimeImmutable;
+use DateTimeZone;
+use Exception;
+
+defined( 'ABSPATH' ) || exit;
 
 /**
  * WP integration
  */
 class Quick_Bulk_Edit {
 	/**
+	 * Whether bulk edit already ran this request.
+	 *
+	 * Core bulk edit fires save_post once per selected post; without this guard
+	 * every firing would re-save the entire selection (N²).
+	 *
+	 * @var bool
+	 */
+	private static $bulk_edit_ran = false;
+
+	/**
 	 * Hooks into WordPress
 	 *
 	 * @return void
 	 */
-	public function hooks() {
+	public function hooks(): void {
 		add_action( 'quick_edit_custom_box', [ $this, 'add_quick_edit_fields' ], 10, 2 );
 		add_action( 'bulk_edit_custom_box', [ $this, 'add_bulk_edit_fields' ], 10, 2 );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'save_post', [ $this, 'save_quick_edits' ], 100 );
 		add_action( 'save_post', [ $this, 'save_bulk_edit' ], 100 );
 		add_action( 'advanced-ads-ad-render-column-ad_type', [ $this, 'print_ad_json' ] );
 	}
 
 	/**
-	 * Print ad JSON for debugging
+	 * Print ad JSON for the quick-edit JS form filler.
 	 *
 	 * @param Ad $ad the ad being saved.
 	 *
@@ -54,7 +67,7 @@ class Quick_Bulk_Edit {
 	 *
 	 * @return void
 	 */
-	public function save_bulk_edit() {
+	public function save_bulk_edit(): void {
 		// Not bulk edit, not ads or not enough permissions.
 		if (
 			! wp_verify_nonce( sanitize_key( Params::get( '_wpnonce', '', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ), 'bulk-posts' )
@@ -64,14 +77,17 @@ class Quick_Bulk_Edit {
 			return;
 		}
 
-		$changes = [ 'on', 'off' ];
+		$flags = [ 'on', 'off' ];
 
 		$debug_mode     = Params::get( 'debug_mode' );
 		$set_expiry     = Params::get( 'expiry_date' );
 		$ad_label       = Params::get( 'ad_label', false );
 		$ignore_privacy = Params::get( 'ignore_privacy' );
 
-		$has_change = in_array( $debug_mode, $changes, true ) || in_array( $set_expiry, $changes, true ) || in_array( $ignore_privacy, $changes, true ) || false !== $ad_label;
+		$has_change = in_array( $debug_mode, $flags, true )
+			|| in_array( $set_expiry, $flags, true )
+			|| in_array( $ignore_privacy, $flags, true )
+			|| false !== $ad_label;
 
 		/**
 		 * Allow add-ons to confirm early abort if no change has been made and avoid iterating through an ad stack.
@@ -85,27 +101,61 @@ class Quick_Bulk_Edit {
 			return;
 		}
 
-		$expiry_date = 'on' === $set_expiry ?
-			$this->get_expiry_timestamp( 'get' ) : 0;
-
 		$ads = array_map(
-			function ( $ad ) {
+			static function ( $ad ) {
 				return wp_advads_get_ad( absint( $ad ) );
 			},
 			wp_unslash( Params::get( 'post', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY ) )
 		);
 
+		$this->persist_bulk_edit(
+			$ads,
+			[
+				'debug_mode'     => $debug_mode,
+				'set_expiry'     => $set_expiry,
+				'expiry_date'    => 'on' === $set_expiry ? $this->get_expiry_timestamp( 'get' ) : 0,
+				'ad_label'       => $ad_label,
+				'ignore_privacy' => $ignore_privacy,
+			]
+		);
+	}
+
+	/**
+	 * Persist bulk-edit field changes once per request.
+	 *
+	 * @param array<int, \AdvancedAds\Abstracts\Ad> $ads     Ad instances.
+	 * @param array<string, mixed>                  $changes Parsed change payload.
+	 *
+	 * @return void
+	 */
+	private function persist_bulk_edit( array $ads, array $changes ): void {
+		if ( self::$bulk_edit_ran ) {
+			return;
+		}
+		self::$bulk_edit_ran = true;
+
+		$flags          = [ 'on', 'off' ];
+		$debug_mode     = $changes['debug_mode'] ?? null;
+		$set_expiry     = $changes['set_expiry'] ?? null;
+		$expiry_date    = (int) ( $changes['expiry_date'] ?? 0 );
+		$ad_label       = $changes['ad_label'] ?? false;
+		$ignore_privacy = $changes['ignore_privacy'] ?? null;
+
 		foreach ( $ads as $ad ) {
-			if ( in_array( $debug_mode, $changes, true ) ) {
+			if ( ! $ad ) {
+				continue;
+			}
+
+			if ( in_array( $debug_mode, $flags, true ) ) {
 				$ad->set_debugmode( 'on' === $debug_mode );
 			}
 
-			if ( in_array( $set_expiry, $changes, true ) ) {
+			if ( in_array( $set_expiry, $flags, true ) ) {
 				$ad->set_prop( 'expiry_date', $expiry_date );
 			}
 
 			if ( false !== $ad_label ) {
-				$ad->set_prop( 'ad_label', esc_html( trim( $ad_label ) ) );
+				$ad->set_prop( 'ad_label', sanitize_text_field( wp_unslash( $ad_label ) ) );
 			}
 
 			if ( 'on' === $ignore_privacy ) {
@@ -132,7 +182,7 @@ class Quick_Bulk_Edit {
 	 *
 	 * @return void
 	 */
-	public function save_quick_edits( $id ) {
+	public function save_quick_edits( $id ): void {
 		// Not inline edit, or no permission.
 		if (
 			! wp_verify_nonce( sanitize_key( Params::post( '_inline_edit' ) ), 'inlineeditnonce' ) ||
@@ -148,16 +198,16 @@ class Quick_Bulk_Edit {
 			return;
 		}
 
-		// Render columns properly.
+		// Re-register columns for the AJAX list-table response.
 		( new List_Table() )->hooks();
 
-		$ad->set_prop( 'debugmode', Params::post( 'debugmode', false, FILTER_VALIDATE_BOOLEAN ) );
+		$ad->set_debugmode( Params::post( 'debugmode', false, FILTER_VALIDATE_BOOLEAN ) );
 		$ad->set_prop(
 			'expiry_date',
 			Params::post( 'enable_expiry' ) ? $this->get_expiry_timestamp() : 0
 		);
 
-		if ( isset( Advanced_Ads_Privacy::get_instance()->options()['enabled'] ) ) {
+		if ( Options::instance()->get( 'privacy.enabled' ) ) {
 			if ( Params::post( 'ignore_privacy' ) ) {
 				$ad->set_prop( 'privacy', [ 'ignore-consent' => 'on' ] );
 			} else {
@@ -167,7 +217,7 @@ class Quick_Bulk_Edit {
 
 		$ad_label = Params::post( 'ad_label', false );
 		if ( false !== $ad_label ) {
-			$ad->set_prop( 'ad_label', esc_html( trim( $ad_label ) ) );
+			$ad->set_prop( 'ad_label', sanitize_text_field( wp_unslash( $ad_label ) ) );
 		}
 
 		/**
@@ -187,7 +237,7 @@ class Quick_Bulk_Edit {
 	 *
 	 * @return int
 	 */
-	private function get_expiry_timestamp( $method = 'post' ) {
+	private function get_expiry_timestamp( $method = 'post' ): int {
 		$day     = absint( 'get' === $method ? Params::get( 'day' ) : Params::post( 'day' ) );
 		$month   = absint( 'get' === $method ? Params::get( 'month' ) : Params::post( 'month' ) );
 		$year    = 'get' === $method ? Params::get( 'year', 0, FILTER_VALIDATE_INT ) : Params::post( 'year', 0, FILTER_VALIDATE_INT );
@@ -195,28 +245,13 @@ class Quick_Bulk_Edit {
 		$minutes = absint( 'get' === $method ? Params::get( 'minute' ) : Params::post( 'minute' ) );
 
 		try {
-			$local_dt = new \DateTimeImmutable( 'now', WordPress::get_timezone() );
+			$local_dt = new DateTimeImmutable( 'now', WordPress::get_timezone() );
 			$local_dt = $local_dt->setDate( $year, $month, $day )->setTime( $hours, $minutes );
 
 			return $local_dt->getTimestamp();
 		} catch ( Exception $e ) {
 			return 0;
 		}
-	}
-
-	/**
-	 * Enqueue scripts and print inline JS variable.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts() {
-		$screen = get_current_screen();
-
-		if ( 'edit-advanced_ads' !== $screen->id ) {
-			return;
-		}
-
-		wp_advads()->registry->enqueue_script( 'screen-ads-listing' );
 	}
 
 	/**
@@ -227,13 +262,13 @@ class Quick_Bulk_Edit {
 	 *
 	 * @return void
 	 */
-	public function add_bulk_edit_fields( $column_name, $post_type ) {
+	public function add_bulk_edit_fields( $column_name, $post_type ): void {
 		if ( Constants::POST_TYPE_AD !== $post_type || 'ad_type' !== $column_name ) {
 			return;
 		}
 
-		$privacy_options = \Advanced_Ads_Privacy::get_instance()->options();
-		include plugin_dir_path( ADVADS_FILE ) . 'views/admin/bulk-edit.php';
+		$is_privacy_enabled = (bool) Options::instance()->get( 'privacy.enabled' );
+		include ADVADS_ABSPATH . 'views/admin/bulk-edit.php';
 
 		/**
 		 * Allow add-ons to add more fields.
@@ -249,13 +284,13 @@ class Quick_Bulk_Edit {
 	 *
 	 * @return void
 	 */
-	public function add_quick_edit_fields( $column_name, $post_type ) {
+	public function add_quick_edit_fields( $column_name, $post_type ): void {
 		if ( Constants::POST_TYPE_AD !== $post_type || 'ad_date' !== $column_name ) {
 			return;
 		}
 
-		$privacy_options = \Advanced_Ads_Privacy::get_instance()->options();
-		include plugin_dir_path( ADVADS_FILE ) . 'views/admin/quick-edit.php';
+		$is_privacy_enabled = (bool) Options::instance()->get( 'privacy.enabled' );
+		include ADVADS_ABSPATH . 'views/admin/quick-edit.php';
 
 		/**
 		 * Allow add-ons to add more fields.
@@ -268,20 +303,23 @@ class Quick_Bulk_Edit {
 	 *
 	 * @param int    $timestamp default expiry date.
 	 * @param string $prefix    prefix for input names.
-	 * @param bool   $seconds   whether to add seconds input.
 	 *
 	 * @return void
 	 */
-	public static function print_date_time_inputs( $timestamp = 0, $prefix = '', $seconds = false ) {
+	public static function print_date_time_inputs( $timestamp = 0, $prefix = '' ): void {
+		global $wp_locale;
+
 		try {
-			$initial_date = (bool) $timestamp ? new \DateTimeImmutable( "@$timestamp", new \DateTimeZone( 'UTC' ) ) : current_datetime();
+			$initial_date = $timestamp ? new DateTimeImmutable( "@$timestamp", new DateTimeZone( 'UTC' ) ) : current_datetime();
 		} catch ( Exception $e ) {
 			$initial_date = current_datetime();
 		}
 
-		$current_year = (int) ( current_datetime()->format( 'Y' ) );
+		$current_year = (int) current_datetime()->format( 'Y' );
+		$expiry_year  = (int) $initial_date->format( 'Y' );
+		$start_year   = min( $current_year, $expiry_year );
+		$end_year     = max( $current_year + 10, $expiry_year );
 
-		global $wp_locale;
 		?>
 		<label>
 			<span class="screen-reader-text"><?php esc_html_e( 'Month', 'advanced-ads' ); ?></span>
@@ -301,8 +339,8 @@ class Quick_Bulk_Edit {
 		<label>
 			<span class="screen-reader-text"><?php esc_html_e( 'Year', 'advanced-ads' ); ?></span>
 			<select name="<?php echo esc_attr( $prefix ); ?>year">
-				<?php for ( $y = $current_year; $y < $current_year + 11; $y++ ) : ?>
-					<option value="<?php echo esc_attr( $y ); ?>" <?php selected( $y, (int) $initial_date->format( 'Y' ) ); ?>><?php echo esc_html( $y ); ?></option>
+				<?php for ( $y = $start_year; $y <= $end_year; $y++ ) : ?>
+					<option value="<?php echo esc_attr( $y ); ?>" <?php selected( $y, $expiry_year ); ?>><?php echo esc_html( $y ); ?></option>
 				<?php endfor; ?>
 			</select>
 		</label>
@@ -315,16 +353,9 @@ class Quick_Bulk_Edit {
 			<span class="screen-reader-text"><?php esc_html_e( 'Minute', 'advanced-ads' ); ?></span>
 			<input type="number" name="<?php echo esc_attr( $prefix ); ?>minute" min="0" max="59" value="<?php echo esc_attr( $initial_date->format( 'i' ) ); ?>"/>
 		</label>
-		<?php if ( $seconds ) : ?>
-			:
-			<label>
-				<span class="screen-reader-text"><?php esc_html_e( 'Second', 'advanced-ads' ); ?></span>
-				<input type="number" name="<?php echo esc_attr( $prefix ); ?>second" min="0" max="59" value="<?php echo esc_attr( $initial_date->format( 's' ) ); ?>"/>
-			</label>
-		<?php endif; ?>
-		<?php $timezone = wp_timezone_string(); ?>
-		<span><?php echo esc_html( strlen( $timezone ) !== strlen( str_replace( [ '+', '-' ], '', $timezone ) ) ? "UTC$timezone" : $timezone ); ?></span>
 		<?php
+		$timezone = wp_timezone_string();
+		echo esc_html( false !== strpbrk( $timezone, '+-' ) ? "UTC{$timezone}" : $timezone );
 	}
 
 	/**
@@ -332,24 +363,20 @@ class Quick_Bulk_Edit {
 	 *
 	 * @param Ad $ad Ad instance.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_json_data( $ad ): array {
 		$expiry = $ad->get_expiry_date();
-
-		if ( $expiry ) {
-			$expiry_date = array_combine(
-				[ 'year', 'month', 'day', 'hour', 'minute' ],
-				explode( '-', wp_date( 'Y-m-d-H-i', $expiry ) )
-			);
-		}
 
 		$ad_data = [
 			'debug_mode' => $ad->is_debug_mode(),
 			'expiry'     => $expiry
 				? [
 					'expires'     => true,
-					'expiry_date' => $expiry_date,
+					'expiry_date' => array_combine(
+						[ 'year', 'month', 'day', 'hour', 'minute' ],
+						explode( '-', wp_date( 'Y-m-d-H-i', $expiry ) )
+					),
 				]
 				: [
 					'expires' => false,
@@ -357,7 +384,7 @@ class Quick_Bulk_Edit {
 			'ad_label'   => $ad->get_prop( 'ad_label' ),
 		];
 
-		if ( isset( Advanced_Ads_Privacy::get_instance()->options()['enabled'] ) ) {
+		if ( Options::instance()->get( 'privacy.enabled' ) ) {
 			$ad_data['ignore_privacy'] = isset( $ad->get_data()['privacy']['ignore-consent'] );
 		}
 
@@ -365,10 +392,8 @@ class Quick_Bulk_Edit {
 		 * Allow add-ons to add more ad data fields.
 		 *
 		 * @param array $ad_data the fields to be sent back to the browser.
-		 * @param       $ad      Ad the ad being currently edited.
+		 * @param Ad    $ad      the ad being currently edited.
 		 */
-		$ad_data = apply_filters( 'advanced-ads-quick-edit-ad-data', $ad_data, $ad );
-
-		return $ad_data;
+		return apply_filters( 'advanced-ads-quick-edit-ad-data', $ad_data, $ad );
 	}
 }

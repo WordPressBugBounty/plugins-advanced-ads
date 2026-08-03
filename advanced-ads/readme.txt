@@ -2,9 +2,9 @@
 Contributors: advancedads
 Tags: ads, adsense, amazon, affiliate, ad manager
 Requires at least: 5.7
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.25
+Stable tag: 2.0.26
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -359,6 +359,18 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 10. Convert AdSense ads into AMP automatically (AMP Ads add-on)
 
 == Changelog ==
+
+= 2.0.26 (August 3, 2026) =
+
+- Improvement: bulk Activate all and Deactivate all for Included add-ons with license activation
+- Fix: fatal error when groups contain invalid ad ids
+- Fix: license rest api for non-post name permalinks
+- Fix: fatal error in Ad Health notices
+- Fix: license activate flow, Sites count, notice dismiss, and install crash
+- Fix: shortcode vulnerability for content attribute
+- Fix: incorrect Ad count for All view at list table
+- Fix: unauthorized plugin update download site was not activated on the shop.
+- Fix: help links and internal compatibility improvements
 
 = 2.0.25 (July 10, 2026) =
 

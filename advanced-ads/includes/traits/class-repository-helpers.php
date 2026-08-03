@@ -62,7 +62,7 @@ trait Repository_Helpers {
 		foreach ( $post_ids as $post_id ) {
 			$entity = $loader( $post_id );
 
-			if ( $skip_invalid && ( false === $entity || null === $entity ) ) {
+			if ( ( ! is_object( $entity ) ) || ( $skip_invalid && ( false === $entity || null === $entity ) ) ) {
 				continue;
 			}
 

@@ -79,7 +79,7 @@ class Ads extends Screen {
 	/**
 	 * Get page header arguments
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function define_header_args(): array {
 		return [

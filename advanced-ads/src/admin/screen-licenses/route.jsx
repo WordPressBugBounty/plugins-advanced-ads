@@ -22,7 +22,7 @@ export const licenseRoute = {
 		upgradeUrl:
 			'https://wpadvancedads.com/add-ons/?utm_source=advanced-ads&utm_medium=link&utm_campaign=header-upgrade-license',
 		manualUrl:
-			'https://wpadvancedads.com/manual/?utm_source=advancedads&utm_medium=in-plugin&utm_campaign=a2-in_plugin-licenses_addons-header-manual',
+			'https://wpadvancedads.com/manual/how-to-manage-your-licenses-and-add-ons-in-advanced-ads/?utm_source=advancedads&utm_medium=in-plugin&utm_campaign=a2-in_plugin-licenses_addons-header-manual',
 	},
 	areas: {
 		content: () => <License />,

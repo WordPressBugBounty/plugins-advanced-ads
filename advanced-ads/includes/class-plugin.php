@@ -253,13 +253,9 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Admin\License_Admin_Post::class );
 
 		// Ads.
-		$this->register_integration( Admin\Ads\Ajax::class );
 		$this->register_integration( Admin\Metabox_Ad::class );
 		$this->register_integration( Admin\Metabox_Ad_Settings::class );
 		$this->register_integration( Admin\Ads\Quick_Bulk_Edit::class );
-
-		// Groups.
-		$this->register_integration( Admin\Groups\Ajax::class );
 
 		// Placements.
 		$this->register_integration( Admin\Placements\Ajax::class );
@@ -323,7 +319,6 @@ class Plugin extends Framework\Loader {
 		require_once ADVADS_ABSPATH . 'includes/functions-ad.php';
 		require_once ADVADS_ABSPATH . 'includes/functions-group.php';
 		require_once ADVADS_ABSPATH . 'includes/functions-placement.php';
-		require_once ADVADS_ABSPATH . 'includes/cap_map.php';
 		require_once ADVADS_ABSPATH . 'includes/default-hooks.php';
 		require_once ADVADS_ABSPATH . 'includes/functions-components.php';
 	}

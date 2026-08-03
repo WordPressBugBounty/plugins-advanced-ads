@@ -53,7 +53,26 @@ $all_access = Advanced_Ads_Admin_Licenses::get_instance()->get_probably_all_acce
 if ( ! $all_access ) :
 	?>
 	<footer>
-		<a class="no-underline" href="https://wpadvancedads.com/add-ons/all-access/?utm_source=advanced-ads&utm_medium=link&utm_campaign=pitch-bundle" target="_blank">
+		<a
+			class="no-underline"
+			href="
+			<?php
+				echo esc_url(
+					add_query_arg(
+						[
+							'page'         => 'advanced-ads-app',
+							'path'         => '/license',
+							'utm_source'   => 'advancedads',
+							'utm_medium'   => 'in-plugin',
+							'utm_campaign' => 'a2-in_plugin-pricing_table-all_access_plan',
+						],
+						admin_url( 'admin.php' )
+					)
+				);
+			?>
+			"
+			target="_blank"
+		>
 			<?php esc_html_e( 'Get the All Access pass', 'advanced-ads' ); ?>
 			<span aria-hidden="true" class="dashicons dashicons-external"></span>
 		</a>

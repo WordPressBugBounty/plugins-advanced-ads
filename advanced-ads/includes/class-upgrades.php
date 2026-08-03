@@ -26,7 +26,7 @@ class Upgrades extends Updates implements Initializer_Interface {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_updates(): array {
 		return [

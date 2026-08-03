@@ -64,7 +64,7 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Define hidden columns.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	protected function define_hidden_columns(): array {
 		return [ 'id', 'title' ];
@@ -73,9 +73,9 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Define which columns to show on this screen.
 	 *
-	 * @param array $columns Existing columns.
+	 * @param array<string, string> $columns Existing columns.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function define_columns( $columns ): array {
 		return [
@@ -91,9 +91,9 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Define which columns are sortable.
 	 *
-	 * @param array $columns Existing columns.
+	 * @param array<string, string|array<string, mixed>> $columns Existing columns.
 	 *
-	 * @return array
+	 * @return array<string, string|array<string, mixed>>
 	 */
 	public function define_sortable_columns( $columns ): array {
 		$columns['type'] = 'type';
@@ -129,7 +129,7 @@ class List_Table extends Admin_List_Table {
 	 *
 	 * @param string[] $views An array of available list table views.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function display_views( $views ): array {
 		global $wp_list_table;
@@ -146,9 +146,9 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Filter the row actions for placements.
 	 *
-	 * @param array $actions Array of actions.
+	 * @param array<string, string> $actions Array of actions.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function row_actions( array $actions ): array {
 		unset( $actions['inline hide-if-no-js'] );
@@ -165,9 +165,9 @@ class List_Table extends Admin_List_Table {
 	/**
 	 * Order ads by title on ads list
 	 *
-	 * @param array $query_vars Query vars.
+	 * @param array<string, mixed> $query_vars Query vars.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	protected function query_filters( $query_vars ): array {
 		// Early bail!!
@@ -214,7 +214,7 @@ class List_Table extends Admin_List_Table {
 			return $order_sql;
 		}
 
-		$order = strtoupper( Params::get( 'order', 'asc' ) ) === 'DESC' ? 'DESC' : 'ASC';
+		$order       = strtoupper( Params::get( 'order', 'asc' ) ) === 'DESC' ? 'DESC' : 'ASC';
 		$types_order = wp_advads()->placements->types->get_types();
 		$types_order = array_keys( $types_order );
 

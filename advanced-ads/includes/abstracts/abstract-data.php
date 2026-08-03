@@ -30,21 +30,21 @@ abstract class Data {
 	/**
 	 * Core data for this object. Name value pairs (name + default value).
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected $data = [];
 
 	/**
 	 * Core data changes for this object.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected $changes = [];
 
 	/**
 	 * Set to _data on construct so we can track and reset data if needed.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected $default_data = [];
 
@@ -72,7 +72,7 @@ abstract class Data {
 	/**
 	 * Stores temp data.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected $temp_data = [];
 
@@ -88,7 +88,7 @@ abstract class Data {
 	/**
 	 * Default constructor.
 	 *
-	 * @param int|object|array $read ID to load from the DB (optional) or already queried data.
+	 * @param int|object|array<string, mixed> $read ID to load from the DB (optional) or already queried data.
 	 */
 	public function __construct( $read = 0 ) { // phpcs:ignore
 		$this->default_data = $this->data;
@@ -174,7 +174,7 @@ abstract class Data {
 	/**
 	 * Returns all data for this object.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_data(): array {
 		return array_merge(
@@ -186,7 +186,7 @@ abstract class Data {
 	/**
 	 * Returns array of expected data keys for this object.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 */
 	public function get_data_keys() {
 		$keys = array_keys( $this->data );
@@ -197,7 +197,7 @@ abstract class Data {
 	/**
 	 * Return data changes only.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_changes(): array {
 		return $this->changes;
@@ -295,7 +295,7 @@ abstract class Data {
 	 * Set a collection of props in one go, collect any errors, and return the result.
 	 * Only sets using public methods.
 	 *
-	 * @param array $props Key value pairs to set. Key is the prop and should map to a setter function name.
+	 * @param array<string, mixed> $props Key value pairs to set. Key is the prop and should map to a setter function name.
 	 *
 	 * @return bool|WP_Error
 	 */

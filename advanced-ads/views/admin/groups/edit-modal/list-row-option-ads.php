@@ -5,8 +5,8 @@
  * @package AdvancedAds
  * @author  Advanced Ads <info@wpadvancedads.com>
  *
- * @var array $ad_form_rows  HTML to render ad form.
- * @var array $this->all_ads Array with ads that can be chosen from for the group.
+ * @var list<string> $ad_form_rows HTML to render ad form.
+ * @var array<int, string> $this->all_ads Array with ads that can be chosen from for the group.
  * @var Group $group         Group instance.
  */
 

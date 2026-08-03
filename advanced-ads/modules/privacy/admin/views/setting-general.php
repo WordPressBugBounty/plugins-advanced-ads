@@ -7,7 +7,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  *
  * @var bool   $module_enabled                Whether the privacy module is enabled.
- * @var array  $methods                       Available privacy methods.
+ * @var array<string, array{label: string, manual_url?: string}> $methods Available privacy methods.
  * @var string $current_method                Currently chosen method.
  * @var string $custom_cookie_name            Name of custom cookie, if this setting is chosen.
  * @var string $custom_cookie_value           (Partial) Value of custom cookie, if this setting is chosen.

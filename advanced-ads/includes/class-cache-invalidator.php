@@ -12,6 +12,7 @@ namespace AdvancedAds;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Utilities\Cache;
 use AdvancedAds\Utilities\Validation;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -21,21 +22,52 @@ defined( 'ABSPATH' ) || exit;
 class Cache_Invalidator implements Integration_Interface {
 
 	/**
+	 * Group term meta keys that affect list summaries.
+	 *
+	 * @var string[]
+	 */
+	private const GROUP_META_KEYS = [
+		'_advads_group_type',
+		'advanced_ads_group_options',
+		'modified_date',
+		'publish_date',
+	];
+
+	/**
+	 * Placement post meta keys that affect list summaries.
+	 *
+	 * @var string[]
+	 */
+	private const PLACEMENT_META_KEYS = [
+		'item',
+		'type',
+	];
+
+	/**
 	 * Hook into WordPress.
 	 *
 	 * @return void
 	 */
 	public function hooks(): void {
 		add_action( 'save_post', [ $this, 'invalidate_on_save_post' ], 99, 2 );
-		add_action( 'deleted_post', [ $this, 'invalidate_on_post_change' ], 99 );
-		add_action( 'trashed_post', [ $this, 'invalidate_on_post_change' ], 99 );
-		add_action( 'untrashed_post', [ $this, 'invalidate_on_post_change' ], 99 );
+		add_action( 'clean_post_cache', [ $this, 'invalidate_on_clean_post_cache' ], 99, 2 );
+		add_action( 'advanced-ads-import', [ self::class, 'invalidate_all' ], 99 );
 
-		add_action( 'created_term', [ $this, 'invalidate_on_term_change' ], 99, 3 );
-		add_action( 'edited_term', [ $this, 'invalidate_on_term_change' ], 99, 3 );
-		add_action( 'delete_term', [ $this, 'invalidate_on_term_change' ], 99, 3 );
+		foreach ( [ 'deleted_post', 'trashed_post', 'untrashed_post' ] as $hook ) {
+			add_action( $hook, [ $this, 'invalidate_on_post_change' ], 99 );
+		}
 
-		add_action( 'advanced-ads-import', [ Cache_Invalidator::class, 'invalidate_all' ], 99 );
+		foreach ( [ 'created_term', 'edited_term', 'delete_term' ] as $hook ) {
+			add_action( $hook, [ $this, 'invalidate_on_term_change' ], 99, 3 );
+		}
+
+		foreach ( [ 'added_term_meta', 'updated_term_meta', 'deleted_term_meta' ] as $hook ) {
+			add_action( $hook, [ $this, 'invalidate_on_term_meta_change' ], 99, 4 );
+		}
+
+		foreach ( [ 'added_post_meta', 'updated_post_meta', 'deleted_post_meta' ] as $hook ) {
+			add_action( $hook, [ $this, 'invalidate_on_post_meta_change' ], 99, 4 );
+		}
 	}
 
 	/**
@@ -89,11 +121,9 @@ class Cache_Invalidator implements Integration_Interface {
 	 * @return void
 	 */
 	public function invalidate_on_save_post( $post_id, $post ): void {
-		if ( ! Validation::check_save_post( $post_id, $post ) ) {
-			return;
+		if ( Validation::check_save_post( $post_id, $post ) ) {
+			$this->invalidate_post_type( $post->post_type );
 		}
-
-		$this->invalidate_post_type( $post->post_type );
 	}
 
 	/**
@@ -104,13 +134,29 @@ class Cache_Invalidator implements Integration_Interface {
 	 * @return void
 	 */
 	public function invalidate_on_post_change( $post_id ): void {
-		$post_type = get_post_type( $post_id );
+		$this->invalidate_post_type( (string) get_post_type( $post_id ) );
+	}
 
-		if ( ! $post_type ) {
+	/**
+	 * Invalidate ad caches when post cache is cleaned outside save_post.
+	 *
+	 * Covers text-ad $wpdb updates that call clean_post_cache() without firing save_post.
+	 *
+	 * @param int          $post_id Post ID.
+	 * @param WP_Post|null $post    Post object when provided by core.
+	 *
+	 * @return void
+	 */
+	public function invalidate_on_clean_post_cache( $post_id, $post = null ): void {
+		if ( doing_action( 'save_post' ) ) {
 			return;
 		}
 
-		$this->invalidate_post_type( $post_type );
+		$post = $post instanceof WP_Post ? $post : get_post( $post_id );
+
+		if ( Validation::check_save_post( $post_id, $post ) && Constants::POST_TYPE_AD === $post->post_type ) {
+			self::invalidate_ads();
+		}
 	}
 
 	/**
@@ -125,11 +171,57 @@ class Cache_Invalidator implements Integration_Interface {
 	public function invalidate_on_term_change( $term_id, $tt_id, $taxonomy ): void {
 		unset( $term_id, $tt_id );
 
-		if ( Constants::TAXONOMY_GROUP !== $taxonomy ) {
+		if ( Constants::TAXONOMY_GROUP === $taxonomy ) {
+			self::invalidate_groups();
+		}
+	}
+
+	/**
+	 * Invalidate caches when summary-affecting group term meta changes.
+	 *
+	 * @param int|int[] $meta_id    Meta ID(s).
+	 * @param int       $object_id  Term ID.
+	 * @param string    $meta_key   Meta key.
+	 * @param mixed     $meta_value Meta value.
+	 *
+	 * @return void
+	 */
+	public function invalidate_on_term_meta_change( $meta_id, $object_id, $meta_key, $meta_value ): void {
+		unset( $meta_id, $meta_value );
+
+		if ( ! in_array( $meta_key, self::GROUP_META_KEYS, true ) ) {
 			return;
 		}
 
-		self::invalidate_groups();
+		$term = get_term( $object_id );
+		if ( $term && ! is_wp_error( $term ) && Constants::TAXONOMY_GROUP === $term->taxonomy ) {
+			self::invalidate_groups();
+		}
+	}
+
+	/**
+	 * Invalidate caches when summary-affecting post meta changes without save_post.
+	 *
+	 * @param int|int[] $meta_id    Meta ID(s).
+	 * @param int       $object_id  Post ID.
+	 * @param string    $meta_key   Meta key.
+	 * @param mixed     $meta_value Meta value.
+	 *
+	 * @return void
+	 */
+	public function invalidate_on_post_meta_change( $meta_id, $object_id, $meta_key, $meta_value ): void {
+		unset( $meta_id, $meta_value );
+
+		$post_type = get_post_type( $object_id );
+
+		if ( Constants::POST_TYPE_AD === $post_type && 'advanced_ads_ad_options' === $meta_key ) {
+			self::invalidate_ads();
+			return;
+		}
+
+		if ( Constants::POST_TYPE_PLACEMENT === $post_type && in_array( $meta_key, self::PLACEMENT_META_KEYS, true ) ) {
+			self::invalidate_placements();
+		}
 	}
 
 	/**
@@ -139,13 +231,10 @@ class Cache_Invalidator implements Integration_Interface {
 	 *
 	 * @return void
 	 */
-	private function invalidate_post_type( $post_type ): void {
+	private function invalidate_post_type( string $post_type ): void {
 		if ( Constants::POST_TYPE_AD === $post_type ) {
 			self::invalidate_ads();
-			return;
-		}
-
-		if ( Constants::POST_TYPE_PLACEMENT === $post_type ) {
+		} elseif ( Constants::POST_TYPE_PLACEMENT === $post_type ) {
 			self::invalidate_placements();
 		}
 	}

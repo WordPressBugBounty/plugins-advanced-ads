@@ -26,14 +26,14 @@ class Admin_Menu implements Integration_Interface {
 	/**
 	 * Registered screens.
 	 *
-	 * @var array
+	 * @var array<string, object>
 	 */
 	private $screens = [];
 
 	/**
 	 * Cached screen IDs mapped to their hooks.
 	 *
-	 * @var array|null
+	 * @var array<int, string>|null
 	 */
 	private $screen_ids = null;
 
@@ -214,7 +214,7 @@ class Admin_Menu implements Integration_Interface {
 	/**
 	 * Get screens
 	 *
-	 * @return array
+	 * @return array<string, object>
 	 */
 	private function get_screens(): array {
 		if ( ! empty( $this->screens ) ) {

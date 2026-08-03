@@ -22,7 +22,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	/**
 	 * Hold AI options
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $ai_options = null;
 
@@ -169,7 +169,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 		}
 
 		wp_advads()->importers->add_session_history( $this->get_id(), $history_key, $count );
-		/* translators: 1: counts 2: Importer title */
+		/* translators: 1: Number of migrated ads, 2: Importer title. */
 		return sprintf( esc_html__( '%1$d ads migrated from %2$s', 'advanced-ads' ), $count, $this->get_title() );
 	}
 
@@ -279,8 +279,8 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	/**
 	 * Imports special AI containers [h] Header, [f] Footer, and [a] Manual as Ads.
 	 *
-	 * @param array  $ai_options ad inserter options.
-	 * @param string $history_key Session key for rollback.
+	 * @param array<string, mixed> $ai_options ad inserter options.
+	 * @param string               $history_key Session key for rollback.
 	 */
 	private function import_special_ai_blocks( $ai_options, $history_key ) {
 		$dummy_count = 0;
@@ -298,7 +298,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	/**
 	 * Return Ad Inserter block and option array
 	 *
-	 * @return array|bool
+	 * @return array<string, mixed>|bool
 	 */
 	private function get_ai_options() {
 		if ( null !== $this->ai_options ) {
@@ -424,8 +424,8 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	/**
 	 * Set ad alignment
 	 *
-	 * @param object $ad ad.
-	 * @param array  $block alignment settings.
+	 * @param object               $ad ad.
+	 * @param array<string, mixed> $block alignment settings.
 	 *
 	 * @return void
 	 */
@@ -442,11 +442,11 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	/**
 	 * Create an Advanced Ads placement based on Ad Inserter's display settings.
 	 *
-	 * @param int    $ad_id       The ID of the migrated ad to be assigned to this placement.
-	 * @param string $name        The name/title of the ad block.
-	 * @param array  $block       The Ad Inserter block configuration array.
-	 * @param string $history_key The unique session key for history tracking and rollbacks.
-	 * @param string $forced_type Optional custom placement type (e.g., 'head', 'footer').
+	 * @param int                  $ad_id       The ID of the migrated ad to be assigned to this placement.
+	 * @param string               $name        The name/title of the ad block.
+	 * @param array<string, mixed> $block       The Ad Inserter block configuration array.
+	 * @param string               $history_key The unique session key for history tracking and rollbacks.
+	 * @param string               $forced_type Optional custom placement type (e.g., 'head', 'footer').
 	 *
 	 * @return \AdvancedAds\Framework\Objects\Placement|null
 	 */
@@ -496,9 +496,9 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	/**
 	 * Parse Ad Inserter viewport detection settings and convert them into Advanced Ads visitor conditions.
 	 *
-	 * @param array $block configuration settings.
+	 * @param array<string, mixed> $block configuration settings.
 	 *
-	 * @return array visitor condition settings
+	 * @return array<string, mixed> visitor condition settings
 	 */
 	private function parse_visitor_conditions( $block ): array {
 		$devices = [];
@@ -528,8 +528,8 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	/**
 	 * Map Ad Inserter page visibility settings to Advanced Ads display conditions.
 	 *
-	 * @param  array $block block configuration.
-	 * @return array 'general' display condition.
+	 * @param  array<string, mixed> $block block configuration.
+	 * @return array<string, mixed> 'general' display condition.
 	 */
 	private function parse_display_conditions( $block ): array {
 		$enabled = [];
@@ -556,11 +556,11 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	/**
 	 *  Create Ad and Placement
 	 *
-	 * @param array  $block          ad data.
-	 * @param array  $ai_options     ad inserter options.
-	 * @param string $history_key    Session key for rollback.
-	 * @param int    $count          migrated ads count.
-	 * @param string $forced_type    Optional custom placement type (e.g., 'head', 'footer').
+	 * @param array<string, mixed> $block          ad data.
+	 * @param array<string, mixed> $ai_options     ad inserter options.
+	 * @param string               $history_key    Session key for rollback.
+	 * @param int                  $count          migrated ads count.
+	 * @param string               $forced_type    Optional custom placement type (e.g., 'head', 'footer').
 	 */
 	private function create_ad( $block, $ai_options, $history_key, &$count, $forced_type = '' ) {
 		$ad_code = trim( $block['code'] );

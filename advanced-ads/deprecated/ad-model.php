@@ -13,7 +13,7 @@ class Advanced_Ads_Model {
 	 * @since 1.1.0
 	 * @deprecated 2.0.0 Use `wp_advads_get_placements()` instead
 	 *
-	 * @return array $ad_placements
+	 * @return array<string, array<string, mixed>> $ad_placements
 	 */
 	public function get_ad_placements_array() {
 		return wp_advads_get_placements();

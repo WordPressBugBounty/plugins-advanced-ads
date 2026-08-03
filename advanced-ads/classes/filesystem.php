@@ -29,7 +29,7 @@ class Advanced_Ads_Filesystem {
 	/**
 	 * Connect to the filesystem.
 	 *
-	 * @param array $directories                  A list of directories. If any of these do
+	 * @param array<int, string> $directories     A list of directories. If any of these do
 	 *                                            not exist, a WP_Error object will be returned.
 	 * @return bool|WP_Error True if able to connect, false or a WP_Error otherwise.
 	 */

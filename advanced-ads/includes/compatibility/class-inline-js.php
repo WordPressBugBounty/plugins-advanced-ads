@@ -21,7 +21,7 @@ class Inline_JS implements Integration_Interface {
 	/**
 	 * Array that holds strings that should not be optimized by other plugins.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $inline_js;
 
@@ -43,9 +43,9 @@ class Inline_JS implements Integration_Interface {
 	 * and outputted into the footer. This is needed because WP Rocket does not output all
 	 * the code that depends on this function into the footer.
 	 *
-	 * @param array $exclusions Patterns to match in inline JS content.
+	 * @param array<int, string> $exclusions Patterns to match in inline JS content.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function rocket_exclude_inline_js( $exclusions ): array {
 		return array_merge( $exclusions, $this->inline_js );
@@ -88,7 +88,7 @@ class Inline_JS implements Integration_Interface {
 		/**
 		 * Filters an array of strings of (inline) JavaScript "identifiers" that should not be "optimized"/delayed etc.
 		 *
-		 * @param array $default Array of excluded patterns.
+		 * @param array<string, mixed> $default Array of excluded patterns.
 		 */
 		$exclusions = apply_filters( 'advanced-ads-compatibility-critical-inline-js', $default, $frontend_prefix );
 

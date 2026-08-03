@@ -229,14 +229,6 @@ class Constants {
 	const API_ENDPOINT = 'https://wpadvancedads.com/license-api/';
 
 	/**
-	 * License key exchange endpoint (legacy map → rich records).
-	 * Override with filter `advanced_ads_license_exchange_url` in License_Exchange.
-	 *
-	 * @const string
-	 */
-	const LICENSE_EXCHANGE_ENDPOINT = 'https://wpadvancedads.com/license-api/exchange';
-
-	/**
 	 * Add-on slugs and their EDD ID
 	 *
 	 * @const array

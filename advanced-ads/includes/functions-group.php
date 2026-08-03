@@ -28,7 +28,7 @@ use AdvancedAds\Groups\Group_Repository;
  *
  * @param Group|WP_Term|int|bool $group_id Group instance, term instance or numeric.
  * @param string                 $new_type Change type of group.
- * @param array                  $args     Additional arguments.
+ * @param array<string, mixed>   $args     Additional arguments.
  *
  * @return string|mixed The group output or whatever entity or string that is overriding the return value.
  */
@@ -68,8 +68,8 @@ function get_the_group( $group_id = 0, $new_type = '', $args = [] ) {
  *
  * @since 1.0.0
  *
- * @param int   $id   ID of the ad group.
- * @param array $args Additional arguments.
+ * @param int                  $id   ID of the ad group.
+ * @param array<string, mixed> $args Additional arguments.
  *
  * @return void
  */
@@ -211,7 +211,7 @@ function wp_advads_get_group_summaries(): array {
 /**
  * Get all group as dropdown.
  *
- * @return array
+ * @return array<string, mixed>
  */
 function wp_advads_get_groups_dropdown() {
 	return wp_advads()->groups->repository->get_groups_dropdown();

@@ -29,7 +29,7 @@ abstract class Screen {
 	/**
 	 * List of tabs for the screen.
 	 *
-	 * @var array
+	 * @var array<string, array<string, mixed>>
 	 */
 	private $tabs = [];
 
@@ -99,7 +99,7 @@ abstract class Screen {
 	/**
 	 * Get the tabs.
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>>
 	 */
 	public function get_tabs(): array {
 		return $this->tabs;
@@ -108,7 +108,7 @@ abstract class Screen {
 	/**
 	 * Set the tabs.
 	 *
-	 * @param array $tabs Array of screen tabs.
+	 * @param array<string, array<string, mixed>> $tabs Array of screen tabs.
 	 *
 	 * @return void
 	 */
@@ -130,7 +130,7 @@ abstract class Screen {
 	/**
 	 * Render tabs menu
 	 *
-	 * @param array $args Arguments to be used in the template.
+	 * @param array<string, mixed> $args Arguments to be used in the template.
 	 *
 	 * @return void
 	 */
@@ -144,7 +144,7 @@ abstract class Screen {
 	/**
 	 * Render tabs content
 	 *
-	 * @param array $args Arguments to be used in the template.
+	 * @param array<string, mixed> $args Arguments to be used in the template.
 	 *
 	 * @return void
 	 */
@@ -171,7 +171,7 @@ abstract class Screen {
 	/**
 	 * Get page header arguments
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function define_header_args(): array {
 		return [];
@@ -187,7 +187,7 @@ abstract class Screen {
 	/**
 	 * Get admin page header
 	 *
-	 * @param array $args Arguments to be used in the template.
+	 * @param array<string, mixed> $args Arguments to be used in the template.
 	 *
 	 * @return void
 	 */
@@ -202,7 +202,7 @@ abstract class Screen {
 	/**
 	 * Get page header arguments
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_header_args(): array {
 		$wp_screen = get_current_screen();

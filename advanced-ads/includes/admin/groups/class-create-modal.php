@@ -9,9 +9,8 @@
 
 namespace AdvancedAds\Admin\Groups;
 
-use AdvancedAds\Modal;
-use AdvancedAds\Entities;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Modal;
 
 defined( 'ABSPATH' ) || exit;
 

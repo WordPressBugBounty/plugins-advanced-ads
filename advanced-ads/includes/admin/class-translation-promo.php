@@ -128,8 +128,8 @@ class Translation_Promo {
 	 *
 	 * Required fields are the 'textdomain', 'plugin_name' and 'hook'.
 	 *
-	 * @param array $args                 The settings for the i18n module.
-	 * @param bool  $show_translation_box Whether the translation box should be shown.
+	 * @param array<string, mixed> $args The settings for the i18n module.
+	 * @param bool                 $show_translation_box Whether the translation box should be shown.
 	 */
 	public function __construct( $args, $show_translation_box = true ) {
 		if ( ! is_admin() ) {
@@ -186,7 +186,7 @@ class Translation_Promo {
 	 *
 	 * @access private
 	 *
-	 * @param array $args Contains the settings for the class.
+	 * @param array<string, mixed> $args Contains the settings for the class.
 	 */
 	private function init( $args ) {
 		foreach ( $args as $key => $arg ) {
@@ -292,9 +292,9 @@ class Translation_Promo {
 	/**
 	 * Sets the default values for wordpress.org
 	 *
-	 * @param array $args The arguments to set defaults for.
+	 * @param array<string, mixed> $args The arguments to set defaults for.
 	 *
-	 * @return array The arguments with the arguments set.
+	 * @return array<string, mixed> The arguments with the arguments set.
 	 */
 	private function set_defaults( $args ) {
 

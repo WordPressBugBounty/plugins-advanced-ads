@@ -41,9 +41,9 @@ class Advanced_Ads_Privacy_Admin {
 	/**
 	 * Add tracking settings tab.
 	 *
-	 * @param array $tabs existing setting tabs.
+	 * @param array<string, array{page: string, group: string, tabid: string, title: string}> $tabs existing setting tabs.
 	 *
-	 * @return array $tabs setting tabs with AdSense tab attached
+	 * @return array<string, array{page: string, group: string, tabid: string, title: string}> $tabs setting tabs with AdSense tab attached
 	 * @since 1.8.30
 	 */
 	public function setting_tabs( array $tabs ) {
@@ -66,9 +66,9 @@ class Advanced_Ads_Privacy_Admin {
 		/**
 		 * Allow Ad Admin to save privacy options.
 		 *
-		 * @param array $settings Array with allowed options.
+		 * @param list<string> $settings Array with allowed options.
 		 *
-		 * @return array
+		 * @return list<string>
 		 */
 		add_filter(
 			'advanced-ads-ad-admin-options',
@@ -99,9 +99,9 @@ class Advanced_Ads_Privacy_Admin {
 	/**
 	 * Sanitize settings.
 	 *
-	 * @param array $options Privacy options.
+	 * @param array<string, mixed> $options Privacy options.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function sanitize_settings( $options ) {
 		$options['custom-cookie-name']  = isset( $options['custom-cookie-name'] ) ? trim( $options['custom-cookie-name'] ) : '';
@@ -194,7 +194,7 @@ class Advanced_Ads_Privacy_Admin {
 	 * Save ad options.
 	 *
 	 * @param Ad    $ad        Ad instance.
-	 * @param array $post_data Post data array.
+	 * @param array<string, mixed> $post_data Post data array.
 	 *
 	 * @return void
 	 */

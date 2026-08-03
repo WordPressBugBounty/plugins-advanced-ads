@@ -21,14 +21,14 @@ class Unknown implements Ad_Type {
 	/**
 	 * Hold type data.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $data = [];
 
 	/**
 	 * The constructor.
 	 *
-	 * @param array $data Array of type data.
+	 * @param array<string, mixed> $data Array of type data.
 	 */
 	public function __construct( array $data ) {
 		$this->data = $data;

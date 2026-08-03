@@ -11,7 +11,7 @@ namespace AdvancedAds\Admin;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\License\License;
-use AdvancedAds\License\License_Exchange;
+use AdvancedAds\License\License_Shop_Client;
 use AdvancedAds\License\License_Utils;
 use AdvancedAds\Utilities\Conditional;
 use WP_Error;
@@ -53,7 +53,12 @@ class License_Admin_Post implements Integration_Interface {
 			$this->redirect_with_error( 'invalid_token' );
 		}
 
-		$rows = License_Exchange::request_by_token( $token );
+		$rows = License_Shop_Client::exchange(
+			[
+				'token' => $token,
+				'site'  => License::get_site_hostname(),
+			]
+		);
 		if ( is_wp_error( $rows ) ) {
 			$this->redirect_with_error( $this->map_error_code( $rows ) );
 		}
@@ -65,13 +70,11 @@ class License_Admin_Post implements Integration_Interface {
 
 		$saved = License::save_licenses(
 			$rows,
-			'' !== $activating_key,
-			$activating_key,
-			'',
-			false,
-			'',
-			'',
-			true
+			[
+				'activate_new'           => '' !== $activating_key,
+				'activating_license_key' => $activating_key,
+				'preserve_legacy_map'    => true,
+			]
 		);
 
 		if ( is_wp_error( $saved ) ) {
@@ -142,13 +145,13 @@ class License_Admin_Post implements Integration_Interface {
 	 * @return bool
 	 */
 	private function is_site_active_on_row( array $row ): bool {
-		$host = wp_parse_url( home_url(), PHP_URL_HOST );
-		$host = is_string( $host ) ? preg_replace( '/^www\./', '', strtolower( $host ) ) : '';
+		$host  = wp_parse_url( home_url(), PHP_URL_HOST );
+		$host  = is_string( $host ) ? preg_replace( '/^www\./', '', strtolower( $host ) ) : '';
 		$sites = isset( $row['sitesActivated'] ) && is_array( $row['sitesActivated'] ) ? $row['sitesActivated'] : [];
 
 		foreach ( $sites as $site ) {
 			$domain = is_array( $site ) ? (string) ( $site['domain'] ?? '' ) : '';
-			$parsed = wp_parse_url( $domain, PHP_URL_HOST ) ?: $domain;
+			$parsed = wp_parse_url( $domain, PHP_URL_HOST ) ?? $domain;
 			$parsed = preg_replace( '/^www\./', '', strtolower( (string) $parsed ) );
 			if ( $parsed === $host ) {
 				return true;
@@ -221,7 +224,7 @@ class License_Admin_Post implements Integration_Interface {
 			$code = 'network';
 		}
 
-		$args = [ 'advads_activation_error' => $code ];
+		$args    = [ 'advads_activation_error' => $code ];
 		$message = sanitize_text_field( $error->get_error_message() );
 		if ( '' !== $message ) {
 			$args['advads_activation_message'] = substr( $message, 0, 200 );

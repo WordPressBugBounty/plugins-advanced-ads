@@ -23,14 +23,14 @@ class Unknown extends Base implements Placement_Type {
 	/**
 	 * Hold type data.
 	 *
-	 * @var array
+	 * @var array{id?: string, classname?: class-string, title?: string, description?: string, is_premium?: bool, order?: int, options?: array<string, mixed>, image?: string}
 	 */
 	private $data = [];
 
 	/**
 	 * The constructor.
 	 *
-	 * @param array $data Array of type data.
+	 * @param array{id?: string, classname?: class-string, title?: string, description?: string, is_premium?: bool, order?: int, options?: array<string, mixed>, image?: string} $data Array of type data.
 	 */
 	public function __construct( array $data ) {
 		$this->data = $data;
@@ -93,7 +93,7 @@ class Unknown extends Base implements Placement_Type {
 	/**
 	 * Get options for this placement type.
 	 *
-	 * @return array The options array.
+	 * @return array<string, mixed> The options array.
 	 */
 	public function get_options(): array {
 		return $this->apply_filter_on_options( $this->data['options'] ?? [] );

@@ -48,7 +48,7 @@ class Placements implements Routes_Interface {
 	 *
 	 * @param WP_REST_Request $request the request object.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function call_endpoint( $request ) {
 		switch ( $request->get_method() ) {
@@ -69,7 +69,7 @@ class Placements implements Routes_Interface {
 	 *
 	 * @param WP_REST_Request $request the request object.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function read( $request ) {
 		$params    = $request->get_params();

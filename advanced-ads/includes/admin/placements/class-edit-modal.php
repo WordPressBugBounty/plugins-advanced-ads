@@ -228,7 +228,7 @@ class Edit_Modal implements Integration_Interface {
 	/**
 	 * Render a group of placements options
 	 *
-	 * @param array $settings placement option fields.
+	 * @param array<string, array<string, mixed>> $settings Placement option fields.
 	 *
 	 * @return void
 	 */

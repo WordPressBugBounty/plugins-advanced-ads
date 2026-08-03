@@ -80,10 +80,10 @@ class Post_List implements Integration_Interface {
 	/**
 	 * Order post list by ad status
 	 *
-	 * @param array     $clauses existing request clauses.
-	 * @param \WP_Query $query   the current WP Query.
+	 * @param array<string, string> $clauses Existing request clauses.
+	 * @param \WP_Query             $query   the current WP Query.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function request_clauses( $clauses, $query ) {
 		global $wpdb;
@@ -118,9 +118,9 @@ class Post_List implements Integration_Interface {
 	/**
 	 * Make the ad status column sortable
 	 *
-	 * @param array $columns columns list.
+	 * @param array<string, string|array<string, mixed>> $columns Columns list.
 	 *
-	 * @return array
+	 * @return array<string, string|array<string, mixed>>
 	 */
 	public function sortable_ads_column( $columns ) {
 		$columns['ad-status'] = 'ad-status';
@@ -131,9 +131,9 @@ class Post_List implements Integration_Interface {
 	/**
 	 * Adds a new column to the post overview page for public post types.
 	 *
-	 * @param array $columns An array of column names.
+	 * @param array<string, string> $columns An array of column names.
 	 *
-	 * @return array The modified array of column names.
+	 * @return array<string, string> The modified array of column names.
 	 */
 	public function ads_column_init( array $columns ): array {
 		$post_type = wp_doing_ajax() ? Params::post( 'post_type', '' ) : get_current_screen()->post_type;

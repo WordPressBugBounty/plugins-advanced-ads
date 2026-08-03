@@ -11,7 +11,6 @@ namespace AdvancedAds\Placements;
 
 use AdvancedAds\Abstracts\Placement;
 use AdvancedAds\Constants;
-use AdvancedAds\Cache_Invalidator;
 use AdvancedAds\Traits\Repository_Helpers;
 use AdvancedAds\Utilities\Cache;
 use AdvancedAds\Utilities\WordPress;
@@ -57,8 +56,6 @@ class Placement_Repository {
 			$placement->set_id( $id );
 			$this->update_post_meta( $placement );
 			$placement->apply_changes();
-
-			Cache_Invalidator::invalidate_placements();
 		}
 
 		return $placement;
@@ -102,8 +99,6 @@ class Placement_Repository {
 	 * @return void
 	 */
 	public function update( &$placement ): void {
-		global $wpdb;
-
 		$changes = $placement->get_changes();
 
 		// Only update the post when the post data changes.
@@ -141,8 +136,6 @@ class Placement_Repository {
 		$this->update_post_meta( $placement );
 
 		$placement->apply_changes();
-
-		Cache_Invalidator::invalidate_placements();
 	}
 
 	/**
@@ -166,8 +159,6 @@ class Placement_Repository {
 			wp_trash_post( $placement->get_id() );
 			$placement->set_status( 'trash' );
 		}
-
-		Cache_Invalidator::invalidate_placements();
 	}
 
 	/* Finder Methods ------------------- */
@@ -206,12 +197,12 @@ class Placement_Repository {
 	 *
 	 * Filters cached placement summaries by type and hydrates matches.
 	 *
-	 * @param string|array $types          Placement types to query.
-	 * @param string       $output         The required return type. One of OBJECT or ids,
-	 *                                     which correspond to an Placement object or an array containing post ids respectively.
-	 * @param bool         $published_only Whether to return only published placements.
+	 * @param string|array<int, string> $types Placement types to query.
+	 * @param string                    $output         The required return type. One of OBJECT or ids,
+	 *                                                  which correspond to an Placement object or an array containing post ids respectively.
+	 * @param bool                      $published_only Whether to return only published placements.
 	 *
-	 * @return array An associative array of placement IDs as keys and their corresponding placement objects as values.
+	 * @return Placement[]|array<int, int> Placement objects keyed by ID, or placement IDs when $output is "ids".
 	 */
 	public function find_by_types( $types, $output = OBJECT, $published_only = false ): array {
 		$types = array_values( array_filter( array_map( 'sanitize_key', (array) $types ) ) );
@@ -363,7 +354,7 @@ class Placement_Repository {
 	/**
 	 * Read placement data. Can be overridden by child classes to load other props.
 	 *
-	 * @param Ad $placement Ad object.
+	 * @param Placement $placement Placement object.
 	 *
 	 * @return void
 	 */

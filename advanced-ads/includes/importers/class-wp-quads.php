@@ -40,7 +40,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Array of ad mappings for creating groups.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	private $ad_mapping = [];
 
@@ -164,7 +164,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Retrieves the WP Quads options.
 	 *
-	 * @return array|false WP Quads options, or false if not found.
+	 * @return array<string, mixed>|false WP Quads options, or false if not found.
 	 */
 	private function get_plugin_options() {
 		if ( null !== $this->options ) {
@@ -365,9 +365,9 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Sets the content.
 	 *
-	 * @param Ad    $ad        The ad object.
-	 * @param array $quad_ad   The quad ad data.
-	 * @param bool  $is_mobile Whether the ad is for mobile or not.
+	 * @param Ad                   $ad        The ad object.
+	 * @param array<string, mixed> $quad_ad   The quad ad data.
+	 * @param bool                 $is_mobile Whether the ad is for mobile or not.
 	 *
 	 * @return void
 	 */
@@ -386,9 +386,9 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Sets the content.
 	 *
-	 * @param Ad    $ad        The ad object.
-	 * @param array $quad_ad   The quad ad data.
-	 * @param bool  $is_mobile Whether the ad is for mobile or not.
+	 * @param Ad                   $ad        The ad object.
+	 * @param array<string, mixed> $quad_ad   The quad ad data.
+	 * @param bool                 $is_mobile Whether the ad is for mobile or not.
 	 *
 	 * @return void
 	 */
@@ -413,9 +413,9 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Sets the content.
 	 *
-	 * @param Ad    $ad        The ad object.
-	 * @param array $quad_ad   The quad ad data.
-	 * @param bool  $is_mobile Whether the ad is for mobile or not.
+	 * @param Ad                   $ad        The ad object.
+	 * @param array<string, mixed> $quad_ad   The quad ad data.
+	 * @param bool                 $is_mobile Whether the ad is for mobile or not.
 	 *
 	 * @return void
 	 */
@@ -455,9 +455,9 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Sets the content.
 	 *
-	 * @param Ad    $ad        The ad object.
-	 * @param array $quad_ad   The quad ad data.
-	 * @param bool  $is_mobile Whether the ad is for mobile or not.
+	 * @param Ad                   $ad        The ad object.
+	 * @param array<string, mixed> $quad_ad   The quad ad data.
+	 * @param bool                 $is_mobile Whether the ad is for mobile or not.
 	 *
 	 * @return void
 	 */
@@ -505,9 +505,9 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Parses the ad display conditions for a quad ad.
 	 *
-	 * @param array $quad_ad The quad ad to parse.
+	 * @param array<string, mixed> $quad_ad The quad ad to parse.
 	 *
-	 * @return array The parsed display conditions.
+	 * @return array<string, mixed> The parsed display conditions.
 	 */
 	private function parse_ad_display_conditions( $quad_ad ): array {
 		$display_conditions = [];
@@ -590,9 +590,9 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Parses the ad visitor conditions for a quad ad.
 	 *
-	 * @param array $quad_ad The quad ad to parse.
+	 * @param array<string, mixed> $quad_ad The quad ad to parse.
 	 *
-	 * @return array The parsed visitor conditions.
+	 * @return array<string, mixed> The parsed visitor conditions.
 	 */
 	private function parse_ad_visitor_conditions( $quad_ad ): array {
 		$visitor_conditions = [];
@@ -709,9 +709,9 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Finds display conditions found in quad visitor conditions.
 	 *
-	 * @param array $quad_ad The quad ad to parse.
+	 * @param array<string, mixed> $quad_ad The quad ad to parse.
 	 *
-	 * @return array The parsed display conditions.
+	 * @return array<string, mixed> The parsed display conditions.
 	 */
 	private function parse_cross_display_conditions( $quad_ad ): array {
 		$display_conditions = [];
@@ -741,9 +741,9 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Finds visitor conditions found in quad display conditions.
 	 *
-	 * @param array $quad_ad The quad ad to parse.
+	 * @param array<string, mixed> $quad_ad The quad ad to parse.
 	 *
-	 * @return array The parsed visitor conditions.
+	 * @return array<string, mixed> The parsed visitor conditions.
 	 */
 	private function parse_cross_visitor_conditions( $quad_ad ): array {
 		$visitor_conditions = [];
@@ -792,10 +792,10 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Creates a new Ad based quad ad data.
 	 *
-	 * @param string $ad_type The type of the ad.
-	 * @param array  $quad_ad The quad ad data.
+	 * @param string               $ad_type The type of the ad.
+	 * @param array<string, mixed> $quad_ad The quad ad data.
 	 *
-	 * @return array|false Ad and Mobile ad if applicable, or false if the ad creation fails.
+	 * @return array<string, mixed>|false Ad and Mobile ad if applicable, or false if the ad creation fails.
 	 */
 	private function create_ad( $ad_type, $quad_ad ) {
 		$ad = wp_advads_create_new_ad( $ad_type );
@@ -872,7 +872,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Creates a group for a random quad ad.
 	 *
-	 * @param array $quad_ad Quad ad data.
+	 * @param array<string, mixed> $quad_ad Quad ad data.
 	 *
 	 * @return Group|false Group object or false if creation fails.
 	 */
@@ -900,7 +900,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Creates slider group for a quad ad.
 	 *
-	 * @param array $quad_ad Quad ad data.
+	 * @param array<string, mixed> $quad_ad Quad ad data.
 	 *
 	 * @return Group|false Group object or false if creation fails.
 	 */
@@ -934,8 +934,8 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Creates a new placement for the given ad.
 	 *
-	 * @param Ad|Group $item    The ad to create the placement for.
-	 * @param array    $quad_ad The Quad ad.
+	 * @param Ad|Group             $item    The ad to create the placement for.
+	 * @param array<string, mixed> $quad_ad The Quad ad.
 	 *
 	 * @return Placement|false The created placement, or false if not created.
 	 */
@@ -971,7 +971,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 *
 	 * @param string $quad_ad The Quad ad.
 	 *
-	 * @return array The parsed type and props.
+	 * @return array<string, mixed> The parsed type and props.
 	 */
 	private function parse_placement_position( $quad_ad ): array {
 		$position    = $quad_ad['position'];

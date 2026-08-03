@@ -6,7 +6,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   2.0
  *
- * @var array $privacy_options privacy module options.
+ * @var bool $is_privacy_enabled Whether privacy module is enabled.
  */
 
 use AdvancedAds\Options;
@@ -28,7 +28,7 @@ global $wp_locale;
 			</div>
 		</div>
 
-		<?php if ( isset( $privacy_options['enabled'] ) ) : ?>
+		<?php if ( $is_privacy_enabled ) : ?>
 			<div class="wp-clearfix">
 				<label><input type="checkbox" name="ignore_privacy" value="1"/><?php esc_html_e( 'Ignore privacy settings', 'advanced-ads' ); ?></label>
 			</div>

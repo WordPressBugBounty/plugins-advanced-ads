@@ -187,6 +187,8 @@ class Assets implements Integration_Interface {
 			'assetsUrl'    => esc_url( ADVADS_BASE_URL ),
 			'dashboardUrl' => esc_url( admin_url( 'admin.php?page=advanced-ads' ) ),
 			'editAd'       => esc_url( admin_url( 'post.php?action=edit&post=' ) ),
+			'restUrl'      => esc_url_raw( rest_url() ),
+			'restNonce'    => wp_create_nonce( 'wp_rest' ),
 			'shopUrl'      => defined( 'AA_SHOP_URL' ) ? esc_url( AA_SHOP_URL ) : esc_url( 'https://wpadvancedads.com' ), // SHOP_URL define on wp-config.php.
 			'siteUrl'      => esc_url( site_url() ),
 		];

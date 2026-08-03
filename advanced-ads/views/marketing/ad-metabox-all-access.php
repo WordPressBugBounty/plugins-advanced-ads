@@ -20,4 +20,22 @@
 	<li><span class="dashicons dashicons-yes"></span><?php esc_html_e( 'Ad Slider', 'advanced-ads' ); ?></li>
 </ul>
 <p><?php esc_html_e( 'Risk free with 30-day Money-Back guarantee', 'advanced-ads' ); ?></p>
-<a class="button button-primary" href="https://wpadvancedads.com/add-ons/all-access/?utm_source=advanced-ads&utm_medium=link&utm_campaign=pitch-bundle" target="_blank"><?php esc_html_e( 'Get All Access', 'advanced-ads' ); ?></a>
+<a class="button button-primary"
+		href="
+			<?php
+				echo esc_url(
+					add_query_arg(
+						[
+							'page'         => 'advanced-ads-app',
+							'path'         => '/license',
+							'utm_source'   => 'advancedads',
+							'utm_medium'   => 'in-plugin',
+							'utm_campaign' => 'a2-in_plugin-pricing_table-all_access_plan',
+						],
+						admin_url( 'admin.php' )
+					)
+				);
+				?>
+		"
+
+target="_blank"><?php esc_html_e( 'Get All Access', 'advanced-ads' ); ?></a>

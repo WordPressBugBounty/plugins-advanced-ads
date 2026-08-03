@@ -9,10 +9,10 @@
 
 namespace AdvancedAds\Admin;
 
-use stdClass;
 use AdvancedAds\Constants;
-use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Params;
+use stdClass;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,44 +39,33 @@ class Post_Types implements Integration_Interface {
 	/**
 	 * Prepare the ad groups for ad deletion
 	 *
-	 * @param int $post_id id of the post.
+	 * @param int     $post_id id of the post.
+	 * @param WP_Post $post    Post object.
 	 *
 	 * @return void
 	 */
 	public function before_delete_ad( $post_id, $post ): void {
 		global $wpdb;
 
-		if ( ! current_user_can( 'delete_posts' ) ) {
+		if (
+			! current_user_can( 'delete_posts' )
+			|| $post_id <= 0
+			|| Constants::POST_TYPE_AD !== $post->post_type
+		) {
 			return;
 		}
 
-		if ( $post_id > 0 ) {
-			if ( Constants::POST_TYPE_AD === $post->post_type ) {
-				/**
-				 * Images uploaded to an image ad type get the `_advanced-ads_parent_id` meta key from WordPress automatically
-				 * the following SQL query removes that meta data from any attachment when the ad is removed.
-				 */
-				$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %d", '_advanced-ads_parent_id', $post_id ) ); // phpcs:ignore
+		/**
+		 * Images uploaded to an image ad type get the `_advanced-ads_parent_id` meta key from WordPress automatically
+		 * the following SQL query removes that meta data from any attachment when the ad is removed.
+		 */
+		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %d", '_advanced-ads_parent_id', $post_id ) ); // phpcs:ignore
 
-				$terms = wp_get_object_terms( $post_id, Constants::TAXONOMY_GROUP );
-
-				if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
-					$term_ids = wp_list_pluck( $terms, 'term_id' );
-
-					if( ! empty( $term_ids ) ) {
-						foreach( $term_ids as $group_id ) {
-							$group = wp_advads_get_group( $group_id );
-
-							$ad_weights = $group->get_ad_weights();
-
-							unset( $ad_weights[ $post_id ] );
-
-							$group->set_ad_weights( $ad_weights );
-							$group->save();
-						}
-					}
-				}
-			}
+		foreach ( wp_advads_get_groups_by_ad_id( $post_id ) as $group ) {
+			$ad_weights = $group->get_ad_weights();
+			unset( $ad_weights[ $post_id ] );
+			$group->set_ad_weights( $ad_weights );
+			$group->save();
 		}
 	}
 
@@ -113,9 +102,9 @@ class Post_Types implements Integration_Interface {
 	 *
 	 * @since 1.4.7
 	 *
-	 * @param array $messages Existing post update messages.
+	 * @param array<string, array<int, string>> $messages Existing post update messages.
 	 *
-	 * @return array
+	 * @return array<string, array<int, string>>
 	 */
 	public function post_updated_messages( $messages = [] ): array {
 		global $post;
@@ -152,10 +141,10 @@ class Post_Types implements Integration_Interface {
 	/**
 	 * Edit ad bulk update messages
 	 *
-	 * @param array $messages existing bulk update messages.
-	 * @param array $counts numbers of updated ads.
+	 * @param array<string, array<string, string>> $messages Existing bulk update messages.
+	 * @param array<string, int>                   $counts   Numbers of updated ads.
 	 *
-	 * @return array
+	 * @return array<string, array<string, string>>
 	 */
 	public function bulk_post_updated_messages( array $messages, array $counts ): array {
 		$messages[ Constants::POST_TYPE_AD ] = [
@@ -196,8 +185,8 @@ class Post_Types implements Integration_Interface {
 	 * @return string
 	 */
 	public function get_edit_post_link( string $link, int $post_id ): string {
-		if ( get_post_type( $post_id ) === Constants::POST_TYPE_PLACEMENT ) {
-			$link = admin_url( 'edit.php?post_type=' . Constants::POST_TYPE_PLACEMENT . '#modal-placement-edit-' . $post_id );
+		if ( Constants::POST_TYPE_PLACEMENT === get_post_type( $post_id ) ) {
+			return admin_url( 'edit.php?post_type=' . Constants::POST_TYPE_PLACEMENT . '#modal-placement-edit-' . $post_id );
 		}
 
 		return $link;

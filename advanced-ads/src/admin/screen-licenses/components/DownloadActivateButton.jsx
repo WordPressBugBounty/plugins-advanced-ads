@@ -32,6 +32,7 @@ export function DownloadActivateButton( {
 	noticesContext,
 	downloadUrl = '',
 	addonId = '',
+	isInstalled = false,
 } ) {
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
 	const [ installFailed, setInstallFailed ] = useState( false );
@@ -157,9 +158,8 @@ export function DownloadActivateButton( {
 			await deactivateLicenseOnSite( licenseKey, licensesFromStore );
 		} catch ( err ) {
 			const errorMessage =
-				err instanceof Error
-					? err.message
-					: __( 'Deactivation failed.', 'advanced-ads' );
+				extractApiErrorMessage( err ) ||
+				__( 'Deactivation failed.', 'advanced-ads' );
 			const noticeId = 'advanced-ads/license-deactivation';
 
 			removeNotice( noticeId, noticesContext );
@@ -207,6 +207,8 @@ export function DownloadActivateButton( {
 
 	const buttonLabel = isSubmitting
 		? __( 'Activating…', 'advanced-ads' )
+		: isInstalled
+		? __( 'Activate', 'advanced-ads' )
 		: __( 'Download and activate', 'advanced-ads' );
 
 	return (

@@ -1,7 +1,5 @@
 <?php // phpcs:ignore WordPress.Files.FileName
 
-use AdvancedAds\Framework\Utilities\Params;
-
 /**
  * Display the 'ads.txt' file.
  */
@@ -29,8 +27,8 @@ class Advanced_Ads_Ads_Txt_Public {
 	 * Display the 'ads.txt' file on the frontend.
 	 */
 	public function display() {
-		$request_uri = filter_var( $_SERVER['REQUEST_URI'] ?? '', FILTER_SANITIZE_URL );
-		if ( '/ads.txt' === esc_url_raw( $request_uri ) ) {
+		$request_uri = sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) );
+		if ( '/ads.txt' === $request_uri ) {
 			$content = $this->prepare_frontend_output();
 			if ( $content ) {
 				header( 'Content-Type: text/plain; charset=utf-8' );
@@ -48,10 +46,7 @@ class Advanced_Ads_Ads_Txt_Public {
 	 * @return string
 	 */
 	public function prepare_frontend_output() {
-		if (
-			Advanced_Ads_Ads_Txt_Utils::is_subdir() ||
-			! $this->strategy->is_enabled()
-		) {
+		if ( Advanced_Ads_Ads_Txt_Utils::is_subdir() || ! $this->strategy->is_enabled() ) {
 			return;
 		}
 
@@ -148,7 +143,6 @@ class Advanced_Ads_Ads_Txt_Public {
 			$blog_data = Advanced_Ads_Ads_Txt_Utils::remove_duplicate_lines( $blog_data, [ 'to_comments' => true ] );
 
 			foreach ( $blog_data as $blog_id => $blog_lines ) {
-
 				$content = $this->strategy->parse_content( $blog_lines );
 				if ( $content ) {
 					$content = "# blog_id: $blog_id\n" . $content;

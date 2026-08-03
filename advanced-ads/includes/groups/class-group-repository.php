@@ -12,7 +12,6 @@ namespace AdvancedAds\Groups;
 use AdvancedAds\Abstracts\Group;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Formatting;
-use AdvancedAds\Cache_Invalidator;
 use AdvancedAds\Traits\Repository_Helpers;
 use AdvancedAds\Utilities\Cache;
 use Exception;
@@ -46,6 +45,8 @@ class Group_Repository {
 	 *
 	 * @param Group $group Group object.
 	 *
+	 * @throws Exception If the group could not be created.
+	 *
 	 * @return Group
 	 */
 	public function create( &$group ): Group {
@@ -60,11 +61,13 @@ class Group_Repository {
 			]
 		);
 
-		if ( $ids && ! is_wp_error( $ids ) ) {
-			$group->set_id( $ids['term_id'] );
-			$this->update_term_meta( $group );
-			$group->apply_changes();
+		if ( ! $ids || is_wp_error( $ids ) ) {
+			throw new Exception( esc_html__( 'Unable to create group.', 'advanced-ads' ) );
 		}
+
+		$group->set_id( $ids['term_id'] );
+		$this->update_term_meta( $group );
+		$group->apply_changes();
 
 		return $group;
 	}
@@ -130,10 +133,6 @@ class Group_Repository {
 
 		$this->update_term_meta( $group );
 		$group->apply_changes();
-
-		if ( empty( $term_args ) ) {
-			Cache_Invalidator::invalidate_groups();
-		}
 	}
 
 	/**
@@ -229,17 +228,6 @@ class Group_Repository {
 	}
 
 	/**
-	 * Get ad IDs assigned to a group from cached summaries.
-	 *
-	 * @param int $group_id Group term ID.
-	 *
-	 * @return int[]
-	 */
-	private function get_ad_ids_by_group_id( int $group_id ): array {
-		return array_map( 'absint', array_keys( $this->get_ad_weights_by_group_id( $group_id ) ) );
-	}
-
-	/**
 	 * Get ad weights for a group from cached summaries.
 	 *
 	 * @param int $group_id Group term ID.
@@ -289,7 +277,7 @@ class Group_Repository {
 				$type = is_array( $meta_values ) ? ( $meta_values['type'] ?? 'default' ) : 'default';
 			}
 
-			$type = $this->normalize_group_type( $type );
+			$type = self::normalize_group_type( $type );
 
 			$summaries[ (int) $term->term_id ] = [
 				'id'            => (int) $term->term_id,
@@ -412,11 +400,10 @@ class Group_Repository {
 			$meta_values = [];
 		}
 
-		$type = $this->normalize_group_type( $type ?: ( $meta_values['type'] ?? 'default' ) );
-
+		$type        = self::normalize_group_type( $type ? $type : ( $meta_values['type'] ?? 'default' ) );
 		$meta_values = $this->merge_group_options_meta( $meta_values, $type );
-		$meta_values['type'] = $type;
 
+		$meta_values['type']          = $type;
 		$meta_values['publish_date']  = $publish_date ?? '';
 		$meta_values['modified_date'] = $modified_date ?? '';
 
@@ -459,29 +446,25 @@ class Group_Repository {
 	/**
 	 * Normalize stored group type to a registered type slug.
 	 *
-	 * @param string $type Raw type from meta or legacy storage.
+	 * @param mixed $type Raw type from meta or legacy storage.
 	 *
 	 * @return string
 	 */
-	private function normalize_group_type( $type ): string {
-		if ( empty( $type ) ) {
+	public static function normalize_group_type( $type ): string {
+		if ( empty( $type ) || 'refresh' === $type ) {
 			return 'default';
 		}
 
-		if ( 'refresh' === $type ) {
-			return 'default';
-		}
-
-		return $type;
+		return (string) $type;
 	}
 
 	/**
 	 * Merge per-type options from stored group meta.
 	 *
-	 * @param array  $meta_values Group option meta values.
-	 * @param string $type        Normalized group type.
+	 * @param array<string, mixed> $meta_values Group option meta values.
+	 * @param string               $type        Normalized group type.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function merge_group_options_meta( array $meta_values, string $type ): array {
 		if ( ! isset( $meta_values['options'] ) || ! is_array( $meta_values['options'] ) ) {

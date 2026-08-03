@@ -6,7 +6,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   2.0
  *
- * @var array $privacy_options privacy module options.
+ * @var bool $is_privacy_enabled Whether privacy module is enabled.
  */
 
 global $wp_locale;
@@ -60,7 +60,7 @@ use AdvancedAds\Admin\Ads\Quick_Bulk_Edit;
 
 		</label>
 
-		<?php if ( isset( $privacy_options['enabled'] ) ) : ?>
+		<?php if ( $is_privacy_enabled ) : ?>
 			<label>
 				<span><?php esc_html_e( 'Ignore privacy settings', 'advanced-ads' ); ?></span>
 				<select name="ignore_privacy">

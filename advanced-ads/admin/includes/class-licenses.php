@@ -8,6 +8,7 @@
  */
 
 use AdvancedAds\Constants;
+use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Data;
 
 defined( 'ABSPATH' ) || exit;
@@ -85,7 +86,7 @@ class Advanced_Ads_Admin_Licenses {
 	/**
 	 * Save license keys for all add-ons
 	 *
-	 * @param array $licenses licenses.
+	 * @param array<string, string> $licenses Licenses keyed by add-on identifier.
 	 */
 	public function save_licenses( $licenses = [] ) {
 		if ( ! is_array( $licenses ) ) {
@@ -217,10 +218,10 @@ class Advanced_Ads_Admin_Licenses {
 	/**
 	 * Search if a name is in the add-on array and return the add-on data of it
 	 *
-	 * @param string $key   key to search for.
-	 * @param string $value value to search for.
+	 * @param string $key   Key to search for.
+	 * @param string $value Value to search for.
 	 *
-	 * @return  array    array with the add-on data
+	 * @return array<string, mixed>|null Array with the add-on data, or null if not found.
 	 */
 	private function get_installed_add_on_by_key( $key, $value ) {
 		// Early bail!!
@@ -245,7 +246,7 @@ class Advanced_Ads_Admin_Licenses {
 	 * can be used to display information for any Pro user only, like link to direct support
 	 */
 	public static function any_license_valid() {
-		$add_ons = Data::get_addons();
+		$add_ons = Addons::get_installed_addons();
 		if ( [] === $add_ons ) {
 			return false;
 		}
@@ -274,12 +275,13 @@ class Advanced_Ads_Admin_Licenses {
 	/**
 	 * Update the license status based on information retrieved from the version info check
 	 *
-	 * @param array|WP_Error $response    HTTP response or WP_Error object.
-	 * @param string         $context     Context under which the hook is fired.
-	 * @param string         $http        HTTP transport used.
-	 * @param array          $parsed_args HTTP request arguments.
-	 * @param string         $url         The request URL.
-	 * @return array|WP_Error
+	 * @param array<string, mixed>|\WP_Error $response    HTTP response or WP_Error object.
+	 * @param string                         $context     Context under which the hook is fired.
+	 * @param string                         $http        HTTP transport used.
+	 * @param array<string, mixed>           $parsed_args HTTP request arguments.
+	 * @param string                         $url         The request URL.
+	 *
+	 * @return array<string, mixed>|\WP_Error
 	 */
 	public function update_license_after_version_info( $response, $context, $http, $parsed_args, $url ) {
 		// Early bail!!
@@ -294,70 +296,7 @@ class Advanced_Ads_Admin_Licenses {
 			return $response;
 		}
 
-		$params = json_decode( wp_remote_retrieve_body( $response ) );
-		if ( empty( $params->name ) ) {
-			return $response;
-		}
-
-		$new_license_status = null;
-		$new_expiry_date    = null;
-
-		// Some of the conditions could happen at the same time,
-		// though due to different conditions in EDD we are safer to have multiple checks.
-		if ( isset( $params->valid_until ) ) {
-			if ( 'invalid' === $params->valid_until ) {
-				$new_license_status = 'invalid';
-			}
-			if ( 'lifetime' === $params->valid_until ) {
-				$new_license_status = 'valid';
-				$new_expiry_date    = 'lifetime';
-			}
-
-			if ( is_int( $params->valid_until ) ) {
-				$new_expiry_date = (int) $params->valid_until;
-				if ( time() < $params->valid_until ) {
-					$new_license_status = 'valid';
-				}
-			}
-		} elseif ( empty( $params->download_link ) || empty( $params->package ) || isset( $params->msg ) ) {
-			// If either of these two parameters is missing then the user does not have a valid license according to our store
-			// If there is a "msg" parameter then the license did also not work for another reason.
-			$new_license_status = 'invalid';
-		}
-
-		if ( ! $new_license_status && ! $new_expiry_date ) {
-			return $response;
-		}
-
-		if ( \AdvancedAds\License\License::is_flat_map_retired() ) {
-			return $response;
-		}
-
-		$add_ons = Data::get_addons();
-
-		// Look for the add-on with the appropriate license key.
-		foreach ( $add_ons as $_add_on ) {
-			if ( ! isset( $_add_on['name'] ) || $params->name !== $_add_on['name'] ) {
-				continue;
-			}
-
-			$options_slug = $_add_on['options_slug'];
-
-			if ( $new_license_status ) {
-				update_option( $options_slug . '-license-status', $new_license_status, false );
-			}
-
-			if ( $new_expiry_date ) {
-				if ( 'lifetime' !== $new_expiry_date ) {
-					$new_expiry_date = gmdate( 'Y-m-d 23:59:49', $new_expiry_date );
-				}
-				update_option( $options_slug . '-license-expires', $new_expiry_date, false );
-			}
-
-			// Return with the first match since there should only be one plugin per name.
-			return $response;
-		}
-
+		// Status/expiry are derived from rich licenses after flat-map retirement.
 		return $response;
 	}
 }

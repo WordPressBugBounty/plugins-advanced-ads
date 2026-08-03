@@ -1,12 +1,16 @@
 <?php
-if ( class_exists( 'Advanced_Ads', false ) ) {
+/**
+ * Privacy module bootstrap.
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ */
 
-	// only load if not already existing (maybe included from another plugin)
+if ( class_exists( 'Advanced_Ads', false ) ) {
 	if ( defined( 'ADVADS_PRIVACY_SLUG' ) ) {
 		return;
 	}
 
-	// general and global slug, e.g. to store options in WP
 	define( 'ADVADS_PRIVACY_SLUG', 'advanced-ads-privacy' );
 	define( 'ADVADS_PRIVACY_BASE_PATH', plugin_dir_path( __FILE__ ) );
 	define( 'ADVADS_PRIVACY_BASE_URL', plugins_url( basename( ADVADS_ABSPATH ) . '/modules/' . basename( ADVADS_PRIVACY_BASE_PATH ) . '/' ) );
@@ -17,6 +21,3 @@ if ( class_exists( 'Advanced_Ads', false ) ) {
 		Advanced_Ads_Privacy_Admin::get_instance();
 	}
 }
-
-
-

@@ -41,8 +41,8 @@ class Widget extends \WP_Widget {
 	/**
 	 * Echoes the widget content.
 	 *
-	 * @param array $args     Display arguments including 'before_title', 'after_title', 'before_widget', and 'after_widget'.
-	 * @param array $instance The settings for the particular instance of the widget.
+	 * @param array<string, mixed> $args     Display arguments including 'before_title', 'after_title', 'before_widget', and 'after_widget'.
+	 * @param array<string, mixed> $instance The settings for the particular instance of the widget.
 	 *
 	 * @return void
 	 */
@@ -76,9 +76,9 @@ class Widget extends \WP_Widget {
 	 * value of `$instance` should be returned. If false is returned, the instance won't be
 	 * saved/updated.
 	 *
-	 * @param array $new_instance New settings for this instance as input by the user via WP_Widget::form().
-	 * @param array $old_instance Old settings for this instance.
-	 * @return array Settings to save or bool false to cancel saving.
+	 * @param array<string, mixed> $new_instance New settings for this instance as input by the user via WP_Widget::form().
+	 * @param array<string, mixed> $old_instance Old settings for this instance.
+	 * @return array<string, mixed> Settings to save or bool false to cancel saving.
 	 */
 	public function update( $new_instance, $old_instance ) {
 		$instance            = $old_instance;
@@ -96,7 +96,7 @@ class Widget extends \WP_Widget {
 	/**
 	 * Outputs the settings update form.
 	 *
-	 * @param array $instance Current settings.
+	 * @param array<string, mixed> $instance Current settings.
 	 */
 	public function form( $instance ) {
 		$instance = wp_parse_args(
@@ -166,7 +166,7 @@ class Widget extends \WP_Widget {
 	/**
 	 * Get items for widget select field
 	 *
-	 * @return array $select items for select field.
+	 * @return array<string, mixed> $select items for select field.
 	 */
 	public static function items_for_select() {
 		return Data::items_for_select( [ 'placements' => false ] );
@@ -175,15 +175,14 @@ class Widget extends \WP_Widget {
 	/**
 	 * Get widget placements for select field
 	 *
-	 * @return array $items for select field.
+	 * @return array<string, mixed> $items for select field.
 	 */
 	public static function widget_placements_for_select() {
-		$select     = [];
-		$placements = wp_advads_get_placements();
+		$select = [];
 
-		foreach ( $placements as $key => $placement ) {
-			if ( $placement->is_type( [ 'sidebar_widget', 'default' ] ) ) {
-				$select['placements'][ 'placement_' . $key ] = $placement->get_title();
+		foreach ( wp_advads_get_placement_summaries() as $id => $summary ) {
+			if ( in_array( $summary['type'] ?? '', [ 'sidebar_widget', 'default' ], true ) ) {
+				$select['placements'][ 'placement_' . $id ] = $summary['title'];
 			}
 		}
 
@@ -247,8 +246,8 @@ class Widget extends \WP_Widget {
 	 * Make it harder for ad blockers to block the widget.
 	 * removes the pre-defined widget ID (e.g., advads_ad_widget-20) and replaces it with one that uses the individual frontend prefix
 	 *
-	 * @param string $before_widget content before the widget.
-	 * @param array  $instance Settings for the current widget instance.
+	 * @param string               $before_widget content before the widget.
+	 * @param array<string, mixed> $instance Settings for the current widget instance.
 	 * @return string $before_widget
 	 */
 	private function maybe_replace_frontend_id( $before_widget, $instance ) {
@@ -276,8 +275,8 @@ class Widget extends \WP_Widget {
 	/**
 	 * Provide the 'Q2W3 Fixed Widget' plugin with the new frontend widget id.
 	 *
-	 * @param array $sidebars_widgets existing sidebar widgets.
-	 * @return array $sidebars_widgets
+	 * @param array<string, array<int, string>> $sidebars_widgets existing sidebar widgets.
+	 * @return array<string, array<int, string>> $sidebars_widgets
 	 */
 	public function q2w3_replace_frontend_id( $sidebars_widgets ) {
 		foreach ( $sidebars_widgets as $sidebar => $widgets ) {

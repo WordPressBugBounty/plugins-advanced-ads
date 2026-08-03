@@ -14,7 +14,7 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * Registered display conditions.
 	 *
-	 * @var array
+	 * @var array<string, array<string, mixed>>
 	 */
 	public $conditions;
 
@@ -26,7 +26,7 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * List of query var values
 	 *
-	 * @var array
+	 * @var array<int, string>
 	 */
 	protected static $query_var_keys = [
 		'is_archive',
@@ -42,7 +42,7 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * List of options for the General Conditions
 	 *
-	 * @var array
+	 * @var array<int, string>
 	 */
 
 	protected static $default_general_keys = [
@@ -208,10 +208,10 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Controls frontend checks for conditions
 	 *
-	 * @param array $options options of the condition.
-	 * @param Ad    $ad Ad object.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad object.
 	 *
-	 * @return bool false, if ad can’t be delivered
+	 * @return bool False, if ad can’t be delivered.
 	 */
 	public static function frontend_check( $options = [], $ad = false ) {
 		// Early bail!!
@@ -238,13 +238,13 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Render the list of set display conditions.
 	 *
-	 * @param array  $set_conditions array of existing conditions.
-	 * @param string $list_target ID of the list with the conditions.
-	 * @param string $form_name prefix of the form field name attribute.
-	 * @param array  $options {
+	 * @param array<int, array<string, mixed>> $set_conditions Array of existing conditions.
+	 * @param string                           $list_target    ID of the list with the conditions.
+	 * @param string                           $form_name      Prefix of the form field name attribute.
+	 * @param array<string, mixed>             $options {
 	 *     Optional. Render options.
 	 *
-	 *     @type string/array $in May be:
+	 *     @type string|array<int, string> $in May be:
 	 *     - set to `all` (default) to include all conditions, including not global.
 	 *     - set to `global` to include all conditions, except for not global.
 	 *     - set to array of condition ID's to include only them.
@@ -365,9 +365,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Callback to display the metabox for the post type condition
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_post_type( $options, $index = 0, $form_name = '' ) {
 		if ( ! isset( $options['type'] ) || '' === $options['type'] ) {
@@ -439,9 +439,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Callback to display the metabox for the author condition
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_author( $options, $index = 0, $form_name = '' ) {
 
@@ -486,9 +486,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Callback to display the metabox for the taxonomy archive pages
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_taxonomy_terms( $options, $index = 0, $form_name = '' ) {
 
@@ -526,7 +526,7 @@ class Advanced_Ads_Display_Conditions {
 		/**
 		 * Allow adding markup on the condition table
 		 *
-		 * @param array $options options of the current condition being rendered.
+		 * @param array<string, mixed> $options Options of the current condition being rendered.
 		 */
 		do_action( 'advads-conditions-operator-after', $options );
 
@@ -545,9 +545,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Callback to display the metabox for the taxonomies
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_taxonomies( $options, $index = 0, $form_name = '' ) {
 
@@ -600,13 +600,13 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Display terms of a taxonomy for choice
 	 *
-	 * @param object $taxonomy taxonomy object.
-	 * @param array  $checked ids of checked terms.
-	 * @param string $inputname name of the input field.
-	 * @param int    $max_terms maximum number of terms to show.
-	 * @param int    $index index of the conditions group.
+	 * @param object                 $taxonomy  Taxonomy object.
+	 * @param array<int, int|string> $checked   IDs of checked terms.
+	 * @param string                 $inputname Name of the input field.
+	 * @param int                    $max_terms Maximum number of terms to show.
+	 * @param int                    $index     Index of the conditions group.
 	 *
-	 * @return array|int|WP_Error
+	 * @return array<int|string, mixed>|int|\WP_Error
 	 */
 	public static function display_term_list( $taxonomy, $checked = [], $inputname = '', $max_terms = 50, $index = 0 ) { // phpcs:ignore
 		$terms = get_terms(
@@ -680,9 +680,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Callback to display the metabox for the taxonomy archive pages
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_post_ids( $options, $index = 0, $form_name = '' ) {
 
@@ -784,9 +784,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Callback to display the metabox for the general display conditions
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_general( $options, $index = 0, $form_name = '' ) {
 
@@ -821,8 +821,8 @@ class Advanced_Ads_Display_Conditions {
 				esc_attr( $field_id ),
 				esc_html( $_condition['label'] )
 			);
-
 		}
+
 		include ADVADS_ABSPATH . 'admin/views/conditions/not-selected.php';
 		echo '</div>';
 	}
@@ -830,7 +830,7 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Retrieve the array with general conditions
 	 *
-	 * @return array $conditions
+	 * @return array<string, array<string, mixed>> $conditions
 	 */
 	public static function general_conditions() {
 		return apply_filters(
@@ -888,9 +888,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Callback to display the 'content age' condition
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_content_age( $options, $index = 0, $form_name = '' ) {
 		if ( ! isset( $options['type'] ) || '' === $options['type'] ) {
@@ -933,8 +933,8 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Check post type display condition in frontend
 	 *
-	 * @param array $options Options of the condition.
-	 * @param Ad    $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad instance.
 	 *
 	 * @return bool true if can be displayed
 	 */
@@ -962,8 +962,8 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Check author display condition in frontend
 	 *
-	 * @param array $options Options of the condition.
-	 * @param Ad    $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad instance.
 	 *
 	 * @return bool true if can be displayed
 	 */
@@ -991,8 +991,8 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Check taxonomies display condition in frontend
 	 *
-	 * @param array $options Options of the condition.
-	 * @param Ad    $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad instance.
 	 *
 	 * @return bool true if can be displayed
 	 */
@@ -1042,8 +1042,8 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Check taxonomy archive display condition in frontend
 	 *
-	 * @param array $options Options of the condition.
-	 * @param Ad    $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad instance.
 	 *
 	 * @return bool true if can be displayed
 	 */
@@ -1073,8 +1073,8 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Check if a specific archive belongs to a taxonomy in general (not a specific term)
 	 *
-	 * @param array $options Options of the condition.
-	 * @param Ad    $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad instance.
 	 *
 	 * @return bool true if can be displayed
 	 */
@@ -1104,8 +1104,8 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Check post ids display condition in frontend
 	 *
-	 * @param array $options Options of the condition.
-	 * @param Ad    $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad instance.
 	 *
 	 * @return bool true if can be displayed
 	 */
@@ -1151,8 +1151,8 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Check general display conditions in frontend
 	 *
-	 * @param array $options Options of the condition.
-	 * @param Ad    $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad instance.
 	 *
 	 * @return bool true if can be displayed
 	 */
@@ -1209,8 +1209,8 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Check 'content age' condition in frontend.
 	 *
-	 * @param array $options Options of the condition.
-	 * @param Ad    $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param Ad                   $ad      Ad instance.
 	 *
 	 * @return bool true if can be displayed
 	 */
@@ -1251,11 +1251,11 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Helper function to check for in array values
 	 *
-	 * @param mixed  $id   scalar (key) or array of keys as needle.
-	 * @param array  $ids  haystack.
-	 * @param string $type type to use for comparison. accepted values: integer|string.
+	 * @param mixed                  $id   Scalar (key) or array of keys as needle.
+	 * @param array<int, int|string> $ids  Haystack.
+	 * @param string                 $type Type to use for comparison. Accepted values: integer|string.
 	 *
-	 * @return boolean|void void if either argument is empty
+	 * @return boolean|void Void if either argument is empty.
 	 */
 	public static function in_array( $id, $ids, $type = 'integer' ) {
 		// empty?
@@ -1282,9 +1282,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Helper to compare ids.
 	 *
-	 * @param array  $needle ids that should be searched for in haystack.
-	 * @param array  $haystack reference ids.
-	 * @param string $operator whether it should be included or not.
+	 * @param array<int, int|string> $needle   IDs that should be searched for in haystack.
+	 * @param array<int, int|string> $haystack Reference IDs.
+	 * @param string                 $operator Whether it should be included or not.
 	 *
 	 * @return boolean
 	 */
@@ -1379,9 +1379,9 @@ class Advanced_Ads_Display_Conditions {
 	 * Existing arguments must not be overridden.
 	 * Some arguments might be cachable.
 	 *
-	 * @param array $args arguments.
+	 * @param array<string, mixed> $args Arguments.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function ad_select_args_callback( $args ) {
 		global $post, $wp_the_query, $wp_query, $numpages;
@@ -1464,9 +1464,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * ;odify post search query to search by post_title or ID
 	 *
-	 * @param array $query post search query.
+	 * @param array<string, mixed> $query Post search query.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public static function modify_post_search( $query ) {
 
@@ -1501,7 +1501,7 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Preg_replace callback used in modify_post_search_sql()
 	 *
-	 * @param array $matches results for post search.
+	 * @param array<int, string> $matches Results for post search.
 	 *
 	 * @return string
 	 * @deprecated since version 1.8.16

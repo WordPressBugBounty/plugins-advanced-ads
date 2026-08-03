@@ -163,43 +163,39 @@ foreach ( \AdvancedAds\Constants::ADDONS_NON_COMPATIBLE_VERSIONS as $version => 
 	}
 }
 
-// List of plugins that handle ads and may conflict with Advanced Ads
+// List of plugins that handle ads and may conflict with Advanced Ads.
 $plugin_conflicts = [
-	// Ad management / insertion plugins
-	'ad-inserter/ad-inserter.php'                          	=> 'Ad Inserter',
-	'adsanity/adsanity.php'                                	=> 'AdSanity',
-	'wp-quads/wpquads.php'                                 	=> 'WP QUADS',
-	'quick-adsense-reloaded/quick-adsense-reloaded.php'    	=> 'Quick AdSense Reloaded',
-	'simple-ads-manager/simple-ads-manager.php'            	=> 'Simple Ads Manager',
-	'adrotate/adrotate.php'                                	=> 'AdRotate',
-	'adrotate-pro/adrotate-pro.php'                        	=> 'AdRotate Pro',
-	'wp-insert/wp-insert.php'                              	=> 'WP Insert',
-	'insert-post-ads/insert-post-ads.php'                  	=> 'Insert Post Ads',
+	// Ad management / insertion plugins.
+	'ad-inserter/ad-inserter.php'                       => 'Ad Inserter',
+	'adsanity/adsanity.php'                             => 'AdSanity',
+	'wp-quads/wpquads.php'                              => 'WP QUADS',
+	'quick-adsense-reloaded/quick-adsense-reloaded.php' => 'Quick AdSense Reloaded',
+	'simple-ads-manager/simple-ads-manager.php'         => 'Simple Ads Manager',
+	'adrotate/adrotate.php'                             => 'AdRotate',
+	'adrotate-pro/adrotate-pro.php'                     => 'AdRotate Pro',
+	'wp-insert/wp-insert.php'                           => 'WP Insert',
+	'insert-post-ads/insert-post-ads.php'               => 'Insert Post Ads',
 
-	// AdSense specific plugins
-	'adsense-plugin/adsense-plugin.php'                    	=> 'AdSense Plugin',
-	'google-adsense/google-adsense.php'                    	=> 'Google AdSense',
-	'adsense-made-easy/adsense-made-easy.php'              	=> 'AdSense Made Easy',
+	// AdSense specific plugins.
+	'adsense-plugin/adsense-plugin.php'       => 'AdSense Plugin',
+	'google-adsense/google-adsense.php'       => 'Google AdSense',
+	'adsense-made-easy/adsense-made-easy.php' => 'AdSense Made Easy',
 
-	// Auto ads / monetization plugins
-	'monetag/monetag.php'                                  	=> 'Monetag',
-	'media-net-ads/media-net-ads.php'                      	=> 'Media.net Ads',
-	'ezoic/ezoic.php'                                      	=> 'Ezoic',
-	'mediavine-control-panel/mediavine.php'                	=> 'Mediavine',
+	// Auto ads / monetization plugins.
+	'monetag/monetag.php'                   => 'Monetag',
+	'media-net-ads/media-net-ads.php'       => 'Media.net Ads',
+	'ezoic/ezoic.php'                       => 'Ezoic',
+	'mediavine-control-panel/mediavine.php' => 'Mediavine',
 ];
 
 
-// Loop through conflict plugins
+// Loop through conflict plugins.
 foreach ( $plugin_conflicts as $slug => $name ) {
-
-	// Check if plugin is active
 	if ( is_plugin_active( $slug ) ) {
+		// Generate unique notice ID.
+		$notice_id = str_replace( ' ', '_', strtolower( $name ) );
+		$notice_id = sanitize_title( $notice_id ) . '_active';
 
-		// Generate unique notice ID
-		$noticeId  = str_replace( ' ', '_', strtolower( $name ) );
-		$notice_id = sanitize_title( $noticeId ) . '_active';
-
-		// Register admin notice
 		$advanced_ads_admin_notices[ $notice_id ] = [
 			'type'   => NOTICE_TYPES['error'],
 			'text'   => sprintf(

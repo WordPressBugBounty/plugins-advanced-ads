@@ -188,7 +188,7 @@ class Conditional {
 	/**
 	 * Check if we are on desired screen.
 	 *
-	 * @param array|string $screen_id Screen id.
+	 * @param array<int, string>|string $screen_id Screen id.
 	 *
 	 * @return bool
 	 */

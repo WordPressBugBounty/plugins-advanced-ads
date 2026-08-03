@@ -152,8 +152,8 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Import Ads from Adsforwp CPT.
 	 *
-	 * @param string $history_key Unique key for this import session, used for rollback.
-	 * @param array  $ad_map      Reference to the ad ID mapping array.
+	 * @param string               $history_key Unique key for this import session, used for rollback.
+	 * @param array<string, mixed> $ad_map      Reference to the ad ID mapping array.
 	 * @return int Count of imported ads.
 	 * @throws \Exception If any error occurs during the import process.
 	 * @since 1.50.0
@@ -235,8 +235,8 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Map AdSense specific meta.
 	 *
-	 * @param object $ad The new Ad instance being created.
-	 * @param array  $meta The meta data from the old ad post, containing the AdSense information.
+	 * @param object               $ad The new Ad instance being created.
+	 * @param array<string, mixed> $meta The meta data from the old ad post, containing the AdSense information.
 	 * @return void
 	 * @since 1.50.0
 	 */
@@ -256,8 +256,8 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Map Image specific meta.
 	 *
-	 * @param object $ad The new Ad instance being created.
-	 * @param array  $meta The meta data from the old ad post, containing the image information.
+	 * @param object               $ad The new Ad instance being created.
+	 * @param array<string, mixed> $meta The meta data from the old ad post, containing the image information.
 	 * @return void
 	 * @since 1.50.0
 	 */
@@ -278,8 +278,8 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Apply Alignment based on Adsforwp meta.
 	 *
-	 * @param object $ad The Ad instance being created.
-	 * @param array  $meta The meta data from the old ad post, containing the alignment information.
+	 * @param object               $ad The Ad instance being created.
+	 * @param array<string, mixed> $meta The meta data from the old ad post, containing the alignment information.
 	 * @return void
 	 * @since 1.50.0
 	 */
@@ -321,9 +321,9 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Create Placement.
 	 *
-	 * @param int    $ad_id The ID of the newly created Ad.
-	 * @param string $title The title for the Placement, typically the same as the Ad.
-	 * @param array  $meta The meta data from the old ad post, containing the placement information.
+	 * @param int                  $ad_id The ID of the newly created Ad.
+	 * @param string               $title The title for the Placement, typically the same as the Ad.
+	 * @param array<string, mixed> $meta The meta data from the old ad post, containing the placement information.
 	 * @return object|null The created Placement instance, or null if no placement was created.
 	 * @since 1.50.0
 	 * @throws \Exception If any error occurs during the placement creation process.
@@ -391,7 +391,7 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Convert Group CPT to native Taxonomy.
 	 *
-	 * @param array $ad_map A mapping of old ad IDs to new ad IDs, used to maintain group associations during the import process.
+	 * @param array<string, mixed> $ad_map A mapping of old ad IDs to new ad IDs, used to maintain group associations during the import process.
 	 * @return void
 	 * @since 1.50.0
 	 * @throws \Exception If any error occurs during the group import process.

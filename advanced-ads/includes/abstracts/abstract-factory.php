@@ -71,9 +71,9 @@ abstract class Factory {
 	/**
 	 * Store an entity instance in the request-scoped cache.
 	 *
-	 * @param int           $id       Entity ID.
-	 * @param string        $new_type Optional type override passed to the factory getter.
-	 * @param object|false  $instance Loaded entity instance.
+	 * @param int          $id       Entity ID.
+	 * @param string       $new_type Optional type override passed to the factory getter.
+	 * @param object|false $instance Loaded entity instance.
 	 *
 	 * @return void
 	 */
@@ -100,5 +100,4 @@ abstract class Factory {
 
 		return $entity;
 	}
-
 }

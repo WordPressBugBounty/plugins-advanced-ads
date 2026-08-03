@@ -29,11 +29,11 @@ class Peepso_Ad extends Ad implements Ad_Interface {
 
 		$image_id  = (int) $this->get_prop( 'image_id' );
 		$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'full' ) : false;
-		$image_url = $image_url ?: null;
+		$image_url = false !== $image_url ? $image_url : null;
 
 		$avatar_id  = (int) $this->get_prop( 'avatar_id' );
 		$avatar_url = $avatar_id ? wp_get_attachment_image_url( $avatar_id, 'full' ) : false;
-		$avatar_url = $avatar_url ?: null;
+		$avatar_url = false !== $avatar_url ? $avatar_url : null;
 
 		$url            = $this->get_url() ?? '#';
 		$title          = $this->get_title() ?? '';

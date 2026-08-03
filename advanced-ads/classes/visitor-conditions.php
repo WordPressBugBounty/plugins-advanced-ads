@@ -17,7 +17,7 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Registered visitor conditions
 	 *
-	 * @var array $conditions
+	 * @var array<string, array<string, mixed>> $conditions
 	 */
 	public $conditions;
 
@@ -110,9 +110,9 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Callback to render the mobile condition using the "is not" condition
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function mobile_is_or_not( $options, $index = 0, $form_name = '' ) {
 
@@ -153,9 +153,9 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Callback to display the "is not" condition
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_is_or_not( $options, $index = 0, $form_name = '' ) {
 		if ( ! isset( $options['type'] ) || '' === $options['type'] ) {
@@ -177,9 +177,9 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Callback to display the any condition based on a number
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_number( $options, $index = 0, $form_name = '' ) {
 
@@ -206,9 +206,9 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Callback to display the any condition based on a number
 	 *
-	 * @param array  $options options of the condition.
-	 * @param int    $index index of the condition.
-	 * @param string $form_name name of the form, falls back to class constant.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param int                  $index index of the condition.
+	 * @param string               $form_name name of the form, falls back to class constant.
 	 */
 	public static function metabox_string( $options, $index = 0, $form_name = '' ) {
 
@@ -235,8 +235,8 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Controls frontend checks for conditions
 	 *
-	 * @param array   $options Options of the condition.
-	 * @param bool|Ad $ad      Ad instance.
+	 * @param array<string, mixed> $options Options of the condition.
+	 * @param bool|Ad              $ad      Ad instance.
 	 *
 	 * @return bool false, if ad can’t be delivered
 	 */
@@ -260,9 +260,9 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Render the list of set visisor conditions
 	 *
-	 * @param array  $set_conditions array of existing conditions.
-	 * @param string $list_target ID of the list with the conditions.
-	 * @param string $form_name prefix of the form.
+	 * @param array<int, array<string, mixed>> $set_conditions Array of existing conditions.
+	 * @param string                           $list_target ID of the list with the conditions.
+	 * @param string                           $form_name prefix of the form.
 	 */
 	public static function render_condition_list( array $set_conditions, $list_target = '', $form_name = '' ) {
 
@@ -351,7 +351,7 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Check whether device visitor condition in frontend is true.
 	 *
-	 * @param array $options options of the condition.
+	 * @param array<string, mixed> $options Options of the condition.
 	 *
 	 * @return bool
 	 */
@@ -391,7 +391,7 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Check mobile visitor condition in frontend
 	 *
-	 * @param array $options options of the condition.
+	 * @param array<string, mixed> $options Options of the condition.
 	 * @deprecated -- Only used if new options hasn't been saved
 	 *
 	 * @return bool
@@ -420,7 +420,7 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Check mobile visitor condition in frontend
 	 *
-	 * @param array $options options of the condition.
+	 * @param array<string, mixed> $options Options of the condition.
 	 *
 	 * @return bool true if can be displayed
 	 * @since 1.6.3
@@ -450,8 +450,8 @@ class Advanced_Ads_Visitor_Conditions {
 	/**
 	 * Helper for check with strings
 	 *
-	 * @param string $string string that is going to be checked.
-	 * @param array  $options options of this condition.
+	 * @param string               $string string that is going to be checked.
+	 * @param array<string, mixed> $options Options of this condition.
 	 *
 	 * @return bool true if ad can be displayed
 	 * @since 1.6.3

@@ -9,12 +9,12 @@
 
 namespace AdvancedAds\Admin;
 
-use AdvancedAds\Constants;
 use Advanced_Ads_Admin_Notices;
-use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Importers\XML_Importer;
-use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Importers\XML_Importer;
+use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -131,7 +131,6 @@ class Misc implements Integration_Interface {
 			&& ( ! isset( $screen->id ) || 'toplevel_page_advanced-ads' !== $screen->id )
 			&& 'revision' !== $screen->id
 		) {
-
 			echo '<div class="wrap">';
 			Advanced_Ads_Admin_Notices::get_instance()->display_notices();
 
@@ -237,11 +236,11 @@ class Misc implements Integration_Interface {
 	 * This function checks if the plugin is already active or recommended. If not,
 	 * it fetches the plugin data using the WordPress Plugin API and adds it to the result.
 	 *
-	 * @param string $slug         The slug of the plugin to recommend.
-	 * @param string $file_path    The file path of the plugin.
-	 * @param object $args         Additional arguments for the recommendation.
-	 * @param object $result       The current result object containing recommended plugins.
-	 * @param array  $result_slugs An array of slugs of already recommended plugins.
+	 * @param string             $slug         The slug of the plugin to recommend.
+	 * @param string             $file_path    The file path of the plugin.
+	 * @param object             $args         Additional arguments for the recommendation.
+	 * @param object             $result       The current result object containing recommended plugins.
+	 * @param array<int, string> $result_slugs An array of slugs of already recommended plugins.
 	 *
 	 * @return object The updated result object with the recommended plugin added.
 	 */

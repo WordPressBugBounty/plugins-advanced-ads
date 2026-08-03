@@ -9,12 +9,12 @@
 
 namespace AdvancedAds\Admin\Pages;
 
-use WP_Screen;
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Screen;
-use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Admin\Placements\List_Table;
 use AdvancedAds\Admin\Placements\Create_Modal;
+use AdvancedAds\Admin\Placements\List_Table;
+use AdvancedAds\Constants;
+use AdvancedAds\Utilities\Conditional;
+use WP_Screen;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -72,7 +72,7 @@ class Placements extends Screen {
 		wp_advads_json_add(
 			'placements',
 			[
-				'updateItemNonce' => wp_create_nonce( 'placement-update-item'),
+				'updateItemNonce' => wp_create_nonce( 'placement-update-item' ),
 				'pickerUrl'       => $this->get_placement_picker_url(),
 			]
 		);
@@ -116,7 +116,7 @@ class Placements extends Screen {
 	/**
 	 * Get page header arguments
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function define_header_args(): array {
 		return [

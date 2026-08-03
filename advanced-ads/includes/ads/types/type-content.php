@@ -136,10 +136,10 @@ class Content implements Ad_Type {
 	/**
 	 * Add JS into tinyMCE
 	 *
-	 * @param array  $init_array TinyMCE arguments.
-	 * @param string $editor_id  Editor id.
+	 * @param array<string, mixed> $init_array TinyMCE arguments.
+	 * @param string               $editor_id  Editor id.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function tiny_mce_before_init( array $init_array, $editor_id ): array {
 		if ( 'advanced-ad-parameters-content' !== $editor_id ) {

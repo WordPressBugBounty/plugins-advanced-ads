@@ -4,10 +4,10 @@
  *
  * @package AdvancedAds
  *
- * @var string $_notice     notice ID.
- * @var string $text        notice text.
- * @var array  $notice      notice data (optional).
- * @var string $box_classes additional classes (optional).
+ * @var string               $_notice     notice ID.
+ * @var string               $text        notice text.
+ * @var array<string, mixed> $notice      notice data (optional).
+ * @var string               $box_classes additional classes (optional).
  */
 
 ?>

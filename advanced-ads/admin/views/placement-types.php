@@ -3,7 +3,7 @@
 /**
  * Render all placement types for forms.
  *
- * @var array $placement_types
+ * @var array<string, array<string, mixed>> $placement_types
  */
 ?>
 <?php if ( is_array( $placement_types ) ) : ?>

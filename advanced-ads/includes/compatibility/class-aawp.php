@@ -30,9 +30,9 @@ class AAWP implements Integration_Interface {
 	/**
 	 * Add AAWP ad type to Advanced Ads.
 	 *
-	 * @param array $types ad types.
+	 * @param array<string, mixed> $types ad types.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function ad_type( $types ): array {
 		if ( isset( $types['aawp'] ) && 'Advanced_Ads_Ad_Type_Abstract' === get_parent_class( $types['aawp'] ) ) {

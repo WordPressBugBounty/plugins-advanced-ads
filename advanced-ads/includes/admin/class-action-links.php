@@ -37,9 +37,9 @@ class Action_Links implements Integration_Interface {
 	/**
 	 * Add links to the plugins list
 	 *
-	 * @param array $links array of links for the plugins, adapted when the current plugin is found.
+	 * @param array<string, string> $links Array of links for the plugins, adapted when the current plugin is found.
 	 *
-	 * @return array
+	 * @return array<string, string>
 	 */
 	public function add_links( $links ): array {
 		// Early bail!!

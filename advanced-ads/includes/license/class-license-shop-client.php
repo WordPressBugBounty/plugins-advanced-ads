@@ -1,6 +1,6 @@
 <?php
 /**
- * HTTP client for license shop REST (activate, deactivate, validate).
+ * HTTP client for license shop REST (activate, validate, exchange).
  *
  * @package AdvancedAds
  * @since   2.0.9
@@ -19,36 +19,15 @@ defined( 'ABSPATH' ) || exit;
 final class License_Shop_Client {
 
 	/**
-	 * Shop REST activate endpoint URL.
+	 * Shop REST license endpoint URL for an action (activate|deactivate|validate|exchange).
 	 *
+	 * @param string $action Endpoint action segment.
 	 * @return string
 	 */
-	public static function get_activate_endpoint(): string {
+	public static function endpoint( string $action ): string {
 		$base = defined( 'AA_SHOP_URL' ) ? AA_SHOP_URL : 'https://wpadvancedads.com';
 
-		return untrailingslashit( $base ) . '/wp-json/advanced-ads/v2/license/activate';
-	}
-
-	/**
-	 * Shop REST deactivate endpoint URL.
-	 *
-	 * @return string
-	 */
-	public static function get_deactivate_endpoint(): string {
-		$base = defined( 'AA_SHOP_URL' ) ? AA_SHOP_URL : 'https://wpadvancedads.com';
-
-		return untrailingslashit( $base ) . '/wp-json/advanced-ads/v2/license/deactivate';
-	}
-
-	/**
-	 * Shop REST validate endpoint URL (fresh package download URLs for this site).
-	 *
-	 * @return string
-	 */
-	public static function get_validate_endpoint(): string {
-		$base = defined( 'AA_SHOP_URL' ) ? AA_SHOP_URL : 'https://wpadvancedads.com';
-
-		return untrailingslashit( $base ) . '/wp-json/advanced-ads/v2/license/validate';
+		return untrailingslashit( $base ) . '/wp-json/advanced-ads/v2/license/' . ltrim( $action, '/' );
 	}
 
 	/**
@@ -77,10 +56,11 @@ final class License_Shop_Client {
 	 *
 	 * @param bool   $is_external Whether WordPress considers the host external.
 	 * @param string $host        Request host.
-	 * @param string $url         Request URL.
+	 * @param string $url        Request URL. Required by the WordPress filter signature.
 	 * @return bool
 	 */
 	public static function allow_local_development_http_request( $is_external, string $host, string $url ) {
+		$url = $url;
 		foreach ( self::get_configured_api_hosts() as $shop_host ) {
 			if ( $host === $shop_host ) {
 				return true;
@@ -92,15 +72,6 @@ final class License_Shop_Client {
 		}
 
 		return $is_external;
-	}
-
-	/**
-	 * Register the local/development shop HTTP bypass for admin add-on updates.
-	 *
-	 * @return void
-	 */
-	public static function register_local_development_http_filters(): void {
-		self::add_local_development_http_filter();
 	}
 
 	/**
@@ -127,27 +98,6 @@ final class License_Shop_Client {
 	}
 
 	/**
-	 * HTTP timeout (seconds) for shop REST calls.
-	 *
-	 * @return int
-	 */
-	public static function http_timeout(): int {
-		return 1200;
-	}
-
-	/**
-	 * HTTP timeout (seconds) for signed package download URLs.
-	 *
-	 * @param string $download_url Package URL.
-	 * @return int
-	 */
-	public static function package_download_timeout( string $download_url = '' ): int {
-		unset( $download_url );
-
-		return 1200;
-	}
-
-	/**
 	 * Whether outbound HTTPS to the shop should verify certificates.
 	 *
 	 * @return bool
@@ -158,27 +108,6 @@ final class License_Shop_Client {
 		}
 
 		return License_Utils::should_verify_ssl_for_url( AA_SHOP_URL );
-	}
-
-	/**
-	 * Whether a package download URL targets the configured shop host.
-	 *
-	 * @param string $download_url Package download URL from the shop.
-	 * @return bool
-	 */
-	public static function is_shop_download_url( string $download_url ): bool {
-		$host = wp_parse_url( $download_url, PHP_URL_HOST );
-		if ( ! is_string( $host ) || '' === $host ) {
-			return false;
-		}
-
-		foreach ( self::get_configured_api_hosts() as $shop_host ) {
-			if ( $host === $shop_host ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
@@ -212,7 +141,7 @@ final class License_Shop_Client {
 	public static function http_request_args( array $args = [] ): array {
 		$merged = array_merge(
 			[
-				'timeout' => self::http_timeout(),
+				'timeout' => 15,
 				'headers' => [ 'Content-Type' => 'application/json; charset=utf-8' ],
 			],
 			$args
@@ -223,61 +152,6 @@ final class License_Shop_Client {
 		}
 
 		return $merged;
-	}
-
-	/**
-	 * Deactivate a site on the shop REST (/license/deactivate).
-	 *
-	 * @param string $license_key License key string.
-	 * @param string $site        Site hostname.
-	 * @return array<int, array<string, mixed>>|WP_Error Rich list when shop returns one, else [].
-	 */
-	public static function request_deactivate( string $license_key, string $site ) {
-		$license_key = trim( $license_key );
-		$site        = trim( $site );
-
-		if ( '' === $license_key || '' === $site ) {
-			return new WP_Error(
-				'advanced_ads_license_deactivate_invalid',
-				__( 'Provide license and site.', 'advanced-ads' )
-			);
-		}
-
-		self::add_local_development_http_filter();
-
-		$response = wp_remote_post(
-			self::get_deactivate_endpoint(),
-			self::http_request_args(
-				[
-					'body' => wp_json_encode(
-						[
-							'license' => $license_key,
-							'site'    => $site,
-						]
-					),
-				]
-			)
-		);
-
-		self::remove_local_development_http_filter();
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$code = wp_remote_retrieve_response_code( $response );
-		if ( $code < 200 || $code >= 300 ) {
-			$body    = json_decode( wp_remote_retrieve_body( $response ), true );
-			$message = is_array( $body ) ? (string) ( $body['message'] ?? $body['data']['message'] ?? '' ) : '';
-
-			return new WP_Error(
-				'advanced_ads_license_deactivate_http',
-				'' !== $message ? $message : __( 'Failed to deactivate license.', 'advanced-ads' ),
-				[ 'status' => $code ]
-			);
-		}
-
-		return self::parse_rich_response( wp_remote_retrieve_body( $response ) );
 	}
 
 	/**
@@ -307,37 +181,26 @@ final class License_Shop_Client {
 			$payload['license_id'] = $license_id;
 		}
 
-		self::add_local_development_http_filter();
-
-		$response = wp_remote_post(
-			self::get_activate_endpoint(),
-			self::http_request_args(
-				[
-					'body' => wp_json_encode( $payload ),
-				]
-			)
-		);
-
-		self::remove_local_development_http_filter();
+		$response = self::post_json( self::endpoint( 'activate' ), $payload );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
 
-		$code = wp_remote_retrieve_response_code( $response );
+		$code = (int) wp_remote_retrieve_response_code( $response );
 		if ( $code < 200 || $code >= 300 ) {
 			$body     = json_decode( wp_remote_retrieve_body( $response ), true );
 			$api_code = is_array( $body ) ? (string) ( $body['code'] ?? '' ) : '';
-			if ( $license_id > 0 && 403 === (int) $code && 'identity_mismatch' === $api_code ) {
+			if ( $license_id > 0 && 403 === $code && 'identity_mismatch' === $api_code ) {
 				return self::request_activate( $license_key, $site, 0 );
 			}
 
-			$message = is_array( $body ) ? (string) ( $body['message'] ?? $body['data']['message'] ?? '' ) : '';
-
-			return new WP_Error(
+			return self::http_error_from_response(
+				$response,
+				$code,
 				'advanced_ads_license_activate_http',
-				'' !== $message ? $message : __( 'Failed to activate license.', 'advanced-ads' ),
-				[ 'status' => $code ]
+				__( 'Failed to activate license.', 'advanced-ads' ),
+				false
 			);
 		}
 
@@ -356,23 +219,13 @@ final class License_Shop_Client {
 			return $row;
 		}
 
-		self::add_local_development_http_filter();
-
-		$response = wp_remote_post(
-			self::get_validate_endpoint(),
-			self::http_request_args(
-				[
-					'body' => wp_json_encode(
-						[
-							'license' => $license_key,
-							'site'    => site_url(),
-						]
-					),
-				]
-			)
+		$response = self::post_json(
+			self::endpoint( 'validate' ),
+			[
+				'license' => $license_key,
+				'site'    => License::get_site_hostname(),
+			]
 		);
-
-		self::remove_local_development_http_filter();
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -380,7 +233,17 @@ final class License_Shop_Client {
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		if ( 200 !== $code ) {
-			return self::validate_http_error( $response, $code );
+			return self::http_error_from_response(
+				$response,
+				$code,
+				'advanced_ads_license_validate_http',
+				sprintf(
+					/* translators: %d: HTTP status code */
+					__( 'Could not refresh license download URLs from the shop (HTTP %d).', 'advanced-ads' ),
+					$code
+				),
+				true
+			);
 		}
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -435,6 +298,122 @@ final class License_Shop_Client {
 	}
 
 	/**
+	 * POST JSON to a shop URL with local-dev HTTP bypass.
+	 *
+	 * @param string               $url     Request URL.
+	 * @param array<string, mixed> $payload Request body.
+	 * @return array<string, mixed>|\WP_Error wp_remote_post result.
+	 */
+	public static function post_json( string $url, array $payload ) {
+		self::add_local_development_http_filter();
+
+		$response = wp_remote_post(
+			$url,
+			self::http_request_args(
+				[
+					'body' => wp_json_encode( $payload ),
+				]
+			)
+		);
+
+		self::remove_local_development_http_filter();
+
+		return $response;
+	}
+
+	/**
+	 * Exchange a legacy license key or one-time shop token for rich license rows.
+	 *
+	 * @param array<string, mixed> $payload Must include `license` or `token`; `site` defaults to current hostname.
+	 * @return array<int, array<string, mixed>>|WP_Error
+	 */
+	public static function exchange( array $payload ) {
+		$license = trim( (string) ( $payload['license'] ?? '' ) );
+		$token   = sanitize_text_field( (string) ( $payload['token'] ?? '' ) );
+
+		if ( '' === $license && '' === $token ) {
+			return new WP_Error(
+				isset( $payload['token'] ) ? 'advanced_ads_license_exchange_token' : 'advanced_ads_license_exchange_empty',
+				isset( $payload['token'] )
+					? __( 'Missing exchange token.', 'advanced-ads' )
+					: __( 'No license keys to exchange.', 'advanced-ads' )
+			);
+		}
+
+		$body = [
+			'site' => trim( (string) ( $payload['site'] ?? License::get_site_hostname() ) ),
+		];
+		if ( '' !== $token ) {
+			$body['token'] = $token;
+		} else {
+			$body['license'] = $license;
+		}
+
+		return self::parse_exchange_response(
+			self::post_json( self::endpoint( 'exchange' ), $body )
+		);
+	}
+
+	/**
+	 * Decode exchange HTTP response into license rows or WP_Error.
+	 *
+	 * @param array<string, mixed>|\WP_Error $response wp_remote_post result.
+	 * @return array<int, array<string, mixed>>|WP_Error
+	 */
+	private static function parse_exchange_response( $response ) {
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $code ) {
+			return self::http_error_from_response(
+				$response,
+				$code,
+				'advanced_ads_license_exchange_http',
+				__( 'License exchange request failed.', 'advanced-ads' ),
+				true
+			);
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( ! is_array( $data ) ) {
+			return new WP_Error(
+				'advanced_ads_license_exchange_parse',
+				__( 'Invalid license exchange response.', 'advanced-ads' )
+			);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Build WP_Error from a non-2xx shop HTTP response body.
+	 *
+	 * @param array<string, mixed>|\WP_Error $response HTTP response.
+	 * @param int                            $code HTTP status code.
+	 * @param string                         $fallback_error_code WP_Error code when body has no code.
+	 * @param string                         $fallback_message Fallback message when body has none.
+	 * @param bool                           $prefer_api_code When true, use body.code as WP_Error code.
+	 * @return WP_Error
+	 */
+	private static function http_error_from_response( $response, int $code, string $fallback_error_code, string $fallback_message, bool $prefer_api_code = false ): WP_Error {
+		$body       = json_decode( wp_remote_retrieve_body( $response ), true );
+		$message    = is_array( $body ) ? (string) ( $body['message'] ?? ( $prefer_api_code ? '' : ( $body['data']['message'] ?? '' ) ) ) : '';
+		$error_code = $fallback_error_code;
+
+		if ( $prefer_api_code && is_array( $body ) && ! empty( $body['code'] ) ) {
+			$error_code = sanitize_key( (string) $body['code'] );
+		}
+
+		return new WP_Error(
+			$error_code,
+			'' !== $message ? $message : $fallback_message,
+			[ 'status' => $code ]
+		);
+	}
+
+	/**
 	 * Parse shop JSON body into a normalized rich license list.
 	 *
 	 * @param string $body Response body.
@@ -455,34 +434,5 @@ final class License_Shop_Client {
 		}
 
 		return [];
-	}
-
-	/**
-	 * Build WP_Error from a non-200 shop validate HTTP response.
-	 *
-	 * @param array<string, mixed>|\WP_HTTP_Requests_Response $response HTTP response.
-	 * @param int                                                $code     HTTP status code.
-	 * @return WP_Error
-	 */
-	private static function validate_http_error( $response, int $code ): WP_Error {
-		$body       = json_decode( wp_remote_retrieve_body( $response ), true );
-		$message    = is_array( $body ) ? (string) ( $body['message'] ?? '' ) : '';
-		$error_code = is_array( $body ) && ! empty( $body['code'] )
-			? sanitize_key( (string) $body['code'] )
-			: 'advanced_ads_license_validate_http';
-
-		if ( '' === $message ) {
-			$message = sprintf(
-				/* translators: %d: HTTP status code */
-				__( 'Could not refresh license download URLs from the shop (HTTP %d).', 'advanced-ads' ),
-				$code
-			);
-		}
-
-		return new WP_Error(
-			$error_code,
-			$message,
-			[ 'status' => $code ]
-		);
 	}
 }

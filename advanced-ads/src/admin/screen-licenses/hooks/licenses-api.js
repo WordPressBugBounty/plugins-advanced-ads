@@ -1,11 +1,10 @@
-import apiFetch from '@wordpress/api-fetch';
 import { dispatch, select } from '@wordpress/data';
 
 import { STORE_NAME } from '@admin/store';
+import { licensesApiRequest } from '../utils';
 
 const API_PATH = '/advanced-ads/v1/licenses';
 const AUTOUPDATE_API_PATH = '/advanced-ads/v1/plugin-autoupdate';
-const API_URL = `${ advancedAds.endpoints.siteUrl }/wp-json${ API_PATH }`;
 
 export function extractApiMessage( payload ) {
 	if (
@@ -82,6 +81,7 @@ export function normalizeLicensesResponse( payload ) {
 		return {
 			licenses: payload,
 			appliedAddonKeyMap: {},
+			currentActiveLicenses: '',
 			autoUpdateStates: {},
 			addonInstallStates: {},
 			lastSyncAt: 0,
@@ -92,6 +92,7 @@ export function normalizeLicensesResponse( payload ) {
 	return {
 		licenses: Array.isArray( payload?.licenses ) ? payload.licenses : [],
 		appliedAddonKeyMap: safeObject( payload?.appliedAddonKeyMap ),
+		currentActiveLicenses: String( payload?.currentActiveLicenses ?? '' ),
 		autoUpdateStates: safeObject( payload?.autoUpdateStates ),
 		addonInstallStates: safeObject( payload?.addonInstallStates ),
 		lastSyncAt: payload?.lastSyncAt ?? 0,
@@ -103,6 +104,7 @@ function applyLicensesPayloadToStore( payload ) {
 	const {
 		licenses,
 		appliedAddonKeyMap,
+		currentActiveLicenses,
 		autoUpdateStates,
 		addonInstallStates,
 		lastSyncAt,
@@ -114,7 +116,8 @@ function applyLicensesPayloadToStore( payload ) {
 		autoUpdateStates,
 		addonInstallStates,
 		lastSyncAt,
-		expiryNoticeFlags
+		expiryNoticeFlags,
+		currentActiveLicenses
 	);
 	return licenses;
 }
@@ -126,8 +129,7 @@ function applyLicensesPayloadToStore( payload ) {
  * @param {string} state   "on" or "off".
  */
 export async function togglePluginAutoUpdate( addonId, state ) {
-	const response = await apiFetch( {
-		path: AUTOUPDATE_API_PATH,
+	const response = await licensesApiRequest( AUTOUPDATE_API_PATH, {
 		method: 'POST',
 		data: {
 			addonId: addonId || 'main',
@@ -148,7 +150,7 @@ export async function togglePluginAutoUpdate( addonId, state ) {
 //  ----------- Internal Api call --------------- //
 
 export function fetchLicenses() {
-	return apiFetch( { url: API_URL, method: 'GET' } );
+	return licensesApiRequest( API_PATH, { method: 'GET' } );
 }
 
 export function saveLicenses(
@@ -163,8 +165,7 @@ export function saveLicenses(
 		signal = undefined,
 	} = {}
 ) {
-	return apiFetch( {
-		url: API_URL,
+	return licensesApiRequest( API_PATH, {
 		method: 'POST',
 		signal,
 		data: {

@@ -95,7 +95,7 @@ class Ad_Adsense {
 	/**
 	 * Return manual link
 	 *
-	 * @return array|string
+	 * @return array<string, mixed>|string
 	 */
 	public function get_handle_link() {
 		return '<a href="' . esc_url( admin_url( 'admin.php?page=advanced-ads-settings#top#adsense' ) ) . '" target="_blank">' . __( 'Disable', 'advanced-ads' ) . '</a>';

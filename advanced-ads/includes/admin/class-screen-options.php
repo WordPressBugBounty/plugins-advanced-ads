@@ -9,11 +9,11 @@
 
 namespace AdvancedAds\Admin;
 
-use WP_Screen;
+use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Options;
 use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Params;
-use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use WP_Screen;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -64,8 +64,8 @@ class Screen_Options implements Integration_Interface {
 			return $options;
 		}
 
-		$selected_filters    = $screen->get_option( 'filters_to_show' ) ?? [];
-		$optional_filters    = $this->get_optional_filters();
+		$selected_filters = $screen->get_option( 'filters_to_show' ) ?? [];
+		$optional_filters = $this->get_optional_filters();
 
 		// If the default WordPress screen options don't exist, we have to force the submit button to show.
 		add_filter( 'screen_options_show_submit', '__return_true' );
@@ -127,7 +127,7 @@ class Screen_Options implements Integration_Interface {
 	/**
 	 * Get the current user screen options from DB.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	private function get_screen_options() {
 		$screen_options = get_user_meta( get_current_user_id(), self::USER_META_KEY, true );
@@ -167,7 +167,7 @@ class Screen_Options implements Integration_Interface {
 	/**
 	 * Get optional filters.
 	 *
-	 * @return array The optional filters.
+	 * @return array<string, mixed> The optional filters.
 	 */
 	private function get_optional_filters() {
 		// $optional_filters array order determines display sequence.

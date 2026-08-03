@@ -26,8 +26,8 @@ class Ad_List_Stats {
 	/**
 	 * Store list stats for an ad (current request only).
 	 *
-	 * @param int   $ad_id Ad post ID.
-	 * @param array $stats clicks, impressions, ctr.
+	 * @param int                                                 $ad_id Ad post ID.
+	 * @param array{clicks?: int, impressions?: int, ctr?: float} $stats clicks, impressions, ctr.
 	 *
 	 * @return void
 	 */

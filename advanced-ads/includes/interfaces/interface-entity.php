@@ -26,7 +26,7 @@ interface Entity_Interface {
 	/**
 	 * Get the wrapper attributes.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
 	public function get_wrapper_attributes(): array;
 

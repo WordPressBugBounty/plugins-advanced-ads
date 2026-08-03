@@ -21,9 +21,9 @@ class Advanced_Ads_Adblock_Finder_Admin {
 	/**
 	 * Add tabs to the settings page.
 	 *
-	 * @param array $tabs setting tabs.
+	 * @param array<string, array{page: string, group: string, tabid: string, title: string}> $tabs setting tabs.
 	 *
-	 * @return array
+	 * @return array<string, array{page: string, group: string, tabid: string, title: string}>
 	 */
 	public function add_tabs( array $tabs ): array {
 		$tabs['adblocker'] = [

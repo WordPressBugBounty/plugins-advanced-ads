@@ -15,12 +15,12 @@
  *   6. Finder functions
  */
 
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Placement;
+use AdvancedAds\Constants;
 use AdvancedAds\Interfaces\Placement_Type;
-use AdvancedAds\Placements\Placement_Types;
 use AdvancedAds\Placements\Placement_Factory;
 use AdvancedAds\Placements\Placement_Repository;
+use AdvancedAds\Placements\Placement_Types;
 
 /* 1. Template ------------------- */
 
@@ -29,7 +29,7 @@ use AdvancedAds\Placements\Placement_Repository;
  *
  * @param Placement|WP_Post|int|bool $placement_id Placement instance, post instance, numeric or false to use global $post.
  * @param string                     $new_type     Change type of placement.
- * @param array                      $args         Additional arguments.
+ * @param array<string, mixed>       $args         Additional arguments.
  *
  * @return string|mixed placement output string or an entity.
  */
@@ -67,7 +67,7 @@ function get_the_placement( $placement_id = 0, $new_type = '', $args = [] ) {
  * @since 1.1.0
  *
  * @param Placement|WP_Post|int|bool $placement_id Placement instance, post instance, numeric or false to use global $post.
- * @param array                      $args         Additional arguments.
+ * @param array<string, mixed>       $args         Additional arguments.
  *
  * @return void
  */
@@ -263,21 +263,29 @@ function wp_advads_get_placement_types( $with_unknown = true ): array {
 /**
  * Get the placement object.
  *
- * @param Placement|WP_Post|int|bool $placement_id Placement instance, post instance, numeric or false to use global $post.
- * @param string                     $new_type     Change type of placement.
+ * @param Placement|WP_Post|int|string|bool $placement_id Placement instance, post, ID, numeric string, slug, or false for global `$post`.
+ * @param string                            $new_type     Change type of placement.
  *
  * @return Placement|bool Placement object or false if the placement cannot be loaded.
  */
 function wp_advads_get_placement( $placement_id = false, $new_type = '' ) {
-	$int_placement_id = intval( $placement_id );
-
-	if ( is_int( $placement_id ) && $int_placement_id < 0 ) {
-		return false;
+	if ( false === $placement_id || is_a_placement( $placement_id ) || $placement_id instanceof WP_Post ) {
+		return wp_advads_get_placement_by_id( $placement_id, $new_type );
 	}
 
-	return is_int( $placement_id ) && $int_placement_id > 0
-		? wp_advads_get_placement_by_id( $int_placement_id, $new_type )
-		: wp_advads_get_placement_by_slug( $placement_id, $new_type );
+	if ( is_numeric( $placement_id ) ) {
+		$id = (int) $placement_id;
+
+		return $id > 0
+			? wp_advads_get_placement_by_id( $id, $new_type )
+			: false;
+	}
+
+	if ( is_string( $placement_id ) && '' !== $placement_id ) {
+		return wp_advads_get_placement_by_slug( $placement_id, $new_type );
+	}
+
+	return false;
 }
 
 /**
@@ -303,19 +311,19 @@ function wp_advads_get_placement_by_id( $id, $new_type = '' ) {
 function wp_advads_get_placement_by_slug( $slug, $new_type = '' ) {
 	global $wpdb;
 
+	if ( ! is_string( $slug ) || '' === $slug ) {
+		return false;
+	}
+
 	$post_id = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prepare(
-			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s and post_type = %s",
+			"SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = %s",
 			$slug,
 			Constants::POST_TYPE_PLACEMENT
 		)
 	);
 
-	if ( $post_id ) {
-		return wp_advads_get_placement_by_id( absint( $post_id ), $new_type );
-	}
-
-	return false;
+	return $post_id ? wp_advads_get_placement_by_id( absint( $post_id ), $new_type ) : false;
 }
 
 /**
@@ -329,7 +337,7 @@ function wp_advads_get_placement_by_slug( $slug, $new_type = '' ) {
  *
  * @param string $item_id Item id to search for.
  *
- * @return array
+ * @return array<string, mixed>
  */
 function wp_advads_placements_by_item_id( $item_id ): array {
 	return wp_advads()->placements->repository->find_by_item_id( $item_id );
@@ -340,12 +348,12 @@ function wp_advads_placements_by_item_id( $item_id ): array {
  *
  * Filters cached placement summaries by type and hydrates matches.
  *
- * @param string|array $types          Placement types to query.
- * @param string       $output         The required return type. One of OBJECT or ids,
- *                                     which correspond to an Placement object or an array containing post ids respectively.
- * @param bool         $published_only Whether to return only published placements.
+ * @param string|array<int, string> $types Placement types to query.
+ * @param string                    $output         The required return type. One of OBJECT or ids,
+ *                                                  which correspond to an Placement object or an array containing post ids respectively.
+ * @param bool                      $published_only Whether to return only published placements.
  *
- * @return array An associative array of placement IDs as keys and their corresponding placement objects as values.
+ * @return array<string, mixed> An associative array of placement IDs as keys and their corresponding placement objects as values.
  */
 function wp_advads_get_placements_by_types( $types, $output = OBJECT, $published_only = false ): array {
 	return wp_advads()->placements->repository->find_by_types( $types, $output, $published_only );

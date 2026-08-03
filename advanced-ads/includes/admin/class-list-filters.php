@@ -24,35 +24,35 @@ class List_Filters implements Integration_Interface {
 	/**
 	 * Ads data for the ad list table
 	 *
-	 * @var     array
+	 * @var array<int, \WP_Post>
 	 */
 	protected $all_ads = [];
 
 	/**
 	 * Ads ad groups
 	 *
-	 * @var     array
+	 * @var array<int|string, mixed>
 	 */
 	protected $all_groups = [];
 
 	/**
 	 * Ads in each group
 	 *
-	 * @var     array
+	 * @var array<int, array<int, int>>
 	 */
 	protected $ads_in_groups = [];
 
 	/**
 	 * All filters available in the current ad list table
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected $all_filters = [];
 
 	/**
 	 * All ad options for the ad list table
 	 *
-	 * @var     array
+	 * @var array<int, array<string, mixed>>
 	 */
 	protected $all_ads_options = [];
 
@@ -69,7 +69,7 @@ class List_Filters implements Integration_Interface {
 	/**
 	 * Collect available filters for ad overview page.
 	 *
-	 * @param array $posts array of ads.
+	 * @param array<int, \WP_Post> $posts Array of ads.
 	 *
 	 * @return void
 	 */
@@ -233,10 +233,10 @@ class List_Filters implements Integration_Interface {
 	/**
 	 * Edit the query for list table.
 	 *
-	 * @param array    $posts the posts array from the query.
-	 * @param WP_Query $the_query the current WP_Query object.
+	 * @param array<int, \WP_Post> $posts The posts array from the query.
+	 * @param WP_Query             $the_query the current WP_Query object.
 	 *
-	 * @return array with posts
+	 * @return array<int, \WP_Post> with posts
 	 */
 	public function post_results( $posts, $the_query ): array {
 		// Execute only in the main query.
@@ -301,10 +301,10 @@ class List_Filters implements Integration_Interface {
 	/**
 	 * Apply ad filters on post array
 	 *
-	 * @param array    $posts the original post array.
-	 * @param WP_Query $the_query the current WP_Query object.
+	 * @param array<int, \WP_Post> $posts The original post array.
+	 * @param WP_Query             $the_query the current WP_Query object.
 	 *
-	 * @return array with posts
+	 * @return array<int, \WP_Post> with posts
 	 */
 	private function ad_filters( $posts, &$the_query ) {
 		$using_original = true;
@@ -526,7 +526,7 @@ class List_Filters implements Integration_Interface {
 	/**
 	 * Author filter dropdown data.
 	 *
-	 * @return array An associative array of authors, keys are the author IDs and values are the author display names.
+	 * @return array<int, string> An associative array of authors, keys are the author IDs and values are the author display names.
 	 */
 	private function collect_authors(): array {
 		$authors = [];

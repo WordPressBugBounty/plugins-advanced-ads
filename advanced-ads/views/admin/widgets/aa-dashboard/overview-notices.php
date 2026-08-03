@@ -33,7 +33,22 @@ use AdvancedAds\Utilities\Data;
 
 <footer>
 	<span class="dashicons dashicons-lightbulb"></span>
-	<a class="no-underline" href="<?php echo esc_url( Data::support_url( '/?utm_source=advanced-ads&utm_medium=link&utm_campaign=overview-notices-support' ) ); ?>" target="_blank">
+	<a class="no-underline" href="
+			<?php
+				echo esc_url(
+					add_query_arg(
+						[
+							'page'         => 'advanced-ads-app',
+							'path'         => '/support',
+							'utm_source'   => 'advancedads',
+							'utm_medium'   => 'in-plugin',
+							'utm_campaign' => 'a2-in_plugin-support',
+						],
+						admin_url( 'admin.php' )
+					)
+				);
+				?>
+		" target="_blank">
 		<?php esc_html_e( 'Save time and get personal support.', 'advanced-ads' ); ?>
 		<strong class="underline"><?php esc_html_e( 'Ask your question!', 'advanced-ads' ); ?></strong>
 		<span aria-hidden="true" class="dashicons dashicons-external"></span>

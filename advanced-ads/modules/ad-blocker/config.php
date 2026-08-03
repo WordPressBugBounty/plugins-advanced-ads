@@ -1,13 +1,15 @@
 <?php
-
-// module configuration
-
-$path = dirname( __FILE__ );
+/**
+ * Ad blocker module configuration.
+ *
+ * @package AdvancedAds
+ * @author  Advanced Ads <info@wpadvancedads.com>
+ */
 
 return [
 	'classmap' => [
-		'Advanced_Ads_Ad_Blocker' => $path . '/classes/plugin.php',
-		'Advanced_Ads_Ad_Blocker_Admin' => $path . '/admin/admin.php',
+		'Advanced_Ads_Ad_Blocker'       => __DIR__ . '/classes/plugin.php',
+		'Advanced_Ads_Ad_Blocker_Admin' => __DIR__ . '/admin/admin.php',
 	],
 	'textdomain' => null,
 ];

@@ -72,10 +72,10 @@ class Tags_Conversion implements Integration_Interface {
 	/**
 	 * Get ad divs only
 	 *
-	 * @param string $page Page html.
-	 * @param array  $slots Ad slots ids.
+	 * @param string       $page Page html.
+	 * @param list<string> $slots Ad slots ids.
 	 *
-	 * @return array
+	 * @return list<string>
 	 */
 	private function get_ad_divs( $page, $slots ): array {
 		$matches  = [];
@@ -93,7 +93,7 @@ class Tags_Conversion implements Integration_Interface {
 	/**
 	 * Get slots from config
 	 *
-	 * @return bool|array
+	 * @return bool|list<string>
 	 */
 	private function get_ad_slots() {
 		$ads = Helpers::get_ads_from_config();
