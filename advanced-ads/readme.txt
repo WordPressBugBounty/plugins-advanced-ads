@@ -1,10 +1,10 @@
 === Advanced Ads – Ad Manager & AdSense ===
 Contributors: advancedads
 Tags: ads, adsense, amazon, affiliate, ad manager
-Requires at least: 5.7
-Tested up to: 7.0
+Requires at least: 5.9
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.0.26
+Stable tag: 2.0.29
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -360,6 +360,52 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 
 == Changelog ==
 
+= 2.0.29 (October 14, 2026) =
+
+- Fix: Urgent fix for version number
+
+= 2.0.27 (October 14, 2026) =
+
+- Improvement: Redesigned the Plugins-screen deactivation feedback modal
+- Improvement: Add rescue fallback on init to expire published ads missed by Action Scheduler cron
+- Improvement: Add gear icon and dropdown on the License page with Sync licenses and Disconnect Account actions, including a button to refresh licenses from the shop
+- Improvement: Licenses page row hides the activated sites count and domains when the license owner opts out on the Shop Account Page
+- Improvement: Add-on updates now run through the WordPress update system and require the latest version of each add-on
+- Improvement: All Access licenses cover every active add-on without activating each one and include Geo Targeting
+- Improvement: PHP in a plain text ad now runs only when the author of the ad may use unfiltered HTML
+- Improvement: Remove automatic deactivation of add-on versions from before Advanced Ads 2.0; updating directly from 1.x is no longer supported
+- Fix: Avoid fatal error in admin notices by ensuring the notice class exists before invoking its display function
+- Fix: Fatal error caused by invalid ad option data
+- Fix: Hide App menu item by slug instead of `:last-child` to prevent hiding add-on pages
+- Fix: Improved sanitization of ad wrapper attributes on shortcode injection
+- Fix: Fatal error caused by a missing second argument on the `http_headers_useragent` filter call during cache bot checking
+- Fix: Ad expiry dates on quick bulk edit could be corrupted to year 0000 when saved with incomplete data
+- Fix: Quick Edit expiry year not prefilling for past dates
+- Fix: Resolve missing update notifications by fixing API endpoint URL handling during updater class initialization
+- Fix: PubGuru import using fallback units instead of API ad units due to an incorrect loop variable name
+- Fix: PubGuru ad unit slot names mapping to the correct placement type
+- Fix: Resolve placement clearfix option not saving when disabled
+- Fix: Ad weights higher than the remaining group count now persist correctly after deleting ads, preserving delivery odds
+- Fix: Polyfill `react-jsx-runtime` from `window.React` on WordPress versions before 6.6 to resolve a blank License page
+- Fix: Prevent subscribers from accessing private ads via the AJAX ad renderer
+- Fix: Renewed licenses remaining expired locally even after syncing, blocking add-on installation and activation
+- Fix: Add safeguard against fatal errors when opening a placement assigned to a deleted ad group
+- Fix: Undefined property warning on Groups list when using PHP 8+ by overriding the `aria-label` method in `List_Table`
+- Fix: Remove plugins page `wp-cookies` dependency causing a notice on the Plugins screen in WordPress 6.9.1+
+- Fix: Placement checkbox options not being disabled when unchecked; add missing null guards
+- Fix: Keep Dashicons visible on primary buttons in the Advanced Ads admin header
+- Fix: Prevent updater and Action Scheduler fatals when Free is removed during a request
+- Fix: Fatal error in the Ad Inserter import when its stored settings are damaged
+- Fix: Deprecation notice on PHP 8.2 and later in the list of AdSense ad units
+- Fix: Show the "Adjust Auto ads options" link in the AdSense settings again
+- Fix: AdSense API quota message showing "1 hours 60 minutes" and never leaving out a zero part
+- Fix: Saved AdSense earnings report could not be read back, so the report was requested from Google again on each view
+- Fix: AMP for WP Ads import left an ad without display conditions when its visibility setting was not recognized
+- Fix: Dashboard news feed was chosen from a fixed earnings value instead of the real AdSense earnings of the site
+- Fix: Fatal error when deleting an ad, group or placement by an ID that does not exist
+- Fix: PHP warning when importing from Ads for WP Ads or Ad Inserter and a margin or display type is not set
+- Fix: PHP warning on the PubGuru import when the configuration has no ad units
+
 = 2.0.26 (August 3, 2026) =
 
 - Improvement: bulk Activate all and Deactivate all for Included add-ons with license activation
@@ -408,7 +454,6 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 - Fix: Woocommerce plugin was injecting SQL on the WP Query of finding placements by type, suppress filters on query
 - Fix: Remove credentials check from fs_connect function when FS method is direct
 - Fix: Add safeguard on EDD Updater class if request data is not an object
-- Fix: 
 - Fix: Block injection ancestor search logic used str_starts_with, wont work with PHP less than 8, replaced by framework function
 - Fix: Add early bail for Ad Health if the top bar is hidden
 - Fix: Adding new ads to a group made the new ad status and name columns appear misaligned
@@ -464,48 +509,3 @@ Yes. You can use plenty of [hooks](https://wpadvancedads.com/codex/) to customiz
 - Fix: prevent removal of backslashes in ad code
 - Fix: screen options from Advanced Ads showing on other plugin’s pages
 - Fix: conflict with Fluent-SMTP plugin
-
-= 2.0.16 (December 30, 2025) =
-
-- Improvement: PHP 8+ compatibility for the ad expiration cron event
-- Improvement: security by allowing only valid sorting options when loading placements
-
-= 2.0.15 (December 25, 2025) =
-
-- Improvement: prevent any PHP execution in shortcode rendered ads to enhance security
-- Improvement: handle IP visitor condition by removing extra spaces and line breaks
-- Improvement: enhance security by permission check when updating placement item
-- Fix: show hierarchical groups metabox in edit ad page
-
-= 2.0.14 (November 18, 2025) =
-
-- Feature: pagination for Groups and Rotations
-- Fix: Groups page screen options spacing
-
-= 2.0.13 (October 20, 2025) =
-
-- Fix: Enhance protection against potential unauthorized access in certain frontend requests
-
-= 2.0.12 (September 23, 2025) =
-
-- Improvement: prevent quotation marks in ad codes being escaped with ACF enabled
-- Fix: groups now correctly inject ads in header placements
-- Fix: remove placements from WPML translation options
-
-= 2.0.11 (August 27, 2025) =
-
-- Fix: backslash disappears in ad code editor
-- Fix: deprecated parameters warning
-- Fix: avoid crash when restoring posts from other post types
-- Fix: extra whitespace being added before headings in rich-content editor
-- Fix: ads expiry date works as expected
-
-= 2.0.10 (July 28, 2025) =
-
-- Fix: add null check in display conditions
-- Fix: optimize ad handling and performance for MailPoet
-- Fix: restore placement in widget dropdown
-- Fix: resolve issue with ad blocker detection
-- Fix: save pagination display condition in placements
-- Fix: duplicate ad labels when using group as ad type
-- Fix: append ad to existing group when selecting placement from ad edit screen

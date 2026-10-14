@@ -86,6 +86,8 @@ class Advanced_Ads_Display_Conditions {
 	 * Register display conditions
 	 *
 	 * @since 1.7.1.4
+	 *
+	 * @return void
 	 */
 	public function register_conditions() {
 		$conditions = [
@@ -189,6 +191,8 @@ class Advanced_Ads_Display_Conditions {
 	 * Get the conditions array alphabetically by label
 	 *
 	 * @since 1.8.12
+	 *
+	 * @return array<string, mixed>
 	 */
 	public function get_conditions() {
 		uasort(
@@ -209,7 +213,7 @@ class Advanced_Ads_Display_Conditions {
 	 * Controls frontend checks for conditions
 	 *
 	 * @param array<string, mixed> $options Options of the condition.
-	 * @param Ad                   $ad      Ad object.
+	 * @param Ad|false             $ad      Ad object.
 	 *
 	 * @return bool False, if ad can’t be delivered.
 	 */
@@ -249,6 +253,8 @@ class Advanced_Ads_Display_Conditions {
 	 *     - set to `global` to include all conditions, except for not global.
 	 *     - set to array of condition ID's to include only them.
 	 * }
+	 *
+	 * @return void
 	 */
 	public static function render_condition_list( array $set_conditions, $list_target = '', $form_name = '', $options = [] ) {
 		$conditions = self::get_instance()->get_conditions();
@@ -328,7 +334,7 @@ class Advanced_Ads_Display_Conditions {
 		$rand = uniqid();
 
 		return sprintf(
-			"<input style='display:none' type='checkbox' name='%s[connector]' value='or' id='%s' %s><label for='%s'>%s</label>",
+			"<input type='checkbox' name='%s[connector]' value='or' id='%s' %s><label for='%s'>%s</label>",
 			esc_attr( $name ),
 			esc_attr( "advads-conditions-$index-connector-$rand" ),
 			checked( 'or', $value, false ),
@@ -342,6 +348,8 @@ class Advanced_Ads_Display_Conditions {
 	 *
 	 * @param string $type type of the current condition.
 	 * @param string $name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function render_type_field( $type, $name ) {
 		?>
@@ -368,6 +376,8 @@ class Advanced_Ads_Display_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_post_type( $options, $index = 0, $form_name = '' ) {
 		if ( ! isset( $options['type'] ) || '' === $options['type'] ) {
@@ -399,7 +409,7 @@ class Advanced_Ads_Display_Conditions {
 				'public'             => true,
 				'publicly_queryable' => true,
 			],
-			'object',
+			'objects',
 			'or'
 		);
 		?>
@@ -442,6 +452,8 @@ class Advanced_Ads_Display_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_author( $options, $index = 0, $form_name = '' ) {
 
@@ -489,6 +501,8 @@ class Advanced_Ads_Display_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_taxonomy_terms( $options, $index = 0, $form_name = '' ) {
 
@@ -548,6 +562,8 @@ class Advanced_Ads_Display_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_taxonomies( $options, $index = 0, $form_name = '' ) {
 
@@ -635,7 +651,8 @@ class Advanced_Ads_Display_Conditions {
 					?>
 					<div class="advads-conditions-terms-buttons dynamic-search"><?php
 					foreach ( $checked_terms as $_checked_term ) :
-						?><label class="button advads-button advads-ui-state-active"><span class="advads-button-text"><?php
+						/* translators: %s: name of the selected item. */
+						?><label class="button advads-button advads-ui-state-active" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s', 'advanced-ads' ), $_checked_term->name ) ); ?>"><span class="advads-button-text"><?php
 							echo esc_html( $_checked_term->name ); ?><input type="hidden" name="<?php echo esc_attr( $inputname ); ?>"
 					value="<?php echo esc_attr( $_checked_term->term_id ); ?>"></span></label><?php
 					endforeach;
@@ -648,7 +665,7 @@ class Advanced_Ads_Display_Conditions {
 				}
 
 				printf(
-					"<span class='advads-conditions-terms-show-search button' title='%s'>+</span><br>",
+					'<button type="button" class="advads-conditions-terms-show-search button" title="%1$s" aria-label="%1$s">+</button><br>',
 					esc_attr_x( 'add more terms', 'display the terms search field on ad edit page', 'advanced-ads' )
 				);
 				printf(
@@ -683,6 +700,8 @@ class Advanced_Ads_Display_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_post_ids( $options, $index = 0, $form_name = '' ) {
 
@@ -746,7 +765,8 @@ class Advanced_Ads_Display_Conditions {
 					$display_text .= '&nbsp;<div class="advads-help advads-help-info"><div class="advads-tooltip advads-text-left">' . $tooltip . '</div></div>';
 				}
 				?>
-				<label class="button advads-button advads-ui-state-active">
+				<?php /* translators: %s: name of the selected item. */ ?>
+				<label class="button advads-button advads-ui-state-active" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s', 'advanced-ads' ), get_the_title( $the_query->post ) ) ); ?>">
 					<span class="advads-button-text">
 						<?php echo wp_kses_post( $display_text ); ?>
 					</span>
@@ -756,8 +776,9 @@ class Advanced_Ads_Display_Conditions {
 			}
 		}
 		printf(
-			"<span class='advads-conditions-postids-show-search button' style='%s'>+</span>",
-			empty( $values ) ? 'display:none;' : ''
+			"<button type='button' class='advads-conditions-postids-show-search button' style='%s' aria-label='%s'>+</button>",
+			empty( $values ) ? 'display:none;' : '',
+			esc_attr__( 'add more posts', 'advanced-ads' )
 		);
 
 		printf(
@@ -787,6 +808,8 @@ class Advanced_Ads_Display_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_general( $options, $index = 0, $form_name = '' ) {
 
@@ -891,6 +914,8 @@ class Advanced_Ads_Display_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_content_age( $options, $index = 0, $form_name = '' ) {
 		if ( ! isset( $options['type'] ) || '' === $options['type'] ) {
@@ -1020,9 +1045,7 @@ class Advanced_Ads_Display_Conditions {
 		$terms = get_the_terms( $post_id, $taxonomy );
 
 		if ( is_array( $terms ) ) {
-			foreach ( $terms as $term ) {
-				$term_ids[] = $term->term_id;
-			}
+			$term_ids = wp_list_pluck( $terms, 'term_id' );
 		} elseif ( false === $terms && 'is' === $operator ) {
 			// don’t show if should show only for a specific tag.
 			return false;
@@ -1215,13 +1238,11 @@ class Advanced_Ads_Display_Conditions {
 	 * @return bool true if can be displayed
 	 */
 	public static function check_content_age( $options, $ad ) { // phpcs:ignore
-		$post   = get_post();
-		$the_id = Params::request( 'theId', 0, FILTER_VALIDATE_INT );
+		$post       = get_post();
+		$the_id     = Params::request( 'theId', 0, FILTER_VALIDATE_INT );
+		$is_ad_ajax = wp_doing_ajax() && $the_id && 'advads_ad_select' === Params::request( 'action' ) && Params::request( 'isSingular' );
 
-		if ( ! $post && wp_doing_ajax() && $the_id &&
-			Params::request( 'action' ) === 'advads_ad_select' &&
-			Params::request( 'isSingular' )
-		) {
+		if ( ! $post && $is_ad_ajax ) {
 			$post = get_post( $the_id );
 		}
 
@@ -1282,9 +1303,9 @@ class Advanced_Ads_Display_Conditions {
 	/**
 	 * Helper to compare ids.
 	 *
-	 * @param array<int, int|string> $needle   IDs that should be searched for in haystack.
-	 * @param array<int, int|string> $haystack Reference IDs.
-	 * @param string                 $operator Whether it should be included or not.
+	 * @param array<int, int|string>|int|string $needle   IDs, or a single ID, that should be searched for in haystack.
+	 * @param array<int, int|string>            $haystack Reference IDs.
+	 * @param string                            $operator Whether it should be included or not.
 	 *
 	 * @return boolean
 	 */
@@ -1343,16 +1364,16 @@ class Advanced_Ads_Display_Conditions {
 			 *  the conditions don’t have the same condition type
 			 *  they are both set to SHOW
 			 */
-			$tax      = ( isset( $_condition['type'] ) && isset( $this->conditions[ $_condition['type'] ]['taxonomy'] ) ) ? $this->conditions[ $_condition['type'] ]['taxonomy'] : false;
-			$next_tax = ( isset( $next['type'] ) && isset( $this->conditions[ $next['type'] ]['taxonomy'] ) ) ? $this->conditions[ $next['type'] ]['taxonomy'] : false;
-			if ( $tax && $next_tax && $next_key
-				&& $next_tax === $tax
-				&& ( ! isset( $next['connector'] ) || 'or' !== $next['connector'] )
-				&& 'is' === $_condition['operator'] && 'is' === $next['operator']
-				&& $_condition['type'] !== $next['type']
-			) {
-					$next['connector']                    = 'or';
-					$conditions[ $next_key ]['connector'] = 'or';
+			$tax      = isset( $_condition['type'], $this->conditions[ $_condition['type'] ]['taxonomy'] ) ? $this->conditions[ $_condition['type'] ]['taxonomy'] : false;
+			$next_tax = is_array( $next ) && isset( $next['type'], $this->conditions[ $next['type'] ]['taxonomy'] ) ? $this->conditions[ $next['type'] ]['taxonomy'] : false;
+
+			$same_taxonomy = $tax && $next_tax && $next_key && $next_tax === $tax;
+			$and_connector = ! is_array( $next ) || ! isset( $next['connector'] ) || 'or' !== $next['connector'];
+			$is_operator   = is_array( $next ) && 'is' === $_condition['operator'] && 'is' === $next['operator'];
+
+			if ( $same_taxonomy && $and_connector && $is_operator && $_condition['type'] !== $next['type'] ) {
+				$next['connector']                    = 'or';
+				$conditions[ $next_key ]['connector'] = 'or';
 			}
 
 			// ignore OR if last result was true.
@@ -1364,7 +1385,7 @@ class Advanced_Ads_Display_Conditions {
 			$last_result = $result;
 			if ( ! $result ) {
 				// return false only, if the next condition doesn’t have an OR operator.
-				if ( ! isset( $next['connector'] ) || 'or' !== $next['connector'] ) {
+				if ( ! is_array( $next ) || ! isset( $next['connector'] ) || 'or' !== $next['connector'] ) {
 					return false;
 				}
 			}
@@ -1496,26 +1517,5 @@ class Advanced_Ads_Display_Conditions {
 		$sql = preg_replace( "/OR \({$wpdb->posts}.post_(content|excerpt)( NOT)? LIKE '(.*?)'\)/", '', $sql );
 
 		return $sql;
-	}
-
-	/**
-	 * Preg_replace callback used in modify_post_search_sql()
-	 *
-	 * @param array<int, string> $matches Results for post search.
-	 *
-	 * @return string
-	 * @deprecated since version 1.8.16
-	 */
-	public static function modify_post_search_sql_callback( $matches ) {
-		global $wpdb;
-		if ( 'content' === $matches[1] && preg_match( '@^([0-9]+)$@', $matches[3], $matches_id ) ) {
-			$equals_op = ' NOT' === $matches[2] ? '!=' : '=';
-
-			return "{$wpdb->posts}.ID$equals_op$matches_id[1]";
-		} elseif ( ' NOT' === $matches[2] ) {
-			return '1=1';
-		} else {
-			return '1=0';
-		}
 	}
 }

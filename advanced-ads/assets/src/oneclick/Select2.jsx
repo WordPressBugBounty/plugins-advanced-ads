@@ -12,20 +12,19 @@ import { useEffect, useRef, useState, forwardRef } from '@wordpress/element';
 
 const namespace = 'react-select2';
 
-const Select2 = forwardRef((props, ref) => {
+const Select2 = forwardRef( ( props, ref ) => {
 	const {
 		defaultValue = '',
 		value: propValue,
 		data = [],
 		events = [
-			[`change.${namespace}`, 'onChange'],
-			[`select2:open.${namespace}`, 'onOpen'],
-			[`select2:close.${namespace}`, 'onClose'],
-			[`select2:select.${namespace}`, 'onSelect'],
-			[`select2:unselect.${namespace}`, 'onUnselect'],
+			[ `change.${ namespace }`, 'onChange' ],
+			[ `select2:open.${ namespace }`, 'onOpen' ],
+			[ `select2:close.${ namespace }`, 'onClose' ],
+			[ `select2:select.${ namespace }`, 'onSelect' ],
+			[ `select2:unselect.${ namespace }`, 'onUnselect' ],
 		],
 		options = {},
-		multiple = false,
 		onChange,
 		onOpen,
 		onClose,
@@ -34,102 +33,121 @@ const Select2 = forwardRef((props, ref) => {
 		...rest
 	} = props;
 
-	const selectRef = ref || useRef(null);
-	const [internalValue, setInternalValue] = useState(propValue || defaultValue);
+	const internalRef = useRef( null );
+	const selectRef = ref || internalRef;
+	const [ internalValue ] = useState( propValue || defaultValue );
 
-	useEffect(() => {
-		const $el = jQuery(selectRef.current);
+	useEffect( () => {
+		const $el = jQuery( selectRef.current );
 
 		// Initialize select2
-		$el.select2(prepareOptions(options));
-		attachEventHandlers($el);
+		$el.select2( prepareOptions( options ) );
+		attachEventHandlers( $el );
 
 		// Set initial value
-		updateSelect2Value($el, internalValue);
+		updateSelect2Value( $el, internalValue );
 
 		return () => {
 			// Cleanup: destroy select2 instance
-			detachEventHandlers($el);
-			$el.select2('destroy');
+			detachEventHandlers( $el );
+			$el.select2( 'destroy' );
 		};
-	}, []);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- initialize select2 once on mount, destroy on unmount.
+	}, [] );
 
-	useEffect(() => {
-		const $el = jQuery(selectRef.current);
+	useEffect( () => {
+		const $el = jQuery( selectRef.current );
 
 		// Update select2 options if they change
-		$el.select2(prepareOptions(options));
+		$el.select2( prepareOptions( options ) );
 
 		// Update value if propValue changes
-		if (propValue !== undefined && !fuzzyValuesEqual($el.val(), propValue)) {
-			updateSelect2Value($el, propValue);
+		if (
+			propValue !== undefined &&
+			! fuzzyValuesEqual( $el.val(), propValue )
+		) {
+			updateSelect2Value( $el, propValue );
 		}
-	}, [propValue, options]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- only react to propValue/options; the helper functions are redefined every render.
+	}, [ propValue, options ] );
 
-	const prepareOptions = options => {
-    	const opt = { ...options };
-    	if (typeof opt.dropdownParent === 'string') {
-      		opt.dropdownParent = jQuery(opt.dropdownParent);
-    	}
-    	return opt;
-  	};
-
-	const attachEventHandlers = $el => {
-    	const handlers = { onChange, onOpen, onClose, onSelect, onUnselect };
-    	events.forEach(([event, handlerName]) => {
-      		if (handlers[handlerName]) {
-        		$el.on(event, handlers[handlerName]);
-      		}
-    	});
-  	};
-
-	const detachEventHandlers = $el => {
-		events.forEach(([event]) => {
-			$el.off(event);
-		});
+	const prepareOptions = ( rawOptions ) => {
+		const opt = { ...rawOptions };
+		if ( typeof opt.dropdownParent === 'string' ) {
+			opt.dropdownParent = jQuery( opt.dropdownParent );
+		}
+		return opt;
 	};
 
-	const updateSelect2Value = ($el, value) => {
-		$el.off(`change.${namespace}`).val(value).trigger('change');
-		if (onChange) {
-			$el.on(`change.${namespace}`, onChange);
+	const attachEventHandlers = ( $el ) => {
+		const handlers = { onChange, onOpen, onClose, onSelect, onUnselect };
+		events.forEach( ( [ event, handlerName ] ) => {
+			if ( handlers[ handlerName ] ) {
+				$el.on( event, handlers[ handlerName ] );
+			}
+		} );
+	};
+
+	const detachEventHandlers = ( $el ) => {
+		events.forEach( ( [ event ] ) => {
+			$el.off( event );
+		} );
+	};
+
+	const updateSelect2Value = ( $el, value ) => {
+		$el.off( `change.${ namespace }` ).val( value ).trigger( 'change' );
+		if ( onChange ) {
+			$el.on( `change.${ namespace }`, onChange );
 		}
 	};
 
-	const fuzzyValuesEqual = (currentValue, newValue) => {
-		return (currentValue === null && newValue === '') || shallowEqualFuzzy(currentValue, newValue);
+	const fuzzyValuesEqual = ( currentValue, newValue ) => {
+		return (
+			( currentValue === null && newValue === '' ) ||
+			shallowEqualFuzzy( currentValue, newValue )
+		);
 	};
 
-	const makeOption = item => {
-		if (typeof item === 'object') {
+	const makeOption = ( item ) => {
+		if ( typeof item === 'object' ) {
 			const { value, label, ...itemParams } = item;
 			return (
-				<option key={`option-${value}`} value={value} {...itemParams}>
-					{label}
+				<option
+					key={ `option-${ value }` }
+					value={ value }
+					{ ...itemParams }
+				>
+					{ label }
 				</option>
 			);
 		}
 
 		return (
-			<option key={`option-${item}`} value={item}>
-				{item}
+			<option key={ `option-${ item }` } value={ item }>
+				{ item }
 			</option>
 		);
 	};
 
 	return (
-		<select ref={selectRef} {...rest}>
-			{data.map((item, index) =>
+		<select ref={ selectRef } { ...rest }>
+			{ data.map( ( item, index ) =>
 				item.children ? (
-					<optgroup key={`optgroup-${index}`} label={item.label} {...item}>
-						{item.children.map(child => makeOption(child))}
+					<optgroup
+						key={ `optgroup-${ index }` }
+						label={ item.label }
+						{ ...item }
+					>
+						{ item.children.map( ( child ) =>
+							makeOption( child )
+						) }
 					</optgroup>
 				) : (
-					makeOption(item)
+					makeOption( item )
 				)
-			)}
+			) }
 		</select>
 	);
-});
+} );
 
 export default Select2;

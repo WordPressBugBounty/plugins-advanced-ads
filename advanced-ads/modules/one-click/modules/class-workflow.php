@@ -56,7 +56,7 @@ class Workflow implements Integration_Interface {
 			if ( is_admin() ) {
 				( new Detector() )->hooks();
 			}
-			remove_action( 'advanced-ads-plugin-loaded', 'advanced_ads_ads_txt_init' );
+			remove_action( 'init', 'advanced_ads_ads_txt_init' );
 		}
 	}
 

@@ -9,10 +9,10 @@
 
 namespace AdvancedAds\Modules\OneClick\AdsTxt;
 
-use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Utilities\Str;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -27,7 +27,7 @@ class AdsTxt implements Integration_Interface {
 	 * @return void
 	 */
 	public function hooks(): void {
-		remove_action( 'advanced-ads-plugin-loaded', 'advanced_ads_ads_txt_init' );
+		remove_action( 'init', 'advanced_ads_ads_txt_init' );
 
 		add_action( 'template_redirect', [ $this, 'handle_redirect' ] );
 		add_filter( 'allowed_redirect_hosts', [ $this, 'allowed_redirect_hosts' ] );

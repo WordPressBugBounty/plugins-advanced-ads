@@ -22,11 +22,15 @@ use AdvancedAds\Traits;
 use AdvancedAds\Utilities\Ad_List_Stats;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Interfaces\Ad_Type;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Ad.
+ *
+ * @method string prepare_frontend_output() Output for the frontend; every ad class defines it.
  */
 abstract class Ad extends Data implements Entity_Interface {
 
@@ -318,7 +322,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Set display conditions.
 	 *
-	 * @param string $conditions Ad conditions.
+	 * @param array<int|string, mixed> $conditions Ad conditions.
 	 *
 	 * @return void
 	 */
@@ -329,7 +333,7 @@ abstract class Ad extends Data implements Entity_Interface {
 	/**
 	 * Set conditions.
 	 *
-	 * @param string $conditions Ad conditions.
+	 * @param array<int|string, mixed> $conditions Ad conditions.
 	 *
 	 * @return void
 	 */
@@ -447,6 +451,8 @@ abstract class Ad extends Data implements Entity_Interface {
 	 * Set the width.
 	 *
 	 * @param float|string $width Total width.
+	 *
+	 * @return void
 	 */
 	public function set_width( $width ) {
 		$this->clear_wrapper_cache();
@@ -663,7 +669,7 @@ abstract class Ad extends Data implements Entity_Interface {
 
 		if ( ! $check_options['passive_cache_busting'] ) {
 			// Don’t display ads that are not published or private for users not logged in.
-			if ( ! $this->is_status( 'publish' ) && ! ( $this->is_status( 'private' ) && is_user_logged_in() ) ) {
+			if ( ! $this->is_status( 'publish' ) && ! ( $this->is_status( 'private' ) && Conditional::user_can( 'advanced_ads_edit_ads' ) ) ) {
 				return false;
 			}
 
@@ -1001,6 +1007,12 @@ abstract class Ad extends Data implements Entity_Interface {
 		$ad_args = $this->get_prop( 'ad_args' );
 		$label   = $this->get_label();
 		$attrs   = $this->get_wrapper_attributes();
+
+		// Tell screen reader users where an ad starts: the wrapper is a region named like the ad label. Both can be changed with the filter below.
+		$attrs['role']       = 'region';
+		$attrs['aria-label'] = '' !== trim( wp_strip_all_tags( $label ) )
+			? trim( wp_strip_all_tags( $label ) )
+			: _x( 'Advertisements', 'label above ads', 'advanced-ads' );
 
 		$attrs = apply_filters_deprecated(
 			'advanced-ads-output-wrapper-options',

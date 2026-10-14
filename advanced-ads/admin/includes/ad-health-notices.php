@@ -45,7 +45,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 		'conflicting_plugins'                           => [
 			'text' => sprintf(
 				/* translators: %1$s is a list of plugin names; %2$s is a target URL */
-				__( 'Plugins that are known to cause (partial) problems: <strong>%1$s</strong>. <a href="%2$s" target="_blank">Learn more</a>.', 'advanced-ads' ),
+				__( 'Plugins that are known to cause (partial) problems: <strong>%1$s</strong>. <a href="%2$s" target="_blank">Learn more about plugin conflicts</a>.', 'advanced-ads' ),
 				implode( ', ', Advanced_Ads_Checks::conflicting_plugins() ),
 				'https://wpadvancedads.com/manual/known-plugin-conflicts/?utm_source=advanced-ads&utm_medium=link&utm_campaign=error-plugin-conflicts'
 			),
@@ -67,14 +67,14 @@ $advanced_ads_ad_health_notices = apply_filters(
 			'text' => sprintf(
 				/* translators: %s is a target URL */
 				__( 'Ads are disabled for all or some pages. See "disabled ads" in <a href="%s">settings</a>.', 'advanced-ads' ),
-				admin_url( 'admin.php?page=advanced-ads-settings#top#general' )
+				admin_url( 'admin.php?page=advanced-ads-app&path=/settings' )
 			),
 			'type' => 'problem',
 		],
 		// check if Advanced Ads related constants are enabled
 		// Advanced_Ads_Checks::get_defined_constants().
 		'constants_enabled'                             => [
-			'text' => '<a href="' . admin_url( 'admin.php?page=advanced-ads-settings#top#support' ) . '">' . esc_html__( 'Advanced Ads related constants enabled', 'advanced-ads' ) . '</a>',
+			'text' => '<a href="' . admin_url( 'admin.php?page=advanced-ads-app&path=/settings' ) . '">' . esc_html__( 'Advanced Ads related constants enabled', 'advanced-ads' ) . '</a>',
 			'type' => 'notice',
 		],
 		// adblocker assets expired
@@ -83,7 +83,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 			'text' => sprintf(
 				/* translators: %s is a target URL */
 				__( 'Some assets were changed. Please <strong>rebuild the asset folder</strong> in the <a href="%s">Advanced Ads settings</a> to update the ad blocker disguise.', 'advanced-ads' ),
-				admin_url( 'admin.php?page=advanced-ads-settings' )
+				admin_url( 'admin.php?page=advanced-ads-app&path=/settings' )
 			),
 			'type' => 'problem',
 			'hide' => true,
@@ -94,7 +94,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 			'text'    => __( 'One or more license keys for <strong>Advanced Ads add-ons are invalid or missing</strong>.', 'advanced-ads' ) . ' '
 				. sprintf(
 					/* translators: %s is a target URL. */
-					__( 'Please add valid license keys <a href="%s">here</a>.', 'advanced-ads' ),
+					__( 'Please <a href="%s">add valid license keys</a>.', 'advanced-ads' ),
 					\AdvancedAds\License\License_Utils::admin_screen_url()
 				),
 			'type'    => 'problem',
@@ -159,7 +159,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				__( 'One of your sites is missing the AdSense publisher ID in the ads.txt file.', 'advanced-ads' )
 				. ' <a class="advads-settings-link" href="%s">'
 				. _x( 'Create one now.', 'related to ads.txt file', 'advanced-ads' ) . '</a>',
-				admin_url( 'admin.php?page=advanced-ads-settings#general__advads-ads-txt' )
+				admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=ads-txt' )
 			) . ' ' . Advanced_Ads_Ad_Health_Notices::get_adsense_error_link( 'ALERT_TYPE_ADS_TXT_UNAUTHORIZED' ),
 			'type' => 'problem',
 		],
@@ -169,7 +169,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				__( 'One of your sites is missing the AdSense publisher ID in the ads.txt file.', 'advanced-ads' )
 				. ' <a class="advads-settings-link" href="%s">'
 				. _x( 'Create one now.', 'related to ads.txt file', 'advanced-ads' ) . '</a>',
-				admin_url( 'admin.php?page=advanced-ads-settings#general__advads-ads-txt' )
+				admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=ads-txt' )
 			) . ' ' . Advanced_Ads_Ad_Health_Notices::get_adsense_error_link( 'ADS_TXT_MISSING' ),
 			'type' => 'problem',
 		],
@@ -179,7 +179,7 @@ $advanced_ads_ad_health_notices = apply_filters(
 				__( 'One of your sites is missing the AdSense publisher ID in the ads.txt file.', 'advanced-ads' )
 				. ' <a class="advads-settings-link" href="%s">'
 				. _x( 'Create one now.', 'related to ads.txt file', 'advanced-ads' ) . '</a>',
-				admin_url( 'admin.php?page=advanced-ads-settings#general__advads-ads-txt' )
+				admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=ads-txt' )
 			) . ' ' . Advanced_Ads_Ad_Health_Notices::get_adsense_error_link( 'ADS_TXT_ISSUES' ),
 			'type' => 'problem',
 		],

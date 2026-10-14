@@ -8,17 +8,13 @@
  *
  * Content:
  *   1. Template
- *   2. Repositories functions
- *   3. CRUD functions
- *   4. Conditional functions
- *   5. Getter functions
- *   6. Finder functions
+ *   2. CRUD functions
+ *   3. Conditional functions
+ *   4. Getter functions
+ *   5. Finder functions
  */
 
 use AdvancedAds\Abstracts\Ad;
-use AdvancedAds\Ads\Ad_Types;
-use AdvancedAds\Ads\Ad_Factory;
-use AdvancedAds\Ads\Ad_Repository;
 use AdvancedAds\Interfaces\Ad_Type;
 
 /** 1. Template --------------- */
@@ -78,42 +74,7 @@ function the_ad( $id = 0, $args = [] ): void {
 	echo get_the_ad( $id, '', $args ); // phpcs:ignore
 }
 
-/* 2. Repositories ------------------- */
-
-/**
- * Get Ad Factory
- *
- * @deprecated 2.0.24 Use wp_advads()->ads->factory instead.
- *
- * @return Ad_Factory
- */
-function wp_advads_get_ad_factory(): Ad_Factory {
-	return wp_advads()->ads->factory;
-}
-
-/**
- * Get Ad Repository
- *
- * @deprecated 2.0.24 Use wp_advads()->ads->repository instead.
- *
- * @return Ad_Repository
- */
-function wp_advads_get_ad_repository(): Ad_Repository {
-	return wp_advads()->ads->repository;
-}
-
-/**
- * Get Ad Types
- *
- * @deprecated 2.0.24 Use wp_advads()->ads->types instead.
- *
- * @return Ad_Types
- */
-function wp_advads_get_ad_type_manager(): Ad_Types {
-	return wp_advads()->ads->types;
-}
-
-/* 3. CRUD ------------------- */
+/* 2. CRUD ------------------- */
 
 /**
  * Create an empty ad object
@@ -132,6 +93,8 @@ function wp_advads_create_new_ad( $type = 'dummy' ) {
  * @param int|Ad $ad           Ad object or Id.
  * @param bool   $force_delete Whether to bypass Trash and force deletion. Default false.
  *
+ * @param-out Ad|bool $ad The ad object, or false when no ad has that id.
+ *
  * @return void
  */
 function wp_advads_delete_ad( &$ad, $force_delete = false ): void {
@@ -139,7 +102,9 @@ function wp_advads_delete_ad( &$ad, $force_delete = false ): void {
 		$ad = wp_advads_get_ad( $ad );
 	}
 
-	$ad->delete( $force_delete );
+	if ( $ad ) {
+		$ad->delete( $force_delete );
+	}
 }
 
 /**
@@ -164,7 +129,7 @@ function wp_advads_register_ad_type( $classname ): void {
 	wp_advads()->ads->types->register_type( $classname );
 }
 
-/* 4. Conditional ------------------- */
+/* 3. Conditional ------------------- */
 
 /**
  * Has ad type.
@@ -188,7 +153,7 @@ function is_an_ad( $thing ): bool {
 	return $thing instanceof Ad;
 }
 
-/* 5. Getter ------------------- */
+/* 4. Getter ------------------- */
 
 /**
  * Get array of ads.
@@ -220,7 +185,7 @@ function wp_advads_get_all_statuses(): array {
 /**
  * Get all ads.
  *
- * @return array<string, mixed>
+ * @return array<int, string>
  */
 function wp_advads_get_ads_dropdown(): array {
 	return wp_advads()->ads->repository->get_ads_dropdown();
@@ -246,7 +211,7 @@ function wp_advads_get_ad_types(): array {
 	return wp_advads()->ads->types->get_types();
 }
 
-/* 6. Finder ------------------- */
+/* 5. Finder ------------------- */
 
 /**
  * Get the ad object.
@@ -277,7 +242,7 @@ function wp_advads_get_ads_by_group_id( $group_id, $output = OBJECT ): array {
  *
  * @param int $placement_id The ID of the placement.
  *
- * @return array<string, mixed>
+ * @return array<int, Ad>
  */
 function wp_advads_get_ads_by_placement_id( $placement_id ): array {
 	return wp_advads()->ads->repository->get_ads_by_placement_id( $placement_id );
@@ -288,7 +253,7 @@ function wp_advads_get_ads_by_placement_id( $placement_id ): array {
  *
  * @param string $type The type of ads to retrieve.
  *
- * @return array<string, mixed>
+ * @return array<int, Ad>
  */
 function wp_advads_get_ads_by_type( $type ): array {
 	return wp_advads()->ads->repository->get_ads_by_type( $type );

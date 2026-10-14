@@ -130,12 +130,12 @@ class Helpers {
 
 		$pubguru_config_ads = false;
 		// 1. Get ads from auto_created = true or name contains auto_created
-		foreach ( $config['configs'] as $config ) {
+		foreach ( $config['configs'] as $config_item ) {
 			if (
-				( isset( $config['auto_created'] ) && $config['auto_created'] ) ||
-				Str::contains( 'auto_created', $config['name'] )
+				( isset( $config_item['auto_created'] ) && $config_item['auto_created'] ) ||
+				Str::contains( 'auto_created', $config_item['name'] )
 			) {
-				$pubguru_config_ads = $config['ad_units'];
+				$pubguru_config_ads = $config_item['ad_units'];
 				return $pubguru_config_ads;
 			}
 		}

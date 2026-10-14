@@ -9,6 +9,8 @@
  * @var Placement $placement Placement instance.
  */
 
+use AdvancedAds\Abstracts\Placement;
+
 $placement_item = $placement->get_item_object();
 $allowed_ads    = $placement->get_type_object()->get_allowed_ads();
 $allowed_groups = $placement->get_type_object()->get_allowed_groups();
@@ -31,7 +33,7 @@ endif;
 	<?php include 'item-select.php'; ?>
 	<span class="advads-loader hidden"></span>
 
-	<a class="advads-placement-item-edit" href="<?php echo esc_url( $placement_item ? $placement_item->get_edit_link() : '#' ); ?>" style="display: <?php echo esc_attr( $placement_item && $placement_item->get_id() > 0 ? 'inline' : 'none' ); ?>" title="<?php esc_attr_e( 'Edit item', 'advanced-ads' ); ?>">
+	<a class="advads-placement-item-edit" href="<?php echo esc_url( $placement_item ? $placement_item->get_edit_link() : '#' ); ?>" style="display: <?php echo esc_attr( $placement_item && $placement_item->get_id() > 0 ? 'inline' : 'none' ); ?>" title="<?php esc_attr_e( 'Edit item', 'advanced-ads' ); ?>" aria-label="<?php esc_attr_e( 'Edit item', 'advanced-ads' ); ?>">
 		<span class="dashicons dashicons-external"></span>
 	</a>
 </div>

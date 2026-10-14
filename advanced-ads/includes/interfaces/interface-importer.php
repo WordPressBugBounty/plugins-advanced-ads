@@ -9,6 +9,8 @@
 
 namespace AdvancedAds\Interfaces;
 
+use WP_Error;
+
 defined( 'ABSPATH' ) || exit;
 
 /**

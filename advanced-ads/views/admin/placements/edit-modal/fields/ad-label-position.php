@@ -11,22 +11,22 @@
  */
 
 ?>
-<label title="<?php esc_html_e( 'default', 'advanced-ads' ); ?>">
+<label title="<?php esc_attr_e( 'default', 'advanced-ads' ); ?>">
 	<input type="radio" name="advads[placements][options][placement_position]" value="default" <?php checked( $position, 'default' ); ?>/>
 	<?php esc_html_e( 'default', 'advanced-ads' ); ?>
 </label>
 
-<label title="<?php esc_html_e( 'left', 'advanced-ads' ); ?>">
+<label title="<?php esc_attr_e( 'left', 'advanced-ads' ); ?>">
 	<input type="radio" name="advads[placements][options][placement_position]" value="left" <?php checked( $position, 'left' ); ?>/>
 	<?php esc_html_e( 'left', 'advanced-ads' ); ?>
 </label>
 
-<label title="<?php esc_html_e( 'center', 'advanced-ads' ); ?>">
+<label title="<?php esc_attr_e( 'center', 'advanced-ads' ); ?>">
 	<input type="radio" name="advads[placements][options][placement_position]" value="center" <?php checked( $position, 'center' ); ?>/>
 	<?php esc_html_e( 'center', 'advanced-ads' ); ?>
 </label>
 
-<label title="<?php esc_html_e( 'right', 'advanced-ads' ); ?>">
+<label title="<?php esc_attr_e( 'right', 'advanced-ads' ); ?>">
 	<input type="radio" name="advads[placements][options][placement_position]" value="right" <?php checked( $position, 'right' ); ?>/>
 	<?php esc_html_e( 'right', 'advanced-ads' ); ?>
 </label>

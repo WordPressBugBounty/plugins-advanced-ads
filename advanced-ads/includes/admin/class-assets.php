@@ -9,10 +9,13 @@
 
 namespace AdvancedAds\Admin;
 
-use Advanced_Ads_AdSense_Admin;
 use Advanced_Ads_Display_Conditions;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\License\License;
+use AdvancedAds\License\License_Shop_Client;
+use AdvancedAds\Modules\AdSense\Utils;
+use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
@@ -98,8 +101,10 @@ class Assets implements Integration_Interface {
 			$translation_array = [
 				'condition_or'                 => __( 'or', 'advanced-ads' ),
 				'condition_and'                => __( 'and', 'advanced-ads' ),
+				/* translators: %s: name of the selected item. */
+				'remove_item'                  => __( 'Remove %s', 'advanced-ads' ),
 				'after_paragraph_promt'        => __( 'After which paragraph?', 'advanced-ads' ),
-				'page_level_ads_enabled'       => Advanced_Ads_AdSense_Admin::get_auto_ads_messages()['enabled'],
+				'page_level_ads_enabled'       => Utils::get_auto_ads_messages()['enabled'],
 				'today'                        => __( 'Today', 'advanced-ads' ),
 				'yesterday'                    => __( 'Yesterday', 'advanced-ads' ),
 				'this_month'                   => __( 'This Month', 'advanced-ads' ),
@@ -168,7 +173,7 @@ class Assets implements Integration_Interface {
 			'phpVersion'         => phpversion(),
 			'wpVersion'          => get_bloginfo( 'version' ),
 			'proVersion'         => defined( 'AAP_VERSION' ),
-			'hasAnyValidLicense' => \Advanced_Ads_Admin_Licenses::get_instance()->any_license_valid(),
+			'hasAnyValidLicense' => License::has_valid_license(),
 			'currentUserEmail'   => get_current_user_id() ? wp_get_current_user()->user_email : '',
 		];
 
@@ -189,11 +194,12 @@ class Assets implements Integration_Interface {
 			'editAd'       => esc_url( admin_url( 'post.php?action=edit&post=' ) ),
 			'restUrl'      => esc_url_raw( rest_url() ),
 			'restNonce'    => wp_create_nonce( 'wp_rest' ),
-			'shopUrl'      => defined( 'AA_SHOP_URL' ) ? esc_url( AA_SHOP_URL ) : esc_url( 'https://wpadvancedads.com' ), // SHOP_URL define on wp-config.php.
+			'shopUrl'      => esc_url( License_Shop_Client::shop_base_url() ),
 			'siteUrl'      => esc_url( site_url() ),
 		];
 
 		wp_advads_json_add( 'endpoints', $endpoints );
+		wp_advads_json_add( 'addons', Addons::license_screen_data() );
 	}
 
 	/**

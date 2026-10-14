@@ -15,6 +15,7 @@ use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Abstracts\Screen;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -157,19 +158,6 @@ class Admin_Menu implements Integration_Interface {
 	}
 
 	/**
-	 * Get a screen by its id
-	 *
-	 * @param string $id Screen id.
-	 *
-	 * @return Screen|null
-	 */
-	private function get_screen( string $id ) {
-		$screens = $this->get_screens();
-
-		return $screens[ $id ] ?? null;
-	}
-
-	/**
 	 * Get the hook of a screen by its id
 	 *
 	 * @param string $id Screen id.
@@ -177,7 +165,8 @@ class Admin_Menu implements Integration_Interface {
 	 * @return string|null
 	 */
 	public function get_hook( $id ) {
-		$screen = $this->get_screen( $id );
+		$screens = $this->get_screens();
+		$screen  = $screens[ $id ] ?? null;
 
 		return $screen ? $screen->get_hook() : null;
 	}
@@ -226,7 +215,7 @@ class Admin_Menu implements Integration_Interface {
 		/**
 		 * Let developers add their own screens.
 		 *
-		 * @param Admin_Menu $this The admin menu instance.
+		 * @param Admin_Menu $admin_menu The admin menu instance.
 		 */
 		do_action( 'advanced-ads-add-screen', $this );
 
@@ -269,9 +258,7 @@ class Admin_Menu implements Integration_Interface {
 		$this->add_screen( Pages\Ads_Editing::class );
 		$this->add_screen( Pages\Groups::class );
 		$this->add_screen( Pages\Placements::class );
-		$this->add_screen( Pages\Settings::class );
 		$this->add_screen( Pages\Tools::class );
-		$this->add_screen( Pages\Onboarding::class );
 	}
 
 	/**
@@ -282,16 +269,7 @@ class Admin_Menu implements Integration_Interface {
 	private function sort_screens(): void {
 		uasort(
 			$this->screens,
-			static function ( $a, $b ) {
-				$order_a = $a->get_order();
-				$order_b = $b->get_order();
-
-				if ( $order_a === $order_b ) {
-					return 0;
-				}
-
-				return ( $order_a < $order_b ) ? -1 : 1;
-			}
+			static fn( $a, $b ) => $a->get_order() <=> $b->get_order()
 		);
 	}
 }

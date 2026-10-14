@@ -13,42 +13,42 @@ import Step3 from './Step3';
 import StepWrapper from './StepWrapper';
 
 export default function Metabox() {
-	const { showMetabox, currentStep } = useContext(OneClickContext);
+	const { showMetabox, currentStep } = useContext( OneClickContext );
 	const { metabox } = advancedAds.oneclick;
-	if (!showMetabox) {
+	if ( ! showMetabox ) {
 		return null;
 	}
 
 	return (
 		<div id="advads-m2-connect" className="postbox position-full">
 			<h2 className="hndle">
-				<span>{metabox.title}</span>
+				<span>{ metabox.title }</span>
 			</h2>
 			<div className="inside">
-				{1 === currentStep && (
-					<StepWrapper title={advancedAds.oneclick.step1.title}>
+				{ 1 === currentStep && (
+					<StepWrapper title={ advancedAds.oneclick.step1.title }>
 						<Step1 />
 					</StepWrapper>
-				)}
-				{2 === currentStep && (
-					<StepWrapper title={advancedAds.oneclick.step2.title}>
+				) }
+				{ 2 === currentStep && (
+					<StepWrapper title={ advancedAds.oneclick.step2.title }>
 						<Step2 />
 					</StepWrapper>
-				)}
-				{3 === currentStep && (
+				) }
+				{ 3 === currentStep && (
 					<StepWrapper>
 						<Step3 />
 					</StepWrapper>
-				)}
+				) }
 				<footer>
 					<a
-						href={metabox.visitLink}
+						href={ metabox.visitLink }
 						target="_blank"
 						rel="noreferrer"
 					>
-						{metabox.visitText}
+						{ metabox.visitText }
 						<span className="screen-reader-text">
-							{' '}
+							{ ' ' }
 							(opens in a new tab)
 						</span>
 						<span

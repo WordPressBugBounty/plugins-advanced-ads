@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" overflow="visible" viewBox="0 0 100 100" class="size-8" role="img" aria-labelledby="cache-busting-title">
+  <title id="cache-busting-title">Cache busting</title>
+  <path fill="#fff" d="M19.878 99C9.469 99 1 90.531 1 80.121V2a1 1 0 0 1 1-1h78.122C90.531 1 99 9.468 99 19.876V98a1 1 0 0 1-1 1z"/>
+  <path fill="#0074a2" d="M80.122 2C89.98 2 98 10.019 98 19.876V98H19.878C10.02 98 2 89.979 2 80.121V2zm0-2H2a2 2 0 0 0-2 2v78.121C0 91.082 8.917 100 19.878 100H98a2 2 0 0 0 2-2V19.876C100 8.917 91.083 0 80.122 0"/>
+  <path fill="#0074a2" d="M25 29h48a5 5 0 0 1 5 5v6a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5v-6a5 5 0 0 1 5-5m0 17h48a5 5 0 0 1 5 5v6a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5v-6a5 5 0 0 1 5-5m0 17h48a5 5 0 0 1 5 5v6a5 5 0 0 1-5 5H25a5 5 0 0 1-5-5v-6a5 5 0 0 1 5-5"/>
+  <path fill="#fff" d="M27 34h12v6H27zm0 17h12v6H27zm0 17h12v6H27z"/>
+  <circle cx="72" cy="68" r="18" fill="#fff"/>
+  <circle cx="72" cy="68" r="15" fill="#0074a2"/>
+  <path fill="none" stroke="#fff" stroke-linecap="round" stroke-width="3.5" d="M79.5 68a8 8 0 1 1-2.3-5.7"/>
+  <path fill="#fff" d="M79 57.5v7h-7z"/>
+</svg>

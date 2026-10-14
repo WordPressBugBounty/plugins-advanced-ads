@@ -13,6 +13,7 @@
  */
 
 use AdvancedAds\Utilities\Validation;
+use AdvancedAds\Abstracts\Ad;
 
 if ( defined( 'WP_DEBUG' ) && WP_DEBUG &&
 	( $error = Validation::is_valid_ad_dom( $ad ) ) ) : // phpcs:ignore ?>
@@ -32,7 +33,7 @@ if ( defined( 'WP_DEBUG' ) && WP_DEBUG &&
 					],
 				]
 			),
-			esc_url( admin_url( 'admin.php?page=advanced-ads-settings#top#support' ) )
+			esc_url( admin_url( 'admin.php?page=advanced-ads-app&path=/support' ) )
 		);
 		?>
 		<span style="white-space:pre-wrap"><?php echo $error; ?></span>

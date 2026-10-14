@@ -13,6 +13,7 @@ use Exception;
 use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Ad;
 use AdvancedAds\Abstracts\Factory;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 

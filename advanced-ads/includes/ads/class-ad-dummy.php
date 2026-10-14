@@ -34,7 +34,7 @@ class Ad_Dummy extends Ad implements Ad_Interface {
 
 		$style = '' !== $style ? 'style="' . $style . '"' : '';
 		$img   = sprintf(
-			'<img src="%s" width="300" height="250" %s />',
+			'<img src="%s" width="300" height="250" alt="" %s />',
 			esc_url( ADVADS_BASE_URL . 'public/assets/img/dummy.jpg' ),
 			$style
 		);

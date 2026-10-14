@@ -17,19 +17,58 @@ defined( 'ABSPATH' ) || exit;
 final class Addons {
 
 	/**
-	 * Plugin bootstrap paths keyed by short add-on id.
+	 * The paid add-ons keyed by short add-on id: plugin bootstrap path, shop product ID and shop product name — the text domain is `advanced-ads-{id}` unless set, and the add-on is part of All Access unless `all_access` is false.
 	 *
-	 * @var array<string, string>
+	 * @var array<string, array{file: string, item_id: int, name: string, text_domain?: string, all_access?: bool}>
 	 */
-	private const PLUGIN_FILES = [
-		'pro'        => 'advanced-ads-pro/advanced-ads-pro.php',
-		'responsive' => 'advanced-ads-responsive/responsive-ads.php',
-		'gam'        => 'advanced-ads-gam/advanced-ads-gam.php',
-		'layer'      => 'advanced-ads-layer/layer-ads.php',
-		'selling'    => 'advanced-ads-selling/advanced-ads-selling.php',
-		'sticky'     => 'advanced-ads-sticky-ads/sticky-ads.php',
-		'tracking'   => 'advanced-ads-tracking/tracking.php',
-		'slider-ads' => 'advanced-ads-slider/slider.php',
+	private const ADDONS = [
+		'pro'        => [
+			'file'    => 'advanced-ads-pro/advanced-ads-pro.php',
+			'item_id' => 1742,
+			'name'    => 'Pro',
+		],
+		'responsive' => [
+			'file'    => 'advanced-ads-responsive/responsive-ads.php',
+			'item_id' => 678,
+			'name'    => 'AMP Ads',
+		],
+		'gam'        => [
+			'file'    => 'advanced-ads-gam/advanced-ads-gam.php',
+			'item_id' => 215545,
+			'name'    => 'Google Ad Manager Integration',
+		],
+		'geo'        => [
+			'file'    => 'advanced-ads-geo/advanced-ads-geo.php',
+			'item_id' => 8387,
+			'name'    => 'Geo Targeting',
+		],
+		'layer'      => [
+			'file'    => 'advanced-ads-layer/layer-ads.php',
+			'item_id' => 686,
+			'name'    => 'PopUp and Layer Ads',
+		],
+		'selling'    => [
+			'file'    => 'advanced-ads-selling/advanced-ads-selling.php',
+			'item_id' => 35300,
+			'name'    => 'Selling Ads',
+		],
+		'sticky'     => [
+			'file'    => 'advanced-ads-sticky-ads/sticky-ads.php',
+			'item_id' => 683,
+			'name'    => 'Sticky Ads',
+		],
+		'tracking'   => [
+			'file'    => 'advanced-ads-tracking/advanced-ads-tracking.php',
+			'item_id' => 638,
+			'name'    => 'Tracking',
+		],
+		'slider-ads' => [
+			'file'        => 'advanced-ads-slider/slider.php',
+			'item_id'     => 1168,
+			'name'        => 'Ad Slider',
+			'text_domain' => 'slider-ads',
+			'all_access'  => false,
+		],
 	];
 
 	/**
@@ -45,7 +84,7 @@ final class Addons {
 	 * @return array<string, string> Short add-on id => plugins-relative bootstrap path.
 	 */
 	public static function plugin_files(): array {
-		return self::PLUGIN_FILES;
+		return wp_list_pluck( self::ADDONS, 'file' );
 	}
 
 	/**
@@ -54,7 +93,7 @@ final class Addons {
 	 * @return string[]
 	 */
 	public static function known_addon_ids(): array {
-		return array_keys( self::PLUGIN_FILES );
+		return array_keys( self::ADDONS );
 	}
 
 	/**
@@ -65,7 +104,7 @@ final class Addons {
 	 * @return bool
 	 */
 	public static function is_known_addon( string $addon_id ): bool {
-		return isset( self::PLUGIN_FILES[ sanitize_key( $addon_id ) ] );
+		return isset( self::ADDONS[ sanitize_key( $addon_id ) ] );
 	}
 
 	/**
@@ -78,7 +117,57 @@ final class Addons {
 	public static function plugin_file( string $addon_id ): ?string {
 		$addon_id = sanitize_key( $addon_id );
 
-		return self::PLUGIN_FILES[ $addon_id ] ?? null;
+		return self::ADDONS[ $addon_id ]['file'] ?? null;
+	}
+
+	/**
+	 * Shop product ID of a catalog add-on.
+	 *
+	 * @param string $addon_id Short add-on id.
+	 *
+	 * @return int 0 when unknown.
+	 */
+	public static function item_id( string $addon_id ): int {
+		return self::ADDONS[ sanitize_key( $addon_id ) ]['item_id'] ?? 0;
+	}
+
+	/**
+	 * Shop product name of a catalog add-on, used to match licenses to add-ons.
+	 *
+	 * @param string $addon_id Short add-on id.
+	 *
+	 * @return string The add-on id for an unknown add-on.
+	 */
+	public static function product_name( string $addon_id ): string {
+		return self::ADDONS[ $addon_id ]['name'] ?? $addon_id;
+	}
+
+	/**
+	 * Whether an All Access license covers the add-on.
+	 *
+	 * @param string $addon_id Short add-on id.
+	 *
+	 * @return bool
+	 */
+	public static function is_all_access_addon( string $addon_id ): bool {
+		return isset( self::ADDONS[ $addon_id ] ) && ( self::ADDONS[ $addon_id ]['all_access'] ?? true );
+	}
+
+	/**
+	 * The add-on list the license screen works with.
+	 *
+	 * @return array<string, array{name: string, allAccess: bool}> Keyed by short add-on id.
+	 */
+	public static function license_screen_data(): array {
+		$data = [];
+		foreach ( self::ADDONS as $addon_id => $addon ) {
+			$data[ $addon_id ] = [
+				'name'      => self::product_name( $addon_id ),
+				'allAccess' => self::is_all_access_addon( $addon_id ),
+			];
+		}
+
+		return $data;
 	}
 
 	/**
@@ -108,34 +197,7 @@ final class Addons {
 	}
 
 	/**
-	 * Installed plugins indexed by TextDomain.
-	 *
-	 * @param bool $refresh When true, bust the plugins object cache first.
-	 *
-	 * @return array<string, array{file: string, version: string}>
-	 */
-	public static function get_plugins_by_text_domain( bool $refresh = false ): array {
-		$normalized = [];
-
-		foreach ( self::get_plugins( $refresh ) as $plugin_file => $plugin_data ) {
-			$text_domain = $plugin_data['TextDomain'] ?? '';
-			if ( '' === $text_domain ) {
-				continue;
-			}
-
-			$normalized[ $text_domain ] = [
-				'file'    => $plugin_file,
-				'version' => $plugin_data['Version'] ?? '0.0.1',
-			];
-		}
-
-		return $normalized;
-	}
-
-	/**
-	 * Resolve the installed bootstrap path for a catalog add-on.
-	 *
-	 * Falls back to TextDomain and plugin folder matching when the canonical path differs.
+	 * Resolve the installed bootstrap path for a catalog add-on — falls back to TextDomain and plugin folder matching when the canonical path differs.
 	 *
 	 * @param string $addon_id Short add-on id.
 	 *
@@ -217,7 +279,7 @@ final class Addons {
 	 * @return string
 	 */
 	private static function text_domain( string $addon_id ): string {
-		return 'slider-ads' === $addon_id ? 'slider-ads' : 'advanced-ads-' . $addon_id;
+		return self::ADDONS[ $addon_id ]['text_domain'] ?? 'advanced-ads-' . $addon_id;
 	}
 
 	/**
@@ -227,8 +289,8 @@ final class Addons {
 	 *
 	 * @return string|null Short add-on id when recognized, otherwise null.
 	 */
-	private static function addon_id_for_text_domain( string $text_domain ): ?string {
-		foreach ( self::PLUGIN_FILES as $addon_id => $file ) {
+	public static function addon_id_for_text_domain( string $text_domain ): ?string {
+		foreach ( array_keys( self::ADDONS ) as $addon_id ) {
 			if ( self::text_domain( $addon_id ) === $text_domain ) {
 				return $addon_id;
 			}

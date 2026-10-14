@@ -21,25 +21,6 @@ if ( ! defined( 'NOTICE_TYPES' ) ) {
 	);
 }
 
-// These add-on names correspond to the names in the class of constants from ADDONS_NON_COMPATIBLE_VERSIONS.
-$manual_addons = [
-	'advanced-ads-page-peel'        => [
-		'title' => 'Advanced Ads Page Peel',
-		'zip'   => esc_url( 'https://wpadvancedads.com/wp-content/uploads/advanced-ads-page-peel.zip' ),
-		'link'  => esc_url( 'https://wpadvancedads.com/manual/how-to-install-an-add-on/?utm_source=advanced-ads&utm_medium=link&utm_campaign=notice-update-pagepeel-a220' ),
-	],
-	'advanced-ads-browser-language' => [
-		'title' => 'Advanced Ads Browser Language Visitor Condition',
-		'zip'   => esc_url( 'https://wpadvancedads.com/wp-content/uploads/advanced-ads-browser-language.zip' ),
-		'link'  => esc_url( 'https://wpadvancedads.com/manual/how-to-install-an-add-on/?utm_source=advanced-ads&utm_medium=link&utm_campaign=notice-update-browserlang-a220' ),
-	],
-	'slider-ads'                    => [
-		'title' => 'Advanced Ads Ad Slider',
-		'zip'   => esc_url( 'https://wpadvancedads.com/wp-content/uploads/advanced-ads-slider.zip' ),
-		'link'  => esc_url( 'https://wpadvancedads.com/manual/how-to-install-an-add-on/?utm_source=advanced-ads&utm_medium=link&utm_campaign=notice-update-adslider-a220' ),
-	],
-];
-
 $advanced_ads_admin_notices = [
 	// email tutorial.
 	'nl_first_steps'  => [
@@ -65,8 +46,8 @@ $advanced_ads_admin_notices = [
 	'license_invalid' => [
 		'type' => NOTICE_TYPES['error'],
 		'text' => __( 'One or more license keys for <strong>Advanced Ads add-ons are invalid or missing</strong>.', 'advanced-ads' ) . ' '
-				  /* translators: %s is a target URL. */
-				  . sprintf( __( 'Please add valid license keys <a href="%s">here</a>.', 'advanced-ads' ), License_Utils::admin_screen_url() ),
+		/* translators: %s is a target URL. */
+		. sprintf( __( 'Please <a href="%s">add valid license keys</a>.', 'advanced-ads' ), License_Utils::admin_screen_url() ),
 	],
 	// please review.
 	'review'          => [
@@ -80,8 +61,8 @@ $advanced_ads_admin_notices = [
 					/* translators: this belongs to our message asking the user for a review. You can find a nice equivalent in your own language. */
 					__( 'When you give 5-stars, an actual person does a little happy dance!', 'advanced-ads' ) . '</p>'
 					. '<p>'
-					. '<span class="dashicons dashicons-external"></span>&nbsp;<strong><a href="https://wordpress.org/support/plugin/advanced-ads/reviews/?rate=5#new-post" target=_"blank">' . __( 'Sure, I appreciate your work', 'advanced-ads' ) . '</a></strong>'
-					. ' &nbsp;&nbsp;<span class="dashicons dashicons-sos"></span>&nbsp;<a href="https://wpadvancedads.com/support/?utm_source=advanced-ads&utm_medium=link&utm_campaign=notice-review" target=_"blank">' . __( 'Yes, but help me first to solve a problem, please', 'advanced-ads' ) . '</a>'
+					. '<span class="dashicons dashicons-external"></span>&nbsp;<strong><a href="https://wordpress.org/support/plugin/advanced-ads/reviews/?rate=5#new-post" target="_blank">' . __( 'Sure, I appreciate your work', 'advanced-ads' ) . '</a></strong>'
+					. ' &nbsp;&nbsp;<span class="dashicons dashicons-sos"></span>&nbsp;<a href="https://wpadvancedads.com/support/?utm_source=advanced-ads&utm_medium=link&utm_campaign=notice-review" target="_blank">' . __( 'Yes, but help me first to solve a problem, please', 'advanced-ads' ) . '</a>'
 					. '</p></div>',
 		'global' => false,
 	],
@@ -113,55 +94,13 @@ $advanced_ads_admin_notices = [
 		'type' => NOTICE_TYPES['info'],
 		'text' => sprintf(
 			wp_kses_post(
-			/* translators: %s: URL to the Advanced Ads onboarding wizard. */
+			/* translators: %s: URL to the Advanced Ads setup wizard. */
 				__( 'Quickly set up Advanced Ads and monetize your website with just a few clicks. <a class="button button-primary" href="%s">Launch the wizard</a>', 'advanced-ads' )
 			),
-			admin_url( 'admin.php?page=advanced-ads-onboarding' )
+			admin_url( 'admin.php?page=advanced-ads-app&path=/wizard' )
 		),
 	],
 ];
-
-// Add specific notifications for plugins that are incompatible with Advanced Ads 2.0.
-foreach ( \AdvancedAds\Constants::ADDONS_NON_COMPATIBLE_VERSIONS as $version => $addon ) {
-	if ( isset( $manual_addons[ $addon ] ) ) {
-		$advanced_ads_admin_notices[ $addon . '_upgrade' ] = [
-			'type'   => NOTICE_TYPES['info'],
-			'text'   => sprintf(
-				wp_kses(
-				/* translators: %1$s: URL to the plugin file, %2$s: URL to the guide */
-					__( 'Your automatically deactivated version of <strong>%1$s needs to be updated manually</strong>. Please <a href="%2$s" target="_blank">download the newest plugin file</a> and follow our guide on <a href="%3$s" target="_blank">How to install an add-on</a>.', 'advanced-ads' ),
-					[
-						'strong' => [],
-						'a'      => [
-							'href'   => [],
-							'target' => [],
-						],
-					]
-				),
-				$manual_addons[ $addon ]['title'],
-				$manual_addons[ $addon ]['zip'],
-				$manual_addons[ $addon ]['link']
-			),
-			'global' => true,
-		];
-	} else {
-		$advanced_ads_admin_notices[ $addon . '_upgrade' ] = [
-			'type'   => NOTICE_TYPES['info'],
-			'text'   => sprintf(
-				wp_kses(
-				/* translators: %1$s: URL to the plugin file, %2$s: URL to the guide */
-					__( 'Your version of <strong>%1$s</strong> is incompatible with <strong>Advanced Ads %2$s</strong> and has been deactivated. Please update the plugin to the latest version.', 'advanced-ads' ),
-					[
-						'strong' => [],
-					]
-				),
-				ucwords( str_replace( '-', ' ', $addon ) ),
-				ADVADS_VERSION
-			),
-			'global' => true,
-		];
-	}
-}
 
 // List of plugins that handle ads and may conflict with Advanced Ads.
 $plugin_conflicts = [
@@ -177,15 +116,15 @@ $plugin_conflicts = [
 	'insert-post-ads/insert-post-ads.php'               => 'Insert Post Ads',
 
 	// AdSense specific plugins.
-	'adsense-plugin/adsense-plugin.php'       => 'AdSense Plugin',
-	'google-adsense/google-adsense.php'       => 'Google AdSense',
-	'adsense-made-easy/adsense-made-easy.php' => 'AdSense Made Easy',
+	'adsense-plugin/adsense-plugin.php'                 => 'AdSense Plugin',
+	'google-adsense/google-adsense.php'                 => 'Google AdSense',
+	'adsense-made-easy/adsense-made-easy.php'           => 'AdSense Made Easy',
 
 	// Auto ads / monetization plugins.
-	'monetag/monetag.php'                   => 'Monetag',
-	'media-net-ads/media-net-ads.php'       => 'Media.net Ads',
-	'ezoic/ezoic.php'                       => 'Ezoic',
-	'mediavine-control-panel/mediavine.php' => 'Mediavine',
+	'monetag/monetag.php'                               => 'Monetag',
+	'media-net-ads/media-net-ads.php'                   => 'Media.net Ads',
+	'ezoic/ezoic.php'                                   => 'Ezoic',
+	'mediavine-control-panel/mediavine.php'             => 'Mediavine',
 ];
 
 

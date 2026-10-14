@@ -79,7 +79,7 @@ class Placements extends Screen {
 
 		// Localize texts.
 		$i18n = [
-			'placements'               => [
+			'placements' => [
 				'created'   => __( 'New placement created', 'advanced-ads' ),
 				'updated'   => __( 'Placement updated', 'advanced-ads' ),
 				'closeSave' => __( 'Close and save', 'advanced-ads' ),
@@ -96,7 +96,8 @@ class Placements extends Screen {
 	 * @return void
 	 */
 	public function redirect_to_post_type(): void {
-		wp_safe_redirect( 'edit.php?post_type=' . Constants::POST_TYPE_PLACEMENT );
+		wp_safe_redirect( admin_url( 'edit.php?post_type=' . Constants::POST_TYPE_PLACEMENT ) );
+		exit;
 	}
 
 	/**
@@ -145,8 +146,8 @@ class Placements extends Screen {
 	 *
 	 * @return string
 	 */
-	private function get_placement_picker_url() {
-		$location = false;
+	private function get_placement_picker_url(): string {
+		$location = null;
 
 		if ( get_option( 'show_on_front' ) === 'posts' ) {
 			$recent_posts = wp_get_recent_posts(
@@ -163,6 +164,6 @@ class Placements extends Screen {
 			}
 		}
 
-		return $location ?? home_url();
+		return $location ? $location : home_url();
 	}
 }

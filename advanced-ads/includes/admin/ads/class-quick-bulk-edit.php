@@ -25,10 +25,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class Quick_Bulk_Edit {
 	/**
-	 * Whether bulk edit already ran this request.
-	 *
-	 * Core bulk edit fires save_post once per selected post; without this guard
-	 * every firing would re-save the entire selection (N²).
+	 * Whether bulk edit already ran this request — core bulk edit fires save_post once per selected post; without this guard every firing would re-save the entire selection (N²).
 	 *
 	 * @var bool
 	 */
@@ -55,6 +52,12 @@ class Quick_Bulk_Edit {
 	 * @return void
 	 */
 	public function print_ad_json( $ad ): void {
+		if (
+			( $ad->is_type( 'adsense' ) && ! wp_advads_is_module_active( 'adsense' ) )
+			|| ( $ad->is_type( 'gam' ) && ! defined( 'AAGAM_VERSION' ) )
+		) {
+			return;
+		}
 		?>
 		<script type="text/javascript">
 			var ad_json_<?php echo esc_attr( $ad->get_id() ); ?> = <?php echo wp_json_encode( $this->get_json_data( $ad ) ); ?>;
@@ -244,6 +247,11 @@ class Quick_Bulk_Edit {
 		$hours   = absint( 'get' === $method ? Params::get( 'hour' ) : Params::post( 'hour' ) );
 		$minutes = absint( 'get' === $method ? Params::get( 'minute' ) : Params::post( 'minute' ) );
 
+		// An invalid value means the request didn't actually send a real date, return to prevent 0000 corruption.
+		if ( $day < 1 || $month < 1 || $year < 1970 ) {
+			return 0;
+		}
+
 		try {
 			$local_dt = new DateTimeImmutable( 'now', WordPress::get_timezone() );
 			$local_dt = $local_dt->setDate( $year, $month, $day )->setTime( $hours, $minutes );
@@ -317,7 +325,7 @@ class Quick_Bulk_Edit {
 
 		$current_year = (int) current_datetime()->format( 'Y' );
 		$expiry_year  = (int) $initial_date->format( 'Y' );
-		$start_year   = min( $current_year, $expiry_year );
+		$start_year   = min( $current_year - 20, $expiry_year );
 		$end_year     = max( $current_year + 10, $expiry_year );
 
 		?>

@@ -1,5 +1,5 @@
-export default function reducers(state, action) {
-	switch (action.type) {
+export default function reducers( state, action ) {
+	switch ( action.type ) {
 		case 'SET_COUNT':
 			return {
 				...state,
@@ -20,7 +20,7 @@ export default function reducers(state, action) {
 				...state,
 				settings: {
 					...state.settings,
-					[action.name]: action.value,
+					[ action.name ]: action.value,
 				},
 			};
 		case 'SET_METHOD':

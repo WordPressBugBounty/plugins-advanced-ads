@@ -9,7 +9,7 @@
 
 namespace AdvancedAds\Utilities;
 
-use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Admin\Upsell;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Utilities\Str;
@@ -263,8 +263,7 @@ class WordPress {
 	}
 
 	/**
-	 * Check if the current user is a bot prepopulating the cache
-	 * Ads should be loaded for the bot, because they should show up on the cached site
+	 * Check if the current user is a bot prepopulating the cache — ads should be loaded for the bot, because they should show up on the cached site.
 	 *
 	 * @return bool
 	 */
@@ -279,7 +278,7 @@ class WordPress {
 			}
 
 			// WP Super Cache.
-			$wp_useragent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ) );
+			$wp_useragent = apply_filters( 'http_headers_useragent', 'WordPress/' . get_bloginfo( 'version' ) . '; ' . get_bloginfo( 'url' ), '' );
 			if ( $current === $wp_useragent ) {
 				return true;
 			}
@@ -298,7 +297,7 @@ class WordPress {
 	 *
 	 * @link https://patchstack.com/articles/unauthenticated-php-object-injection-in-flatsome-theme-3-17-5/
 	 *
-	 * @param string $data Data that might be unserialized.
+	 * @param mixed $data Data that might be unserialized.
 	 *
 	 * @return mixed Unserialized data can be any type.
 	 */
@@ -316,16 +315,20 @@ class WordPress {
 	 * @param   string $title  label of the option.
 	 * @param   string $content    content of the option or full path to template file or custom flag to show a pre-defined information.
 	 * @param   string $description  description of the option.
+	 *
+	 * @return void
 	 */
 	public static function render_option( $id, $title, $content, $description = '' ) {
 		/**
-		 * This filter allows to extend the class dynamically by add-ons
-		 * this would allow add-ons to dynamically hide/show only attributes belonging to them, practically not used now
+		 * This filter allows to extend the class dynamically by add-ons — this would allow add-ons to dynamically hide/show only attributes belonging to them, practically not used now.
 		 */
 		$class = apply_filters( 'advanced-ads-option-class', $id );
+
+		// The title names the controls of the row for screen readers. The same row can appear several times on a page, so the id is unique.
+		$title_id = wp_unique_id( 'advads-option-title-' );
 		?>
-		<div class="advads-option advads-option-<?php echo esc_attr( $class ); ?>">
-			<span><?php echo esc_html( $title ); ?></span>
+		<div class="advads-option advads-option-<?php echo esc_attr( $class ); ?>" role="group" aria-labelledby="<?php echo esc_attr( $title_id ); ?>">
+			<span id="<?php echo esc_attr( $title_id ); ?>"><?php echo esc_html( $title ); ?></span>
 			<div>
 			<?php
 			if ( 'is_pro_pitch' === $content ) { // phpcs:ignore
@@ -345,34 +348,12 @@ class WordPress {
 
 			// place an upgrade link below the description if there is one.
 			if ( 'is_pro_pitch' === $content ) {
-				Upgrades::pro_feature_link( 'upgrade-pro-' . $id );
+				Upsell::pro_feature_link( 'upgrade-pro-' . $id );
 			}
 			?>
 			</div>
 		</div>
 		<?php
-	}
-
-	/**
-	 * Show a note about a deprecated feature and link to the appropriate page in our manual
-	 *
-	 * @param string $feature simple string to indicate the deprecated feature. Will be added to the UTM campaign attribute.
-	 */
-	public static function show_deprecated_notice( $feature = '' ) {
-		$url = 'https://wpadvancedads.com/manual/deprecated-features/';
-
-		if ( '' !== $feature ) {
-			$url .= '#utm_source=advanced-ads&utm_medium=link&utm_campaign=deprecated-' . sanitize_title_for_query( $feature );
-		}
-
-		echo '<br/><br/><span class="advads-notice-inline advads-error">';
-		printf(
-			/* translators: %1$s is the opening link tag, %2$s is closing link tag */
-			esc_html__( 'This feature is deprecated. Please find the removal schedule %1$shere%2$s', 'advanced-ads' ),
-			'<a href="' . esc_url( $url ) . '" target="_blank">',
-			'</a>'
-		);
-		echo '</span>';
 	}
 
 	/**
@@ -397,5 +378,38 @@ class WordPress {
 		);
 
 		include ADVADS_ABSPATH . 'views/admin/manual-link.php';
+	}
+
+	/**
+	 * Get the content of a file
+	 *
+	 * @param string $file File path.
+	 *
+	 * @return string File content.
+	 */
+	public static function get_file_content( $file ): string {
+		if ( file_exists( $file ) ) {
+			ob_start();
+			include $file;
+			return ob_get_clean();
+		}
+
+		return '';
+	}
+
+	/**
+	 * Instantiates the WordPress filesystem for use
+	 *
+	 * @return \WP_Filesystem_Base|null
+	 */
+	public static function get_filesystem(): ?\WP_Filesystem_Base {
+		global $wp_filesystem;
+
+		if ( empty( $wp_filesystem ) ) {
+			require_once ABSPATH . '/wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		return $wp_filesystem instanceof \WP_Filesystem_Base ? $wp_filesystem : null;
 	}
 }

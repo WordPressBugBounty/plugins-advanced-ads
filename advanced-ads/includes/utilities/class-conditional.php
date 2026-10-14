@@ -57,13 +57,15 @@ class Conditional {
 	 * @return bool
 	 */
 	public static function has_cache_plugins(): bool {
-		return ( defined( 'WP_CACHE' ) && WP_CACHE ) // General cache constant.
-			|| defined( 'W3TC' ) // W3 Total Cache.
-			|| function_exists( 'wp_super_cache_text_domain' ) // WP Super Cache.
-			|| defined( 'WP_ROCKET_SLUG' ) // WP Rocket.
-			|| defined( 'WPFC_WP_CONTENT_DIR' ) // WP Fastest Cache.
-			|| class_exists( 'HyperCache', false ) // Hyper Cache.
-			|| defined( 'CE_CACHE_DIR' ); // Cache Enabler.
+		$is_wp_cache         = defined( 'WP_CACHE' ) && WP_CACHE;
+		$is_w3_total_cache   = defined( 'W3TC' );
+		$is_wp_super_cache   = function_exists( 'wp_super_cache_text_domain' );
+		$is_wp_rocket        = defined( 'WP_ROCKET_SLUG' );
+		$is_wp_fastest_cache = defined( 'WPFC_WP_CONTENT_DIR' );
+		$is_hyper_cache      = class_exists( 'HyperCache', false );
+		$is_cache_enabler    = defined( 'CE_CACHE_DIR' );
+
+		return $is_wp_cache || $is_w3_total_cache || $is_wp_super_cache || $is_wp_rocket || $is_wp_fastest_cache || $is_hyper_cache || $is_cache_enabler;
 	}
 
 	/**
@@ -170,9 +172,7 @@ class Conditional {
 	}
 
 	/**
-	 * Returns true if the request is a non-legacy REST API request.
-	 *
-	 * TODO: replace this function once core WP function is available: https://core.trac.wordpress.org/ticket/42061.
+	 * Returns true if the request is a non-legacy REST API request. TODO: replace this function once core WP function is available: https://core.trac.wordpress.org/ticket/42061.
 	 *
 	 * @return bool
 	 */

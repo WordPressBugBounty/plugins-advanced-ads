@@ -6,6 +6,7 @@
  */
 
 use AdvancedAds\Constants;
+use AdvancedAds\License\License;
 use AdvancedAds\Utilities\Conditional;
 
 $recent_ads = wp_advads_get_ads_dropdown();
@@ -19,7 +20,7 @@ $recent_ads = wp_advads_get_ads_dropdown();
 		</p>
 
 		<p>
-			<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=advanced-ads-settings#top#adsense' ) ); ?>">
+			<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=adsense' ) ); ?>">
 				<?php esc_html_e( 'Connect to AdSense', 'advanced-ads' ); ?>
 			</a>
 		</p>
@@ -49,7 +50,7 @@ $recent_ads = wp_advads_get_ads_dropdown();
 
 <?php
 // Footer.
-$all_access = Advanced_Ads_Admin_Licenses::get_instance()->get_probably_all_access();
+$all_access = License::is_probably_all_access();
 if ( ! $all_access ) :
 	?>
 	<footer>

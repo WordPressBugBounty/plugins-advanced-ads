@@ -49,7 +49,7 @@ function advads_get_existing_placement_posts( $slugs ): array {
  *
  * @param array<string, mixed> $data Placement data array.
  *
- * @return int|WP_Error
+ * @return int
  */
 function advads_save_new_placement( $data ) {
 	// Normalize options.

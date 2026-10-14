@@ -1,13 +1,13 @@
-export function adminUrl(url) {
+export function adminUrl( url ) {
 	const {
-		endpoints: { adminUrl },
+		endpoints: { adminUrl: baseAdminUrl },
 	} = advancedAds;
-	return adminUrl + url;
+	return baseAdminUrl + url;
 }
 
-export function assetsUrl(file) {
+export function assetsUrl( file ) {
 	const {
-		endpoints: { assetsUrl },
+		endpoints: { assetsUrl: baseAssetsUrl },
 	} = advancedAds;
-	return assetsUrl + file;
+	return baseAssetsUrl + file;
 }

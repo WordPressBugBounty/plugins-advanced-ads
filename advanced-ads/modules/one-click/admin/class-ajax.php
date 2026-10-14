@@ -252,7 +252,7 @@ class Ajax implements Integration_Interface {
 		if ( 'error' === $config['status'] ) {
 			return new WP_Error(
 				'domain_not_found',
-				'Connection with PubGuru & MonetizeMore was unsuccessful. Please <a href="https://www.monetizemore.com/contact/">click here</a> to contact MonetizeMore Support or email us at <a href="mailto:support@monetizemore.com">support@monetizemore.com</a>',
+				'Connection with PubGuru & MonetizeMore was unsuccessful. Please <a href="https://www.monetizemore.com/contact/">contact MonetizeMore Support</a> or email us at <a href="mailto:support@monetizemore.com">support@monetizemore.com</a>',
 				201
 			);
 		}

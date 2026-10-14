@@ -209,7 +209,7 @@ class Groups implements Routes_Interface {
 	 * @return array<string, mixed>
 	 */
 	private function get_payload( $request ): array {
-		$body = json_decode( $request->get_body(), JSON_UNESCAPED_UNICODE );
+		$body = json_decode( $request->get_body(), true );
 		parse_str( $body['fields'], $payload );
 
 		return $payload;

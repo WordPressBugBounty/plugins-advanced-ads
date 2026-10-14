@@ -8,27 +8,23 @@
  *
  *  Content:
  *   1. Template
- *   2. Repositories functions
- *   3. CRUD functions
- *   4. Conditional functions
- *   5. Getter functions
- *   6. Finder functions
+ *   2. CRUD functions
+ *   3. Conditional functions
+ *   4. Getter functions
+ *   5. Finder functions
  */
 
 use AdvancedAds\Abstracts\Group;
-use AdvancedAds\Groups\Group_Types;
-use AdvancedAds\Groups\Group_Factory;
 use AdvancedAds\Interfaces\Group_Type;
-use AdvancedAds\Groups\Group_Repository;
 
 /** 1. Template --------------- */
 
 /**
  * Get the group object.
  *
- * @param Group|WP_Term|int|bool $group_id Group instance, term instance or numeric.
- * @param string                 $new_type Change type of group.
- * @param array<string, mixed>   $args     Additional arguments.
+ * @param Group|WP_Term|int|string|bool $group_id Group instance, term instance or numeric.
+ * @param string                        $new_type Change type of group.
+ * @param array<string, mixed>          $args     Additional arguments.
  *
  * @return string|mixed The group output or whatever entity or string that is overriding the return value.
  */
@@ -77,42 +73,7 @@ function the_ad_group( $id = 0, $args = [] ): void {
 	echo get_the_group( $id, '', $args ); // phpcs:ignore
 }
 
-/* 2. Repositories ------------------- */
-
-/**
- * Get Group Factory
- *
- * @deprecated 2.0.24 Use wp_advads()->groups->factory instead.
- *
- * @return Group_Factory
- */
-function wp_advads_get_group_factory(): Group_Factory {
-	return wp_advads()->groups->factory;
-}
-
-/**
- * Get Group Repository
- *
- * @deprecated 2.0.24 Use wp_advads()->groups->repository instead.
- *
- * @return Group_Repository
- */
-function wp_advads_get_group_repository(): Group_Repository {
-	return wp_advads()->groups->repository;
-}
-
-/**
- * Get Group Types
- *
- * @deprecated 2.0.24 Use wp_advads()->groups->types instead.
- *
- * @return Group_Types
- */
-function wp_advads_get_group_type_manager(): Group_Types {
-	return wp_advads()->groups->types;
-}
-
-/* 3. CRUD ------------------- */
+/* 2. CRUD ------------------- */
 
 /**
  * Create an empty group object
@@ -130,6 +91,8 @@ function wp_advads_create_new_group( $type = 'default' ) {
  *
  * @param int|Group $group Group object or Id.
  *
+ * @param-out Group|bool $group The group object, or false when no group has that id.
+ *
  * @return void
  */
 function wp_advads_delete_group( &$group ): void {
@@ -137,7 +100,9 @@ function wp_advads_delete_group( &$group ): void {
 		$group = wp_advads_get_group( $group );
 	}
 
-	$group->delete();
+	if ( $group ) {
+		$group->delete();
+	}
 }
 
 /**
@@ -151,18 +116,7 @@ function wp_advads_create_group_type( $type ): void {
 	wp_advads()->groups->types->create_missing( $type );
 }
 
-/**
- * Register custom group type.
- *
- * @param string $classname Type class name.
- *
- * @return void
- */
-function wp_advads_register_group_type( $classname ): void {
-	wp_advads()->groups->types->register_type( $classname );
-}
-
-/* 4. Conditional ------------------- */
+/* 3. Conditional ------------------- */
 
 /**
  * Has group type.
@@ -186,18 +140,7 @@ function is_a_group( $thing ): bool {
 	return $thing instanceof Group;
 }
 
-/* 5. Getter ------------------- */
-
-/**
- * Get all groups object.
- *
- * @deprecated 2.0.24 Use wp_advads_get_group_summaries() or wp_advads_get_groups_by_ids().
- *
- * @return Group[]
- */
-function wp_advads_get_all_groups(): array {
-	return wp_advads()->groups->repository->get_all_groups();
-}
+/* 4. Getter ------------------- */
 
 /**
  * Get lightweight group summaries for admin list UIs.
@@ -211,7 +154,7 @@ function wp_advads_get_group_summaries(): array {
 /**
  * Get all group as dropdown.
  *
- * @return array<string, mixed>
+ * @return array<int, string>
  */
 function wp_advads_get_groups_dropdown() {
 	return wp_advads()->groups->repository->get_groups_dropdown();
@@ -237,7 +180,7 @@ function wp_advads_get_group_types() {
 	return wp_advads()->groups->types->get_types();
 }
 
-/* 6. Finder ------------------- */
+/* 5. Finder ------------------- */
 
 /**
  * Get the group object.

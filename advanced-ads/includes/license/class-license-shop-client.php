@@ -14,9 +14,20 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Shop REST calls and local/development HTTP bypass for `.test` hosts.
+ * Shop REST calls.
  */
 final class License_Shop_Client {
+
+	/**
+	 * Absolute shop origin (no trailing slash) — `AA_SHOP_URL` in wp-config.php points it at another shop for development.
+	 *
+	 * @return string
+	 */
+	public static function shop_base_url(): string {
+		$base = defined( 'AA_SHOP_URL' ) ? (string) AA_SHOP_URL : 'https://wpadvancedads.com';
+
+		return untrailingslashit( $base );
+	}
 
 	/**
 	 * Shop REST license endpoint URL for an action (activate|deactivate|validate|exchange).
@@ -25,111 +36,25 @@ final class License_Shop_Client {
 	 * @return string
 	 */
 	public static function endpoint( string $action ): string {
-		$base = defined( 'AA_SHOP_URL' ) ? AA_SHOP_URL : 'https://wpadvancedads.com';
-
-		return untrailingslashit( $base ) . '/wp-json/advanced-ads/v2/license/' . ltrim( $action, '/' );
+		return self::shop_base_url() . '/wp-json/advanced-ads/v2/license/' . ltrim( $action, '/' );
 	}
 
 	/**
-	 * Whether the configured shop/API host is a local or development environment.
-	 *
-	 * Laragon, Valet, and similar setups use `.test` / `.local` hosts that resolve to
-	 * 127.0.0.1. WordPress then rejects outbound requests via {@see wp_http_validate_url()}
-	 * unless the host is treated as external.
-	 *
-	 * @return bool
-	 */
-	public static function uses_local_development_host(): bool {
-		if ( defined( 'AA_SHOP_URL' ) && ! License_Utils::should_verify_ssl_for_url( AA_SHOP_URL ) ) {
-			return true;
-		}
-
-		if ( ! License_Utils::should_verify_ssl_for_url( site_url() ) ) {
-			return true;
-		}
-
-		return ! License_Utils::should_verify_ssl_for_url( Constants::API_ENDPOINT );
-	}
-
-	/**
-	 * Mark the configured shop host as external for local/development HTTP requests.
-	 *
-	 * @param bool   $is_external Whether WordPress considers the host external.
-	 * @param string $host        Request host.
-	 * @param string $url        Request URL. Required by the WordPress filter signature.
-	 * @return bool
-	 */
-	public static function allow_local_development_http_request( $is_external, string $host, string $url ) {
-		$url = $url;
-		foreach ( self::get_configured_api_hosts() as $shop_host ) {
-			if ( $host === $shop_host ) {
-				return true;
-			}
-		}
-
-		if ( self::uses_local_development_host() && ! License_Utils::should_verify_ssl_for_url( 'https://' . $host ) ) {
-			return true;
-		}
-
-		return $is_external;
-	}
-
-	/**
-	 * Shop hosts from {@see AA_SHOP_URL} and {@see Constants::API_ENDPOINT}.
+	 * Shop hosts from {@see self::shop_base_url()} and {@see Constants::API_ENDPOINT}.
 	 *
 	 * @return string[]
 	 */
 	public static function get_configured_api_hosts(): array {
-		$hosts = [];
-
-		if ( defined( 'AA_SHOP_URL' ) ) {
-			$shop_host = wp_parse_url( AA_SHOP_URL, PHP_URL_HOST );
-			if ( is_string( $shop_host ) && '' !== $shop_host ) {
-				$hosts[] = $shop_host;
-			}
-		}
-
-		$api_host = wp_parse_url( Constants::API_ENDPOINT, PHP_URL_HOST );
-		if ( is_string( $api_host ) && '' !== $api_host ) {
-			$hosts[] = $api_host;
-		}
-
-		return array_values( array_unique( $hosts ) );
-	}
-
-	/**
-	 * Whether outbound HTTPS to the shop should verify certificates.
-	 *
-	 * @return bool
-	 */
-	public static function should_verify_ssl(): bool {
-		if ( ! defined( 'AA_SHOP_URL' ) ) {
-			return true;
-		}
-
-		return License_Utils::should_verify_ssl_for_url( AA_SHOP_URL );
-	}
-
-	/**
-	 * Temporarily allow shop HTTP during a single license API or download request.
-	 *
-	 * @return void
-	 */
-	public static function add_local_development_http_filter(): void {
-		if ( ! self::uses_local_development_host() ) {
-			return;
-		}
-
-		add_filter( 'http_request_host_is_external', [ self::class, 'allow_local_development_http_request' ], 10, 3 );
-	}
-
-	/**
-	 * Remove the temporary local/development shop HTTP bypass.
-	 *
-	 * @return void
-	 */
-	public static function remove_local_development_http_filter(): void {
-		remove_filter( 'http_request_host_is_external', [ self::class, 'allow_local_development_http_request' ], 10 );
+		return array_values(
+			array_unique(
+				array_filter(
+					[
+						wp_parse_url( self::shop_base_url(), PHP_URL_HOST ),
+						wp_parse_url( Constants::API_ENDPOINT, PHP_URL_HOST ),
+					]
+				)
+			)
+		);
 	}
 
 	/**
@@ -139,19 +64,13 @@ final class License_Shop_Client {
 	 * @return array<string, mixed>
 	 */
 	public static function http_request_args( array $args = [] ): array {
-		$merged = array_merge(
+		return array_merge(
 			[
 				'timeout' => 15,
 				'headers' => [ 'Content-Type' => 'application/json; charset=utf-8' ],
 			],
 			$args
 		);
-
-		if ( ! self::should_verify_ssl() ) {
-			$merged['sslverify'] = false;
-		}
-
-		return $merged;
 	}
 
 	/**
@@ -255,12 +174,6 @@ final class License_Shop_Client {
 		}
 
 		$rows = isset( $data[0] ) ? $data : ( isset( $data['licenses'] ) && is_array( $data['licenses'] ) ? $data['licenses'] : $data );
-		if ( ! is_array( $rows ) ) {
-			return new WP_Error(
-				'advanced_ads_license_validate_parse',
-				__( 'Invalid license validate response from the shop.', 'advanced-ads' )
-			);
-		}
 
 		foreach ( $rows as $fresh ) {
 			if ( ! is_array( $fresh ) ) {
@@ -298,27 +211,26 @@ final class License_Shop_Client {
 	}
 
 	/**
-	 * POST JSON to a shop URL with local-dev HTTP bypass.
+	 * POST JSON to a shop URL.
 	 *
-	 * @param string               $url     Request URL.
-	 * @param array<string, mixed> $payload Request body.
+	 * @param string                $url            Request URL.
+	 * @param array<string, mixed>  $payload        Request body.
+	 * @param array<string, string> $extra_headers  Optional headers merged onto Content-Type.
 	 * @return array<string, mixed>|\WP_Error wp_remote_post result.
 	 */
-	public static function post_json( string $url, array $payload ) {
-		self::add_local_development_http_filter();
-
-		$response = wp_remote_post(
+	public static function post_json( string $url, array $payload, array $extra_headers = [] ) {
+		return wp_remote_post(
 			$url,
 			self::http_request_args(
 				[
-					'body' => wp_json_encode( $payload ),
+					'headers' => array_merge(
+						[ 'Content-Type' => 'application/json; charset=utf-8' ],
+						$extra_headers
+					),
+					'body'    => wp_json_encode( $payload ),
 				]
 			)
 		);
-
-		self::remove_local_development_http_filter();
-
-		return $response;
 	}
 
 	/**

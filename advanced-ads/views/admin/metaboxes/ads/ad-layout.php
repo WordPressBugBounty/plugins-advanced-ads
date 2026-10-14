@@ -9,8 +9,9 @@
  * @var Ad $ad Ad instance.
  */
 
-use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Admin\Upsell;
 use AdvancedAds\Options;
+use AdvancedAds\Abstracts\Ad;
 
 ?>
 <div class="advads-ad-positioning">
@@ -60,7 +61,7 @@ use AdvancedAds\Options;
 				printf(
 					/* Translators: %s is the URL to the settings page. */
 					esc_html__( 'Enable the Ad Label %1$s in the settings%2$s.', 'advanced-ads' ),
-					'<a href="' . esc_url( admin_url( 'admin.php?page=advanced-ads-settings' ) ) . '" target="_blank">',
+					'<a href="' . esc_url( admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=general' ) ) . '" target="_blank">',
 					'</a>'
 				);
 				?>
@@ -87,7 +88,7 @@ use AdvancedAds\Options;
 			<?php esc_html_e( 'Display the ad only once per page', 'advanced-ads' ); ?>
 			<p>
 				<?php
-				Upgrades::pro_feature_link( 'upgrade-pro-display-only-once' );
+				Upsell::pro_feature_link( 'upgrade-pro-display-only-once' );
 				?>
 				</p>
 		</div><hr class="advads-hide-in-wizard"/>
@@ -98,7 +99,7 @@ use AdvancedAds\Options;
 			?>
 			<p>
 			<?php
-			Upgrades::pro_feature_link( 'upgrade-pro-custom-code' );
+			Upsell::pro_feature_link( 'upgrade-pro-custom-code' );
 			?>
 				</p>		</div>
 	<?php endif; ?>

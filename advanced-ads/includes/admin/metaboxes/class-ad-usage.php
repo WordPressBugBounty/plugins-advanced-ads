@@ -30,12 +30,16 @@ class Ad_Usage {
 	/**
 	 * Hook into WordPress.
 	 *
-	 * @param Metabox_Ad $manager Manager instance.
+	 * @param \AdvancedAds\Admin\Metabox_Ad $manager Manager instance.
 	 *
 	 * @return void
 	 */
 	public function register( $manager ): void {
 		global $post;
+
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
 
 		if ( 'edit' === $post->filter ) {
 			add_meta_box(
@@ -52,9 +56,11 @@ class Ad_Usage {
 	/**
 	 * Get metaboxe view file
 	 *
+	 * @param mixed $ad Ad instance.
+	 *
 	 * @return string
 	 */
-	public function get_view(): string {
+	public function get_view( $ad = null ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		return ADVADS_ABSPATH . 'views/admin/metaboxes/ads/ad-usage.php';
 	}
 

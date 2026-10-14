@@ -9,6 +9,8 @@
  * @var Placement $placement Placement instance.
  */
 
+use AdvancedAds\Abstracts\Placement;
+
 $type_object = $placement->get_type_object();
 ?>
 <div class="advads-table-name">

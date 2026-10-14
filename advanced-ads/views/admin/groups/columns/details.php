@@ -9,6 +9,8 @@
  * @var Group $group Group instance.
  */
 
+use AdvancedAds\Abstracts\Group;
+
 ?>
 <ul>
 	<li>

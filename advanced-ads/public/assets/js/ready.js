@@ -1,12 +1,12 @@
 /**
  * Wait for the page to be ready before firing JS.
  *
- * @param {function} callback - A callable function to be executed.
- * @param {string} [requestedState=complete] - document.readyState to wait for. Defaults to 'complete', can be 'interactive'.
+ * @param {Function} callback                  - A callable function to be executed.
+ * @param {string}   [requestedState=complete] - document.readyState to wait for. Defaults to 'complete', can be 'interactive'.
  */
 window.advanced_ads_ready = function ( callback, requestedState ) {
 	requestedState = requestedState || 'complete';
-	var checkState = function ( state ) {
+	const checkState = function ( state ) {
 		return requestedState === 'interactive' ? state !== 'loading' : state === 'complete';
 	};
 

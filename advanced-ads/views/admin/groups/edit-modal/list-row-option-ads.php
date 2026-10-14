@@ -6,9 +6,12 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  *
  * @var list<string> $ad_form_rows HTML to render ad form.
- * @var array<int, string> $this->all_ads Array with ads that can be chosen from for the group.
- * @var Group $group         Group instance.
+ * @var List_Table   $this         List table; its all_ads holds the ads that can be chosen from for the group.
+ * @var Group        $group        Group instance.
  */
+
+use AdvancedAds\Abstracts\Group;
+use AdvancedAds\Admin\Groups\List_Table;
 
 $max_weight = $group->get_max_weight();
 $sorted_ads = $group->get_sorted_ads();
@@ -32,7 +35,7 @@ $group_ads  = $group->get_ads();
 				continue;
 			}
 
-			$ad_url    = add_query_arg(
+			$ad_url = add_query_arg(
 				[
 					'post'   => $ad_id,
 					'action' => 'edit',
@@ -56,7 +59,10 @@ $group_ads  = $group->get_ads();
 			</td>
 			<td>
 				<select class="small-input" name="advads-groups[<?php echo esc_attr( $group->get_id() ); ?>][ads][<?php echo esc_attr( $ad_id ); ?>]">
-				<?php for ( $i = 0; $i <= $max_weight; $i++ ) : ?>
+				<?php
+				$ad_select_max = max( $max_weight, (int) $ad['weight'] );
+				for ( $i = 0; $i <= $ad_select_max; $i++ ) :
+					?>
 					<option<?php selected( $ad['weight'], $i ); ?>><?php echo $i; // phpcs:ignore ?></option>
 				<?php endfor; ?>
 

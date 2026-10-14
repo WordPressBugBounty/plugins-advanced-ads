@@ -14,6 +14,7 @@ use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Modal;
 use WP_Query;
+use AdvancedAds\Abstracts\Placement;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -51,7 +52,7 @@ class List_Table extends Admin_List_Table {
 	public function hooks(): void {
 		parent::hooks();
 
-		add_action( 'views_edit-' . $this->list_table_type, [ $this, 'display_views' ] );
+		add_filter( 'views_edit-' . $this->list_table_type, [ $this, 'display_views' ] );
 
 		// Manage rows and columns.
 		add_filter( 'list_table_primary_column', [ $this, 'set_primary_column' ], 10, 0 );
@@ -185,14 +186,11 @@ class List_Table extends Admin_List_Table {
 		// Sort by type.
 		$order   = Params::get( 'order', 'asc' );
 		$orderby = Params::get( 'orderby', 'type' );
-		if ( in_array( $orderby, [ 'type' ], true ) ) {
-			$query_vars['order'] = $order;
-
-			if ( 'type' === $orderby ) {
-				$query_vars['meta_key'] = 'type'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				$query_vars['orderby']  = 'meta_value';
-				add_filter( 'posts_orderby', [ $this, 'sort_by_type_order' ], 10, 2 );
-			}
+		if ( 'type' === $orderby ) {
+			$query_vars['order']    = $order;
+			$query_vars['meta_key'] = 'type'; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+			$query_vars['orderby']  = 'meta_value';
+			add_filter( 'posts_orderby', [ $this, 'sort_by_type_order' ], 10, 2 );
 		}
 
 		return $query_vars;
@@ -213,6 +211,8 @@ class List_Table extends Admin_List_Table {
 		if ( ! $wp_query->is_main_query() ) {
 			return $order_sql;
 		}
+
+		remove_filter( 'posts_orderby', [ $this, 'sort_by_type_order' ], 10 );
 
 		$order       = strtoupper( Params::get( 'order', 'asc' ) ) === 'DESC' ? 'DESC' : 'ASC';
 		$types_order = wp_advads()->placements->types->get_types();

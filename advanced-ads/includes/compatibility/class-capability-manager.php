@@ -16,11 +16,7 @@ use AdvancedAds\Framework\Interfaces\Integration_Interface;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Capability Manager.
- *
- * Integrates with: Members
- * Integrates with: User Role Editor
- * Integrates with: PublishPress Capabilities
+ * Capability Manager — integrates with Members, User Role Editor, and PublishPress Capabilities.
  */
 class Capability_Manager implements Integration_Interface {
 

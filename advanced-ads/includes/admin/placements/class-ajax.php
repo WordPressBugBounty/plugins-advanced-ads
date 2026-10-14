@@ -9,9 +9,9 @@
 
 namespace AdvancedAds\Admin\Placements;
 
-use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,11 +37,30 @@ class Ajax implements Integration_Interface {
 	 */
 	public function get_allowed_items(): void {
 		check_ajax_referer( 'advads-create-new-placement', 'security' );
-		$type = sanitize_text_field( Params::post( 'placement_type' ) );
+
+		if ( ! Conditional::user_can( 'advanced_ads_manage_placements' ) ) {
+			wp_send_json_error(
+				[
+					'message' => __( 'User don\'t have permission to update the placement.', 'advanced-ads' ),
+				],
+				400
+			);
+		}
+
+		$type           = sanitize_text_field( Params::post( 'placement_type' ) );
+		$placement_type = wp_advads_get_placement_type( $type );
+		if ( ! $placement_type ) {
+			wp_send_json_error(
+				[
+					'message' => __( 'Invalid placement type.', 'advanced-ads' ),
+				],
+				400
+			);
+		}
 
 		wp_send_json_success(
 			[
-				'items' => wp_advads_get_placement_type( $type )->get_allowed_items(),
+				'items' => $placement_type->get_allowed_items(),
 			]
 		);
 	}
@@ -63,35 +82,45 @@ class Ajax implements Integration_Interface {
 			);
 		}
 
-		$placement     = wp_advads_get_placement( Params::post( 'placement_id', false, FILTER_VALIDATE_INT ) );
+		$placement = wp_advads_get_placement( Params::post( 'placement_id', false, FILTER_VALIDATE_INT ) );
+		if ( ! $placement ) {
+			wp_send_json_error(
+				[
+					'message' => __( 'Invalid placement.', 'advanced-ads' ),
+				],
+				400
+			);
+		}
+
 		$new_item      = sanitize_text_field( Params::post( 'item_id' ) );
-		$new_item_type = 0 === strpos( $new_item, 'ad' ) ? 'ad_' : 'group_';
+		$new_item_type = 0 === strpos( $new_item, 'ad_' ) ? 'ad_' : 'group_';
 
 		try {
 			if ( empty( $new_item ) ) {
 				$placement->remove_item();
 				wp_send_json_success(
 					[
-						'edit_href'    => '#',
+						'edit_href'    => '',
 						'placement_id' => $placement->get_id(),
 						'item_id'      => '',
 					]
 				);
 			}
 
-			$new_item = $placement->update_item( $new_item );
+			$updated_item = $placement->update_item( $new_item );
 			wp_send_json_success(
 				[
-					'edit_href'    => $new_item->get_edit_link(),
+					'edit_href'    => $updated_item->get_edit_link(),
 					'placement_id' => $placement->get_id(),
-					'item_id'      => $new_item_type . $new_item->get_id(),
+					'item_id'      => $new_item_type . $updated_item->get_id(),
 				]
 			);
 		} catch ( \RuntimeException $e ) {
+			$item = $placement->get_item_object();
 			wp_send_json_error(
 				[
 					'message' => $e->getMessage(),
-					'item_id' => $placement->get_item_object() ? $placement->get_item_object()->get_id() : 0,
+					'item_id' => is_object( $item ) ? $item->get_id() : 0,
 				],
 				400
 			);

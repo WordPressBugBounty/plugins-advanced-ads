@@ -9,12 +9,12 @@
 
 namespace AdvancedAds\Admin;
 
-use AdvancedAds\Options;
-use Advanced_Ads_AdSense_Data;
-use AdvancedAds\Utilities\WordPress;
-use AdvancedAds\Utilities\Conditional;
 use Advanced_Ads_Overview_Widgets_Callbacks;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Modules\AdSense\Utils;
+use AdvancedAds\Options;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -82,11 +82,7 @@ class WordPress_Dashboard implements Integration_Interface {
 	 * @return void
 	 */
 	public function add_adsense_widget(): void {
-		if (
-			Advanced_Ads_AdSense_Data::get_instance()->is_setup() &&
-			! Advanced_Ads_AdSense_Data::get_instance()->is_hide_stats() &&
-			Options::instance()->get( 'adsense.adsense-wp-widget' )
-		) {
+		if ( Utils::can_show_stats() && Options::instance()->get( 'adsense.adsense-wp-widget' ) ) {
 			wp_add_dashboard_widget(
 				'advads-adsense-widget',
 				__( 'AdSense Earnings', 'advanced-ads' ),
@@ -115,7 +111,7 @@ class WordPress_Dashboard implements Integration_Interface {
 		/**
 		 * Let developer add KPIs and info into dashabord
 		 *
-		 * @param WordPress_Dashboard $this Dashabord widget instance.
+		 * @param WordPress_Dashboard $dashboard Dashabord widget instance.
 		 */
 		do_action( 'advanced-ads-dashbaord-widget', $this );
 

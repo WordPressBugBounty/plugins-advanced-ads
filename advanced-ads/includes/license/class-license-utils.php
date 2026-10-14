@@ -314,16 +314,6 @@ final class License_Utils {
 	}
 
 	/**
-	 * Whether stored value is a plan-level site activation list (not legacy flat strings).
-	 *
-	 * @param array<string|int, mixed> $raw Raw option value.
-	 * @return bool
-	 */
-	public static function is_site_activation_list_storage( array $raw ): bool {
-		return 'list' === self::site_activation_storage_shape( $raw );
-	}
-
-	/**
 	 * Whether raw activation data is per-addon shaped and should be compacted to unique keys.
 	 *
 	 * @param array<string|int, mixed> $raw Raw option value.
@@ -334,9 +324,7 @@ final class License_Utils {
 	}
 
 	/**
-	 * Normalize plan-level site activation list: one row per unique license key.
-	 *
-	 * Accepts legacy flat strings, per-addon rows (compacted), or a numeric list.
+	 * Normalize plan-level site activation list: one row per unique license key — accepts legacy flat strings, per-addon rows (compacted), or a numeric list.
 	 *
 	 * @param array<string|int, mixed> $raw Raw option value.
 	 * @return array<int, array{license: string, status: string}>
@@ -397,33 +385,6 @@ final class License_Utils {
 	 */
 	public static function legacy_mirror_status_to_activation( $status ): string {
 		return 'valid' === $status ? 'active' : 'inactive';
-	}
-
-	/**
-	 * Whether outbound HTTPS to a URL should verify SSL certificates.
-	 *
-	 * Local dev hosts (.test, .local, localhost) skip verification for self-signed certs.
-	 *
-	 * @param string $url Request URL.
-	 * @return bool
-	 */
-	public static function should_verify_ssl_for_url( string $url ): bool {
-		$host = wp_parse_url( $url, PHP_URL_HOST );
-		if ( ! is_string( $host ) || '' === $host ) {
-			return true;
-		}
-
-		if ( in_array( $host, [ 'localhost', '127.0.0.1' ], true ) ) {
-			return false;
-		}
-
-		foreach ( [ '.test', '.local', '.localhost' ] as $local_tld ) {
-			if ( strlen( $host ) > strlen( $local_tld ) && str_ends_with( $host, $local_tld ) ) {
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	/**

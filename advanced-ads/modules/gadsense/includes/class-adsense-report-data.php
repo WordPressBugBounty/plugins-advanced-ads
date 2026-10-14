@@ -8,7 +8,7 @@
 /**
  * Main class
  */
-class AdSense_Report_Data implements Serializable {
+class AdSense_Report_Data {
 
 	/**
 	 * Cached data life span.
@@ -110,70 +110,11 @@ class AdSense_Report_Data implements Serializable {
 	}
 
 	/**
-	 * Serialize an instance of this class into a string. For PHP version >= 7.4
-	 *
-	 * @return array{earnings: list<object>|null, type: string, timestamp: int, currency: string, domains: list<string>}
-	 */
-	public function __serialize() {
-		return [
-			'earnings'  => $this->earnings,
-			'type'      => $this->type,
-			'timestamp' => $this->timestamp,
-			'currency'  => $this->currency,
-			'domains'   => $this->domains,
-		];
-	}
-
-	/**
-	 * Recreate an instance of this class from a string. For PHP version >= 7.4
-	 *
-	 * @param array{earnings?: list<object>|null, type?: string|null, timestamp?: int, currency?: string, domains?: list<string>} $data the array from __serialize.
-	 *
-	 * @return void
-	 */
-	public function __unserialize( $data ) {
-		$this->earnings  = $data['earnings'] ?? null;
-		$this->type      = $data['type'] ?? null;
-		$this->timestamp = $data['timestamp'] ?? 0;
-		$this->currency  = $data['currency'] ?? '';
-		$this->domains   = $data['domains'] ?? [];
-	}
-
-	/**
-	 * Returns serialized object properties. For PHP version < 7.4
-	 *
-	 * @return string the serialized data.
-	 */
-	public function serialize() {
-		return serialize(
-			[
-				'earnings'  => $this->earnings,
-				'type'      => $this->type,
-				'timestamp' => $this->timestamp,
-				'currency'  => $this->currency,
-				'domains'   => $this->domains,
-			]
-		);
-	}
-
-	/**
-	 * Set object properties from serialized data string. For PHP version < 7.4
-	 *
-	 * @param string $data serilaized data from DB.
-	 */
-	public function unserialize( $data ) {
-		try {
-			$unwrapped = unserialize( $data );
-		} catch ( Exception $ex ) {
-			$unwrapped = [];
-		}
-		$this->__unserialize( $unwrapped );
-	}
-
-	/**
 	 * Update object properties and DB record from a API response.
 	 *
 	 * @param array<string, mixed> $response API call response from Google.
+	 *
+	 * @return void
 	 */
 	public function update_data_from_response( $response ) {
 		$headers         = [];
@@ -198,7 +139,7 @@ class AdSense_Report_Data implements Serializable {
 						case 'ESTIMATED_EARNINGS':
 							$earning->estimated_earning = (float) $cell['value'];
 							break;
-						default: // "DOMAIN_NAME" or "AD_UNIT_ID".
+						default: // The domain name or the ad unit id.
 							$earning->{strtolower( $headers[ $index ] )} = $cell['value'];
 							if ( 'DOMAIN_NAME' === $headers[ $index ] && ! in_array( $cell['value'], $this->domains, true ) ) {
 								$this->domains[] = $cell['value'];
@@ -215,8 +156,25 @@ class AdSense_Report_Data implements Serializable {
 		delete_option( 'advanced_ads_adsense_report_DATE_AD_UNIT_CODE_EARNINGS_dashboard' );
 		delete_option( 'advanced_ads_adsense_report_DATE_DOMAIN_NAME_EARNINGS_dashboard' );
 
-		// Save the data instance in DB.
-		update_option( $option_name, $this->serialize() );
+		// Save the report as plain data: dates as text, no objects.
+		update_option(
+			$option_name,
+			[
+				'earnings'  => array_map(
+					static function ( $earning ) {
+						$row         = (array) $earning;
+						$row['date'] = $earning->date->format( 'Y-m-d' );
+
+						return $row;
+					},
+					$earnings
+				),
+				'timestamp' => $this->timestamp,
+				'currency'  => $this->currency,
+				'domains'   => $this->domains,
+			],
+			false
+		);
 	}
 
 	/**
@@ -229,25 +187,24 @@ class AdSense_Report_Data implements Serializable {
 	public static function get_data_from_options( $type ) {
 		$option_name = 'unit' === $type ? self::UNIT_OPTION : self::DOMAIN_OPTION;
 		$option      = get_option( $option_name, false );
-		if ( ! $option ) {
-			return new self( $type );
+		$report      = new self( $type );
+		if ( ! is_array( $option ) ) {
+			return $report;
 		}
 
-		// PHP version < 7.4.
-		if ( $option instanceof self ) {
-			return $option;
-		}
+		$report->timestamp = (int) ( $option['timestamp'] ?? 0 );
+		$report->currency  = (string) ( $option['currency'] ?? '' );
+		$report->domains   = (array) ( $option['domains'] ?? [] );
+		$report->earnings  = array_map(
+			static function ( $row ) {
+				$row['date'] = new DateTimeImmutable( $row['date'] );
 
-		try {
-			$unserialized = is_serialized( $option ) ? unserialize( $option ) : null;
-			if ( $unserialized instanceof self ) {
-				return $unserialized;
-			}
+				return (object) $row;
+			},
+			(array) ( $option['earnings'] ?? [] )
+		);
 
-			return new self( $type );
-		} catch ( Exception $ex ) {
-			return new self( $type );
-		}
+		return $report;
 	}
 
 	/**

@@ -116,12 +116,7 @@ class Placement_Repository {
 			];
 
 			/**
-			 * When updating this object, to prevent infinite loops, use $wpdb
-			 * to update data, since wp_update_post spawns more calls to the
-			 * save_post action.
-			 *
-			 * This ensures hooks are fired by either WP itself (admin screen save),
-			 * or an update purely from CRUD.
+			 * When updating this object, to prevent infinite loops, use $wpdb to update data, since wp_update_post spawns more calls to the save_post action — this ensures hooks are fired by either WP itself (admin screen save) or an update purely from CRUD.
 			 */
 			if ( doing_action( 'save_post' ) ) {
 				$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->posts, $post_data, [ 'ID' => $placement->get_id() ] );
@@ -164,13 +159,7 @@ class Placement_Repository {
 	/* Finder Methods ------------------- */
 
 	/**
-	 * Find placement by item id.
-	 *
-	 * Example: Find all placements that are connected to a specific ad.
-	 *          In this case $item_id = "ad_1234"
-	 *
-	 * Example: Find all placements that are connected to a specific group.
-	 *          In this case $item_id = "group_1234"
+	 * Find placement by item id — e.g. $item_id = "ad_1234" finds all placements connected to that ad, and $item_id = "group_1234" finds all placements connected to that group.
 	 *
 	 * @param string $item_id Item id to search for.
 	 *
@@ -193,9 +182,7 @@ class Placement_Repository {
 	}
 
 	/**
-	 * Retrieves placements by type.
-	 *
-	 * Filters cached placement summaries by type and hydrates matches.
+	 * Retrieves placements by type — filters cached placement summaries by type and hydrates matches.
 	 *
 	 * @param string|array<int, string> $types Placement types to query.
 	 * @param string                    $output         The required return type. One of OBJECT or ids,
@@ -231,10 +218,7 @@ class Placement_Repository {
 	}
 
 	/**
-	 * Get array of all placements.
-	 *
-	 * Prefer get_placement_summaries() for admin lists that only need id, title, type,
-	 * status, or author — avoids constructing a full Placement instance per row.
+	 * Get array of all placements — prefer get_placement_summaries() for admin lists that only need id, title, type, status, or author, since it avoids constructing a full Placement instance per row.
 	 *
 	 * @return Placement[]
 	 */

@@ -9,6 +9,8 @@
  * @var Placement $placement Placement instance.
  */
 
+use AdvancedAds\Abstracts\Placement;
+
 $display_conditions = Advanced_Ads_Display_Conditions::get_instance();
 $visitor_conditions = Advanced_Ads_Visitor_Conditions::get_instance();
 ?>

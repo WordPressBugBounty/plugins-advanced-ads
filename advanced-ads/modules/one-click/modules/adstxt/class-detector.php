@@ -9,9 +9,9 @@
 
 namespace AdvancedAds\Modules\OneClick\AdsTxt;
 
-use AdvancedAds\Modules\OneClick\Admin\Admin;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -103,17 +103,11 @@ class Detector implements Integration_Interface {
 	/**
 	 * Instantiates the WordPress filesystem for use
 	 *
-	 * @return object
+	 * @deprecated 1.12.0 Use WordPress::get_filesystem() instead.
+	 * @return \WP_Filesystem_Base|null
 	 */
 	private function get_filesystem() {
-		global $wp_filesystem;
-
-		if ( empty( $wp_filesystem ) ) {
-			require_once ABSPATH . '/wp-admin/includes/file.php';
-			WP_Filesystem();
-		}
-
-		return $wp_filesystem;
+		return WordPress::get_filesystem();
 	}
 
 	/**

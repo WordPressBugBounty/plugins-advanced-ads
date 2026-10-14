@@ -31,14 +31,15 @@
 				 *  this condition and the previous are on page level and not from the identical type
 				 *  they are both set to SHOW
 				 */
-				$taxonomy = isset( $_options['type'] ) && isset( $conditions[ $_options['type'] ]['taxonomy'] ) ? $conditions[ $_options['type'] ]['taxonomy'] : false; // phpcs:ignore
-				$last_tax = isset( $set_conditions[ $last_index ]['type'] ) && isset( $conditions[ $set_conditions[ $last_index ]['type'] ]['taxonomy'] ) ? $conditions[ $set_conditions[ $last_index ]['type'] ]['taxonomy'] : false;
-				if (
-					$taxonomy && $last_tax && $last_tax === $taxonomy
-					&& ( ! isset( $_options['connector'] ) || 'or' !== $_options['connector'] )
-					&& 'is' === $operator && 'is' === $set_conditions[ $last_index ]['operator']
-					&& $_options['type'] !== $set_conditions[ $last_index ]['type']
-				) {
+				$taxonomy = isset( $_options['type'], $conditions[ $_options['type'] ]['taxonomy'] ) ? $conditions[ $_options['type'] ]['taxonomy'] : false; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+				$last_tax = isset( $set_conditions[ $last_index ]['type'], $conditions[ $set_conditions[ $last_index ]['type'] ]['taxonomy'] ) ? $conditions[ $set_conditions[ $last_index ]['type'] ]['taxonomy'] : false; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+
+				$same_taxonomy    = $taxonomy && $last_tax && $taxonomy === $last_tax;
+				$and_connector    = ! isset( $_options['connector'] ) || 'or' !== $_options['connector'];
+				$both_is_operator = 'is' === $operator && 'is' === ( $set_conditions[ $last_index ]['operator'] ?? '' );
+				$different_types  = ( $set_conditions[ $last_index ]['type'] ?? null ) !== $_options['type'];
+
+				if ( $same_taxonomy && $and_connector && $both_is_operator && $different_types ) {
 					$show_or_force_warning = true;
 				}
 
@@ -87,7 +88,8 @@
 						?>
 					</td>
 					<td>
-						<button type="button" class="advads-conditions-remove button">x</button>
+						<?php /* translators: %s: name of the selected item. */ ?>
+						<button type="button" class="advads-conditions-remove button" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s', 'advanced-ads' ), $conditions[ $_options['type'] ]['label'] ) ); ?>">x</button>
 					</td>
 				</tr>
 				<?php

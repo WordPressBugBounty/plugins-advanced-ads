@@ -563,64 +563,6 @@ jQuery(document).ready(function ($) {
 	let file_frame;
 	window.formfield = '';
 
-	// adblocker related code
-	$('#advanced-ads-use-adblocker').on('change', function () {
-		advads_toggle_box(this, '#advads-adblocker-wrapper');
-	});
-
-	// processing of the rebuild asset form and the FTP/SSH credentials form
-	let $advads_adblocker_wrapper = $('#advads-adblocker-wrapper'),
-		$advads_adblocker_rebuild_button = $('#advads-adblocker-rebuild');
-
-	$advads_adblocker_rebuild_button.prop('disabled', false);
-
-	$(document).on('click', '#advads-adblocker-rebuild', function (event) {
-		event.preventDefault();
-		const $form = $('#advanced-ads-rebuild-assets-form');
-		$form.prev('.error').remove();
-		$advads_adblocker_rebuild_button
-			.prop('disabled', true)
-			.after('<span class="spinner advads-spinner"></span>');
-
-		const args = {
-			data: {
-				action: 'advads-adblock-rebuild-assets',
-				nonce: advadsglobal.ajax_nonce,
-			},
-			done(data) {
-				$advads_adblocker_wrapper.html(data);
-				$advads_adblocker_rebuild_button = $(
-					'#advads-adblocker-rebuild'
-				);
-			},
-			fail(jqXHR, textStatus, errorThrown) {
-				$form.before(
-					'<div class="error"><p>' +
-						textStatus +
-						': ' +
-						errorThrown +
-						'</p></div>'
-				);
-				$advads_adblocker_rebuild_button
-					.prop('disabled', false)
-					.next('.advads-spinner')
-					.remove();
-			},
-			on_modal_close() {
-				$advads_adblocker_rebuild_button
-					.prop('disabled', false)
-					.next('.advads-spinner')
-					.remove();
-			},
-		};
-
-		if ($('[name="advads_ab_assign_new_folder"]').is(':checked')) {
-			args.data.advads_ab_assign_new_folder = true;
-		}
-
-		advanced_ads_admin.filesystem.ajax(args);
-	});
-
 	// process "reserve this space" checkbox
 	$('#advanced-ads-ad-parameters').on(
 		'change',
@@ -1423,6 +1365,14 @@ if (!window.AdvancedAdsAdmin.AdImporter)
 					AdvancedAdsAdmin.AdImporter.manualSetup();
 				}
 			);
+
+			// Rows and icon controls of the ad unit list work with Enter or Space.
+			jQuery(document).on('keydown', 'tr.mapiaction, i.mapiaction, #mapi-archived-ads', function (ev) {
+				if (ev.target === this && (ev.key === 'Enter' || ev.key === ' ')) {
+					ev.preventDefault();
+					jQuery(this).trigger('click');
+				}
+			});
 
 			//the individual rows of the ad units may contain elements with the mapiaction class
 			jQuery(document).on('click', '.mapiaction', function (ev) {

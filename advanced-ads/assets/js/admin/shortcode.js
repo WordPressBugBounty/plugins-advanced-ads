@@ -75,7 +75,8 @@
 			type: 'POST',
 			url: ajaxurl,
 			data: {
-				'action': 'advads_content_for_shortcode_creator'
+				'action': 'advads_content_for_shortcode_creator',
+				'nonce': ( typeof advadsglobal !== 'undefined' && advadsglobal.ajax_nonce ) ? advadsglobal.ajax_nonce : ''
 			}
 		})
 		.done( function( data, textStatus, jqXHR ) {

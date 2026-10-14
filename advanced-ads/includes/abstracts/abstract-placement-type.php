@@ -13,6 +13,9 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Placement Type.
+ *
+ * @method string               get_id()      Placement type id; every placement type defines it.
+ * @method array<string, mixed> get_options() Placement type options; every placement type defines it.
  */
 class Placement_Type {
 
@@ -57,7 +60,7 @@ class Placement_Type {
 	 *
 	 * @param string $add_empty Add empty option.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<int|string, mixed>
 	 */
 	public function get_allowed_items( $add_empty = '' ): array {
 

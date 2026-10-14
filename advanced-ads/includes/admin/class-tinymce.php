@@ -30,9 +30,9 @@ class TinyMCE implements Integration_Interface {
 	/**
 	 * Configure TinyMCE to allow unsafe link target.
 	 *
-	 * @param bool $mce_init the tinyMce initialization array.
+	 * @param array<string, mixed> $mce_init the tinyMce initialization array.
 	 *
-	 * @return bool|[]
+	 * @return array<string, mixed>
 	 */
 	public function allow_unsafe_link_target( $mce_init ) {
 		// Early bail!!

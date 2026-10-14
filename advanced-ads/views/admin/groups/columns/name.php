@@ -9,6 +9,8 @@
  * @var Group $group Group instance.
  */
 
+use AdvancedAds\Abstracts\Group;
+
 ?>
 <div class="advads-table-name">
 	<a class="row-title" href="#modal-group-edit-<?php echo esc_attr( $group->get_id() ); ?>"><?php echo esc_html( $group->get_name() ); ?></a>

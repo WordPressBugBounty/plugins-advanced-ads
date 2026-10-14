@@ -9,6 +9,8 @@
  * @var Ad $ad Ad instance.
  */
 
+use AdvancedAds\Abstracts\Ad;
+
 $display_conditions           = $ad->get_display_conditions();
 $visitor_conditions           = $ad->get_visitor_conditions();
 $display_conditions_available = empty( $display_conditions );

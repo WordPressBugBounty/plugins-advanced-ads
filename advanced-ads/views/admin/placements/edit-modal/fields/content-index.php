@@ -36,7 +36,7 @@
 </select>
 
 <div id="advads-frontend-element-<?php echo esc_attr( $placement->get_id() ); ?>" class="advads-placements-content-custom-xpath<?php echo 'custom' !== $selected_tag ? ' hidden' : ''; ?>">
-	<input name="advads[placements][options][xpath]" class="advads-frontend-element" type="text" value="<?php echo esc_html( $xpath ); ?>" placeholder="<?php esc_html_e( 'use xpath, e.g. `p[not(parent::blockquote)]`', 'advanced-ads' ); ?>"/>
+	<input name="advads[placements][options][xpath]" class="advads-frontend-element" type="text" value="<?php echo esc_attr( $xpath ); ?>" placeholder="<?php esc_attr_e( 'use xpath, e.g. `p[not(parent::blockquote)]`', 'advanced-ads' ); ?>"/>
 
 	<button style="display:none; color: red;" type="button" class="advads-deactivate-frontend-picker button ">
 		<?php echo esc_html_x( 'stop selection', 'frontend picker', 'advanced-ads' ); ?>

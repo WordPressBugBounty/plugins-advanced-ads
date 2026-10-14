@@ -70,11 +70,7 @@ class Widget extends \WP_Widget {
 	}
 
 	/**
-	 * Updates a particular instance of a widget.
-	 *
-	 * This function should check that `$new_instance` is set correctly. The newly-calculated
-	 * value of `$instance` should be returned. If false is returned, the instance won't be
-	 * saved/updated.
+	 * Updates a particular instance of a widget — should check that `$new_instance` is set correctly. The newly-calculated value of `$instance` should be returned; if false is returned, the instance won't be saved/updated.
 	 *
 	 * @param array<string, mixed> $new_instance New settings for this instance as input by the user via WP_Widget::form().
 	 * @param array<string, mixed> $old_instance Old settings for this instance.
@@ -148,8 +144,10 @@ class Widget extends \WP_Widget {
 	 * Display hints related to the currently selected item in the dropdown.
 	 *
 	 * @param string $elementid Currently selected item.
+	 *
+	 * @return void
 	 */
-	private function display_hints( $elementid ) {
+	private function display_hints( $elementid ): void {
 		$elementid_parts = explode( '_', $elementid );
 		if ( ! isset( $elementid_parts[1] ) || 'group' !== $elementid_parts[0] ) {
 			return;
@@ -197,7 +195,7 @@ class Widget extends \WP_Widget {
 	 * Return content of an in a widget
 	 *
 	 * @param string $id slug of the display.
-	 * @return bool|string
+	 * @return bool|string|void
 	 */
 	public static function output( $id = '' ) {
 		// Early bail!!
@@ -234,7 +232,7 @@ class Widget extends \WP_Widget {
 	/**
 	 * Get frontend widget id.
 	 *
-	 * @param int $number Unique ID number of the current widget instance.
+	 * @param int|string $number Unique ID number of the current widget instance.
 	 * @return string
 	 */
 	private function get_frontend_id( $number ) {
@@ -243,8 +241,7 @@ class Widget extends \WP_Widget {
 	}
 
 	/**
-	 * Make it harder for ad blockers to block the widget.
-	 * removes the pre-defined widget ID (e.g., advads_ad_widget-20) and replaces it with one that uses the individual frontend prefix
+	 * Make it harder for ad blockers to block the widget — removes the pre-defined widget ID (e.g., advads_ad_widget-20) and replaces it with one that uses the individual frontend prefix.
 	 *
 	 * @param string               $before_widget content before the widget.
 	 * @param array<string, mixed> $instance Settings for the current widget instance.

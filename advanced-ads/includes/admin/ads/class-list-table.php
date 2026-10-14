@@ -14,6 +14,8 @@ use AdvancedAds\Abstracts\Admin_List_Table;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Options;
+use AdvancedAds\Interfaces\Ad_Type;
+use WP_Query;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -50,7 +52,7 @@ class List_Table extends Admin_List_Table {
 	 */
 	public function hooks(): void {
 		parent::hooks();
-		add_filter( 'pre_get_posts', [ $this, 'posts_ordering' ] );
+		add_action( 'pre_get_posts', [ $this, 'posts_ordering' ] );
 		add_filter( 'views_edit-' . $this->list_table_type, [ $this, 'add_views' ] );
 		add_filter( 'disable_months_dropdown', [ $this, 'disable_months_dropdown' ], 10, 2 );
 	}

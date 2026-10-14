@@ -27,7 +27,7 @@ class Screen_Options implements Integration_Interface {
 	/**
 	 * Array key for screen options.
 	 *
-	 * @var string
+	 * @var string|false
 	 */
 	private $screen_key = '';
 
@@ -141,7 +141,7 @@ class Screen_Options implements Integration_Interface {
 	/**
 	 * Get the screen key for DB use.
 	 *
-	 * @param string $screen_id Screen ID.
+	 * @param string|false $screen_id Screen ID.
 	 *
 	 * @return string
 	 */

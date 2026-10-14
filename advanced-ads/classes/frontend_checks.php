@@ -2,9 +2,10 @@
 // phpcs:ignoreFile
 
 use AdvancedAds\Abstracts\Ad;
+use AdvancedAds\Modules\Privacy\Utils;
+use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\Data;
 use AdvancedAds\Utilities\Validation;
-use AdvancedAds\Utilities\Conditional;
 
 /**
  * Class Advanced_Ads_Frontend_Checks
@@ -17,8 +18,7 @@ class Advanced_Ads_Frontend_Checks {
 	 *
 	 * @var bool
 	 */
-	private $did_the_content      = false;
-	private $has_many_the_content = false;
+	private $did_the_content = false;
 
 	/**
 	 * Plugin options.
@@ -51,6 +51,8 @@ class Advanced_Ads_Frontend_Checks {
 
 	/**
 	 * Ad Health init.
+	 *
+	 * @return void
 	 */
 	public function init() {
 		if ( ! is_admin()
@@ -67,7 +69,7 @@ class Advanced_Ads_Frontend_Checks {
 		}
 
 		if ( Advanced_Ads_Ad_Health_Notices::notices_enabled() ) {
-			add_action( 'body_class', [ $this, 'body_class' ] );
+			add_filter( 'body_class', [ $this, 'body_class' ] );
 		}
 
 		if ( ( $this->has_adblocker_placements() || $this->has_adblocker_visitor_condition() )
@@ -90,6 +92,8 @@ class Advanced_Ads_Frontend_Checks {
 	/**
 	 * Enqueue scripts
 	 * needs to add ajaxurl in case no other plugin is doing that
+	 *
+	 * @return void
 	 */
 	public function enqueue_scripts() {
 		if ( Conditional::is_amp() ) {
@@ -104,14 +108,13 @@ class Advanced_Ads_Frontend_Checks {
 	 * List current ad situation on the page in the admin-bar.
 	 *
 	 * @param object $wp_admin_bar WP_Admin_Bar.
+	 *
+	 * @return void
 	 */
 	public function add_admin_bar_menu( $wp_admin_bar ) {
-		global $wp_the_query, $post, $wp_scripts;
+		global $wp_the_query, $post;
 
-		$options = Advanced_Ads::get_instance()->options();
-
-		// load AdSense related options.
-		$adsense_options = Advanced_Ads_AdSense_Data::get_instance()->get_options();
+		$disable_violation_warnings = wp_advads_get_setting( 'adsense-warnings-disable' );
 
 		// common data used in nodes[].
 		$health_parent_class     = 'advanced_ads_ad_health';
@@ -125,7 +128,7 @@ class Advanced_Ads_Frontend_Checks {
 
 		// check if AdSense loads Auto Ads ads
 		// Hidden, will be shown using js.
-		if ( ! isset( $adsense_options['violation-warnings-disable'] ) ) {
+		if ( ! $disable_violation_warnings ) {
 			$nodes[] = [
 				'type' => 2,
 				'data' => [
@@ -222,7 +225,7 @@ class Advanced_Ads_Frontend_Checks {
 
 		$disabled_reason = wp_advads()->frontend->get_disabled_reason();
 		$disabled_id     = wp_advads()->frontend->get_disabled_id();
-		$settings_page   = admin_url( 'admin.php?page=advanced-ads-settings' );
+		$settings_page   = admin_url( 'admin.php?page=advanced-ads-app&path=/settings' );
 
 		if ( 'page' === $disabled_reason && $disabled_id ) {
 			$nodes[] = [
@@ -343,7 +346,7 @@ class Advanced_Ads_Frontend_Checks {
 		];
 
 		// warn if an AdSense ad seems to be hidden.
-		if ( ! isset( $adsense_options['violation-warnings-disable'] ) ) {
+		if ( ! $disable_violation_warnings ) {
 			$nodes[] = [
 				'type' => 2,
 				'data' => [
@@ -381,15 +384,15 @@ class Advanced_Ads_Frontend_Checks {
 		];
 
 		// warn if consent was not given.
-		$privacy = Advanced_Ads_Privacy::get_instance();
-		if ( 'not_needed' !== $privacy->get_state() ) {
+		$state = Utils::parse_state();
+		if ( 'not_needed' !== $state ) {
 			$nodes[] = [
 				'type' => 2,
 				'data' => [
 					'parent' => $health_parent_class,
 					'id'     => 'advanced_ads_ad_health_consent_missing',
 					'title'  => __( 'Consent not given', 'advanced-ads' ),
-					'href'   => admin_url( 'admin.php?page=advanced-ads-settings#top#privacy' ),
+					'href'   => admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=privacy' ),
 					'meta'   => [
 						'class'  => 'hidden advanced_ads_ad_health_warning advanced_ads_ad_health_consent_missing',
 						'target' => '_blank',
@@ -398,15 +401,14 @@ class Advanced_Ads_Frontend_Checks {
 			];
 		}
 
-		$privacy_options = $privacy->options();
-		if ( empty( $privacy_options['enabled'] ) || 'iab_tcf_20' !== $privacy_options['consent-method'] ) {
+		if ( ! wp_advads_is_module_active( 'privacy' ) || 'iab_tcf_20' !== wp_advads_get_setting( 'consent-method' ) ) {
 			$nodes[] = [
 				'type' => 2,
 				'data' => [
 					'parent' => $health_parent_class,
 					'id'     => 'advanced_ads_ad_health_privacy_disabled',
 					'title'  => __( 'Enable TCF integration', 'advanced-ads' ),
-					'href'   => admin_url( 'admin.php?page=advanced-ads-settings#top#privacy' ),
+					'href'   => admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=privacy' ),
 					'meta'   => [
 						'class'  => 'hidden advanced_ads_ad_health_warning advanced_ads_ad_health_privacy_disabled',
 						'target' => '_blank',
@@ -439,8 +441,8 @@ class Advanced_Ads_Frontend_Checks {
 					'<span class="link">%s</span> %s',
 					__( 'highlight ads', 'advanced-ads' ),
 					'<span class="arrows">
-						<i class = "dashicons dashicons-arrow-up-alt previous"></i>
-						<i class = "dashicons dashicons-arrow-down-alt next"></i>
+						<i class = "dashicons dashicons-arrow-up-alt previous" aria-label="' . esc_attr__( 'Previous ad', 'advanced-ads' ) . '"></i>
+						<i class = "dashicons dashicons-arrow-down-alt next" aria-label="' . esc_attr__( 'Next ad', 'advanced-ads' ) . '"></i>
 					</span>'
 				),
 				'meta'   => [
@@ -455,7 +457,6 @@ class Advanced_Ads_Frontend_Checks {
 		 * @param array $node An array that contains:
 		 *      'type' => 1 - warning, 2 - hidden warning that will be shown using JS, 3 - info message
 		 *      'data': @see WP_Admin_Bar->add_node
-		 * @param object  $wp_admin_bar
 		 */
 		$nodes = apply_filters( 'advanced-ads-ad-health-nodes', $nodes );
 
@@ -526,16 +527,15 @@ class Advanced_Ads_Frontend_Checks {
 		return array_merge( $classes, $aa_classes );
 	}
 
-
-
-
 	/**
 	 * Count visible notices and warnings.
 	 *
 	 * @param array<int, array<string, mixed>> $nodes Nodes to add.
-	 * @param array<int, string>               $types Warning types.
+	 * @param array<int, int>                  $types Warning types.
+	 *
+	 * @return int
 	 */
-	private function count_visible_warnings( $nodes, $types = [] ) {
+	private function count_visible_warnings( $nodes, $types = [] ): int {
 		$warnings = 0;
 		foreach ( $nodes as $node ) {
 			if ( ! isset( $node['type'] ) || ! isset( $node['data'] ) ) {
@@ -554,8 +554,10 @@ class Advanced_Ads_Frontend_Checks {
 	 * @param object $wp_admin_bar WP_Admin_Bar object.
 	 * @param int    $issues Number of all issues.
 	 * @param int    $notices Number of notices.
+	 *
+	 * @return void
 	 */
-	private function add_header_nodes( $wp_admin_bar, $issues, $notices ) {
+	private function add_header_nodes( $wp_admin_bar, $issues, $notices ): void {
 		$wp_admin_bar->add_node(
 			[
 				'id'     => 'advanced_ads_ad_health',
@@ -585,10 +587,12 @@ class Advanced_Ads_Frontend_Checks {
 	/**
 	 * Add footer nodes.
 	 *
-	 * @param obj $wp_admin_bar WP_Admin_Bar object.
+	 * @param object $wp_admin_bar WP_Admin_Bar object.
 	 * @param int $issues Number of all issues.
+	 *
+	 * @return void
 	 */
-	private function add_footer_nodes( $wp_admin_bar, $issues ) {
+	private function add_footer_nodes( $wp_admin_bar, $issues ): void {
 		if ( ! $issues ) {
 			$wp_admin_bar->add_node(
 				[
@@ -614,16 +618,6 @@ class Advanced_Ads_Frontend_Checks {
 				],
 			]
 		);
-	}
-
-	/**
-	 * Filter out nodes intended to AMP pages only.
-	 *
-	 * @param array<int, array<string, mixed>> $nodes Nodes to add.
-	 * @return array<int, array<string, mixed>> $nodes Nodes to add.
-	 */
-	private function filter_nodes( $nodes ) {
-		return $nodes;
 	}
 
 	/**
@@ -654,9 +648,6 @@ class Advanced_Ads_Frontend_Checks {
 			$this->did_the_content = true;
 		}
 
-		if ( Advanced_Ads::get_instance()->has_many_the_content() ) {
-			$this->has_many_the_content = true;
-		}
 		return $content;
 	}
 
@@ -666,6 +657,8 @@ class Advanced_Ads_Frontend_Checks {
 	 *     AdBlocker enabled,
 	 *     jQuery is included in header
 	 *     AdSense Quick Start ads are running
+	 *
+	 * @return void
 	 */
 	public function footer_checks() {
 		ob_start();
@@ -689,11 +682,10 @@ class Advanced_Ads_Frontend_Checks {
 			return;
 		}
 
-		$adsense_options = Advanced_Ads_AdSense_Data::get_instance()->get_options();
-		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.EnqueuedResources.NonEnqueuedScript
+		$disable_violation_warnings = wp_advads_get_setting( 'adsense-warnings-disable' );
+		// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 		ob_start();
 		?>
-		<script type="text/javascript" src="<?php echo ADVADS_BASE_URL . 'admin/assets/js/advertisement.js'; ?>"></script>
 		<script>
 			var advanced_ads_frontend_checks = {
 				showCount: function() {
@@ -903,6 +895,18 @@ class Advanced_Ads_Frontend_Checks {
 						arrows[i].addEventListener("click", scrollToHighlightedAd);
 					}
 
+					// make the link and the arrows usable with a keyboard
+					[ link, ...arrows ].forEach( function( el ) {
+						el.tabIndex = 0;
+						el.setAttribute( 'role', 'button' );
+						el.addEventListener( 'keydown', function( ev ) {
+							if ( 'Enter' === ev.key || ' ' === ev.key ) {
+								ev.preventDefault();
+								el.click();
+							}
+						} );
+					} );
+
 					if ( adblock_item && typeof advanced_ads_adblocker_test === 'undefined' ) {
 						// show hidden item
 						adblock_item.className = adblock_item.className.replace( /hidden/, '' );
@@ -918,7 +922,7 @@ class Advanced_Ads_Frontend_Checks {
 					advanced_ads_frontend_checks.showCount();
 				});
 
-				<?php if ( ! isset( $adsense_options['violation-warnings-disable'] ) ) : ?>
+				<?php if ( ! $disable_violation_warnings ) : ?>
 					// show warning if AdSense ad is hidden
 					// show hint if AdSense Auto ads are enabled
 					setTimeout( function(){
@@ -949,8 +953,7 @@ class Advanced_Ads_Frontend_Checks {
 				/**
 				 * Code to check if current user gave consent to show ads
 				 */
-				$privacy = Advanced_Ads_Privacy::get_instance();
-				if ( 'not_needed' !== $privacy->get_state() ) :
+				if ( 'not_needed' !== Utils::parse_state() ) :
 					?>
 					document.addEventListener('advanced_ads_privacy', function (event) {
 						var advads_consent_link = document.querySelector('#wp-admin-bar-advanced_ads_ad_health_consent_missing');
@@ -969,9 +972,8 @@ class Advanced_Ads_Frontend_Checks {
 					});
 					<?php
 				endif;
-				$privacy_options = $privacy->options();
 				if (
-					( empty( $privacy_options['enabled'] ) || 'iab_tcf_20' !== $privacy_options['consent-method'] )
+					( ! wp_advads_is_module_active( 'privacy' ) || 'iab_tcf_20' !== wp_advads_get_setting( 'consent-method' ) )
 					&& (bool) apply_filters( 'advanced-ads-ad-health-show-tcf-notice', true )
 				) :
 					?>
@@ -1058,7 +1060,7 @@ class Advanced_Ads_Frontend_Checks {
 			})(document, window);
 		</script>
 		<?php
-		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped, WordPress.WP.EnqueuedResources.NonEnqueuedScript
+		// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
 		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		echo Advanced_Ads_Utils::get_inline_asset( ob_get_clean() );
 	}
@@ -1104,11 +1106,11 @@ class Advanced_Ads_Frontend_Checks {
 			$content .= Advanced_Ads_Utils::get_inline_asset( ob_get_clean() );
 		}
 
-		$adsense_options = Advanced_Ads_AdSense_Data::get_instance()->get_options();
+		$disable_violation_warnings = wp_advads_get_setting( 'adsense-warnings-disable' );
 		if (
 			$ad->is_type( 'adsense' ) &&
 			! empty( $ad->get_prop( 'cache_busting_elementid' ) ) &&
-			! isset( $adsense_options['violation-warnings-disable'] )
+			! $disable_violation_warnings
 		) {
 			ob_start();
 			?>

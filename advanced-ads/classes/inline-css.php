@@ -24,7 +24,7 @@ class Advanced_Ads_Inline_Css {
 		 *
 		 * Set to false if an addon output inline css before the main plugin.
 		 *
-		 * @param bool Contains the state.
+		 * @param bool $add_inline_css Contains the state.
 		 */
 		$this->add_inline_css = apply_filters( 'advanced-ads-output-inline-css', true );
 		if ( ! $this->add_inline_css ) {
@@ -108,14 +108,11 @@ class Advanced_Ads_Inline_Css {
 
 	/**
 	 * If TCF is active, i.e. there is a TCF container, add the options to this container.
+	 *
+	 * @return void
 	 */
-	private function check_tcf_option() {
-		static $privacy_options;
-		if ( null === $privacy_options ) {
-			$privacy_options = Advanced_Ads_Privacy::get_instance()->options();
-		}
-
-		if ( ! empty( $privacy_options['enabled'] ) && 'on' === $privacy_options['enabled'] && 'iab_tcf_20' === $privacy_options['consent-method'] ) {
+	private function check_tcf_option(): void {
+		if ( wp_advads_is_module_active( 'privacy' ) && 'iab_tcf_20' === wp_advads_get_setting( 'consent-method' ) ) {
 			add_filter( 'advanced-ads-output-final', [ $this, 'add_tcf_container' ], 20, 2 );
 			$this->add_inline_css = false;
 		}

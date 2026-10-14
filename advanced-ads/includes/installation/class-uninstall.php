@@ -10,12 +10,11 @@
 namespace AdvancedAds\Installation;
 
 use Advanced_Ads;
-use AdvancedAds\Widget;
-use AdvancedAds\Entities;
-use AdvancedAds\Constants;
-use Advanced_Ads_Ad_Blocker_Admin;
 use AdvancedAds\Admin\Metabox_Ad_Settings;
+use AdvancedAds\Constants;
+use AdvancedAds\Entities;
 use AdvancedAds\Framework\Interfaces\Initializer_Interface;
+use AdvancedAds\Widget;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -33,6 +32,10 @@ class Uninstall implements Initializer_Interface {
 	 * @return void
 	 */
 	public function initialize(): void {
+		if ( class_exists( '\\ActionScheduler_QueueRunner', false ) ) {
+			\ActionScheduler_QueueRunner::instance()->unhook_dispatch_async_request();
+		}
+
 		$advads_options = Advanced_Ads::get_instance()->options();
 
 		// Early bail!!
@@ -41,8 +44,7 @@ class Uninstall implements Initializer_Interface {
 		}
 
 		// Delete assets (main blog).
-		Advanced_Ads_Ad_Blocker_Admin::get_instance()->clear_assets();
-		( new Entities() )->hooks();
+		( new Entities() )->init();
 
 		if ( ! is_multisite() ) {
 			$this->uninstall();
@@ -68,12 +70,46 @@ class Uninstall implements Initializer_Interface {
 	 * @return void
 	 */
 	private function uninstall(): void { // phpcs:ignore Universal.CodeAnalysis.ConstructorDestructorReturn.ReturnTypeFound
+		// Before delete_options(): a module's uninstall() reads its own
+		// persisted options (e.g. Ad Blocker's folder_name) to know what to
+		// clean up on disk — delete_options()'s option-prefix wipe would
+		// already be gone by the time it runs otherwise.
+		$this->delete_modules();
 		$this->delete_post_types();
 		$this->delete_groups();
 		$this->delete_options();
 		$this->delete_usermeta();
 
 		wp_cache_flush();
+	}
+
+	/**
+	 * Let every registered module (active or not) clean up anything beyond what delete_options()'s option-prefix wipe covers, e.g. files on disk.
+	 *
+	 * @return void
+	 */
+	private function delete_modules(): void {
+		$module_registry = wp_advads()->module_registry;
+
+		// register_uninstall_hook()'s callback runs from a re-include of the
+		// main plugin file after `plugins_loaded` has already fired for this
+		// request, so Modules\Registry::initialize()'s own
+		// add_action( 'plugins_loaded', ... ) never gets a chance to run —
+		// call hooks() directly to make sure modules are actually registered.
+		$module_registry->hooks();
+
+		foreach ( $module_registry->all() as $module ) {
+			$entry = $module->get_entry();
+
+			if ( null === $entry || ! class_exists( $entry ) ) {
+				continue;
+			}
+
+			$instance = new $entry();
+			if ( method_exists( $instance, 'uninstall' ) ) {
+				$instance->uninstall();
+			}
+		}
 	}
 
 	/**
@@ -164,6 +200,8 @@ class Uninstall implements Initializer_Interface {
 		delete_metadata( 'user', null, 'advanced-ads-hide-wizard', '', true );
 		delete_metadata( 'user', null, 'advanced-ads-subscribed', '', true );
 		delete_metadata( 'user', null, 'advanced-ads-ad-list-screen-options', '', true );
+		delete_metadata( 'user', null, 'advanced-ads-screen-options', '', true );
+		delete_metadata( 'user', null, 'advanced-ads-welcome', '', true );
 		delete_metadata( 'user', null, 'advanced-ads-admin-settings', '', true );
 		delete_metadata( 'user', null, 'advanced-ads-role', '', true );
 		delete_metadata( 'user', null, 'edit_advanced_ads_per_page', '', true );

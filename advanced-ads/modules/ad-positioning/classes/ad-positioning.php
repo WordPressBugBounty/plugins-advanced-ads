@@ -106,7 +106,7 @@ class Advanced_Ads_Ad_Positioning {
 	/**
 	 * Set up the positioning options with title, description and icon.
 	 *
-	 * @return array<string, array{title: string, description: string, options: array<string, array{img?: string}>}>
+	 * @return array<string, array{title: string, description: string, options: array<string, array{img?: string, label?: string}>}>
 	 */
 	private function setup_positioning_options() {
 		return [
@@ -121,8 +121,12 @@ class Advanced_Ads_Ad_Positioning {
 				'title'       => _x( 'Float', 'Layout options "Text Flow" heading', 'advanced-ads' ),
 				'description' => __( 'Text will wrap around the ad and its margin.', 'advanced-ads' ),
 				'options'     => [
-					'left_float'  => [],
-					'right_float' => [],
+					'left_float'  => [
+						'label' => __( 'left', 'advanced-ads' ),
+					],
+					'right_float' => [
+						'label' => __( 'right', 'advanced-ads' ),
+					],
 				],
 			],
 			'block'   => [
@@ -130,13 +134,16 @@ class Advanced_Ads_Ad_Positioning {
 				'description' => __( 'Text will continue after the ad and its margin.', 'advanced-ads' ),
 				'options'     => [
 					'left_nofloat'   => [
-						'img' => 'block-lr',
+						'img'   => 'block-lr',
+						'label' => __( 'left', 'advanced-ads' ),
 					],
 					'center_nofloat' => [
-						'img' => 'block-cntr',
+						'img'   => 'block-cntr',
+						'label' => __( 'center', 'advanced-ads' ),
 					],
 					'right_nofloat'  => [
-						'img' => 'block-lr',
+						'img'   => 'block-lr',
+						'label' => __( 'right', 'advanced-ads' ),
 					],
 				],
 			],

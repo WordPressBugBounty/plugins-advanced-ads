@@ -24,9 +24,7 @@ class Autoloader {
 	private $autoloader;
 
 	/**
-	 * Main instance
-	 *
-	 * Ensure only one instance is loaded or can be loaded.
+	 * Main instance — ensures only one instance is loaded or can be loaded.
 	 *
 	 * @return Autoloader
 	 */
@@ -67,9 +65,7 @@ class Autoloader {
 	}
 
 	/**
-	 * Locate the autoload file
-	 *
-	 * This function searches for the autoload file in the packages directory and vendor directory.
+	 * Locate the autoload file — searches for it in the packages directory and vendor directory.
 	 *
 	 * @return bool|string
 	 */

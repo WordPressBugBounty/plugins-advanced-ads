@@ -257,8 +257,10 @@ class Ad_Display_Condition {
 	 *
 	 * @param string     $reason Reason why are disabled.
 	 * @param int|string $id Identifier that supplement the disabled reason.
+	 *
+	 * @return void
 	 */
-	private function disable_ads( $reason = null, $id = null ) {
+	private function disable_ads( $reason = null, $id = null ): void {
 		$this->disabled_id     = $id;
 		$this->disabled_reason = $reason;
 		define( 'ADVADS_ADS_DISABLED', true );

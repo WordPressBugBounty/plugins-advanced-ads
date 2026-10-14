@@ -24,9 +24,7 @@ class Stats {
 	public $entities = [];
 
 	/**
-	 * Main instance
-	 *
-	 * Ensure only one instance is loaded or can be loaded.
+	 * Main instance — ensures only one instance is loaded or can be loaded.
 	 *
 	 * @return Stats
 	 */
@@ -43,10 +41,10 @@ class Stats {
 	/**
 	 * Add an entity to the stats.
 	 *
-	 * @param string $type      Entity type.
-	 * @param string $id        Entity id.
-	 * @param string $title     Entity title.
-	 * @param string $parent_id Parent entity id.
+	 * @param string           $type      Entity type.
+	 * @param int|string       $id        Entity id.
+	 * @param string           $title     Entity title.
+	 * @param int|string|false $parent_id Parent entity id.
 	 *
 	 * @return void
 	 */

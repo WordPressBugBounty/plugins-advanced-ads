@@ -2,7 +2,7 @@
  * External Dependencies
  */
 import jQuery from 'jquery';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress Dependencies
@@ -17,73 +17,65 @@ import { noticeSuccess, noticeError, removeAllNotices } from './Notices';
 
 export default function AddonRow() {
 	const { addonRow } = advancedAds.oneclick;
-	const { isConnected, toggleMetabox, disconnect } = useContext(OneClickContext);
+	const { isConnected, toggleMetabox, disconnect } =
+		useContext( OneClickContext );
 
-	const buttonRow = classnames('cta', {
-		primary: !isConnected,
+	const buttonRow = clsx( 'cta', {
+		primary: ! isConnected,
 		secondary: isConnected,
-	});
+	} );
 
 	const onDisconnect = () => {
-		jQuery.ajax({
+		jQuery.ajax( {
 			url: advancedAds.endpoints.ajaxUrl,
 			type: 'POST',
 			data: {
 				action: 'pubguru_disconnect',
 				nonce: advancedAds.oneclick.security,
 			},
-			success: (response) => {
-				if (response.success) {
-					noticeSuccess(
-						response.data.message
-					);
+			success: ( response ) => {
+				if ( response.success ) {
+					noticeSuccess( response.data.message );
 					disconnect();
 				} else {
-					noticeError(
-						response.data.message
-					);
+					noticeError( response.data.message );
 				}
 			},
-			error: (error) => {
-				noticeError(
-					'Error disconnecting: ' + error.statusText
-				);
+			error: ( error ) => {
+				noticeError( 'Error disconnecting: ' + error.statusText );
 			},
-		})
+		} );
 	};
 
 	return (
 		<div className="single-item add-on js-pubguru-connect">
 			<div className="item-details">
 				<div className="icon">
-					<img src={addonRow.icon} alt="" />
+					<img src={ addonRow.icon } alt="" />
 				</div>
 				<span></span>
-				<div className="name">{addonRow.title}</div>
+				<div className="name">{ addonRow.title }</div>
 				<span></span>
-				<div className="description">{addonRow.content}</div>
+				<div className="description">{ addonRow.content }</div>
 				<span></span>
-				<div className={buttonRow}>
-					{isConnected ? (
-						<button
-							className="button"
-							onClick={onDisconnect}
-						>
+				<div className={ buttonRow }>
+					{ isConnected ? (
+						<button className="button" onClick={ onDisconnect }>
 							<i className="dashicons dashicons-dismiss"></i>
-							{addonRow.disconnect}
+							{ addonRow.disconnect }
 						</button>
 					) : (
 						<button
 							className="button"
-							onClick={() => {
+							onClick={ () => {
 								removeAllNotices();
-								toggleMetabox(true);
-							}}
+								toggleMetabox( true );
+							} }
 						>
 							<i className="dashicons dashicons-plus"></i>
-							{addonRow.connect}
+							{ addonRow.connect }
 						</button>
-					)}
+					) }
 				</div>
 			</div>
 		</div>

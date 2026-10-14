@@ -27,7 +27,7 @@ class Admin_Compatibility implements Integration_Interface {
 	 */
 	public function hooks(): void {
 		add_action( 'admin_enqueue_scripts', [ $this, 'dequeue_jnews_style' ], 100 );
-		add_action( 'quads_meta_box_post_types', [ $this, 'fix_wpquadspro_issue' ], 11 );
+		add_filter( 'quads_meta_box_post_types', [ $this, 'fix_wpquadspro_issue' ], 11 );
 		add_filter( 'wpml_admin_language_switcher_active_languages', [ $this, 'wpml_language_switcher' ] );
 
 		// Hide from WPML translation settings.
@@ -60,9 +60,7 @@ class Admin_Compatibility implements Integration_Interface {
 	}
 
 	/**
-	 * Fixes a WP QUADS PRO compatibility issue
-	 * they inject their ad optimization meta box into our ad page, even though it is not a public post type
-	 * using they filter, we remove AA from the list of post types they inject this box into
+	 * Fixes a WP QUADS PRO compatibility issue: they inject their ad optimization meta box into our ad page, even though it is not a public post type; using their filter, we remove AA from the list of post types they inject this box into.
 	 *
 	 * @param array<string, mixed> $allowed_post_types Array of allowed post types.
 	 *

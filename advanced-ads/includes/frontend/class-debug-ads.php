@@ -30,7 +30,7 @@ class Debug_Ads implements Integration_Interface {
 	 * @return void
 	 */
 	public function hooks(): void {
-		add_action( 'advanced-ads-ad-pre-output', [ $this, 'override_ad_output' ], 50, 2 );
+		add_filter( 'advanced-ads-ad-pre-output', [ $this, 'override_ad_output' ], 50, 2 );
 	}
 
 	/**
@@ -70,8 +70,8 @@ class Debug_Ads implements Integration_Interface {
 			$height = $ad->get_height();
 		}
 
-		$style      = "width:{$width}px;height:{$height}px;background-color:#ddd;overflow:scroll;";
-		$style_full = 'width: 100%; height: 100vh; background-color: #ddd; overflow: scroll; position: fixed; top: 0; left: 0; min-width: 600px; z-index: 99999;';
+		$style      = "width:{$width}px;height:{$height}px;background-color:#ddd;color:#1d2327;overflow:scroll;";
+		$style_full = 'width: 100%; height: 100vh; background-color: #ddd; color: #1d2327; overflow: scroll; position: fixed; top: 0; left: 0; min-width: 600px; z-index: 99999;';
 		$wrapper_id = Str::is_non_empty( $ad->get_wrapper_id() )
 			? $ad->get_wrapper_id()
 			: wp_advads()->get_frontend_prefix() . wp_rand();
@@ -86,7 +86,7 @@ class Debug_Ads implements Integration_Interface {
 
 		// Compare current wp_query with global wp_main_query.
 		if ( ! $wp_query->is_main_query() ) {
-			$content[] = sprintf( '<span style="color: red;">%s</span>', __( 'Current query is not identical to main query.', 'advanced-ads' ) );
+			$content[] = sprintf( '<span style="color: #b30000;">%s</span>', __( 'Current query is not identical to main query.', 'advanced-ads' ) );
 			$content[] = $this->build_query_diff_table();
 		}
 
@@ -96,7 +96,7 @@ class Debug_Ads implements Integration_Interface {
 
 		// Compare current post with global post.
 		if ( $wp_query->post !== $post ) {
-			$error = sprintf( '<span style="color: red;">%s</span>', __( 'Current post is not identical to main post.', 'advanced-ads' ) );
+			$error = sprintf( '<span style="color: #b30000;">%s</span>', __( 'Current post is not identical to main post.', 'advanced-ads' ) );
 			if ( isset( $wp_query->post->post_title ) && $wp_query->post->ID ) {
 				$error .= sprintf( '<br />%s: %s, %s: %s', __( 'main post', 'advanced-ads' ), $wp_query->post->post_title, 'ID', $wp_query->post->ID );
 			}
@@ -109,7 +109,7 @@ class Debug_Ads implements Integration_Interface {
 
 		$message = Validation::is_ad_https( $ad );
 		if ( $message ) {
-			$content[] = sprintf( '<span style="color: red;">%s</span>', $message );
+			$content[] = sprintf( '<span style="color: #b30000;">%s</span>', $message );
 		}
 
 		$content = apply_filters( 'advanced-ads-ad-output-debug-content', $content, $ad );
@@ -133,6 +133,8 @@ class Debug_Ads implements Integration_Interface {
 	 * Build table with differences between current and main query
 	 *
 	 * @since 1.7.0.3
+	 *
+	 * @return string|false
 	 */
 	private function build_query_diff_table() {
 		global $wp_query, $wp_the_query;
@@ -202,7 +204,7 @@ class Debug_Ads implements Integration_Interface {
 	 *
 	 * @param Ad $ad Ad instance.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private function build_display_conditions_table( Ad $ad ) {
 		$conditions = $ad->get_display_conditions();
@@ -308,7 +310,7 @@ class Debug_Ads implements Integration_Interface {
 	 *
 	 * @param Ad $ad Ad instance.
 	 *
-	 * @return string
+	 * @return string|void
 	 */
 	private function build_visitor_conditions_table( Ad $ad ) {
 		$conditions = $ad->get_visitor_conditions();

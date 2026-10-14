@@ -6,13 +6,7 @@
  * @author  Advanced Ads <info@wpadvancedads.com>
  * @since   2.0.0
  *
- * @var array $args Modal arguments.
- * @var string $args['id'] Modal ID.
- * @var string $args['title'] Modal title.
- * @var string $args['content'] Modal content.
- * @var bool $args['show_footer'] Show footer.
- * @var string $args['wrap_class'] Wrap class.
- * @var string $args['save_label'] Save label.
+ * @var array{id: string, title: string, description?: string, content: string, show_footer?: bool, wrap_class?: string, close_label?: string, save_label?: string} $args Modal arguments.
  */
 
 use AdvancedAds\Framework\Utilities\HTML;
@@ -27,7 +21,7 @@ $wrap = HTML::classnames( 'advads-dialog', $args['wrap_class'] ?? '' );
 				<?php if ( $args['description'] ) : ?>
 				<p class="advads-dialog-description"><?php echo esc_html( $args['description'] ); ?></p>
 				<?php endif; ?>
-				<a href="#" data-dialog-close class="advads-dialog-button-close">
+				<a href="#" data-dialog-close class="advads-dialog-button-close" aria-label="<?php esc_attr_e( 'Close', 'advanced-ads' ); ?>">
 					<span class="dashicons dashicons-no-alt"></span>
 				</a>
 			</div>

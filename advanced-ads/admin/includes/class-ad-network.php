@@ -30,32 +30,11 @@ abstract class Advanced_Ads_Ad_Network {
 	protected $name;
 
 	/**
-	 * The name of the hook for the advanced ads settings page
-	 *
-	 * @var string
-	 */
-	protected $settings_page_hook;
-
-	/**
 	 * The WordPress nonce (retrieve with the get_nonce method)
 	 *
 	 * @var string
 	 */
 	protected $nonce;
-
-	/**
-	 * The network’s settings section ID
-	 *
-	 * @var string
-	 */
-	protected $settings_section_id;
-
-	/**
-	 * The network’s settings init hook.
-	 *
-	 * @var string
-	 */
-	private $settings_init_hook;
 
 	/**
 	 * Advanced_Ads_Ad_Network constructor.
@@ -64,20 +43,8 @@ abstract class Advanced_Ads_Ad_Network {
 	 * @param string $name - the (translateable) display name for this ad network.
 	 */
 	public function __construct( $identifier, $name ) {
-		$this->identifier          = $identifier;
-		$this->name                = $name;
-		$this->settings_page_hook  = ADVADS_SLUG . '-' . $this->identifier . '-settings-page';
-		$this->settings_section_id = ADVADS_SLUG . '-' . $this->identifier . '-settings-section';
-		$this->settings_init_hook  = ADVADS_SLUG . '-' . $this->identifier . '-settings-init';
-	}
-
-	/**
-	 * The identifier for this network
-	 *
-	 * @return string
-	 */
-	public function get_identifier() {
-		return $this->identifier;
+		$this->identifier = $identifier;
+		$this->name       = $name;
 	}
 
 	/**
@@ -90,21 +57,12 @@ abstract class Advanced_Ads_Ad_Network {
 	}
 
 	/**
-	 * The display value for the settings tab
-	 *
-	 * @return string
-	 */
-	public function get_settings_tab_name() {
-		return $this->get_display_name();
-	}
-
-	/**
 	 * URL for the settings page (admin)
 	 *
 	 * @return string
 	 */
 	public function get_settings_href() {
-		return admin_url( 'admin.php?page=advanced-ads-settings#top#' . $this->identifier );
+		return admin_url( 'admin.php?page=advanced-ads-app&path=/settings' . $this->identifier );
 	}
 
 	/**
@@ -118,6 +76,8 @@ abstract class Advanced_Ads_Ad_Network {
 
 	/**
 	 * Registers this ad network
+	 *
+	 * @return void
 	 */
 	public function register() {
 		if ( is_admin() ) {
@@ -127,29 +87,19 @@ abstract class Advanced_Ads_Ad_Network {
 				add_action( 'wp_ajax_advanced_ads_get_ad_units_' . $this->identifier, [ $this, 'update_external_ad_units' ] );
 				add_action( 'wp_ajax_advanced_ads_toggle_idle_ads_' . $this->identifier, [ $this, 'toggle_idle_ads' ] );
 			} else {
-				// find out if we need to register the settings. this is necessary
-				// 1) when viewing the settings (admin.php with page="advanced-ads-settings")
-				// 2) when posting the settings to options.php
-				// in all other cases, there is nothing to do.
 				global $pagenow;
-				$requires_settings   = false;
 				$requires_javascript = false;
 
 				if ( 'admin.php' === $pagenow ) {
 					$page = Params::request( 'page', null );
 					switch ( $page ) {
 						case 'advanced-ads-settings':
-							$requires_settings   = true;
-							$requires_javascript = true;
-							break;
 						case 'advanced-ads':
 							$requires_javascript = true;
 							break;
 						default:
 							break;
 					}
-				} elseif ( 'options.php' === $pagenow ) {
-					$requires_settings = true;
 				} elseif ( 'post.php' === $pagenow || 'post-new.php' === $pagenow ) {
 					add_action( 'advanced-ads-ad-pre-save', [ $this, 'sanitize_ad_settings' ], 10, 2 );
 
@@ -160,57 +110,11 @@ abstract class Advanced_Ads_Ad_Network {
 					}
 				}
 
-				if ( $requires_settings ) {
-					// register the settings.
-					add_action( 'advanced-ads-settings-init', [ $this, 'register_settings_callback' ] );
-					add_filter( 'advanced-ads-setting-tabs', [ $this, 'register_settings_tabs_callback' ] );
-				}
 				if ( $requires_javascript ) {
 					add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts_callback' ] );
 				}
 			}
 		}
-	}
-
-	/**
-	 * This method will be called for the wp action "advanced-ads-settings-init" and therefore has to be public.
-	 */
-	public function register_settings_callback() {
-		// register new settings.
-		register_setting(
-			ADVADS_SLUG . '-' . $this->identifier,
-			ADVADS_SLUG . '-' . $this->identifier,
-			[ $this, 'sanitize_settings_callback' ]
-		);
-
-		/**
-		 * Allow Ad Admin to save AdSense options.
-		 *
-		 * @param array $settings Array with allowed options.
-		 *
-		 * @return array
-		 */
-		add_filter(
-			'advanced-ads-ad-admin-options',
-			function ( $options ) {
-				$options[] = ADVADS_SLUG . '-' . $this->identifier;
-
-				return $options;
-			}
-		);
-
-		// add a new section.
-		add_settings_section(
-			$this->settings_section_id,
-			'',
-			'__return_empty_string',
-			$this->settings_page_hook
-		);
-
-		// register all the custom settings.
-		$this->register_settings( $this->settings_page_hook, $this->settings_section_id );
-
-		do_action( $this->settings_init_hook, $this->settings_page_hook );
 	}
 
 	/**
@@ -224,6 +128,8 @@ abstract class Advanced_Ads_Ad_Network {
 
 	/**
 	 * Engueue scripts
+	 *
+	 * @return void
 	 */
 	public function enqueue_scripts_callback() {
 
@@ -269,41 +175,10 @@ abstract class Advanced_Ads_Ad_Network {
 	}
 
 	/**
-	 * This method will be called for the wp action "advanced-ads-settings-tabs" and therefore has to be public.
-	 * it simply adds a tab for this ad type. if you don't want that just override this method with an empty one.
-	 *
-	 * @param array<string, array<string, string>> $tabs Tabs on Advanced Ads settings page.
-	 *
-	 * @return array<string, array<string, string>>
-	 */
-	public function register_settings_tabs_callback( $tabs ) {
-		$tab_id          = $this->identifier;
-		$tabs[ $tab_id ] = [
-			'page'  => $this->settings_page_hook,
-			'group' => ADVADS_SLUG . '-' . $this->identifier,
-			'tabid' => $tab_id,
-			'title' => $this->get_settings_tab_name(),
-		];
-
-		return $tabs;
-	}
-
-	/**
-	 * Callback to sanitize settings
-	 *
-	 * @param array<string, mixed> $options Options to be sanitized.
-	 *
-	 * @return mixed
-	 */
-	public function sanitize_settings_callback( $options ) {
-		$options = $this->sanitize_settings( $options );
-
-		return $options;
-	}
-
-	/**
 	 * Performs basic security checks for wp ajax requests (nonce, capabilities)
 	 * dies, when a problem was detected
+	 *
+	 * @return void
 	 */
 	protected function ajax_security_checks() {
 		if ( ! Conditional::user_can( 'advanced_ads_manage_options' ) ) {
@@ -319,7 +194,9 @@ abstract class Advanced_Ads_Ad_Network {
 	/**
 	 * Send data via AJAX but don’t react on it.
 	 *
-	 * @param bool $json_serializable_response true if data can be serialized.
+	 * @param mixed $json_serializable_response data to send, an empty object when there is none.
+	 *
+	 * @return void
 	 */
 	protected function send_ajax_response_and_die( $json_serializable_response = false ) {
 		if ( ! $json_serializable_response ) {
@@ -334,6 +211,8 @@ abstract class Advanced_Ads_Ad_Network {
 	 * Send message via AJAX but don’t react on it.
 	 *
 	 * @param string $message message string.
+	 *
+	 * @return void
 	 */
 	protected function send_ajax_error_response_and_die( $message ) {
 		header( 'Content-Type: application/json' );
@@ -345,6 +224,8 @@ abstract class Advanced_Ads_Ad_Network {
 
 	/**
 	 * Toggle ad IDs
+	 *
+	 * @return void
 	 */
 	public function toggle_idle_ads() {
 		$this->ajax_security_checks();
@@ -389,25 +270,10 @@ abstract class Advanced_Ads_Ad_Network {
 	 * This method will be called via wp AJAX.
 	 * it has to retrieve the list of ads from the ad network and store it as an option
 	 * does not return ad units - use "get_external_ad_units" if you're looking for an array of ad units
+	 *
+	 * @return void
 	 */
 	abstract public function update_external_ad_units();
-
-	/**
-	 * Adds the custom wp settings to the tab for this ad unit
-	 *
-	 * @param string $hook hook for the settings page.
-	 * @param string $section_id settings section ID.
-	 */
-	abstract protected function register_settings( $hook, $section_id );
-
-	/**
-	 * Sanitize the network specific options
-	 *
-	 * @param array<string, mixed> $options The options to sanitize.
-	 *
-	 * @return mixed The sanitized options.
-	 */
-	abstract protected function sanitize_settings( $options );
 
 	/**
 	 * Sanitize the settings for this ad network

@@ -21,9 +21,9 @@ class Inline_JS implements Integration_Interface {
 	/**
 	 * Array that holds strings that should not be optimized by other plugins.
 	 *
-	 * @var array<string, mixed>
+	 * @var array<int, string>|null
 	 */
-	private $inline_js;
+	private $inline_js = null;
 
 	/**
 	 * Hook into WordPress.
@@ -31,24 +31,20 @@ class Inline_JS implements Integration_Interface {
 	 * @return void
 	 */
 	public function hooks(): void {
-		$this->critical_inline_js();
-
 		add_filter( 'rocket_delay_js_exclusions', [ $this, 'rocket_exclude_inline_js' ] );
 		add_filter( 'rocket_excluded_inline_js_content', [ $this, 'rocket_exclude_inline_js' ] );
 		add_filter( $this->get_cmplz_hook(), [ $this, 'complianz_exclude_inline_js' ], 10, 2 );
 	}
 
 	/**
-	 * Prevent the 'advanced_ads_ready' function declaration from being merged with other JS
-	 * and outputted into the footer. This is needed because WP Rocket does not output all
-	 * the code that depends on this function into the footer.
+	 * Prevent the 'advanced_ads_ready' function declaration from being merged with other JS and outputted into the footer — needed because WP Rocket does not output all the code that depends on this function into the footer.
 	 *
 	 * @param array<int, string> $exclusions Patterns to match in inline JS content.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<int, string>
 	 */
 	public function rocket_exclude_inline_js( $exclusions ): array {
-		return array_merge( $exclusions, $this->inline_js );
+		return array_merge( $exclusions, $this->critical_inline_js() );
 	}
 
 	/**
@@ -65,7 +61,7 @@ class Inline_JS implements Integration_Interface {
 			return $classname;
 		}
 
-		foreach ( $this->inline_js as $critical_inline_js ) {
+		foreach ( $this->critical_inline_js() as $critical_inline_js ) {
 			if ( false !== strpos( $total_match, $critical_inline_js ) ) {
 				return 'cmplz-native';
 			}
@@ -77,9 +73,13 @@ class Inline_JS implements Integration_Interface {
 	/**
 	 * Get an array of strings to exclude when plugins "optimize" JS.
 	 *
-	 * @return void
+	 * @return array<int, string>
 	 */
-	private function critical_inline_js(): void {
+	private function critical_inline_js(): array {
+		if ( null !== $this->inline_js ) {
+			return $this->inline_js ?? [];
+		}
+
 		$frontend_prefix = wp_advads()->get_frontend_prefix();
 		$default         = [
 			sprintf( 'id="%sready"', $frontend_prefix ),
@@ -88,7 +88,8 @@ class Inline_JS implements Integration_Interface {
 		/**
 		 * Filters an array of strings of (inline) JavaScript "identifiers" that should not be "optimized"/delayed etc.
 		 *
-		 * @param array<string, mixed> $default Array of excluded patterns.
+		 * @param array<int, string> $default         Array of excluded patterns.
+		 * @param string             $frontend_prefix Frontend prefix.
 		 */
 		$exclusions = apply_filters( 'advanced-ads-compatibility-critical-inline-js', $default, $frontend_prefix );
 
@@ -97,6 +98,8 @@ class Inline_JS implements Integration_Interface {
 		}
 
 		$this->inline_js = $exclusions;
+
+		return $this->inline_js;
 	}
 
 	/**

@@ -10,6 +10,7 @@
 namespace AdvancedAds\Compatibility;
 
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Abstracts\Ad;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -86,7 +87,7 @@ class Peepso implements Integration_Interface {
 	/**
 	 * Render Peepso parameters.
 	 *
-	 * @param AD $ad Ad object.
+	 * @param Ad $ad Ad object.
 	 *
 	 * @return void
 	 */

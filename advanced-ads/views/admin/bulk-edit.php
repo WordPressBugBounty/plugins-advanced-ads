@@ -49,7 +49,7 @@ use AdvancedAds\Admin\Ads\Quick_Bulk_Edit;
 					printf(
 					/* Translators: %s is the URL to the settings page. */
 						esc_html__( 'Enable the Ad Label %1$s in the settings%2$s.', 'advanced-ads' ),
-						'<a href="' . esc_url( admin_url( 'admin.php?page=advanced-ads-settings' ) ) . '" target="_blank">',
+						'<a href="' . esc_url( admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=general' ) ) . '" target="_blank">',
 						'</a>'
 					);
 					?>

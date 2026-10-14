@@ -25,20 +25,11 @@ final class License_Product_Map {
 	 */
 	public static function addon_manifest(): array {
 		$slug_base = defined( 'ADVADS_SLUG' ) ? ADVADS_SLUG : 'advanced-ads';
-		$names     = [
-			'pro'        => 'Pro',
-			'responsive' => 'AMP Ads',
-			'gam'        => 'Google Ad Manager Integration',
-			'layer'      => 'PopUp and Layer Ads',
-			'selling'    => 'Selling Ads',
-			'sticky'     => 'Sticky Ads',
-			'tracking'   => 'Tracking',
-		];
 		$out       = [];
 
 		foreach ( Addons::plugin_files() as $addon_id => $file ) {
 			$slug         = $slug_base . '-' . $addon_id;
-			$display_name = $names[ $addon_id ] ?? $addon_id;
+			$display_name = Addons::product_name( $addon_id );
 			$normalized   = self::normalize_name( $display_name );
 			$out[ $slug ] = [
 				'id'           => $addon_id,

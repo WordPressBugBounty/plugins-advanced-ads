@@ -95,7 +95,7 @@ class Placements implements Routes_Interface {
 	 * @return mixed
 	 */
 	public function create( $request ) {
-		$body = json_decode( $request->get_body(), JSON_UNESCAPED_UNICODE );
+		$body = json_decode( $request->get_body(), true );
 		parse_str( $body['fields'], $payload );
 
 		if ( ! wp_verify_nonce( sanitize_key( $payload['nonce'] ), 'advads-create-placement' ) ) {
@@ -133,7 +133,7 @@ class Placements implements Routes_Interface {
 	 * @return mixed
 	 */
 	public function update( $request ) {
-		$body = json_decode( $request->get_body(), JSON_UNESCAPED_UNICODE );
+		$body = json_decode( $request->get_body(), true );
 		parse_str( $body['fields'], $payload );
 
 		if ( ! wp_verify_nonce( sanitize_key( $payload['nonce'] ), 'advads-update-placement' ) ) {
@@ -160,6 +160,18 @@ class Placements implements Routes_Interface {
 
 			if ( ! Arr::get( $payload, 'advads.placements.options.start_from_bottom' ) && $placement->get_prop( 'start_from_bottom' ) ) {
 				$placement->set_prop( 'start_from_bottom', null );
+			}
+
+			if ( ! Arr::get( $payload, 'advads.placements.options.placement_clearfix' ) && $placement->get_prop( 'placement_clearfix' ) ) {
+				$placement->set_prop( 'placement_clearfix', null );
+			}
+
+			if ( ! Arr::get( $payload, 'advads.placements.options.sticky_is_fixed' ) && $placement->get_prop( 'sticky_is_fixed' ) ) {
+				$placement->set_prop( 'sticky_is_fixed', null );
+			}
+
+			if ( ! Arr::get( $payload, 'advads.placements.options.sticky_center_vertical' ) && $placement->get_prop( 'sticky_center_vertical' ) ) {
+				$placement->set_prop( 'sticky_center_vertical', null );
 			}
 		}
 

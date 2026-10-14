@@ -22,8 +22,7 @@ use XML_Encoder;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * XML Importer.
- * TODO: Refactor logic.
+ * XML Importer. TODO: Refactor logic.
  */
 class XML_Importer extends Importer implements Interface_Importer {
 	/**
@@ -61,7 +60,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Post data indexs to set before inserting into the database
 	 *
-	 * @var array<string, mixed>
+	 * @var array<int, string>
 	 */
 	private $post_data_index = [];
 
@@ -71,7 +70,6 @@ class XML_Importer extends Importer implements Interface_Importer {
 	public function __construct() {
 		add_action( 'advanced-ads-cleanup-import-file', [ $this, 'delete_old_import_file' ] );
 		add_filter( 'advanced-ads-new-ad-data', [ $this, 'ad_before_inserting' ], 10, 2 );
-		remove_action( 'advanced-ads-ad-pre-save', [ \Advanced_Ads_AdSense_Admin::get_instance(), 'save_ad_options' ] );
 	}
 
 	/**
@@ -130,7 +128,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 	/**
 	 * Import data.
 	 *
-	 * @return array<string, mixed>|string
+	 * @return array<int|string, mixed>|string
 	 */
 	public function import() {
 		switch ( Params::post( 'import_type' ) ) {
@@ -165,10 +163,12 @@ class XML_Importer extends Importer implements Interface_Importer {
 	 * The main controller for the actual import stage
 	 *
 	 * @param string $xml_content XML content to import.
+	 *
+	 * @return void
 	 */
 	public function import_content( &$xml_content ) {
 		@set_time_limit( 0 );
-		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
+		wp_raise_memory_limit( 'admin' );
 
 		$xml_content = trim( $xml_content );
 
@@ -304,8 +304,10 @@ class XML_Importer extends Importer implements Interface_Importer {
 	 * Create new ads and groups based on import information
 	 *
 	 * @param array<string, mixed> $decoded decoded XML.
+	 *
+	 * @return void
 	 */
-	private function import_ads( $decoded ) {
+	private function import_ads( $decoded ): void {
 		// Early bail!!
 		if ( empty( $decoded ) ) {
 			return;
@@ -495,8 +497,10 @@ class XML_Importer extends Importer implements Interface_Importer {
 	 * Create new placements based on import information
 	 *
 	 * @param array<string, mixed> $decoded decoded XML.
+	 *
+	 * @return void
 	 */
-	private function import_placements( $decoded ) {
+	private function import_placements( $decoded ): void {
 		// Early bail!!
 		if ( empty( $decoded ) ) {
 			return;
@@ -572,14 +576,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 
 											if ( $group ) {
 												/**
-												 * By default, a new add added to a group receives the weight of 5
-												 * so that users could set the weight of existing ads either higher or lower
-												 * depending on whether they want to show the new ad with a higher weight or not.
-												 * This is especially useful with Selling Ads to replace an existing ad in a group
-												 * with a newly sold one
-												 *
-												 * Advanced users could use the `advanced-ads-import-default-group-weight` filter
-												 * to manipulate the value
+												 * By default, a new add added to a group receives the weight of 5 so that users could set the weight of existing ads either higher or lower depending on whether they want to show the new ad with a higher weight or not — this is especially useful with Selling Ads to replace an existing ad in a group with a newly sold one. Advanced users could use the `advanced-ads-import-default-group-weight` filter to manipulate the value.
 												 */
 												$weights            = $group->get_ad_weights();
 												$weights[ $found ]  = apply_filters( 'advanced-ads-import-default-group-weight', 5 );
@@ -697,8 +694,10 @@ class XML_Importer extends Importer implements Interface_Importer {
 	 * Create new options based on import information.
 	 *
 	 * @param array<string, mixed> $decoded decoded XML.
+	 *
+	 * @return void
 	 */
-	private function import_options( $decoded ) {
+	private function import_options( $decoded ): void {
 		if ( isset( $decoded['options'] ) && is_array( $decoded['options'] ) ) {
 			$count_options = 0;
 
@@ -751,7 +750,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 	 * Upload image from URL and create attachment
 	 *
 	 * @param string $image_url Image url.
-	 * @return array<string, mixed> with indices: post_id, attachment_url, false on failure
+	 * @return array<string, mixed>|false with indices: post_id, attachment_url, false on failure
 	 */
 	private function upload_image_from_url( $image_url ) {
 		$file_name   = basename( current( explode( '?', $image_url ) ) );
@@ -780,7 +779,7 @@ class XML_Importer extends Importer implements Interface_Importer {
 		}
 
 		// Upload the file.
-		$upload = wp_upload_bits( $file_name, '', wp_remote_retrieve_body( $response ) );
+		$upload = wp_upload_bits( $file_name, null, wp_remote_retrieve_body( $response ) );
 
 		if ( $upload['error'] ) {
 			/* translators: %s image url */

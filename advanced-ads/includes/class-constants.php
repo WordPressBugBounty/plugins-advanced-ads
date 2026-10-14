@@ -23,8 +23,7 @@ class Constants {
 	const REST_BASE = 'advanced-ads/v1';
 
 	/**
-	 * Prefix of selectors (id, class) in the frontend
-	 * can be changed by options
+	 * Prefix of selectors (id, class) in the frontend — can be changed by options.
 	 *
 	 * @var string
 	 */
@@ -109,6 +108,13 @@ class Constants {
 	const CRON_JOB_AD_EXPIRATION = 'advanced-ads-ad-expiration';
 
 	/**
+	 * Anonymous usage-data send cron hook.
+	 *
+	 * @var string
+	 */
+	const CRON_JOB_DATA_USAGE = 'advanced-ads-data-usage';
+
+	/**
 	 * License expiry: one month before expiration.
 	 *
 	 * @var string
@@ -189,6 +195,20 @@ class Constants {
 	const OPTION_WIZARD_COMPLETED = '_advanced_ads_wizard_completed';
 
 	/**
+	 * Option key for wizard setup preference (recommended | advanced).
+	 *
+	 * @var string
+	 */
+	const OPTION_WIZARD_PREF = '_advanced_ads_wizard_pref';
+
+	/**
+	 * Option key for anonymous usage-data preferences.
+	 *
+	 * @var string
+	 */
+	const OPTION_DATA_USAGE = '_advanced_ads_data_usage';
+
+	/**
 	 * Option key for adblocker settings.
 	 *
 	 * @var string
@@ -204,23 +224,6 @@ class Constants {
 
 	/* Misc ---------------------------- */
 
-	const ADDONS_NON_COMPATIBLE_VERSIONS = [
-		'1.1.3'  => 'advanced-ads-adsense-in-feed',    // Advanced Ads – Google AdSense In-feed Placement.
-		'2.5.0'  => 'advanced-ads-gam',                // GAM.
-		'1.0.8'  => 'advanced-ads-genesis',            // Genesis.
-		'1.3.5'  => 'advanced-ads-geo',                // Geo.
-		'1.7.9'  => 'advanced-ads-layer',              // Layer Ads.
-		'0.1.3'  => 'advanced-ads-page-peel',          // Page Peel.
-		'2.28.0' => 'advanced-ads-pro',                // Pro.
-		'1.12.3' => 'advanced-ads-responsive',         // AMP former Responsive Ads.
-		'1.4.5'  => 'advanced-ads-selling',            // Selling.
-		'1.4.10' => 'slider-ads',                      // Slider.
-		'1.8.6'  => 'advanced-ads-sticky',             // Sticky Ads.
-		'2.8.1'  => 'advanced-ads-tracking',           // Tracking.
-		'1.0.7'  => 'ads-for-visual-composer',         // Visual Composer.
-		'1.1.0'  => 'advanced-ads-browser-language',   // Browser Language.
-	];
-
 	/**
 	 * License API endpoint URL
 	 *
@@ -229,18 +232,9 @@ class Constants {
 	const API_ENDPOINT = 'https://wpadvancedads.com/license-api/';
 
 	/**
-	 * Add-on slugs and their EDD ID
+	 * AdSense new account link
 	 *
-	 * @const array
+	 * @const string
 	 */
-	const ADDON_SLUGS_ID = [
-		'advanced-ads-gam'        => 215545,
-		'advanced-ads-layer'      => 686,
-		'advanced-ads-pro'        => 1742,
-		'advanced-ads-responsive' => 678,
-		'advanced-ads-selling'    => 35300,
-		'advanced-ads-sticky'     => 683,
-		'advanced-ads-tracking'   => 638,
-		'slider-ads'              => 1168,
-	];
+	const ADSENSE_NEW_ACCOUNT_LINK = 'https://www.google.com/adsense/start/?utm_source=AdvancedAdsPlugIn&utm_medium=partnerships&utm_campaign=AdvancedAdsPartner1';
 }

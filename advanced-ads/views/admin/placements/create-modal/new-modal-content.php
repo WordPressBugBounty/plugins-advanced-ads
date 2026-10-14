@@ -74,7 +74,6 @@ if ( '' !== $placements_description ) : ?>
 	<p>
 		<?php require 'item-select.php'; ?>
 	</p>
-	<?php wp_nonce_field( 'advads-new-placement', 'advads_placement' ); ?>
 	<input type="hidden" name="action_advads" value="new_placement">
 </form>
 

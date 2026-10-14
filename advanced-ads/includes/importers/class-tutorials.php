@@ -10,6 +10,7 @@
 namespace AdvancedAds\Importers;
 
 use AdvancedAds\Interfaces\Importer as Interface_Importer;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
 

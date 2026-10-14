@@ -39,7 +39,7 @@ class Manager implements Integration_Interface {
 	/**
 	 * Hold message to display on page
 	 *
-	 * @var string|WP_Error
+	 * @var string|WP_Error|false
 	 */
 	private $message = false;
 

@@ -9,14 +9,15 @@
 
 namespace AdvancedAds\Admin;
 
-use Advanced_Ads_AdSense_Data;
-use Advanced_Ads_AdSense_Admin;
-use Advanced_Ads_Ad_Type_Adsense;
 use AdvancedAds\Constants;
-use AdvancedAds\Utilities\Validation;
-use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Modules\AdSense\Utils;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\Validation;
+use AdvancedAds\Abstracts\Ad;
+use WP_Post;
+use WP_Screen;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -148,6 +149,11 @@ class Metabox_Ad implements Integration_Interface {
 			$this->display_warnings( $box );
 			$view = $metabox->get_view( $ad );
 			if ( $view ) {
+				if ( method_exists( $metabox, 'prepare_view_vars' ) ) {
+					foreach ( $metabox->prepare_view_vars( $ad ) as $key => $value ) {
+						$$key = $value;
+					}
+				}
 				include $view;
 			}
 			$this->display_handle_links( $metabox );
@@ -171,8 +177,7 @@ class Metabox_Ad implements Integration_Interface {
 	}
 
 	/**
-	 * Create a unique across all post types slug for the ad.
-	 * Almost all code here copied from `wp_unique_post_slug()`.
+	 * Create a unique across all post types slug for the ad — almost all code here copied from `wp_unique_post_slug()`.
 	 *
 	 * @param string $override_slug Short-circuit return value.
 	 * @param string $slug The desired slug (post_name).
@@ -229,12 +234,14 @@ class Metabox_Ad implements Integration_Interface {
 			Constants::POST_TYPE_AD === $data['post_type'] &&
 			'' === $data['post_title']
 		) {
-			$created_time = function_exists( 'wp_date' )
-				? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ) )
-				: $data['post_date'];
-
-			/* translators: %s is the time the ad was first saved. */
-			$data['post_title'] = sprintf( __( 'Ad created on %s', 'advanced-ads' ), $created_time );
+			$data['post_title'] = sprintf(
+				/* translators: %s: date and time the ad was first saved. */
+				__( 'Ad created on %s', 'advanced-ads' ),
+				wp_date(
+					get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
+					strtotime( $data['post_date'] )
+				)
+			);
 		}
 
 		return $data;
@@ -264,11 +271,23 @@ class Metabox_Ad implements Integration_Interface {
 			return;
 		}
 
+		check_admin_referer( 'update-post_' . $post_id );
+
+		$type = isset( $post_data['type'] ) && is_string( $post_data['type'] )
+			? sanitize_key( wp_unslash( $post_data['type'] ) )
+			: '';
+
+		if ( '' !== $type ) {
+			$post_data['type'] = $type;
+		} else {
+			unset( $post_data['type'] );
+		}
+
 		// Maybe there is a type change so force it.
-		$ad = wp_advads_get_ad( $post_id, wp_unslash( $post_data['type'] ) );
+		$ad = wp_advads_get_ad( $post_id, $type );
 		$ad->set_props( $post_data );
 
-		remove_action( 'save_post_advanced_ads', [ $this, 'save' ], 10, 2 );
+		remove_action( 'save_post_advanced_ads', [ $this, 'save' ], 10 );
 		$ad->save();
 		add_action( 'save_post_advanced_ads', [ $this, 'save' ], 10, 2 );
 	}
@@ -356,12 +375,11 @@ class Metabox_Ad implements Integration_Interface {
 		$box_id   = $box['id'];
 
 		/**
-		 *  List general notices
-		 *  elements in $warnings contain [text] and [class] attributes.
+		 * List general notices — elements in $warnings contain [text] and [class] attributes.
 		 */
 		if ( 'ad-parameters-box' === $box_id ) {
 			$warnings[] = [
-				'text'  => Advanced_Ads_AdSense_Admin::get_auto_ads_messages()[ Advanced_Ads_AdSense_Data::get_instance()->is_page_level_enabled() ? 'enabled' : 'disabled' ],
+				'text'  => Utils::get_auto_ads_messages()[ Utils::is_page_level_enabled() ? 'enabled' : 'disabled' ],
 				'class' => 'advads-auto-ad-in-ad-content hidden advads-notice-inline advads-error',
 			];
 
@@ -378,8 +396,7 @@ class Metabox_Ad implements Integration_Interface {
 		// Let users know that they could use the Google AdSense ad type
 		// when they enter an AdSense code.
 		if ( 'ad-parameters-box' === $box_id && $this->has_adsense_on_plain_content_type() ) {
-			$adsense_auto_ads = Advanced_Ads_AdSense_Data::get_instance()->is_page_level_enabled();
-			$warnings[]       = [
+			$warnings[] = [
 				'class' => 'advads-adsense-found-in-content advads-notice-inline advads-error',
 				'text'  => sprintf(
 					/* translators: %1$s opening button tag, %2$s closing button tag. */
@@ -398,7 +415,19 @@ class Metabox_Ad implements Integration_Interface {
 				printf(
 					'<li class="%s">%s</li>',
 					esc_attr( $warning['class'] ?? '' ),
-					$warning['text'], // phpcs:ignore
+					wp_kses(
+						$warning['text'],
+						array_merge(
+							wp_kses_allowed_html( 'post' ),
+							[
+								'button' => [
+									'type'  => true,
+									'class' => true,
+									'id'    => true,
+								],
+							]
+						)
+					)
 				);
 			}
 		}
@@ -413,7 +442,7 @@ class Metabox_Ad implements Integration_Interface {
 	private function has_adsense_on_plain_content_type(): bool {
 		$content = $this->ad->get_content();
 		if (
-			Advanced_Ads_Ad_Type_Adsense::content_is_adsense( $content ) &&
+			$this->content_is_adsense( $content ) &&
 			$this->ad->is_type( [ 'plain', 'content' ] ) &&
 			false === strpos( $content, 'enable_page_level_ads' ) &&
 			! preg_match( '/script[^>]+data-ad-client=/', $content )
@@ -425,17 +454,138 @@ class Metabox_Ad implements Integration_Interface {
 	}
 
 	/**
-	 * Register metaboxes
+	 * Register metaboxes — definitions must expose get_box_id(), register( $manager ), get_view( $ad ), and get_handle_link(); get_view() returns a filesystem path (or '') and must not include/echo.
 	 *
 	 * @return void
 	 */
 	private function register_metaboxes(): void {
 		$this->register_metabox( Metaboxes\Ad_Usage::class );
-		$this->register_metabox( Metaboxes\Ad_Types::class );
-		$this->register_metabox( Metaboxes\Ad_Parameters::class );
-		$this->register_metabox( Metaboxes\Ad_Layout::class );
-		$this->register_metabox( Metaboxes\Ad_Targeting::class );
+
+		foreach ( $this->get_unconditional_metabox_config() as $config ) {
+			$this->register_config_metabox( $config );
+		}
+
 		$this->register_metabox( Metaboxes\Ad_Adsense::class );
+	}
+
+	/**
+	 * Config for unconditional ad-edit metaboxes.
+	 *
+	 * @return array<int, array{id: string, title: string, view: string, handle_link: string|array, priority: string}>
+	 */
+	private function get_unconditional_metabox_config(): array {
+		return [
+			[
+				'id'          => 'ad-types-box',
+				'title'       => __( 'Ad Type', 'advanced-ads' ),
+				'view'        => ADVADS_ABSPATH . 'views/admin/metaboxes/ads/ad-types.php',
+				'handle_link' => '<a href="https://wpadvancedads.com/manual/ad-types?utm_source=advanced-ads&utm_medium=link&utm_campaign=edit-ad-type" target="_blank" class="advads-manual-link">' . __( 'Manual', 'advanced-ads' ) . '</a>',
+				'priority'    => 'high',
+			],
+			[
+				'id'          => 'ad-parameters-box',
+				'title'       => __( 'Ad Parameters', 'advanced-ads' ),
+				'view'        => ADVADS_ABSPATH . 'views/admin/metaboxes/ads/ad-parameters.php',
+				'handle_link' => '',
+				'priority'    => 'high',
+			],
+			[
+				'id'          => 'ad-output-box',
+				'title'       => __( 'Layout / Output', 'advanced-ads' ),
+				'view'        => ADVADS_ABSPATH . 'views/admin/metaboxes/ads/ad-layout.php',
+				'handle_link' => '<a href="https://wpadvancedads.com/manual/optimizing-the-ad-layout/?utm_source=advanced-ads&utm_medium=link&utm_campaign=edit-ad-layout" target="_blank" class="advads-manual-link">' . __( 'Manual', 'advanced-ads' ) . '</a>',
+				'priority'    => 'high',
+			],
+			[
+				'id'          => 'ad-targeting-box',
+				'title'       => __( 'Targeting', 'advanced-ads' ),
+				'view'        => ADVADS_ABSPATH . 'views/admin/metaboxes/ads/ad-targeting.php',
+				'handle_link' => [
+					'<a href="#" class="advads-video-link">' . __( 'Video', 'advanced-ads' ) . '</a>',
+					'<a href="https://wpadvancedads.com/manual/display-conditions/?utm_source=advanced-ads&utm_medium=link&utm_campaign=edit-display" target="_blank" class="advads-manual-link">' . __( 'Display Conditions', 'advanced-ads' ) . '</a>',
+					'<a href="https://wpadvancedads.com/manual/visitor-conditions/?utm_source=advanced-ads&utm_medium=link&utm_campaign=edit-visitor" target="_blank" class="advads-manual-link">' . __( 'Visitor Conditions', 'advanced-ads' ) . '</a>',
+				],
+				'priority'    => 'default',
+			],
+		];
+	}
+
+	/**
+	 * Register a config-driven metabox definition.
+	 *
+	 * @param array{id: string, title: string, view: string, handle_link: string|array, priority: string} $config Config.
+	 *
+	 * @return void
+	 */
+	private function register_config_metabox( array $config ): void {
+		$metabox = new class( $config ) {
+			/**
+			 * Metabox config.
+			 *
+			 * @var array{id: string, title: string, view: string, handle_link: string|array, priority: string}
+			 */
+			private $config;
+
+			/**
+			 * Constructor.
+			 *
+			 * @param array $config Metabox config.
+			 */
+			public function __construct( array $config ) {
+				$this->config = $config;
+			}
+
+			/**
+			 * Get the metabox id.
+			 *
+			 * @return string
+			 */
+			public function get_box_id(): string {
+				return $this->config['id'];
+			}
+
+			/**
+			 * Register the metabox.
+			 *
+			 * @param Metabox_Ad $manager Manager instance.
+			 *
+			 * @return void
+			 */
+			public function register( $manager ): void {
+				add_meta_box(
+					$this->config['id'],
+					$this->config['title'],
+					[ $manager, 'display' ],
+					Constants::POST_TYPE_AD,
+					'normal',
+					$this->config['priority']
+				);
+			}
+
+			/**
+			 * Get the metabox view path.
+			 *
+			 * @param mixed $ad Ad instance.
+			 *
+			 * @return string
+			 */
+			public function get_view( $ad = null ): string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+				return $this->config['view'];
+			}
+
+			/**
+			 * Get the metabox's help/handle link.
+			 *
+			 * @return array|string
+			 */
+			public function get_handle_link() {
+				return $this->config['handle_link'];
+			}
+		};
+
+		$metabox_id                     = $metabox->get_box_id();
+		$this->meta_box_ids[]           = $metabox_id;
+		$this->metaboxes[ $metabox_id ] = $metabox;
 	}
 
 	/**
@@ -450,5 +600,17 @@ class Metabox_Ad implements Integration_Interface {
 		$metabox_id                     = $metabox->get_box_id();
 		$this->meta_box_ids[]           = $metabox_id;
 		$this->metaboxes[ $metabox_id ] = $metabox;
+	}
+
+	/**
+	 * Check if a string looks like an AdSense ad code.
+	 *
+	 * @param string $content The string that need to be checked.
+	 *
+	 * @return boolean
+	 */
+	private function content_is_adsense( $content = '' ) {
+		return false !== stripos( $content, 'googlesyndication.com' ) &&
+			( false !== stripos( $content, 'google_ad_client' ) || false !== stripos( $content, 'data-ad-client' ) );
 	}
 }

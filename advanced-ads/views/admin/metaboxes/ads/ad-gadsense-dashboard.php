@@ -12,7 +12,10 @@
  * @var string $pub_id        Adsense ID.
  */
 
-$pub_id = Advanced_Ads_AdSense_Data::get_instance()->get_adsense_id();
+use AdvancedAds\Modules\AdSense\Utils;
+use AdvancedAds\Abstracts\Ad;
+
+$pub_id = Utils::get_adsense_id();
 
 // Early bail!!
 if ( ! $pub_id ) {

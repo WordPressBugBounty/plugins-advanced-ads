@@ -97,15 +97,6 @@ abstract class Screen {
 	/* Tabs API -------------------- */
 
 	/**
-	 * Get the tabs.
-	 *
-	 * @return array<string, array<string, mixed>>
-	 */
-	public function get_tabs(): array {
-		return $this->tabs;
-	}
-
-	/**
 	 * Set the tabs.
 	 *
 	 * @param array<string, array<string, mixed>> $tabs Array of screen tabs.
@@ -183,21 +174,6 @@ abstract class Screen {
 	 * @return void
 	 */
 	public function header_actions(): void {}
-
-	/**
-	 * Get admin page header
-	 *
-	 * @param array<string, mixed> $args Arguments to be used in the template.
-	 *
-	 * @return void
-	 */
-	public function get_header( array $args = [] ): void {
-		$args = wp_parse_args( $args, $this->get_header_args() );
-
-		extract( $args, EXTR_SKIP ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
-
-		include ADVADS_ABSPATH . 'views/admin/layout/header.php';
-	}
 
 	/**
 	 * Get page header arguments

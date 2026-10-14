@@ -13,8 +13,10 @@ use AdvancedAds\Constants;
  * Migrates groups and ads to link them together.
  *
  * @since 1.52.1
+ *
+ * @return void
  */
-function advads_migrate_groups() {
+function advads_migrate_groups(): void {
 	$group_summaries = wp_advads_get_group_summaries();
 	$ads             = wp_advads_get_all_ads();
 

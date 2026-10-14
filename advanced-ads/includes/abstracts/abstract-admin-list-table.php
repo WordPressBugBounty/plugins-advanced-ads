@@ -142,9 +142,7 @@ abstract class Admin_List_Table implements Integration_Interface {
 	}
 
 	/**
-	 * Removes this type from list of post types that support "View Mode" switching.
-	 * View mode is seen on posts where you can switch between list or excerpt. Our post types don't support
-	 * it, so we want to hide the useless UI from the screen options tab.
+	 * Removes this type from list of post types that support "View Mode" switching — view mode is seen on posts where you can switch between list or excerpt, and our post types don't support it, so we want to hide the useless UI from the screen options tab.
 	 *
 	 * @param array<string, string> $post_types Array of post types supporting view mode.
 	 *

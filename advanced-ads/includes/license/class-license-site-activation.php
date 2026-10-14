@@ -155,10 +155,7 @@ final class License_Site_Activation {
 	}
 
 	/**
-	 * Local-only flat map retirement (does not write OPTION_RICH).
-	 *
-	 * Always converts the flat map to a plan-level site activation list, even when
-	 * rich does not cover every legacy key (shop exchange may have failed).
+	 * Local-only flat map retirement (does not write OPTION_RICH) — always converts the flat map to a plan-level site activation list, even when rich does not cover every legacy key (shop exchange may have failed).
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list (read only).
 	 * @param array<string, string>            $map  Normalized legacy map.
@@ -175,7 +172,6 @@ final class License_Site_Activation {
 
 		self::persist( self::build_from_legacy_storage() );
 		License::delete_legacy_addon_mirror_options();
-		delete_option( License::OPTION_AA_ACTIVATED_ADDONS );
 		update_option( License::OPTION_FLAT_MAP_RETIRED, '1', false );
 	}
 }

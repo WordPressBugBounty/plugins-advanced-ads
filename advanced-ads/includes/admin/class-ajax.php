@@ -9,20 +9,19 @@
 
 namespace AdvancedAds\Admin;
 
-use Advanced_Ads_Pro;
-use Advanced_Ads_Privacy;
-use AdvancedAds\Constants;
-use AdvancedAds\Abstracts\Ad;
-use Advanced_Ads_Admin_Notices;
-use AdvancedAds\Frontend\Stats;
-use Advanced_Ads_Ad_Blocker_Admin;
 use Advanced_Ads_Ad_Health_Notices;
+use Advanced_Ads_Admin_Notices;
 use Advanced_Ads_Display_Conditions;
+use Advanced_Ads_Pro;
 use Advanced_Ads_Visitor_Conditions;
-use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Abstracts\Ad;
+use AdvancedAds\Constants;
+use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Framework\Utilities\Arr;
 use AdvancedAds\Framework\Utilities\Params;
-use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Frontend\Stats;
+use AdvancedAds\Modules\Privacy\Utils;
+use AdvancedAds\Utilities\Conditional;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -54,7 +53,6 @@ class AJAX implements Integration_Interface {
 		add_action( 'wp_ajax_advads-close-notice', [ $this, 'close_notice' ] );
 		add_action( 'wp_ajax_advads-hide-notice', [ $this, 'hide_notice' ] );
 		add_action( 'wp_ajax_advads-subscribe-notice', [ $this, 'subscribe' ] );
-		add_action( 'wp_ajax_advads-adblock-rebuild-assets', [ $this, 'adblock_rebuild_assets' ] );
 		add_action( 'wp_ajax_advads-post-search', [ $this, 'post_search' ] );
 		add_action( 'wp_ajax_advads-ad-injection-content', [ $this, 'inject_placement' ] );
 		add_action( 'wp_ajax_advads-save-hide-wizard-state', [ $this, 'save_wizard_state' ] );
@@ -62,6 +60,7 @@ class AJAX implements Integration_Interface {
 		add_action( 'wp_ajax_advads-ad-health-notice-display', [ $this, 'ad_health_notice_display' ] );
 		add_action( 'wp_ajax_advads-ad-health-notice-push-adminui', [ $this, 'ad_health_notice_push_adminui' ] );
 		add_action( 'wp_ajax_advads-ad-health-notice-hide', [ $this, 'ad_health_notice_hide' ] );
+		add_action( 'wp_ajax_advads-ad-health-notice-hide-all', [ $this, 'ad_health_notice_hide_all' ] );
 		add_action( 'wp_ajax_advads-ad-health-notice-unignore', [ $this, 'ad_health_notice_unignore' ] );
 		add_action( 'wp_ajax_advads-ad-health-notice-solved', [ $this, 'ad_health_notice_solved' ] );
 		add_action( 'wp_ajax_advads-update-frontend-element', [ $this, 'update_frontend_element' ] );
@@ -83,17 +82,11 @@ class AJAX implements Integration_Interface {
 	 * @return void
 	 */
 	public function subscribe_to_newsletter(): void {
-		if ( ! wp_verify_nonce( sanitize_text_field( Params::post( 'nonce' ), '' ), 'advads-newsletter-subscribe' ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( Params::post( 'nonce', '' ) ), 'advads-newsletter-subscribe' ) ) {
 			wp_send_json_error( 'Not Authorized', 401 );
 		}
 		if ( ! Conditional::user_can( 'advanced_ads_see_interface' ) ) {
-			wp_send_json_error(
-				[
-					/* translators: %s is a URL. */
-					'message' => sprintf( __( 'An error occurred. Please use <a href="%s" target="_blank">this form</a> to sign up.', 'advanced-ads' ), 'http://eepurl.com/bk4z4P' ),
-				],
-				403
-			);
+			$this->send_newsletter_error_json( 403 );
 		}
 
 		wp_send_json_success( \Advanced_Ads_Admin_Notices::get_instance()->subscribe( 'nl_free_addons' ), 200 );
@@ -105,6 +98,12 @@ class AJAX implements Integration_Interface {
 	 * @return void
 	 */
 	public function dismiss_welcome(): void {
+		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
+
+		if ( ! Conditional::user_can( 'advanced_ads_see_interface' ) ) {
+			wp_send_json_error( 'Forbidden', 403 );
+		}
+
 		Welcome::get()->dismiss();
 		wp_send_json_success( 'OK', 200 );
 	}
@@ -134,13 +133,25 @@ class AJAX implements Integration_Interface {
 
 			$requests_by_blog = [];
 			foreach ( $defered_ads as $request ) {
-				$blog_id                        = $request['blog_id'] ?? get_current_blog_id();
+				$blog_id                        = (int) ( $request['blog_id'] ?? get_current_blog_id() );
 				$requests_by_blog[ $blog_id ][] = $request;
 			}
 
 			foreach ( $requests_by_blog as $blog_id => $requests ) {
-				if ( get_current_blog_id() !== $blog_id && is_multisite() ) {
-					switch_to_blog( $blog_id );
+				$switched = false;
+				if ( is_multisite() && get_current_blog_id() !== (int) $blog_id ) {
+					if ( ! $this->can_switch_to_blog( (int) $blog_id ) ) {
+						foreach ( $requests as $request ) {
+							$response[] = [
+								'status'    => 'error',
+								'message'   => 'Invalid blog.',
+								'elementId' => $request['elementId'] ?? null,
+							];
+						}
+						continue;
+					}
+					switch_to_blog( (int) $blog_id );
+					$switched = true;
 				}
 
 				foreach ( $requests as $request ) {
@@ -149,7 +160,7 @@ class AJAX implements Integration_Interface {
 					$response[]          = $result;
 				}
 
-				if ( get_current_blog_id() !== $blog_id && is_multisite() ) {
+				if ( $switched ) {
 					restore_current_blog();
 				}
 			}
@@ -167,23 +178,7 @@ class AJAX implements Integration_Interface {
 	 * @return void
 	 */
 	public function ad_health_notice_push(): void {
-		check_ajax_referer( 'advanced-ads-ad-health-ajax-nonce', 'nonce' );
-
-		if ( ! Conditional::user_can( 'advanced_ads_edit_ads' ) ) {
-			return;
-		}
-
-		$key  = ! empty( $_REQUEST['key'] ) ? esc_attr( Params::request( 'key' ) ) : false;
-		$attr = Params::request( 'attr', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-
-		// Update or new entry?
-		if ( isset( $attr['mode'] ) && 'update' === $attr['mode'] ) {
-			Advanced_Ads_Ad_Health_Notices::get_instance()->update( $key, $attr );
-		} else {
-			Advanced_Ads_Ad_Health_Notices::get_instance()->add( $key, $attr );
-		}
-
-		die();
+		$this->push_ad_health_notice( 'advanced-ads-ad-health-ajax-nonce', 'advanced_ads_edit_ads' );
 	}
 
 	/**
@@ -195,20 +190,18 @@ class AJAX implements Integration_Interface {
 	 * @return bool
 	 */
 	public function can_display_by_consent( $can_display, $ad ) {
-
 		// Early bail!!
 		if ( ! $can_display ) {
 			return $can_display;
 		}
 
 		// If consent is overridden for the ad.
-		$privacy_props = $ad->get_prop( 'privacy' );
-		if ( ! empty( $privacy_props['ignore-consent'] ) ) {
+		if ( ! empty( $ad->get_prop( 'privacy.ignore-consent' ) ) ) {
 			return true;
 		}
 
 		// If privacy module is not active, we can display.
-		if ( empty( Advanced_Ads_Privacy::get_instance()->options()['enabled'] ) ) {
+		if ( ! wp_advads_is_module_active( 'privacy' ) ) {
 			return true;
 		}
 
@@ -219,18 +212,11 @@ class AJAX implements Integration_Interface {
 			return true;
 		}
 
-		if ( 'not_allowed' === $consent_state ) {
-			// Allow image ads without custom code.
-			if ( $ad->get_type() === 'image' ) {
-				$has_custom_code = class_exists( 'Advanced_Ads_Pro' )
-					&& ! empty( Advanced_Ads_Pro::get_instance()->get_custom_code( $ad ) );
-
-				if ( ! $has_custom_code ) {
-					return true;
-				}
-
-				return false;
-			}
+		// For 'not_allowed' consent: only allow image ads without custom code.
+		if ( 'not_allowed' === $consent_state && $ad->get_type() === 'image' ) {
+			$has_custom_code = class_exists( 'Advanced_Ads_Pro' )
+				&& ! empty( Advanced_Ads_Pro::get_instance()->get_custom_code( $ad ) );
+			return ! $has_custom_code;
 		}
 
 		// If there is custom code, don't display the ad (unless it's a group).
@@ -247,11 +233,13 @@ class AJAX implements Integration_Interface {
 		}
 
 		// See if this ad type needs consent.
-		return ! Advanced_Ads_Privacy::get_instance()->ad_type_needs_consent( $ad->get_type() );
+		return ! Utils::ad_type_needs_consent( $ad->get_type() );
 	}
 
 	/**
 	 * Subscribe to multiple newsletters
+	 *
+	 * @return void
 	 */
 	public function multiple_subscribe() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
@@ -259,13 +247,7 @@ class AJAX implements Integration_Interface {
 		$groups = ! empty( Params::post( 'groups' ) ) ? json_decode( Params::post( 'groups' ), true ) : [];
 
 		if ( ! Conditional::user_can( 'advanced_ads_see_interface' ) || empty( $groups ) ) {
-			wp_send_json_error(
-				[
-					/* translators: %s is a URL. */
-					'message' => sprintf( __( 'An error occurred. Please use <a href="%s" target="_blank">this form</a> to sign up.', 'advanced-ads' ), 'http://eepurl.com/bk4z4P' ),
-				],
-				400
-			);
+			$this->send_newsletter_error_json( 400 );
 		}
 
 		foreach ( $groups as $group ) {
@@ -283,7 +265,7 @@ class AJAX implements Integration_Interface {
 	 * @return array<string, mixed>
 	 */
 	private function select_one( $request ) {
-		$method = (string) $request['ad_method'] ?? null;
+		$method = (string) ( $request['ad_method'] ?? '' );
 		if ( 'id' === $method ) {
 			$method = 'ad';
 		}
@@ -297,7 +279,7 @@ class AJAX implements Integration_Interface {
 		}
 
 		$function  = "get_the_$method";
-		$id        = (string) $request['ad_id'] ?? null;
+		$id        = (string) ( $request['ad_id'] ?? '' );
 		$arguments = $request['ad_args'] ?? [];
 
 		if ( is_string( $arguments ) ) {
@@ -359,6 +341,8 @@ class AJAX implements Integration_Interface {
 	 * Load content of the ad parameter metabox
 	 *
 	 * @since 1.0.0
+	 *
+	 * @return void
 	 */
 	public function load_ad_parameters_metabox() {
 
@@ -395,71 +379,36 @@ class AJAX implements Integration_Interface {
 	 * Load interface for single visitor condition
 	 *
 	 * @since 1.5.4
+	 *
+	 * @return void
 	 */
 	public function load_visitor_condition() {
-
-		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
-
-		if ( ! Conditional::user_can( 'advanced_ads_edit_ads' ) ) {
-			return;
-		}
-
-		// get visitor condition types.
-		$visitor_conditions = Advanced_Ads_Visitor_Conditions::get_instance()->conditions;
-		$condition          = [];
-		$condition['type']  = Params::post( 'type', '' );
-		$index              = Params::post( 'index', 0, FILTER_VALIDATE_INT );
-
-		$form_name = Params::post( 'form_name', Advanced_Ads_Visitor_Conditions::FORM_NAME );
-
-		if ( ! isset( $visitor_conditions[ $condition['type'] ] ) ) {
-			die();
-		}
-
-		$metabox = $visitor_conditions[ $condition['type'] ]['metabox'];
-		if ( method_exists( $metabox[0], $metabox[1] ) ) {
-			call_user_func( [ $metabox[0], $metabox[1] ], $condition, $index, $form_name );
-		}
-
-		die();
+		$this->load_condition(
+			Advanced_Ads_Visitor_Conditions::get_instance()->conditions,
+			Advanced_Ads_Visitor_Conditions::FORM_NAME
+		);
 	}
 
 	/**
 	 * Load interface for single display condition
 	 *
 	 * @since 1.7
+	 *
+	 * @return void
 	 */
 	public function load_display_condition() {
-
-		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
-
-		if ( ! Conditional::user_can( 'advanced_ads_edit_ads' ) ) {
-			return;
-		}
-
-		// get display condition types.
-		$conditions        = Advanced_Ads_Display_Conditions::get_instance()->conditions;
-		$condition         = [];
-		$condition['type'] = Params::post( 'type', '' );
-		$index             = Params::post( 'index', 0, FILTER_VALIDATE_INT );
-		$form_name         = Params::post( 'form_name', Advanced_Ads_Display_Conditions::FORM_NAME );
-
-		if ( ! isset( $conditions[ $condition['type'] ] ) ) {
-			die();
-		}
-
-		$metabox = $conditions[ $condition['type'] ]['metabox'];
-		if ( method_exists( $metabox[0], $metabox[1] ) ) {
-			call_user_func( [ $metabox[0], $metabox[1] ], $condition, $index, $form_name );
-		}
-
-		die();
+		$this->load_condition(
+			Advanced_Ads_Display_Conditions::get_instance()->conditions,
+			Advanced_Ads_Display_Conditions::FORM_NAME
+		);
 	}
 
 	/**
 	 * Search terms belonging to a specific taxonomy
 	 *
 	 * @since 1.4.7
+	 *
+	 * @return void
 	 */
 	public function search_terms() {
 
@@ -497,6 +446,8 @@ class AJAX implements Integration_Interface {
 	 * Search authors
 	 *
 	 * @since 1.47.5
+	 *
+	 * @return void
 	 */
 	public function search_authors() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
@@ -505,31 +456,36 @@ class AJAX implements Integration_Interface {
 			return;
 		}
 
-		$args['search_columns'] = [ 'ID', 'user_login', 'user_nicename', 'display_name' ];
-
-		if ( version_compare( get_bloginfo( 'version' ), '5.9' ) > -1 ) {
-			$args['capability'] = [ 'edit_posts' ];
-		} else {
-			$args['who'] = 'authors';
-		}
-
 		$search = Params::post( 'search', '' );
 		if ( '' === $search ) {
 			die();
 		}
 
-		$args['search'] = '*' . sanitize_text_field( wp_unslash( $search ) ) . '*';
+		$args = [
+			'search_columns' => [ 'ID', 'user_login', 'user_nicename', 'display_name' ],
+			'capability'     => [ 'edit_posts' ],
+			'search'         => '*' . sanitize_text_field( wp_unslash( $search ) ) . '*',
+		];
 
-		$results = get_users( $args );
+		$results = array_map(
+			static function ( $user ) {
+				return [
+					'ID'           => (int) $user->ID,
+					'display_name' => (string) $user->display_name,
+				];
+			},
+			get_users( $args )
+		);
 
-		echo wp_json_encode( $results );
-		die();
+		wp_send_json( $results );
 	}
 
 	/**
 	 * Close a notice for good
 	 *
 	 * @since 1.5.3
+	 *
+	 * @return void
 	 */
 	public function close_notice() {
 
@@ -562,6 +518,8 @@ class AJAX implements Integration_Interface {
 	 * Hide a notice for some time (7 days right now)
 	 *
 	 * @since 1.8.17
+	 *
+	 * @return void
 	 */
 	public function hide_notice() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
@@ -581,6 +539,8 @@ class AJAX implements Integration_Interface {
 	 * Subscribe to newsletter
 	 *
 	 * @since 1.5.3
+	 *
+	 * @return void
 	 */
 	public function subscribe() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
@@ -590,35 +550,17 @@ class AJAX implements Integration_Interface {
 			! Conditional::user_can( 'advanced_ads_see_interface' )
 			|| empty( $notice )
 		) {
-			wp_send_json_error(
-				[
-					/* translators: %s is a URL. */
-					'message' => sprintf( __( 'An error occurred. Please use <a href="%s" target="_blank">this form</a> to sign up.', 'advanced-ads' ), 'http://eepurl.com/bk4z4P' ),
-				],
-				400
-			);
+			$this->send_newsletter_error_json( 400 );
 		}
 
 		wp_send_json_success( [ 'message' => Advanced_Ads_Admin_Notices::get_instance()->subscribe( $notice ) ] );
 	}
 
-	/**
-	 * Rebuild assets for ad-blocker module
-	 */
-	public function adblock_rebuild_assets() {
-
-		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
-
-		if ( ! Conditional::user_can( 'advanced_ads_manage_options' ) ) {
-			return;
-		}
-
-		Advanced_Ads_Ad_Blocker_Admin::get_instance()->add_asset_rebuild_form();
-		die();
-	}
 
 	/**
 	 * Post search (used in Display conditions)
+	 *
+	 * @return void
 	 */
 	public function post_search() {
 
@@ -638,6 +580,8 @@ class AJAX implements Integration_Interface {
 	 * Inject an ad and a placement
 	 *
 	 * @since 1.7.3
+	 *
+	 * @return void
 	 */
 	public function inject_placement() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
@@ -704,6 +648,8 @@ class AJAX implements Integration_Interface {
 	 * Save ad wizard state for each user individually
 	 *
 	 * @since 1.7.4
+	 *
+	 * @return void
 	 */
 	public function save_wizard_state() {
 
@@ -727,6 +673,8 @@ class AJAX implements Integration_Interface {
 
 	/**
 	 * Enable Adsense Auto ads, previously "Page-Level ads"
+	 *
+	 * @return void
 	 */
 	public function adsense_enable_pla() {
 
@@ -744,6 +692,8 @@ class AJAX implements Integration_Interface {
 
 	/**
 	 * Display list of Ad Health notices
+	 *
+	 * @return void
 	 */
 	public function ad_health_notice_display() {
 
@@ -759,31 +709,17 @@ class AJAX implements Integration_Interface {
 
 	/**
 	 * Push an Ad Health notice to the queue
+	 *
+	 * @return void
 	 */
 	public function ad_health_notice_push_adminui() {
-
-		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
-
-		if ( ! Conditional::user_can( 'advanced_ads_manage_options' ) ) {
-			return;
-		}
-
-		$key  = Params::request( 'key' );
-		$attr = Params::request( 'attr', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
-		$attr = ! empty( $attr ) && is_array( $attr ) ? $attr : [];
-
-		// update or new entry?
-		if ( isset( $attr['mode'] ) && 'update' === $attr['mode'] ) {
-			Advanced_Ads_Ad_Health_Notices::get_instance()->update( $key, $attr );
-		} else {
-			Advanced_Ads_Ad_Health_Notices::get_instance()->add( $key, $attr );
-		}
-
-		die();
+		$this->push_ad_health_notice( 'advanced-ads-admin-ajax-nonce', 'advanced_ads_manage_options' );
 	}
 
 	/**
 	 * Hide Ad Health notice
+	 *
+	 * @return void
 	 */
 	public function ad_health_notice_hide() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
@@ -800,7 +736,36 @@ class AJAX implements Integration_Interface {
 	}
 
 	/**
+	 * Hide all Ad Health notices at once.
+	 *
+	 * Calls hide() on every current notice so each one is handled according to
+	 * its own definition, notices with hide:false are removed entirely, notices
+	 * with a timeout get a closed timestamp, and the rest are added to the ignore
+	 * list. This mirrors what clicking the individual dismiss button does for each
+	 * notice, but in a single request.
+	 *
+	 * @return void
+	 */
+	public function ad_health_notice_hide_all() {
+		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
+
+		if ( ! Conditional::user_can( 'advanced_ads_manage_options' ) ) {
+			return;
+		}
+
+		$instance = Advanced_Ads_Ad_Health_Notices::get_instance();
+
+		foreach ( array_keys( $instance->notices ) as $notice_key ) {
+			$instance->hide( $notice_key );
+		}
+
+		die();
+	}
+
+	/**
 	 * Show all ignored notices of a given type
+	 *
+	 * @return void
 	 */
 	public function ad_health_notice_unignore() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
@@ -814,7 +779,9 @@ class AJAX implements Integration_Interface {
 	}
 
 	/**
-	 * After the user has selected a new frontend element, update the corresponding placement.
+	 * After the user has selected a new frontend element, update the corresponding placement — accepts only placement fields (mirrors REST placement update), and never passes raw $_POST into wp_update_post(), which would allow overwriting arbitrary posts.
+	 *
+	 * @return void
 	 */
 	public function update_frontend_element() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
@@ -823,17 +790,151 @@ class AJAX implements Integration_Interface {
 			return;
 		}
 
-		$return = wp_update_post( $_POST );
-
-		if ( is_wp_error( $return ) ) {
-			wp_send_json_error( [ 'error' => $return->get_error_message() ], 400 );
+		$post_id = absint( Params::post( 'ID', 0 ) );
+		if ( ! $post_id ) {
+			$post_id = absint( Params::post( 'post_ID', 0 ) );
 		}
 
-		wp_send_json_success( [ 'id' => $return ] );
+		$placement = wp_advads_get_placement( $post_id );
+		if ( ! $placement || ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_send_json_error( [ 'error' => __( 'Invalid placement.', 'advanced-ads' ) ], 400 );
+		}
+
+		$title = sanitize_text_field( Params::post( 'post_title', '' ) );
+		if ( '' !== $title ) {
+			$placement->set_title( $title );
+		}
+
+		$status = sanitize_text_field( Params::post( 'post_status', '' ) );
+		if ( '' !== $status ) {
+			$placement->set_status( $status );
+		}
+
+		$advads = Params::post( 'advads', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		if ( ! empty( $advads['placements'] ) && is_array( $advads['placements'] ) ) {
+			$placement_data = wp_unslash( $advads['placements'] );
+			if ( isset( $placement_data['item'] ) ) {
+				$placement->set_item( sanitize_text_field( $placement_data['item'] ) );
+			}
+			if ( ! empty( $placement_data['options'] ) && is_array( $placement_data['options'] ) ) {
+				$placement->set_props( $placement_data['options'] );
+			}
+		}
+
+		$placement->save();
+
+		wp_send_json_success( [ 'id' => $placement->get_id() ] );
+	}
+
+	/**
+	 * Shared Ad Health notice push used by frontend and admin UI AJAX actions.
+	 *
+	 * @param string $nonce_action Nonce action name.
+	 * @param string $capability   Required capability.
+	 *
+	 * @return void
+	 */
+	private function push_ad_health_notice( string $nonce_action, string $capability ): void {
+		check_ajax_referer( $nonce_action, 'nonce' );
+
+		if ( ! Conditional::user_can( $capability ) ) {
+			return;
+		}
+
+		$key  = Params::request( 'key' );
+		$key  = ! empty( $key ) ? esc_attr( $key ) : false;
+		$attr = Params::request( 'attr', [], FILTER_DEFAULT, FILTER_REQUIRE_ARRAY );
+		$attr = is_array( $attr ) ? $attr : [];
+
+		if ( isset( $attr['mode'] ) && 'update' === $attr['mode'] ) {
+			Advanced_Ads_Ad_Health_Notices::get_instance()->update( $key, $attr );
+		} else {
+			Advanced_Ads_Ad_Health_Notices::get_instance()->add( $key, $attr );
+		}
+
+		die();
+	}
+
+	/**
+	 * Load a single visitor or display condition metabox.
+	 *
+	 * @param array  $conditions   Condition registry.
+	 * @param string $form_default Default form name.
+	 *
+	 * @return void
+	 */
+	private function load_condition( array $conditions, string $form_default ): void {
+		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
+
+		if ( ! Conditional::user_can( 'advanced_ads_edit_ads' ) ) {
+			return;
+		}
+
+		$condition         = [];
+		$condition['type'] = Params::post( 'type', '' );
+		$index             = Params::post( 'index', 0, FILTER_VALIDATE_INT );
+		$form_name         = Params::post( 'form_name', $form_default );
+
+		if ( ! isset( $conditions[ $condition['type'] ] ) ) {
+			die();
+		}
+
+		$metabox = $conditions[ $condition['type'] ]['metabox'];
+		if ( method_exists( $metabox[0], $metabox[1] ) ) {
+			call_user_func( [ $metabox[0], $metabox[1] ], $condition, $index, $form_name );
+		}
+
+		die();
+	}
+
+	/**
+	 * Send the shared newsletter signup error response.
+	 *
+	 * @param int $status HTTP status code.
+	 *
+	 * @return void
+	 */
+	private function send_newsletter_error_json( int $status = 400 ): void {
+		wp_send_json_error(
+			[
+				/* translators: %s is a URL. */
+				'message' => sprintf( __( 'An error occurred. Please use <a href="%s" target="_blank">this form</a> to sign up.', 'advanced-ads' ), 'http://eepurl.com/bk4z4P' ),
+			],
+			$status
+		);
+	}
+
+	/**
+	 * Whether a deferred ad-select request may switch to another blog — allows only public, non-archived, non-deleted blogs in the current network.
+	 *
+	 * @param int $blog_id Requested blog ID.
+	 *
+	 * @return bool
+	 */
+	private function can_switch_to_blog( int $blog_id ): bool {
+		if ( $blog_id <= 0 || ! is_multisite() ) {
+			return false;
+		}
+
+		$details = get_blog_details( $blog_id );
+		if ( ! $details ) {
+			return false;
+		}
+
+		$current_site = get_current_site();
+		if ( ! $current_site || (int) $details->site_id !== (int) $current_site->id ) {
+			return false;
+		}
+
+		return 1 === (int) $details->public
+			&& 1 !== (int) $details->archived
+			&& 1 !== (int) $details->deleted;
 	}
 
 	/**
 	 * Get hints related to the Gutenberg block.
+	 *
+	 * @return void
 	 */
 	public function get_block_hints() {
 		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );

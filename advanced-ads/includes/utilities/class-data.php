@@ -50,26 +50,9 @@ class Data {
 				'advanced-ads_page_advanced-ads-placements',
 				'advanced-ads_page_advanced-ads-settings',
 				'advanced-ads_page_advanced-ads-tools',
+				'advanced-ads_page_advanced-ads-app',
 			]
 		);
-	}
-
-	/**
-	 * Get ad ids
-	 *
-	 * @return array<int, int|string>
-	 */
-	public static function get_ads_ids(): array {
-		static $ad_ids = null;
-
-		if ( null !== $ad_ids ) {
-			return $ad_ids;
-		}
-
-		$ad_ids = wp_advads_get_ads_dropdown();
-		$ad_ids = array_keys( $ad_ids );
-
-		return $ad_ids;
 	}
 
 	/**
@@ -377,7 +360,6 @@ class Data {
 		// Define thresholds and campaigns.
 		$feed_id          = '1';
 		$campaign         = 'dashboard';
-		$adsense_num      = 1500;
 		$valid_currencies = [ 'EUR', 'USD', 'GBP', 'CHF' ];
 
 		if ( $adsense_num > 1000 && in_array( $currency, $valid_currencies, true ) ) {

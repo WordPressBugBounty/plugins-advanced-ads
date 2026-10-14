@@ -7,9 +7,9 @@
  * @since   1.50.0
  */
 
-use AdvancedAds\Admin\Version_Control;
+use AdvancedAds\Updater\Rollback;
 
-$versions = get_transient( Version_Control::VERSIONS_TRANSIENT );
+$versions = get_transient( Rollback::VERSIONS_TRANSIENT );
 ?>
 <div class="wp-header-end hidden"></div>
 <h3>
@@ -38,7 +38,7 @@ $versions = get_transient( Version_Control::VERSIONS_TRANSIENT );
 						<option value="">--<?php esc_html_e( 'Fetching versions', 'advanced-ads' ); ?>--</option>
 					<?php else : ?>
 						<?php foreach ( $versions['order'] as $index => $version ) : ?>
-							<option value="<?php echo esc_attr( $version . '|' . $versions['versions'][ $version ] ); ?>"<?php selected( $index, 0 ); ?>><?php echo esc_html( $version ); ?></option>
+							<option value="<?php echo esc_attr( $version ); ?>"<?php selected( $index, 0 ); ?>><?php echo esc_html( $version ); ?></option>
 						<?php endforeach; ?>
 					<?php endif; ?>
 				</select>
@@ -47,6 +47,8 @@ $versions = get_transient( Version_Control::VERSIONS_TRANSIENT );
 
 				<span class="spinner"></span>
 			</div>
+
+			<p id="version-control-error" class="text-sm font-semibold text-red-600" role="alert" data-fallback="<?php esc_attr_e( 'Something went wrong. Please try again.', 'advanced-ads' ); ?>" hidden></p>
 
 			<p class="text-sm italic text-red-600"><?php esc_html_e( 'Warning: It is advised that you backup your database before installing another version.', 'advanced-ads' ); ?></p>
 		</div>

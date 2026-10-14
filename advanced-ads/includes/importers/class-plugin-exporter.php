@@ -9,8 +9,6 @@
 
 namespace AdvancedAds\Importers;
 
-use Advanced_Ads_Ads_Txt_Strategy;
-use Advanced_Ads_Privacy;
 use AdvancedAds\Ads\Ad_Repository;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
@@ -41,14 +39,14 @@ class Plugin_Exporter {
 	/**
 	 * Types of content to be exported.
 	 *
-	 * @var array<string, mixed>
+	 * @var array<string, mixed>|false
 	 */
 	public $options = false;
 
 	/**
 	 * Download export file
 	 *
-	 * @return array<string, mixed>|string|WP_Error
+	 * @return array<string, mixed>|string|WP_Error|false
 	 */
 	public function download_file() {
 		if ( ! Conditional::user_can( 'advanced_ads_manage_options' ) ) {
@@ -103,7 +101,7 @@ class Plugin_Exporter {
 	 */
 	private function process(): void {
 		@set_time_limit( 0 );
-		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) ); // phpcs:ignore WordPress.PHP.IniSet.memory_limit_Disallowed
+		wp_raise_memory_limit( 'admin' );
 
 		foreach ( $this->options as $option ) {
 			$method = "process_{$option}";
@@ -198,17 +196,16 @@ class Plugin_Exporter {
 		/**
 		 * Filters the list of options to be exported.
 		 *
-		 * @param $options An array of options
+		 * @param array<string, mixed> $options An array of options
 		 */
 		$this->data['options'] = array_filter(
 			apply_filters(
 				'advanced-ads-export-options',
 				[
-					ADVADS_SLUG                           => get_option( ADVADS_SLUG ),
-					GADSENSE_OPT_NAME                     => get_option( GADSENSE_OPT_NAME ),
-					Advanced_Ads_Privacy::OPTION_KEY      => get_option( Advanced_Ads_Privacy::OPTION_KEY ),
-					Advanced_Ads_Ads_Txt_Strategy::OPTION => get_option( Advanced_Ads_Ads_Txt_Strategy::OPTION ),
-					Constants::OPTION_ADBLOCKER_SETTINGS  => Options::instance()->get( 'adblocker', [] ),
+					ADVADS_SLUG                          => get_option( ADVADS_SLUG ),
+					GADSENSE_OPT_NAME                    => get_option( GADSENSE_OPT_NAME ),
+					'advanced-ads-privacy'               => get_option( 'advanced-ads-privacy' ),
+					Constants::OPTION_ADBLOCKER_SETTINGS => Options::instance()->get( 'adblocker', [] ),
 				]
 			)
 		);
@@ -236,7 +233,7 @@ class Plugin_Exporter {
 	/**
 	 * Get group info
 	 *
-	 * @param int $group_id Group id.
+	 * @param int|string $group_id Group id.
 	 *
 	 * @return array<string, mixed>
 	 */

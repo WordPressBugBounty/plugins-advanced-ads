@@ -61,7 +61,7 @@ class Validation {
 	 *
 	 * @param Ad $ad Ad instance.
 	 *
-	 * @return bool false/string
+	 * @return string|false
 	 */
 	public static function is_ad_https( Ad $ad ) {
 		if (
@@ -78,7 +78,7 @@ class Validation {
 	}
 
 	/**
-	 * Check post and nonce while saving post to reduce complexity.
+	 * Whether a post is eligible for meta-box save handling — validates the post object and rejects autosaves/revisions. Does not verify nonces; callers must do that separately.
 	 *
 	 * @param int    $post_id Post ID.
 	 * @param object $post    Post object.
@@ -90,7 +90,7 @@ class Validation {
 			return false;
 		}
 
-		// Dont' save meta boxes for revisions or autosaves.
+		// Don't save meta boxes for revisions or autosaves.
 		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || is_int( wp_is_post_revision( $post ) ) || is_int( wp_is_post_autosave( $post ) ) ) {
 			return false;
 		}

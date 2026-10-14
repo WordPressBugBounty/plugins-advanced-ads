@@ -14,6 +14,7 @@ use Advanced_Ads_Utils;
 use Advanced_Ads;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Modules\Privacy\Utils;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\WordPress;
 
@@ -45,16 +46,14 @@ class Scripts implements Integration_Interface {
 			return;
 		}
 
-		$privacy                    = Advanced_Ads_Privacy::get_instance();
-		$privacy_options            = $privacy->options();
-		$privacy_options['enabled'] = ! empty( $privacy_options['enabled'] );
-		$privacy_options['state']   = $privacy->get_state();
+		$privacy_options          = Advanced_Ads_Privacy::get_instance()->options();
+		$privacy_options['state'] = Utils::parse_state();
 
-		wp_localize_script(
-			wp_advads()->registry->prefix_it( 'advanced-js' ),
-			'advads_options',
+		// On `advancedAds`, printed at wp_footer:0: every reader runs on advanced_ads_ready or later.
+		// A string, as the frontend picker compares it with one from localStorage.
+		wp_advads_json_add(
 			[
-				'blog_id' => get_current_blog_id(),
+				'blogId'  => (string) get_current_blog_id(),
 				'privacy' => $privacy_options,
 			]
 		);

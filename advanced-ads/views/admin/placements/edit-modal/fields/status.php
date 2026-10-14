@@ -9,6 +9,8 @@
  * @var Placement $placement Placement instance.
  */
 
+use AdvancedAds\Abstracts\Placement;
+
 $statuses = [
 	'draft'   => __( 'Draft', 'advanced-ads' ),
 	'publish' => __( 'Publish', 'advanced-ads' ),

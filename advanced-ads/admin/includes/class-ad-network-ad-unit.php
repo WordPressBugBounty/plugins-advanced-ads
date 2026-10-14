@@ -14,7 +14,7 @@ class Advanced_Ads_Ad_Network_Ad_Unit {
 	/**
 	 * Contains the raw data (typically from a JSON response) for this ad unit
 	 *
-	 * @var string
+	 * @var array<string, mixed>
 	 */
 	public $raw;
 
@@ -47,6 +47,13 @@ class Advanced_Ads_Ad_Network_Ad_Unit {
 	public $display_size;
 
 	/**
+	 * Whether the network can import this ad unit; set when the list of ad units is rendered.
+	 *
+	 * @var bool
+	 */
+	public $is_supported = false;
+
+	/**
 	 * In case of an AdSense ad, this is the id of the ad without the publisher id
 	 * the value will be displayed in the ads list
 	 *
@@ -71,7 +78,7 @@ class Advanced_Ads_Ad_Network_Ad_Unit {
 	/**
 	 * Advanced_Ads_Ad_Network_Ad_Unit constructor.
 	 *
-	 * @param string $raw raw ad data.
+	 * @param array<string, mixed> $raw raw ad data.
 	 */
 	public function __construct( $raw ) {
 		$this->raw = $raw;

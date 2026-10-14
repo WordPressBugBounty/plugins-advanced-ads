@@ -88,8 +88,7 @@ class Group_Ad_Relation {
 
 		foreach ( $added_ads as $ad_id ) {
 			/**
-			 * Check if this ad is representing the current group and remove it in this case
-			 * could cause an infinite loop otherwise.
+			 * Check if this ad is representing the current group and remove it in this case — could cause an infinite loop otherwise.
 			 */
 			if ( $this->is_ad_type_group( $ad_id, $group ) ) {
 				unset( $ad_weights[ $ad_id ] );

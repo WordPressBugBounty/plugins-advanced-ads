@@ -7,7 +7,7 @@
  * @since   2.0
  */
 
-use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Admin\Upsell;
 
 ?>
 <fieldset class="inline-edit-col-right">
@@ -37,7 +37,7 @@ use AdvancedAds\Admin\Upgrades;
 						</select>
 						<?php
 						if ( ! defined( 'AAP_VERSION' ) ) {
-							Upgrades::upgrade_link( '', 'https://wpadvancedads.com/advanced-ads-pro/', 'upgrade-pro-disable-post-quick-edit' );
+							Upsell::upgrade_link( '', 'https://wpadvancedads.com/advanced-ads-pro/', 'upgrade-pro-disable-post-quick-edit' );
 						}
 						?>
 					</label>

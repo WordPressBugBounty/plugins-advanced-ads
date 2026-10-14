@@ -88,19 +88,20 @@ class Authors implements Integration_Interface {
 		$query_args['role__in'] = wp_list_pluck( $user_roles_to_display, 'name' );
 
 		// Exclude super-admins from the author dropdown.
-		$query_args['exclude'] = array_map(
-			function ( $login ) {
-				return get_user_by( 'login', $login )->ID;
-			},
-			get_super_admins()
-		);
+		$exclude = [];
+		foreach ( get_super_admins() as $login ) {
+			$user = get_user_by( 'login', $login );
+			if ( $user ) {
+				$exclude[] = (int) $user->ID;
+			}
+		}
+		$query_args['exclude'] = $exclude;
 
 		return $query_args;
 	}
 
 	/**
-	 * Prevent users from editing the form data and assign ads to users they're not allowed to.
-	 * Wp_die() if tampering detected.
+	 * Prevent users from editing the form data and assign ads to users they're not allowed to — wp_die() if tampering detected.
 	 *
 	 * @param int                  $post_id The current post id.
 	 * @param array<string, mixed> $data The post data to be saved.
@@ -177,7 +178,7 @@ class Authors implements Integration_Interface {
 	/**
 	 * Get the user roles that are allowed to edit ads.
 	 *
-	 * @return array<int, string>
+	 * @return array<string, WP_Role>
 	 */
 	private function filtered_user_roles(): array {
 		$current_user_has_unfiltered_html = current_user_can( 'unfiltered_html' );

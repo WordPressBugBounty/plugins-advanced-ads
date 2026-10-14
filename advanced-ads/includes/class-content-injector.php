@@ -1,7 +1,6 @@
 <?php
 /**
- * Content injector template file.
- * Brief description of the styles in this file
+ * Content injector template file — brief description of the styles in this file.
  *
  * @since   2.0.19
  * @package AdvancedAds
@@ -36,8 +35,7 @@ class Content_Injector {
 	private static $ads_for_placeholders = [];
 
 	/**
-	 * Self-closing HTML tags that cannot have children.
-	 * Hash map for O(1) lookup vs in_array() linear scan.
+	 * Self-closing HTML tags that cannot have children — hash map for O(1) lookup vs in_array() linear scan.
 	 *
 	 * @var array<string, bool>
 	 */
@@ -63,8 +61,7 @@ class Content_Injector {
 	];
 
 	/**
-	 * Sort order for ad positions.
-	 * Class constant avoids allocating a new array on every usort() comparison.
+	 * Sort order for ad positions — class constant avoids allocating a new array on every usort() comparison.
 	 *
 	 * @var array<string, int>
 	 */
@@ -306,10 +303,7 @@ class Content_Injector {
 	}
 
 	/**
-	 * Extract the inner body content from a full HTML document string.
-	 *
-	 * DOMDocument::saveHTML() emits a full document including DOCTYPE and <html>.
-	 * Using string operations here avoids a costly second DOM parse just to unwrap it.
+	 * Extract the inner body content from a full HTML document string — DOMDocument::saveHTML() emits a full document including DOCTYPE and <html>; using string operations here avoids a costly second DOM parse just to unwrap it.
 	 *
 	 * @param string $html Full HTML document string from saveHTML().
 	 *
@@ -382,7 +376,7 @@ class Content_Injector {
 	 * @param string   $tag        XPath tag expression.
 	 * @param int      $item_limit Minimum items required before falling back deeper.
 	 *
-	 * @return DOMNodeList
+	 * @return DOMNodeList<DOMNode>
 	 */
 	private static function query_items( DOMXPath $xpath, $tag, $item_limit ) {
 		if ( -1 === $item_limit ) {
@@ -447,16 +441,16 @@ class Content_Injector {
 	}
 
 	/**
-	 * Insert imported nodes into the DOM at the correct position.
-	 *
-	 * The caller must unset() the ad DOM tree immediately after this call.
+	 * Insert imported nodes into the DOM at the correct position. The caller must unset() the ad DOM tree immediately after this call.
 	 *
 	 * @param DOMDocument       $dom      Main document.
 	 * @param DOMNode           $node     Reference node.
 	 * @param array<int, mixed> $ad_nodes Snapshot of ad body child nodes.
 	 * @param string            $position One of 'before', 'after', 'append', 'prepend'.
+	 *
+	 * @return void
 	 */
-	private static function insert_nodes( DOMDocument $dom, DOMNode $node, array $ad_nodes, $position ) {
+	private static function insert_nodes( DOMDocument $dom, DOMNode $node, array $ad_nodes, $position ): void {
 		switch ( $position ) {
 			case 'append':
 				foreach ( $ad_nodes as $ad_node ) {
@@ -504,7 +498,7 @@ class Content_Injector {
 	 *
 	 * @param string $content Original content.
 	 *
-	 * @return string|false Content ready for DOM parsing, or false on empty.
+	 * @return string Content ready for DOM parsing.
 	 */
 	private static function get_content_to_load( $content ) {
 		$content_to_load = preg_replace( '/<script.*?<\/script>/si', '<!--\0-->', $content );
@@ -558,18 +552,11 @@ class Content_Injector {
 	}
 
 	/**
-	 * Locate placeholder positions in the modified content and inject ads at the
-	 * corresponding positions in the original content.
+	 * Locate placeholder positions in the modified content and inject ads at the corresponding positions in the original content. Memory strategy: $content (DOM version) is unset as soon as the placeholder scan is done; $new_content is built incrementally using substr() slices of $content_orig, we never duplicate $content_orig into another variable; match arrays are unset immediately after use.
 	 *
-	 * Memory strategy:
-	 * - $content (DOM version) is unset as soon as the placeholder scan is done.
-	 * - $new_content is built incrementally using substr() slices of $content_orig —
-	 *   we never duplicate $content_orig into another variable.
-	 * - Match arrays are unset immediately after use.
-	 *
-	 * @param string            $content              DOM-serialized content with ad placeholders.
-	 * @param string            $content_orig         Unmodified original content.
-	 * @param array<int, mixed> $ads_for_placeholders Ad metadata array.
+	 * @param string                   $content              DOM-serialized content with ad placeholders.
+	 * @param string                   $content_orig         Unmodified original content.
+	 * @param array<int|string, mixed> $ads_for_placeholders Ad metadata array.
 	 *
 	 * @return string Content with ads injected.
 	 */
@@ -678,8 +665,7 @@ class Content_Injector {
 	}
 
 	/**
-	 * Callback for usort() — sorts ads by position priority.
-	 * Uses the POSITION_ORDER constant so no array is allocated per comparison.
+	 * Callback for usort() — sorts ads by position priority, using the POSITION_ORDER constant so no array is allocated per comparison.
 	 *
 	 * @param array<string, mixed> $first  First ad.
 	 * @param array<string, mixed> $second Second ad.
@@ -710,7 +696,7 @@ class Content_Injector {
 					__( 'Set <em>%s</em> to show more ads', 'advanced-ads' ),
 					__( 'Disable level limitation', 'advanced-ads' )
 				),
-				'href'   => admin_url( '/admin.php?page=advanced-ads-settings#top#general' ),
+				'href'   => admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=general' ),
 				'meta'   => [
 					'class'  => 'advanced_ads_ad_health_warning',
 					'target' => '_blank',
@@ -725,7 +711,7 @@ class Content_Injector {
 	 *
 	 * @param DOMXPath $xpath DOMXPath object.
 	 *
-	 * @return array<string, mixed> Node path strings.
+	 * @return array<int, string> Node path strings.
 	 */
 	private static function get_ancestors_to_limit( DOMXPath $xpath ) {
 		$query = self::get_ancestors_to_limit_query();
@@ -745,18 +731,12 @@ class Content_Injector {
 	}
 
 	/**
-	 * Remove paragraphs whose ancestors should not contain ads.
+	 * Remove paragraphs whose ancestors should not contain ads. Short-circuits immediately when no restricted ancestors exist, avoiding the inner loop entirely. Uses Str::starts_with() from Framework instead of stripos() since node paths are case-sensitive.
 	 *
-	 * Short-circuits immediately when no restricted ancestors exist,
-	 * avoiding the inner loop entirely.
+	 * @param array<int, mixed>  $paragraphs         Array of DOMNode objects.
+	 * @param array<int, string> $ancestors_to_limit Node paths of restricted ancestors.
 	 *
-	 * Uses Str::starts_with() from Framework instead of stripos()
-	 * since node paths are case-sensitive.
-	 *
-	 * @param array<int, mixed> $paragraphs         Array of DOMNode objects.
-	 * @param array<int, mixed> $ancestors_to_limit Node paths of restricted ancestors.
-	 *
-	 * @return array<string, mixed> Filtered array of DOMNode objects.
+	 * @return array<int, mixed> Filtered array of DOMNode objects.
 	 */
 	private static function filter_by_ancestors_to_limit( $paragraphs, $ancestors_to_limit ) {
 		if ( empty( $ancestors_to_limit ) ) {

@@ -11,7 +11,6 @@ namespace AdvancedAds\Admin;
 
 use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Framework\Utilities\Arr;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,10 +36,9 @@ class Addon_Box {
 	 * Constructor
 	 *
 	 * @param bool $hide_activated whether to hide active plugins.
-	 * @param bool $rest_request its rest request or not.
 	 */
-	public function __construct( $hide_activated = false, $rest_request = false ) {
-		if ( ! is_admin() && ! $rest_request ) {
+	public function __construct( $hide_activated = false ) {
+		if ( ! is_admin() ) {
 			return;
 		}
 		$this->hide_activated = (bool) $hide_activated;
@@ -103,7 +101,7 @@ class Addon_Box {
 				'download_link' => 'https://wpadvancedads.com/add-ons/sticky-ads/?utm_source=advanced-ads&utm_medium=link&utm_campaign=overview-add-ons',
 				'manual'        => 'https://wpadvancedads.com/manual/sticky-ads-documentation/?utm_source=advanced-ads&utm_medium=link&utm_campaign=overview-add-ons-manual',
 			],
-			'advanced-ads-tracking/tracking.php'                    => [
+			'advanced-ads-tracking/advanced-ads-tracking.php'       => [
 				'id'            => 'tracking',
 				'constant'      => 'AAT_VERSION',
 				'title'         => 'Tracking',
@@ -152,8 +150,11 @@ class Addon_Box {
 				if ( in_array( $data['id'], $bundle_indicators, true ) ) {
 					$this->plugins['premium_level'] = 'bundle';
 				}
-				if ( in_array( $data['id'], [ 'pro', 'tracking' ], true ) ) {
-					${$data['id']} = true;
+				if ( 'pro' === $data['id'] ) {
+					$pro = true;
+				}
+				if ( 'tracking' === $data['id'] ) {
+					$tracking = true;
 				}
 			} else {
 				$this->plugins['plugins'][ $data['id'] ] = [ 'status' => 'missing' ];
@@ -183,7 +184,7 @@ class Addon_Box {
 	 *
 	 * @param string $id add-on internal ID.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<int, string>
 	 */
 	private function get_grid_data( $id ) {
 		if ( 'pro' === $id ) {
@@ -241,10 +242,10 @@ class Addon_Box {
 	/**
 	 * Sort extra add-ons by the order field
 	 *
-	 * @param int $a order to compare.
-	 * @param int $b order to compare.
+	 * @param array<string, mixed> $a add-on to compare.
+	 * @param array<string, mixed> $b add-on to compare.
 	 *
-	 * @return mixed
+	 * @return int
 	 */
 	private function sort_by_order( $a, $b ) {
 		return (int) $a['order'] - (int) $b['order'];
@@ -255,7 +256,7 @@ class Addon_Box {
 	 *
 	 * @param string $section section slug (installed|available|special).
 	 *
-	 * @return array<string, array<string, mixed>>
+	 * @return array<int|string, array<string, mixed>>
 	 */
 	private function get_displayable_items( $section ) {
 		switch ( $section ) {
@@ -323,9 +324,9 @@ class Addon_Box {
 					$items = [
 						'aa' => [ 'id' => 'aa' ],
 					]
-					+ Arr::where(
+					+ array_filter(
 						$this->get_special_add_ons(),
-						function ( $item ) {
+						static function ( $item ) {
 							return in_array( $item['status'], [ 'installed', 'active' ], true );
 						}
 					);
@@ -333,9 +334,9 @@ class Addon_Box {
 					return $items;
 				}
 
-				$displayable_items = Arr::where(
+				$displayable_items = array_filter(
 					$this->plugins['plugins'],
-					function ( $item ) {
+					static function ( $item ) {
 						return 'missing' !== $item['status'];
 					}
 				);
@@ -352,9 +353,9 @@ class Addon_Box {
 	 * @return array<string, array<string, mixed>>
 	 */
 	private function get_special_add_ons() {
-		return Arr::where(
+		return array_filter(
 			$this->plugins['plugins'],
-			function ( $item ) {
+			static function ( $item ) {
 				return in_array( $item['id'], [ 'adslider', 'adsenseinfeed' ], true );
 			}
 		);

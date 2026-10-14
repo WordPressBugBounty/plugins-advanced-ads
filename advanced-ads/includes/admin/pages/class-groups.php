@@ -22,12 +22,14 @@ defined( 'ABSPATH' ) || exit;
  */
 class Groups extends Screen {
 
+
 	/**
-	 * Hold table object.
+	 * Groups list table (built on load so columns register before admin-header).
 	 *
-	 * @var null|List_Table
+	 * @var List_Table|null
 	 */
 	private $list_table = null;
+
 
 	/**
 	 * Screen unique id.
@@ -54,8 +56,31 @@ class Groups extends Screen {
 		);
 
 		$this->set_hook( $hook );
-		add_action( 'current_screen', [ $this, 'add_screen_options' ], 5 );
-		add_action( 'current_screen', [ $this, 'get_list_table' ] );
+		add_action( 'load-' . $hook, [ $this, 'load_screen' ] );
+	}
+
+	/**
+	 * Prepare the groups screen before it renders — WP_Terms_List_Table expects taxonomy/post_type on the current screen.
+	 *
+	 * @return void
+	 */
+	public function load_screen(): void {
+		$wp_screen = get_current_screen();
+		if ( $wp_screen ) {
+			$wp_screen->taxonomy  = Constants::TAXONOMY_GROUP;
+			$wp_screen->post_type = Constants::POST_TYPE_AD;
+		}
+
+		add_screen_option(
+			'per_page',
+			[
+				'default' => 20,
+				'option'  => 'edit_' . Constants::TAXONOMY_GROUP . '_per_page',
+			]
+		);
+
+		// ponytail: Must call before manage_{screen}_columns.
+		$this->list_table = new List_Table();
 	}
 
 	/**
@@ -69,11 +94,11 @@ class Groups extends Screen {
 
 		// Localize texts.
 		$i18n = [
-			'groups'           => [
-				'save'    => __( 'Save', 'advanced-ads' ),
-				'saveNew' => __( 'Save New Group', 'advanced-ads' ),
-				'updated' => __( 'Group updated', 'advanced-ads' ),
-				'deleted' => __( 'Group deleted', 'advanced-ads' ),
+			'groups' => [
+				'save'         => __( 'Save', 'advanced-ads' ),
+				'saveNew'      => __( 'Save New Group', 'advanced-ads' ),
+				'updated'      => __( 'Group updated', 'advanced-ads' ),
+				'deleted'      => __( 'Group deleted', 'advanced-ads' ),
 				/* translators: an ad group title. */
 				'confirmation' => __( 'You are about to permanently delete %s', 'advanced-ads' ),
 			],
@@ -89,50 +114,10 @@ class Groups extends Screen {
 	public function display(): void {
 		global $wp_list_table;
 
-		$wp_list_table = $this->get_list_table(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+		$wp_list_table = $this->list_table; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- WordPress reads the list table from this global.
 		( new Create_Modal() )->hooks();
 
 		include_once ADVADS_ABSPATH . 'views/admin/groups/page.php';
-	}
-
-	/**
-	 * Get list table object
-	 *
-	 * @return null|List_Table
-	 */
-	public function get_list_table() {
-		$is_screen = wp_advads()->screens->is_screen( $this->get_id() );
-		$wp_screen = get_current_screen();
-		if ( $is_screen && null === $this->list_table ) {
-			wp_advads()->registry->enqueue_script( 'groups' );
-
-			$wp_screen->taxonomy  = Constants::TAXONOMY_GROUP;
-			$wp_screen->post_type = Constants::POST_TYPE_AD;
-			$this->list_table     = new List_Table();
-		}
-
-		return $this->list_table;
-	}
-
-	/**
-	 * Add screen options.
-	 *
-	 * @return void
-	 */
-	public function add_screen_options(): void {
-		// Early bail!!
-		$is_screen = wp_advads()->screens->is_screen( $this->get_id() );
-		if ( ! $is_screen ) {
-			return;
-		}
-
-		add_screen_option(
-			'per_page',
-			[
-				'default' => 20,
-				'option'  => 'edit_' . Constants::TAXONOMY_GROUP . '_per_page',
-			]
-		);
 	}
 
 	/**

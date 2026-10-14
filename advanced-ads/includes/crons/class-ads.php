@@ -35,6 +35,8 @@ class Ads implements Integration_Interface {
 	public function hooks(): void {
 		add_action( 'advanced-ads-ad-pre-save', [ $this, 'save_expiration_date' ] );
 		add_action( Constants::CRON_JOB_AD_EXPIRATION, [ $this, 'update_ad_status' ] );
+
+		$this->rescue_missed_expirations();
 	}
 
 	/**
@@ -85,6 +87,63 @@ class Ads implements Integration_Interface {
 			$group,
 			true
 		);
+	}
+
+	/**
+	 * Expire any published ads whose expiry timestamp is in the past but whose
+	 * post_status was never updated (e.g. the Action Scheduler job failed).
+	 *
+	 * Runs once per request on `init`, guarded by a transient so it only
+	 * queries the database at most once every 15 minutes.
+	 *
+	 * @return void
+	 */
+	public function rescue_missed_expirations(): void {
+		// Early bail.
+		if ( ! is_admin() || ! function_exists( 'as_unschedule_all_actions' ) ) {
+			return;
+		}
+
+		$transient_key = 'advanced_ads_expiry_rescue_lock';
+		if ( get_transient( $transient_key ) ) {
+			return;
+		}
+
+		// Set the lock first to prevent parallel requests from running the same query.
+		set_transient( $transient_key, 1, 15 * MINUTE_IN_SECONDS );
+
+		$now = current_time( 'mysql', true ); // UTC.
+
+		/**
+		 * Find every published ad that has an expiration meta key whose stored
+		 * datetime is in the past. The meta value is stored as 'Y-m-d H:i:s'
+		 * in UTC by save_expiration_date().
+		 */
+		$expired_ids = get_posts(
+			[
+				'post_type'      => Constants::POST_TYPE_AD,
+				'post_status'    => 'publish',
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'meta_query'     => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					[
+						'key'     => Constants::AD_META_EXPIRATION_TIME,
+						'value'   => $now,
+						'compare' => '<',
+						'type'    => 'DATETIME',
+					],
+				],
+			]
+		);
+
+		foreach ( $expired_ids as $post_id ) {
+			$this->update_ad_status( (int) $post_id );
+			as_unschedule_all_actions(
+				Constants::CRON_JOB_AD_EXPIRATION,
+				[ $post_id ],
+				Constants::CRON_GROUP_ADVANCED_ADS
+			);
+		}
 	}
 
 	/**

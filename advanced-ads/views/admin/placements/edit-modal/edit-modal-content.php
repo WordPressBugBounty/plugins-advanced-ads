@@ -8,8 +8,6 @@
  *
  * @var Placement $placement Placement instance.
  *
- * @var int       $user_id
- * @var int       $author_id
  * @var string    $options   Marked-up options.
  */
 

@@ -9,18 +9,19 @@
 
 namespace AdvancedAds\Admin\Pages;
 
-use DateTimeImmutable;
+use AdvancedAds\Abstracts\Screen;
 use AdvancedAds\Constants;
-use AdvancedAds\Utilities\WordPress;
-use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Ads.
+ * Ads editing screen.
  */
-class Ads_Editing extends Ads {
+class Ads_Editing extends Screen {
 
 	/**
 	 * Screen unique id.
@@ -80,7 +81,7 @@ class Ads_Editing extends Ads {
 
 		// Localize texts.
 		$i18n = [
-			'ads'           => [
+			'ads' => [
 				'afterParagraphPrompt' => __( 'After which paragraph?', 'advanced-ads' ),
 			],
 		];
@@ -105,9 +106,17 @@ class Ads_Editing extends Ads {
 	 */
 	public function header_actions(): void {
 		$wp_screen = get_current_screen();
-		if ( 'post' === $wp_screen->base && 'add' !== $wp_screen->action ) {
-			parent::header_actions();
+		if ( 'post' !== $wp_screen->base || 'add' === $wp_screen->action ) {
+			return;
 		}
+
+		$url = admin_url( 'post-new.php?post_type=' . Constants::POST_TYPE_AD );
+		?>
+		<a href="<?php echo esc_url( $url ); ?>" class="button button-primary advads-button">
+			<span class="dashicons dashicons-plus -ml-1.5 leading-6"></span>
+			<span><?php esc_html_e( 'New Ad', 'advanced-ads' ); ?></span>
+		</a>
+		<?php
 	}
 
 	/**
@@ -144,35 +153,21 @@ class Ads_Editing extends Ads {
 			return;
 		}
 
-		// Highlight Dummy ad if this is the first ad.
-		if ( ! WordPress::get_count_ads() ) {
-			?>
-			<style>
-			.advanced-ads-type-list-dummy {
-				font-weight: bold;
-			}
-			</style>
-			<?php
-		}
-
 		// Don’t show placement options if this is an ad translated with WPML since the placement might exist already.
 		if ( defined( 'ICL_SITEPRESS_VERSION' ) ) {
 			$trid         = apply_filters( 'wpml_element_trid', null, $post->ID );
 			$translations = apply_filters( 'wpml_get_element_translations', null, $trid, 'Advanced_Ads' );
-			if ( count( $translations ) > 1 ) {
+			if ( is_array( $translations ) && count( $translations ) > 1 ) {
 				return;
 			}
 		}
 
-		$ad         = wp_advads_get_ad( $post->ID );
-		$placements = wp_advads_get_placements();
-
 		/**
-		 * Display ad injection information after ad is created.
-		 *
-		 * Set `advanced-ads-ad-edit-show-placement-injection` to false if you want to prevent the box from appearing
+		 * Display ad injection information after ad is created — set `advanced-ads-ad-edit-show-placement-injection` to false if you want to prevent the box from appearing.
 		 */
 		if ( 6 === Params::get( 'message', 0, FILTER_VALIDATE_INT ) && apply_filters( 'advanced-ads-ad-edit-show-placement-injection', true ) ) {
+			$ad          = wp_advads_get_ad( $post->ID );
+			$placements  = wp_advads_get_placements();
 			$latest_post = $this->get_latest_post();
 			include_once ADVADS_ABSPATH . 'admin/views/placement-injection-top.php';
 		}
@@ -209,11 +204,11 @@ class Ads_Editing extends Ads {
 	/**
 	 * Load latest blog post
 	 *
-	 * @return WP_POST|null
+	 * @return \WP_Post|null
 	 */
-	private function get_latest_post() {
-		$posts = wp_get_recent_posts( [ 'numberposts' => 1 ] );
+	private function get_latest_post(): ?\WP_Post {
+		$posts = wp_get_recent_posts( [ 'numberposts' => 1 ], OBJECT );
 
-		return $posts ? $posts[0] : null;
+		return $posts[0] ?? null;
 	}
 }

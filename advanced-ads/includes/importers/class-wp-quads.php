@@ -16,6 +16,7 @@ use AdvancedAds\Abstracts\Group;
 use AdvancedAds\Abstracts\Placement;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Interfaces\Importer as Interface_Importer;
+use WP_Error;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -87,7 +88,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 */
 	public function detect(): bool {
 		return false;
-		return ! empty( $this->get_plugin_options() );
+		return ! empty( $this->get_plugin_options() ); // phpcs:ignore Squiz.PHP.NonExecutableCode.Unreachable -- the importer is hidden for now.
 	}
 
 	/**
@@ -147,7 +148,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 
 		if ( isset( $what_to_import['ads'] ) ) {
 			$messages[] = sprintf(
-				/* translators: 1: counts 2: Importer title */
+				/* translators: 1: Number of migrated ads, 2: Importer title. */
 				esc_html__( '%1$d ads migrated from %2$s', 'advanced-ads' ),
 				$count,
 				$this->get_title()
@@ -265,6 +266,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 		$count          = 0;
 		$quads_ads      = $this->get_plugin_options()['ads'];
 		$group_entities = [];
+		$layers         = [];
 
 		// Create ads and separate groups.
 		foreach ( $quads_ads as $quad_ad ) {
@@ -282,24 +284,32 @@ class WP_Quads extends Importer implements Interface_Importer {
 					];
 					break;
 				case 'layer':
-					$ad_id = ! empty( $quad_ad['ads_list'][0] ) ? $quad_ad['ads_list'][0]['value'] : 0;
-					$ad    = wp_advads_get_ad( $ad_id );
-					if ( $ad_id && ! $ad ) {
-						$quad_ad['position'] = 'layer';
-						$this->handle_item( $ad, $quad_ad, $this->history_key );
-						++$count;
-					}
+					$layers[] = $quad_ad;
 					break;
 				default:
 					$ads = $this->create_ad( $ad_type, $quad_ad );
 					if ( ! empty( $ads ) ) {
 						[ $ad, $desktop_ad ] = $ads;
 						if ( $ad->save() ) {
-							$this->handle_item( $desktop_ad, $quad_ad, $this->history_key );
-							$this->handle_item( $ad, $quad_ad, $this->history_key );
+							$this->handle_item( $desktop_ad, $quad_ad );
+							$this->handle_item( $ad, $quad_ad );
 							++$count;
 						}
 					}
+			}
+		}
+
+		// A popup shows an ad that is imported in the loop above, so its placement waits until every ad exists.
+		foreach ( $layers as $quad_ad ) {
+			$ad_id = $this->ad_mapping[ $quad_ad['ads_list'][0]['value'] ?? '' ] ?? 0;
+			$ad    = $ad_id ? wp_advads_get_ad( $ad_id ) : false;
+			if ( $ad ) {
+				$quad_ad['position'] = 'layer';
+				$placement           = $this->create_placement( $ad, $quad_ad );
+				if ( $placement ) {
+					$this->add_session_key( $ad, $placement, $this->history_key );
+					++$count;
+				}
 			}
 		}
 
@@ -316,8 +326,8 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Save ad and create a placement.
 	 *
-	 * @param Ad|Group $item    Ad or Group object to be saved.
-	 * @param object   $quad_ad The Quad ad object.
+	 * @param Ad|Group             $item    Ad or Group object to be saved.
+	 * @param array<string, mixed> $quad_ad The Quad ad data.
 	 *
 	 * @return void
 	 */
@@ -371,7 +381,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 *
 	 * @return void
 	 */
-	private function parse_type_plain( $ad, $quad_ad, $is_mobile = false ): void {
+	private function parse_type_plain( $ad, &$quad_ad, $is_mobile = false ): void {
 		$ad->set_type( 'plain' );
 		$ad->set_content( $quad_ad[ $is_mobile ? 'mob_code' : 'code' ] ?? '' );
 
@@ -392,7 +402,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 *
 	 * @return void
 	 */
-	private function parse_type_content( $ad, $quad_ad, $is_mobile = false ): void {
+	private function parse_type_content( $ad, &$quad_ad, $is_mobile = false ): void {
 		$ad->set_type( 'content' );
 
 		if ( 'video_ads' === $quad_ad['ad_type'] && ! empty( $quad_ad['image_src'] ) ) {
@@ -400,7 +410,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 			$content     = sprintf( '[video width="%d" mp4="%s" loop="true" autoplay="true"][/video]', $video_width, $quad_ad['image_src'] );
 
 			$url = $quad_ad['image_redirect_url'];
-			if ( empty( $url ) ) {
+			if ( ! empty( $url ) ) {
 				$content = "<a href='$url'>$content</a>";
 			}
 			$ad->set_content( $content );
@@ -419,7 +429,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 *
 	 * @return void
 	 */
-	private function parse_type_image( $ad, $quad_ad, $is_mobile = false ): void {
+	private function parse_type_image( $ad, &$quad_ad, $is_mobile = false ): void {
 		$ad->set_type( 'image' );
 		$prefix  = $is_mobile ? 'mob_' : '';
 		$url_key = $is_mobile ? 'image_mobile_src' : 'image_src_id';
@@ -447,7 +457,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 		// need to set placement position for background ad.
 		if ( 'background_ad' === $quad_ad['ad_type'] ) {
 			$quad_ad['position'] = 'background';
-		} elseif ( 'background_ad' === $quad_ad['ad_type'] ) {
+		} elseif ( 'parallax_ads' === $quad_ad['ad_type'] ) {
 			$quad_ad['position'] = 'parallax';
 		}
 	}
@@ -507,7 +517,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 *
 	 * @param array<string, mixed> $quad_ad The quad ad to parse.
 	 *
-	 * @return array<string, mixed> The parsed display conditions.
+	 * @return array<int, mixed> The parsed display conditions.
 	 */
 	private function parse_ad_display_conditions( $quad_ad ): array {
 		$display_conditions = [];
@@ -592,7 +602,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 *
 	 * @param array<string, mixed> $quad_ad The quad ad to parse.
 	 *
-	 * @return array<string, mixed> The parsed visitor conditions.
+	 * @return array<int, mixed> The parsed visitor conditions.
 	 */
 	private function parse_ad_visitor_conditions( $quad_ad ): array {
 		$visitor_conditions = [];
@@ -620,7 +630,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 			$quad_val  = $condition['value']['value'];
 
 			$condition_data['type']      = $condition_types[ $quad_type ];
-			$condition_data['connector'] = strtolower( $condition['condition'] ) ?? 'or';
+			$condition_data['connector'] = strtolower( $condition['condition'] ?? 'or' );
 
 			// phpcs:ignore WordPress.PHP.StrictInArray.MissingTrueStrict
 			if ( in_array(
@@ -711,7 +721,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 *
 	 * @param array<string, mixed> $quad_ad The quad ad to parse.
 	 *
-	 * @return array<string, mixed> The parsed display conditions.
+	 * @return array<int, mixed> The parsed display conditions.
 	 */
 	private function parse_cross_display_conditions( $quad_ad ): array {
 		$display_conditions = [];
@@ -731,7 +741,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 				'type'      => 'request_uri',
 				'value'     => $url_parameter['value']['value'],
 				'operator'  => 'match',
-				'connector' => strtolower( $url_parameter['condition'] ) ?? 'or',
+				'connector' => strtolower( $url_parameter['condition'] ?? 'or' ),
 			];
 		}
 
@@ -743,7 +753,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 *
 	 * @param array<string, mixed> $quad_ad The quad ad to parse.
 	 *
-	 * @return array<string, mixed> The parsed visitor conditions.
+	 * @return array<int, mixed> The parsed visitor conditions.
 	 */
 	private function parse_cross_visitor_conditions( $quad_ad ): array {
 		$visitor_conditions = [];
@@ -763,7 +773,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 				'type'      => 'role',
 				'value'     => $user_type['value']['value'],
 				'operator'  => 'is',
-				'connector' => strtolower( $user_type['condition'] ) ?? 'or',
+				'connector' => strtolower( $user_type['condition'] ?? 'or' ),
 			];
 		}
 
@@ -793,11 +803,11 @@ class WP_Quads extends Importer implements Interface_Importer {
 	 * Creates a new Ad based quad ad data.
 	 *
 	 * @param string               $ad_type The type of the ad.
-	 * @param array<string, mixed> $quad_ad The quad ad data.
+	 * @param array<string, mixed> $quad_ad The quad ad data; the type parser may set the placement position on it.
 	 *
-	 * @return array<string, mixed>|false Ad and Mobile ad if applicable, or false if the ad creation fails.
+	 * @return array<int, mixed>|false Ad and Mobile ad if applicable, or false if the ad creation fails.
 	 */
-	private function create_ad( $ad_type, $quad_ad ) {
+	private function create_ad( $ad_type, &$quad_ad ) {
 		$ad = wp_advads_create_new_ad( $ad_type );
 		if ( ! $ad ) {
 			return false;
@@ -826,7 +836,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 		}
 
 		if ( method_exists( $this, 'parse_type_' . $ad_type ) ) {
-			call_user_func( [ $this, 'parse_type_' . $ad_type ], $ad, $quad_ad, false );
+			$this->{'parse_type_' . $ad_type}( $ad, $quad_ad, false );
 		}
 
 		$ad->set_display_conditions( $display_conditions );
@@ -850,7 +860,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 			);
 			// set mobile data & condition.
 			if ( method_exists( $this, 'parse_type_' . $ad_type ) ) {
-				call_user_func( [ $this, 'parse_type_' . $ad_type ], $ad, $quad_ad, true );
+				$this->{'parse_type_' . $ad_type}( $ad, $quad_ad, true );
 			}
 			$visitor_conditions = array_merge(
 				$visitor_conditions,
@@ -969,7 +979,7 @@ class WP_Quads extends Importer implements Interface_Importer {
 	/**
 	 * Parses the Quad ad position and returns the corresponding Advanced Ads placement position.
 	 *
-	 * @param string $quad_ad The Quad ad.
+	 * @param array<string, mixed> $quad_ad The Quad ad.
 	 *
 	 * @return array<string, mixed> The parsed type and props.
 	 */

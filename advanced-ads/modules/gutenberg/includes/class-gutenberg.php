@@ -12,29 +12,17 @@
 class Advanced_Ads_Gutenberg {
 
 	/**
-	 * The singleton
-	 *
-	 * @var Advanced_Ads_Gutenberg
-	 */
-	private static $instance;
-
-	/**
-	 * CSS classes to use on the frontend
-	 *
-	 * @var string
-	 */
-	private static $css_class;
-
-	/**
 	 * Constructor
 	 */
-	private function __construct() {
+	public function __construct() {
 		add_action( 'init', [ $this, 'init' ] );
 		add_action( 'enqueue_block_editor_assets', [ $this, 'register_scripts' ] );
 	}
 
 	/**
 	 * Register blocks
+	 *
+	 * @return void
 	 */
 	public function init() {
 		if ( ! function_exists( 'register_block_type' ) ) {
@@ -196,6 +184,8 @@ class Advanced_Ads_Gutenberg {
 	 * Server side rendering for single ad block
 	 *
 	 * @param array<string, mixed> $attr Block's attributes.
+	 *
+	 * @return string|false
 	 */
 	public static function render_ad_selector( $attr ) {
 		ob_start();
@@ -263,16 +253,5 @@ class Advanced_Ads_Gutenberg {
 		// phpcs:enable
 
 		return ob_get_clean();
-	}
-
-	/**
-	 * Return the unique instance
-	 */
-	public static function get_instance() {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
 	}
 }

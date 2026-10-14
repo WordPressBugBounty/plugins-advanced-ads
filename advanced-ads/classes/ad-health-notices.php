@@ -24,7 +24,7 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Options
 	 *
-	 * @var array<string, mixed>
+	 * @var array<string, mixed>|null
 	 */
 	protected $options;
 
@@ -65,7 +65,7 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * The last notice key saved
 	 *
-	 * @var string
+	 * @var string|false
 	 */
 	public $last_saved_notice_key = false;
 
@@ -131,6 +131,11 @@ class Advanced_Ads_Ad_Health_Notices {
 		return empty( $options['disable-notices'] );
 	}
 
+	/**
+	 * Load the default notices.
+	 *
+	 * @return void
+	 */
 	public function load_default_notices() {
 		// load default notices.
 		if ( [] === $this->default_notices ) {
@@ -146,6 +151,8 @@ class Advanced_Ads_Ad_Health_Notices {
 
 	/**
 	 * Load notice arrays
+	 *
+	 * @return void
 	 */
 	public function load_notices() {
 
@@ -163,7 +170,7 @@ class Advanced_Ads_Ad_Health_Notices {
 				unset( $this->notices[ $_key ] );
 			}
 
-			$time         = current_time( 'timestamp', 0 );
+			$time         = current_time( 'timestamp' );
 			$notice_array = $this->get_notice_array_for_key( $_key );
 
 			// handle notices with a timeout.
@@ -222,6 +229,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	 * - only when users have ads
 	 * - once per day on any backend page
 	 * - on each Advanced Ads related page
+	 *
+	 * @return void
 	 */
 	public function run_checks() {
 
@@ -246,6 +255,8 @@ class Advanced_Ads_Ad_Health_Notices {
 
 	/**
 	 * General checks done on each Advanced Ads-related page or once per day
+	 *
+	 * @return void
 	 */
 	public function checks() {
 		$checks = [
@@ -306,6 +317,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	 *  - append_key        string attached to the key; enables to create multiple messages for one original key
 	 *  - append_text    text added to the default message
 	 *  - ad_id        ID of an ad, attaches the link to the ad edit page to the message
+	 *
+	 * @return void
 	 */
 	public function add( $notice_key, $atts = [] ) {
 		// Early bail!!
@@ -359,7 +372,7 @@ class Advanced_Ads_Ad_Health_Notices {
 		}
 
 		// add current time – we store localized time including the offset set in WP.
-		$notices[ $notice_key ]['time'] = current_time( 'timestamp', 0 );
+		$notices[ $notice_key ]['time'] = current_time( 'timestamp' );
 
 		$this->last_saved_notice_key = $notice_key;
 
@@ -374,6 +387,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	 *
 	 *  attributes:
 	 *  - append_text – text added to the default message
+	 *
+	 * @return void
 	 */
 	public function update( $notice_key, $atts = [] ) {
 		// Early bail!!
@@ -415,6 +430,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	 * Decide based on the notice, whether to remove or ignore it
 	 *
 	 * @param string $notice_key key of the notice.
+	 *
+	 * @return void
 	 */
 	public function hide( $notice_key ) {
 		if ( empty( $notice_key ) ) {
@@ -427,7 +444,7 @@ class Advanced_Ads_Ad_Health_Notices {
 		// handle notices with a timeout.
 		// set `closed` timestamp if the notice definition has a timeout information.
 		if ( isset( $notice_array['timeout'] ) ) {
-			$this->update( $notice_key, [ 'closed' => current_time( 'timestamp', 0 ) ] );
+			$this->update( $notice_key, [ 'closed' => current_time( 'timestamp' ) ] );
 
 			return;
 		}
@@ -448,6 +465,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	 * practically, this allows users to "skip" an notice if they are sure that it was only temporary
 	 *
 	 * @param string $notice_key notice key to be removed.
+	 *
+	 * @return void
 	 */
 	public function remove( $notice_key ) {
 		// Early bail!!
@@ -476,6 +495,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	 * does not remove it from "notices" array
 	 *
 	 * @param string $notice_key key of the notice to be ignored.
+	 *
+	 * @return void
 	 */
 	public function ignore( $notice_key ) {
 		// Early bail!!
@@ -497,6 +518,8 @@ class Advanced_Ads_Ad_Health_Notices {
 
 	/**
 	 * Clear all "ignore" messages
+	 *
+	 * @return void
 	 */
 	public function unignore() {
 		$this->update_ignore();
@@ -560,6 +583,8 @@ class Advanced_Ads_Ad_Health_Notices {
 
 	/**
 	 * Render notice widget on overview page
+	 *
+	 * @return void
 	 */
 	public function render_widget() {
 		$ignored_count = count( $this->ignore );
@@ -641,6 +666,8 @@ class Advanced_Ads_Ad_Health_Notices {
 
 	/**
 	 * Display problems.
+	 *
+	 * @return void
 	 */
 	public function display_problems() {
 		$this->display( 'problem' );
@@ -648,6 +675,8 @@ class Advanced_Ads_Ad_Health_Notices {
 
 	/**
 	 * Display notices.
+	 *
+	 * @return void
 	 */
 	public function display_notices() {
 		$this->display( 'notice' );
@@ -674,6 +703,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	 * Update notice options
 	 *
 	 * @param array<string, mixed> $options New options.
+	 *
+	 * @return void
 	 */
 	public function update_options( array $options ) {
 		// do not allow to clear options.
@@ -687,6 +718,8 @@ class Advanced_Ads_Ad_Health_Notices {
 
 	/**
 	 * Get the number of overall visible notices
+	 *
+	 * @return int
 	 */
 	public static function get_number_of_notices() {
 		$displayed_notices = self::get_instance()->displayed_notices;
@@ -700,6 +733,8 @@ class Advanced_Ads_Ad_Health_Notices {
 	/**
 	 * Get ignored messages that are also in the notices
 	 * also updates ignored array, if needed
+	 *
+	 * @return array<int, string>
 	 */
 	public function get_valid_ignored() {
 		$options       = $this->options();
@@ -734,51 +769,12 @@ class Advanced_Ads_Ad_Health_Notices {
 	}
 
 	/**
-	 * Get visible notices by type – hidden and displayed
-	 *
-	 * @param string $type type of the notice.
-	 *
-	 * @return array<string, array<string, mixed>>
-	 */
-	public function get_visible_notices_by_type( $type = 'problem' ) {
-		$notices_by_type = [];
-
-		foreach ( $this->notices as $_key => $_notice ) {
-			$notice_array = $this->get_notice_array_for_key( $_key );
-
-			if ( isset( $notice_array['type'] ) && $type === $notice_array['type']
-				 && ( ! isset( $this->ignore ) || false === array_search( $_key, $this->ignore, true ) ) ) {
-				$notices_by_type[ $_key ] = $_notice;
-			}
-		}
-
-		return $notices_by_type;
-	}
-
-	/**
 	 * Check if there are notices
 	 *
 	 * @return  bool    true if there are notices, false if not
 	 */
 	public function has_notices() {
 		return isset( $this->notices ) && is_array( $this->notices ) && count( $this->notices );
-	}
-
-	/**
-	 * Check if there are visible notices for a given type
-	 *
-	 * @param string $type type of the notice.
-	 *
-	 * @return  integer
-	 */
-	public function has_notices_by_type( $type = 'problem' ) {
-		$notices = $this->get_visible_notices_by_type( $type );
-
-		if ( ! is_array( $notices ) ) {
-			return 0;
-		}
-
-		return count( $notices );
 	}
 
 	/**

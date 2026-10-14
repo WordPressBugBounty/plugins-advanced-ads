@@ -154,24 +154,6 @@ abstract class Data {
 	}
 
 	/**
-	 * Get the data store.
-	 *
-	 * @return object
-	 */
-	public function get_data_store() {
-		return $this->data_store;
-	}
-
-	/**
-	 * Get object read property.
-	 *
-	 * @return bool
-	 */
-	public function get_object_read(): bool {
-		return (bool) $this->object_read;
-	}
-
-	/**
 	 * Returns all data for this object.
 	 *
 	 * @return array<string, mixed>
@@ -213,10 +195,7 @@ abstract class Data {
 	}
 
 	/**
-	 * Gets a prop for a getter method.
-	 *
-	 * Gets the value from either current pending changes, or the data itself.
-	 * Context controls what happens to the value before it's returned.
+	 * Gets a prop for a getter method — gets the value from either current pending changes, or the data itself; context controls what happens to the value before it's returned.
 	 *
 	 * @param string $prop Name of prop to get.
 	 * @param string $context What the value is for. Valid values are view and edit.
@@ -228,19 +207,18 @@ abstract class Data {
 
 		if ( Arr::has( $this->temp_data, $prop ) ) {
 			$value = Arr::get( $this->temp_data, $prop );
+		} elseif ( Arr::has( $this->changes, $prop ) ) {
+			$value = Arr::get( $this->changes, $prop );
 		} elseif ( Arr::has( $this->data, $prop ) ) {
-			$value = Arr::has( $this->changes, $prop )
-				? Arr::get( $this->changes, $prop )
-				: Arr::get( $this->data, $prop );
+			$value = Arr::get( $this->data, $prop );
 		}
 
 		if ( 'view' === $context ) {
 			/**
-			 * Filter the option value retrieved for $field.
-			 * `$field` parameter makes dynamic hook portion.
+			 * Filter the option value retrieved for $field — `$field` parameter makes dynamic hook portion.
 			 *
-			 * @var mixed $value The option value (may be set to default).
-			 * @var Ad    $this  The current Ad instance.
+			 * @param mixed $value The option value (may be set to default).
+			 * @param Data  $data  The current ad, group or placement.
 			 */
 			$value = apply_filters_deprecated(
 				"advanced-ads-ad-option-{$prop}",
@@ -292,8 +270,7 @@ abstract class Data {
 	}
 
 	/**
-	 * Set a collection of props in one go, collect any errors, and return the result.
-	 * Only sets using public methods.
+	 * Set a collection of props in one go, collect any errors, and return the result — only sets using public methods.
 	 *
 	 * @param array<string, mixed> $props Key value pairs to set. Key is the prop and should map to a setter function name.
 	 *

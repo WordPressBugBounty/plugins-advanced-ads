@@ -9,6 +9,8 @@
  * @var Placement $placement Placement instance.
  */
 
+use AdvancedAds\Abstracts\Placement;
+
 ?>
 <div class="advads-placement-item-select-wrap">
 	<select
@@ -28,7 +30,7 @@
 			</optgroup>
 		<?php endforeach; ?>
 	</select>
-	<a class="advads-placement-item-edit" href="<?php echo esc_url( $placement->get_item_object() ? $placement->get_item_object()->get_edit_link() : '#' ); ?>" title="<?php esc_attr_e( 'Edit item', 'advanced-ads' ); ?>">
+	<a class="advads-placement-item-edit" href="<?php echo esc_url( $placement->get_item_object() ? $placement->get_item_object()->get_edit_link() : '#' ); ?>" title="<?php esc_attr_e( 'Edit item', 'advanced-ads' ); ?>" aria-label="<?php esc_attr_e( 'Edit item', 'advanced-ads' ); ?>">
 		<span class="dashicons dashicons-external"></span>
 	</a>
 </div>

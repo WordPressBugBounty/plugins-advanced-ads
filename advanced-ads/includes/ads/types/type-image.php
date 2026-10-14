@@ -155,7 +155,15 @@ class Image implements Ad_Type {
 			<div id="advads-image-preview">
 				<?php $this->create_image_tag( $id, $ad ); ?>
 			</div>
-			<a id="advads-image-edit-link" class="<?php echo ! $edit_link ? 'hidden' : ''; ?>" href="<?php echo esc_url( $edit_link ); ?>"><span class="dashicons dashicons-edit"></span></a>
+			<a id="advads-image-edit-link" class="<?php echo ! $edit_link ? 'hidden' : ''; ?>" href="<?php echo esc_url( $edit_link ); ?>" aria-label="<?php esc_attr_e( 'Edit', 'advanced-ads' ); ?>"><span class="dashicons dashicons-edit"></span></a>
+		</div>
+		<hr/>
+		<label for="advads-image-alt" class="label"><?php esc_html_e( 'Alt text', 'advanced-ads' ); ?></label>
+		<div>
+			<input type="text" name="advanced_ad[output][image_alt]" id="advads-image-alt" value="<?php echo esc_attr( $ad->get_image_alt( 'edit' ) ); ?>"/>
+			<p class="description">
+				<?php esc_html_e( 'Describes the image for screen readers and when it cannot be loaded. Leave empty to use the alternative text from the media library.', 'advanced-ads' ); ?>
+			</p>
 		</div>
 		<hr/>
 		<?php
@@ -174,8 +182,7 @@ class Image implements Ad_Type {
 	}
 
 	/**
-	 * Generate a string with the original image size for output in the backend
-	 * Only show, if different from entered image sizes
+	 * Generate a string with the original image size for output in the backend — only show if different from entered image sizes.
 	 *
 	 * @param Ad_Image $ad Ad instance.
 	 *
@@ -233,7 +240,7 @@ class Image implements Ad_Type {
 		}
 
 		$hwstring = image_hwstring( $width, $height );
-		$alt      = trim( esc_textarea( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) );
+		$alt      = $ad->get_image_alt();
 
 		// TODO: use an array for attributes so they are simpler to extend.
 		$sizes           = '';

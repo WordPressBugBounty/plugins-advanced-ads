@@ -21,8 +21,7 @@ defined( 'ABSPATH' ) || exit;
 class Ads_WP_Ads extends Importer implements Interface_Importer {
 
 	/**
-	 * Alignment mapping.
-	 * Adsforwp uses strings: 'left', 'right', 'center', 'none'
+	 * Alignment mapping — Adsforwp uses strings: 'left', 'right', 'center', 'none'.
 	 */
 	private const ALIGNMENT_MAP = [
 		'default' => [
@@ -49,8 +48,7 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 
 
 	/**
-	 * Placement mapping.
-	 * Note: 'manual' is used when no direct mapping is available or when the position is 'manual' in Adsforwp.
+	 * Placement mapping — 'manual' is used when no direct mapping is available or when the position is 'manual' in Adsforwp.
 	 */
 	private const PLACEMENT_MAP = [
 		'before_the_content'              => 'post_top',
@@ -145,15 +143,15 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 
 		wp_advads()->importers->add_session_history( $this->get_id(), $history_key, $count );
 
-		// translators: %1$d is the number of ads imported, %2$s is the title of the importer.
+		/* translators: 1: Number of migrated ads, 2: Importer title. */
 		return sprintf( esc_html__( '%1$d ads migrated from %2$s', 'advanced-ads' ), $count, $this->get_title() );
 	}
 
 	/**
 	 * Import Ads from Adsforwp CPT.
 	 *
-	 * @param string               $history_key Unique key for this import session, used for rollback.
-	 * @param array<string, mixed> $ad_map      Reference to the ad ID mapping array.
+	 * @param string          $history_key Unique key for this import session, used for rollback.
+	 * @param array<int, int> $ad_map      Reference to the ad ID mapping array.
 	 * @return int Count of imported ads.
 	 * @throws \Exception If any error occurs during the import process.
 	 * @since 1.50.0
@@ -207,7 +205,7 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 
 		// Apply Expiry.
 		if ( ! empty( $meta['adsforwp_ad_expire_enable'] ) && ! empty( $meta['adsforwp_ad_expire_to'] ) ) {
-			$options                = $ad->get_prop( 'options', [] );
+			$options                = $ad->get_prop( 'options', 'edit' );
 			$options['expiry_date'] = strtotime( $meta['adsforwp_ad_expire_to'] );
 			$ad->set_prop( 'options', $options );
 		}
@@ -246,7 +244,7 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 
 		$ad->set_content( wp_json_encode( [ 'slotId' => $slot ] ) );
 
-		$options = $ad->get_prop( 'options', [] );
+		$options = $ad->get_prop( 'options', 'edit' );
 		if ( $client ) {
 			$options['adsense_id'] = $client;
 		}
@@ -270,7 +268,7 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 			$ad->set_image_id( $attachment_id );
 		}
 
-		$options        = $ad->get_prop( 'options', [] );
+		$options        = $ad->get_prop( 'options', 'edit' );
 		$options['url'] = $meta['adsforwp_ad_redirect_url'] ?? '';
 		$ad->set_prop( 'options', $options );
 	}
@@ -309,10 +307,10 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 		$output = $ad->get_prop( 'output', [] );
 
 		$output['margin'] = [
-			'top'    => (int) $margins['ad_margin_top'] ?? 0,
-			'right'  => (int) $margins['ad_margin_right'] ?? 0,
-			'bottom' => (int) $margins['ad_margin_bottom'] ?? 0,
-			'left'   => (int) $margins['ad_margin_left'] ?? 0,
+			'top'    => (int) ( $margins['ad_margin_top'] ?? 0 ),
+			'right'  => (int) ( $margins['ad_margin_right'] ?? 0 ),
+			'bottom' => (int) ( $margins['ad_margin_bottom'] ?? 0 ),
+			'left'   => (int) ( $margins['ad_margin_left'] ?? 0 ),
 		];
 
 		$ad->set_prop( 'output', $output );
@@ -391,7 +389,7 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Convert Group CPT to native Taxonomy.
 	 *
-	 * @param array<string, mixed> $ad_map A mapping of old ad IDs to new ad IDs, used to maintain group associations during the import process.
+	 * @param array<int, int> $ad_map A mapping of old ad IDs to new ad IDs, used to maintain group associations during the import process.
 	 * @return void
 	 * @since 1.50.0
 	 * @throws \Exception If any error occurs during the group import process.
@@ -423,10 +421,10 @@ class Ads_WP_Ads extends Importer implements Interface_Importer {
 								$ad_obj = wp_advads_get_ad( $new_ad_id );
 
 								$margin = [
-									'top'    => (int) $group_margins['ad_margin_top'] ?? 0,
-									'right'  => (int) $group_margins['ad_margin_right'] ?? 0,
-									'bottom' => (int) $group_margins['ad_margin_bottom'] ?? 0,
-									'left'   => (int) $group_margins['ad_margin_left'] ?? 0,
+									'top'    => (int) ( $group_margins['ad_margin_top'] ?? 0 ),
+									'right'  => (int) ( $group_margins['ad_margin_right'] ?? 0 ),
+									'bottom' => (int) ( $group_margins['ad_margin_bottom'] ?? 0 ),
+									'left'   => (int) ( $group_margins['ad_margin_left'] ?? 0 ),
 								];
 
 								$ad_obj->set_margin( $margin );

@@ -10,6 +10,8 @@
 namespace AdvancedAds\Ads;
 
 use AdvancedAds\Constants;
+use AdvancedAds\Abstracts\Ad;
+use AdvancedAds\Abstracts\Group;
 
 defined( 'ABSPATH' ) || exit;
 

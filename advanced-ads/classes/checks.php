@@ -1,6 +1,7 @@
 <?php // phpcs:ignoreFile
 
 use AdvancedAds\Constants;
+use AdvancedAds\License\License;
 use AdvancedAds\License\License_Site_Activation;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\Data;
@@ -30,13 +31,6 @@ class Advanced_Ads_Checks {
 	}
 
 	/**
-	 * Show the list of potential issues
-	 */
-	public static function show_issues() {
-		include_once ADVADS_ABSPATH . '/admin/views/checks.php';
-	}
-
-	/**
 	 * PHP version minimum
 	 *
 	 * @return bool true if uses the minimum PHP version or higher
@@ -63,28 +57,11 @@ class Advanced_Ads_Checks {
 	}
 
 	/**
-	 * WordPress update available
-	 *
-	 * @return bool true if WordPress update available
-	 */
-	public static function wp_update_available() {
-
-		$update_data = wp_get_update_data();
-		$count       = absint( $update_data['counts']['wordpress'] );
-
-		if ( $count ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Check if license keys are missing or invalid or expired
 	 *
 	 * @since 1.6.6
 	 * @update 1.8.21 also check for expired licenses
-	 * @return true if there are missing licenses
+	 * @return bool true if there are missing licenses
 	 */
 	public static function licenses_invalid() {
 		$add_ons = Data::get_addons();
@@ -109,10 +86,10 @@ class Advanced_Ads_Checks {
 				continue;
 			}
 
-			$status = Advanced_Ads_Admin_Licenses::get_instance()->get_license_status( $_add_on['options_slug'] );
+			$status = License::get_mirror_status_for_options_slug( $_add_on['options_slug'] );
 
 			// check expiry date.
-			$expiry_date = Advanced_Ads_Admin_Licenses::get_instance()->get_license_expires( $_add_on['options_slug'] );
+			$expiry_date = License::get_mirror_expires_for_options_slug( $_add_on['options_slug'] );
 
 			if ( $expiry_date && 'lifetime' !== $expiry_date && strtotime( $expiry_date ) < time() ) {
 				return true;
@@ -124,7 +101,7 @@ class Advanced_Ads_Checks {
 			}
 
 			// retrieve our license key from the DB.
-			$licenses = Advanced_Ads_Admin_Licenses::get_instance()->get_licenses();
+			$licenses = License::get_addon_key_map();
 
 			$license_key = isset( $licenses[ $_add_on_key ] ) ? $licenses[ $_add_on_key ] : false;
 
@@ -337,12 +314,11 @@ class Advanced_Ads_Checks {
 
 	/**
 	 * Notice for Adblocker module if assets have expired
+	 *
+	 * @return bool
 	 */
 	public static function assets_expired() {
-		$plugin_options    = Advanced_Ads::get_instance()->get_adblocker_options();
-		$adblocker_options = Advanced_Ads_Ad_Blocker::get_instance()->options();
-
-		return ! empty( $plugin_options['use-adblocker'] ) && empty( $adblocker_options['module_can_work'] );
+		return wp_advads_is_module_active( 'ad-blocker' );
 	}
 
 	/**

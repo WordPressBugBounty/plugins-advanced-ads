@@ -48,11 +48,7 @@ class Licenses implements Integration_Interface {
 	}
 
 	/**
-	 * Schedule one-time expiry actions for each stored license key.
-	 *
-	 * Creates up to three pending jobs per license (one month, ten days, grace)
-	 * when their scheduled run times are still in the future. Existing jobs for
-	 * the same hook, key, and group are replaced.
+	 * Schedule one-time expiry actions for each stored license key — creates up to three pending jobs per license (one month, ten days, grace) when their scheduled run times are still in the future. Existing jobs for the same hook, key, and group are replaced.
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list; loads from storage when empty.
 	 *
@@ -92,10 +88,7 @@ class Licenses implements Integration_Interface {
 	}
 
 	/**
-	 * Run a scheduled license expiry action for one license key.
-	 *
-	 * Refreshes the license from the shop, then either sets an admin notice flag
-	 * (one month / ten days) or syncs local expiry state after the grace period.
+	 * Run a scheduled license expiry action for one license key — refreshes the license from the shop, then either sets an admin notice flag (one month / ten days) or syncs local expiry state after the grace period.
 	 *
 	 * @param string $license_key License key (Action Scheduler passes indexed args).
 	 *

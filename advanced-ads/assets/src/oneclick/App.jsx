@@ -14,10 +14,10 @@ import StoreProvider from './store/context';
 function App() {
 	return (
 		<StoreProvider>
-			{createPortal(
+			{ createPortal(
 				<AddonRow />,
-				document.getElementById('advads-oneclick-addon-row')
-			)}
+				document.getElementById( 'advads-oneclick-addon-row' )
+			) }
 			<div className="mb-4">
 				<Notices />
 			</div>

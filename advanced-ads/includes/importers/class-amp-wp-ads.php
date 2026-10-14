@@ -252,7 +252,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 
 		wp_advads()->importers->add_session_history( $this->get_id(), $history_key, $count );
 
-		/* translators: 1: count of migrated ads 2: importer title */
+		/* translators: 1: Number of migrated ads, 2: Importer title. */
 		return sprintf( esc_html__( '%1$d ads migrated from %2$s', 'advanced-ads' ), $count, $this->get_title() );
 	}
 
@@ -617,12 +617,11 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Resolve ad type, title, and raw data for a basic ad slot.
-	 * Returns visibility rules for slot i (slot 3 is configurable).
+	 * Resolve ad type, title, and raw data for a basic ad slot — returns visibility rules for slot i (slot 3 is configurable).
 	 *
 	 * @param array<string, mixed> $amp AMP options.
 	 * @param int                  $i   Slot index.
-	 * @return array<string, mixed> Visibility condition array.
+	 * @return array<int, mixed> Visibility condition array.
 	 */
 	private function build_basic_visibility( array $amp, int $i ): array {
 		if ( 3 !== $i ) {
@@ -674,7 +673,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 			}
 		}
 
-		return $display_conditions ?? [
+		return $display_conditions ? $display_conditions : [
 			[
 				'type'     => 'general',
 				'operator' => 'is',
@@ -689,7 +688,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	 * @param array<string, mixed> $amp         AMP options.
 	 * @param int                  $i           Slot index.
 	 * @param string               $ad_type_raw Numeric ad-type string from AMP options.
-	 * @return array<string, mixed> { aa_type, title, raw_data, position_raw }
+	 * @return array<int, mixed> { aa_type, title, raw_data, position_raw }
 	 */
 	private function resolve_incontent_slot( array $amp, int $i, string $ad_type_raw ): array {
 		switch ( $ad_type_raw ) {
@@ -756,7 +755,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	 * Resolve placement type and paragraph props from a raw in-content position string.
 	 *
 	 * @param string $position_raw Raw position value from AMP options.
-	 * @return array<string, mixed> { placement_type, paragraph_props }
+	 * @return array<int, mixed> { placement_type, paragraph_props }
 	 */
 	private function resolve_incontent_position( string $position_raw ): array {
 		// Percentage-based positions.
@@ -792,7 +791,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	 * @param array<string, mixed> $amp         AMP options.
 	 * @param int                  $i           Slot index.
 	 * @param string               $ad_type_raw Numeric ad-type string from AMP options.
-	 * @return array<string, mixed> { aa_type, title, raw_data }
+	 * @return array<int, mixed> { aa_type, title, raw_data }
 	 */
 	private function resolve_standard_slot( array $amp, int $i, string $ad_type_raw ): array {
 		switch ( $ad_type_raw ) {
@@ -857,7 +856,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	 *
 	 * @param array<string, mixed> $amp         AMP options.
 	 * @param string               $ad_type_raw Numeric ad-type string from AMP options.
-	 * @return array<string, mixed> { aa_type, title, raw_data }
+	 * @return array<int, mixed> { aa_type, title, raw_data }
 	 */
 	private function resolve_featured_image_slot( array $amp, string $ad_type_raw ): array {
 		switch ( $ad_type_raw ) {
@@ -924,14 +923,14 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Create an Advanced Ads ad and (optionally) a placement, then track history.
 	 *
-	 * @param string               $title           Human-readable ad title.
-	 * @param string               $aa_type         Advanced Ads ad type slug ('adsense', 'plain', 'image').
-	 * @param array<string, mixed> $raw_data        Structured data resolved from AMP options.
-	 * @param string               $placement_type  Advanced Ads placement type slug (or 'manual').
-	 * @param array<string, mixed> $visibility      Display / visitor conditions array.
-	 * @param array<string, mixed> $paragraph_props Extra placement props for post_content placements.
-	 * @param string               $history_key     Session key for rollback.
-	 * @param int                  $count           Running import counter (passed by reference).
+	 * @param string                   $title           Human-readable ad title.
+	 * @param string                   $aa_type         Advanced Ads ad type slug ('adsense', 'plain', 'image').
+	 * @param array<string, mixed>     $raw_data        Structured data resolved from AMP options.
+	 * @param string                   $placement_type  Advanced Ads placement type slug (or 'manual').
+	 * @param array<int|string, mixed> $visibility  Display / visitor conditions array.
+	 * @param array<string, mixed>     $paragraph_props Extra placement props for post_content placements.
+	 * @param string                   $history_key     Session key for rollback.
+	 * @param int                      $count           Running import counter (passed by reference).
 	 * @return void
 	 */
 	private function create_ad_and_placement(
@@ -1018,10 +1017,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	}
 
 	/**
-	 * Apply DoubleClick / DFP data as plain HTML to an ad object.
-	 *
-	 * DoubleClick is not a native Advanced Ads type, so we store it as plain
-	 * HTML and preserve the slot / dimensions in options for reference.
+	 * Apply DoubleClick / DFP data as plain HTML to an ad object — DoubleClick is not a native Advanced Ads type, so we store it as plain HTML and preserve the slot / dimensions in options for reference.
 	 *
 	 * @param object               $ad       Advanced Ads ad object.
 	 * @param array<string, mixed> $raw_data Resolved DoubleClick data.
@@ -1110,9 +1106,7 @@ class Amp_WP_Ads extends Importer implements Interface_Importer {
 	// -------------------------------------------------------------------------
 
 	/**
-	 * Import global AMP for WP settings into Advanced Ads options.
-	 *
-	 * Maps: ad sponsorship label text → Advanced Ads custom ad label.
+	 * Import global AMP for WP settings into Advanced Ads options — maps: ad sponsorship label text → Advanced Ads custom ad label.
 	 *
 	 * @return void
 	 */

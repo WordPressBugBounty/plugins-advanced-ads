@@ -9,19 +9,18 @@
 
 namespace AdvancedAds\Admin\Placements;
 
-use AdvancedAds\Modal;
 use AdvancedAds\Abstracts\Placement;
-use AdvancedAds\Utilities\WordPress;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Modal;
 use AdvancedAds\Utilities\Content_Injection;
-use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Placement Edit Modal.
  */
-class Edit_Modal implements Integration_Interface {
+class Edit_Modal {
 
 	/**
 	 * Hold placement
@@ -89,8 +88,6 @@ class Edit_Modal implements Integration_Interface {
 	private function render_modal_content(): string {
 		ob_start();
 		$placement = $this->placement;
-		$user_id   = wp_get_current_user()->ID;
-		$author_id = get_post_field( 'post_author', $this->placement->get_id() );
 
 		include $this->view_path . '/edit-modal-content.php';
 
@@ -103,37 +100,13 @@ class Edit_Modal implements Integration_Interface {
 	 * @return void
 	 */
 	private function render_settings(): void {
-		$basic_settings = [
-			'placement-name'   => [
-				'label'       => __( 'Name', 'advanced-ads' ),
-				'callback'    => [ $this, 'render_placement_name' ],
-				'description' => '',
-				'order'       => 5,
-			],
-			'placement-item'   => [
-				'label'       => __( 'Item', 'advanced-ads' ),
-				'callback'    => [ $this, 'render_placement_item' ],
-				'description' => '',
-				'order'       => 5,
-			],
-			'placement-status' => [
-				'label'       => __( 'Status', 'advanced-ads' ),
-				'callback'    => [ $this, 'render_placement_status' ],
-				'description' => '',
-				'order'       => 5,
-			],
-		];
+		WordPress::render_option( 'placement-name', __( 'Name', 'advanced-ads' ), $this->render_field( 'name.php' ) );
+		WordPress::render_option( 'placement-item', __( 'Item', 'advanced-ads' ), $this->render_field( 'item.php' ) );
+		WordPress::render_option( 'placement-status', __( 'Status', 'advanced-ads' ), $this->render_field( 'status.php' ) );
 
 		if ( $this->placement->is_type( 'post_content' ) ) {
-			$basic_settings['placement-content-injection-index'] = [
-				'label'       => __( 'position', 'advanced-ads' ),
-				'callback'    => [ $this, 'render_placement_position' ],
-				'description' => '',
-				'order'       => 6,
-			];
+			WordPress::render_option( 'placement-content-injection-index', __( 'position', 'advanced-ads' ), $this->render_placement_position() );
 		}
-
-		self::render_settings_group( $basic_settings );
 
 		$slug = $this->placement->get_slug();
 
@@ -145,75 +118,48 @@ class Edit_Modal implements Integration_Interface {
 		 */
 		do_action( 'advanced-ads-placement-options-before-advanced', $slug, $this->placement );
 
-		$type_options      = $this->placement->get_type_object()->get_options();
-		$advanced_settings = [];
+		$type_options = $this->placement->get_type_object()->get_options();
 
 		if ( ! $this->placement->is_type( 'header' ) ) {
 			if ( $type_options['placement-ad-label'] ?? true ) {
-				$advanced_settings['placement-ad-label'] = [
-					'label'       => __( 'ad label', 'advanced-ads' ),
-					'callback'    => [ $this, 'render_placement_ad_label' ],
-					'description' => '',
-					'order'       => 7,
-				];
+				WordPress::render_option( 'placement-ad-label', __( 'ad label', 'advanced-ads' ), $this->render_placement_ad_label() );
 			}
 
-			if ( isset( $type_options['show_position'] ) && $type_options['show_position'] ) {
-				$advanced_settings['placement-position'] = [
-					'label'       => __( 'Position', 'advanced-ads' ),
-					'callback'    => [ $this, 'render_placement_label_position' ],
-					'description' => '',
-					'order'       => 7,
-				];
+			if ( ! empty( $type_options['show_position'] ) ) {
+				WordPress::render_option( 'placement-position', __( 'Position', 'advanced-ads' ), $this->render_placement_label_position() );
 			}
 
-			$advanced_settings['placement-inline-css'] = [
-				'label'       => __( 'Inline CSS', 'advanced-ads' ),
-				'callback'    => [ $this, 'render_placement_inline_css' ],
-				'description' => '',
-				'order'       => 9,
-			];
+			WordPress::render_option( 'placement-inline-css', __( 'Inline CSS', 'advanced-ads' ), $this->render_placement_inline_css() );
 
 			if ( ! defined( 'AAP_VERSION' ) ) {
-				// Minimum Content Length.
-				$advanced_settings['placement-content-minimum-length'] = [
-					'label'       => __( 'Minimum Content Length', 'advanced-ads' ),
-					'callback'    => [ $this, 'render_pro_pitch' ],
-					'description' => __( 'Minimum length of content before automatically injected ads are allowed in them.', 'advanced-ads' ),
-					'order'       => 10,
-				];
-
-				// Words Between Ads.
-				$advanced_settings['placement-skip-paragraph'] = [
-					'label'       => __( 'Words Between Ads', 'advanced-ads' ),
-					'callback'    => [ $this, 'render_pro_pitch' ],
-					'description' => __( 'A minimum amount of words between automatically injected ads.', 'advanced-ads' ),
-					'order'       => 10,
-				];
+				WordPress::render_option(
+					'placement-content-minimum-length',
+					__( 'Minimum Content Length', 'advanced-ads' ),
+					$this->render_pro_pitch(),
+					__( 'Minimum length of content before automatically injected ads are allowed in them.', 'advanced-ads' )
+				);
+				WordPress::render_option(
+					'placement-skip-paragraph',
+					__( 'Words Between Ads', 'advanced-ads' ),
+					$this->render_pro_pitch(),
+					__( 'A minimum amount of words between automatically injected ads.', 'advanced-ads' )
+				);
 			}
 		}
 
-		// show the conditions pitch on the `head` placement as well.
 		if ( ! defined( 'AAP_VERSION' ) ) {
-			// Display Conditions for placements.
-			$advanced_settings['placement-display-conditions'] = [
-				'label'       => __( 'Display Conditions', 'advanced-ads' ),
-				'callback'    => [ $this, 'render_pro_pitch' ],
-				'description' => __( 'Use display conditions for placements.', 'advanced-ads' ) . ' ' . __( 'The free version provides conditions on the ad edit page.', 'advanced-ads' ),
-				'order'       => 10,
-			];
-
-			// Visitor Condition for placements.
-			$advanced_settings['placement-visitor-conditions'] = [
-				'label'       => __( 'Visitor Conditions', 'advanced-ads' ),
-				'callback'    => [ $this, 'render_pro_pitch' ],
-				'description' => __( 'Use visitor conditions for placements.', 'advanced-ads' ) . ' ' . __( 'The free version provides conditions on the ad edit page.', 'advanced-ads' ),
-				'order'       => 10,
-			];
-		}
-
-		if ( $advanced_settings ) {
-			self::render_settings_group( $advanced_settings );
+			WordPress::render_option(
+				'placement-display-conditions',
+				__( 'Display Conditions', 'advanced-ads' ),
+				$this->render_pro_pitch(),
+				__( 'Use display conditions for placements.', 'advanced-ads' ) . ' ' . __( 'The free version provides conditions on the ad edit page.', 'advanced-ads' )
+			);
+			WordPress::render_option(
+				'placement-visitor-conditions',
+				__( 'Visitor Conditions', 'advanced-ads' ),
+				$this->render_pro_pitch(),
+				__( 'Use visitor conditions for placements.', 'advanced-ads' ) . ' ' . __( 'The free version provides conditions on the ad edit page.', 'advanced-ads' )
+			);
 		}
 
 		/**
@@ -226,63 +172,17 @@ class Edit_Modal implements Integration_Interface {
 	}
 
 	/**
-	 * Render a group of placements options
+	 * Render a field view that only needs `$placement`.
 	 *
-	 * @param array<string, array<string, mixed>> $settings Placement option fields.
-	 *
-	 * @return void
-	 */
-	private static function render_settings_group( $settings ) {
-		array_multisort( array_column( $settings, 'order' ), SORT_ASC, $settings );
-
-		foreach ( $settings as $setting_id => $setting ) {
-			WordPress::render_option(
-				$setting_id,
-				$setting['label'],
-				$setting['callback']( $setting_id ),
-				$setting['description']
-			);
-		}
-	}
-
-	/**
-	 * Render the placement name option.
+	 * @param string $file Field view filename under fields/.
 	 *
 	 * @return string
 	 */
-	private function render_placement_name(): string {
+	private function render_field( string $file ): string {
 		$placement = $this->placement;
 
 		ob_start();
-		include $this->view_path . '/fields/name.php';
-
-		return ob_get_clean();
-	}
-
-	/**
-	 * Render the placement item option.
-	 *
-	 * @return string
-	 */
-	private function render_placement_item(): string {
-		$placement = $this->placement;
-
-		ob_start();
-		include $this->view_path . '/fields/item.php';
-
-		return ob_get_clean();
-	}
-
-	/**
-	 * Render the placement status option.
-	 *
-	 * @return string
-	 */
-	private function render_placement_status(): string {
-		$placement = $this->placement;
-
-		ob_start();
-		include $this->view_path . '/fields/status.php';
+		include $this->view_path . '/fields/' . $file;
 
 		return ob_get_clean();
 	}
@@ -333,8 +233,7 @@ class Edit_Modal implements Integration_Interface {
 	}
 
 	/**
-	 * Return    `is_pro_pitch` for the options that are pitching the pro version.
-	 * WordPress::render_option() handles this string as a special case.
+	 * Return `is_pro_pitch` for the options that are pitching the pro version — WordPress::render_option() handles this string as a special case.
 	 *
 	 * @return string
 	 */

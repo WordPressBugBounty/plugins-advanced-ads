@@ -137,7 +137,12 @@ class Page_Quick_Edit implements Integration_Interface {
 			$meta['disable_the_content'] = Params::post( 'advads-disable-the-content', 0 );
 		}
 
-		update_post_meta( $post_id, '_advads_ad_settings', $meta );
+		$existing = get_post_meta( $post_id, '_advads_ad_settings', true );
+		if ( ! is_array( $existing ) ) {
+			$existing = [];
+		}
+
+		update_post_meta( $post_id, '_advads_ad_settings', array_merge( $existing, $meta ) );
 	}
 
 	/**

@@ -9,6 +9,8 @@
  * @var Ad $ad Ad instance.
  */
 
+use AdvancedAds\Abstracts\Ad;
+
 ?>
 <div id="advads-ad-usage" class="advads-option-list">
 	<?php

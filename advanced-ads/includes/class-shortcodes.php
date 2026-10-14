@@ -112,8 +112,7 @@ class Shortcodes implements Integration_Interface {
 		$result = [];
 
 		/**
-		 * Prepare attributes by converting strings to multi-dimensional array
-		 * Example: [ 'output__margin__top' => 1 ]  =>  ['output']['margin']['top'] = 1
+		 * Prepare attributes by converting strings to multi-dimensional array — example: `[ 'output__margin__top' => 1 ]` => `['output']['margin']['top'] = 1`.
 		 */
 		if ( ! defined( 'ADVANCED_ADS_DISABLE_CHANGE' ) || ! ADVANCED_ADS_DISABLE_CHANGE ) {
 			foreach ( $atts as $attr => $data ) {

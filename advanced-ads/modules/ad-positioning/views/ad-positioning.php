@@ -12,7 +12,7 @@
 <div class="advads-ad-positioning-position advads-option-list">
 	<span class="label"><?php esc_html_e( 'Text Flow', 'advanced-ads' ); ?></span>
 
-	<div class="advads-ad-positioning-position-groups-wrapper">
+	<div class="advads-ad-positioning-position-groups-wrapper" role="radiogroup" aria-label="<?php esc_attr_e( 'Text Flow', 'advanced-ads' ); ?>">
 		<?php foreach ( $positioning_options as $group_name => $group ) : ?>
 			<div class="advads-ad-positioning-position-group">
 				<h3 class="advads-ad-positioning-position-group-heading"><?php echo esc_html( $group['title'] ); ?></h3>
@@ -29,6 +29,7 @@
 							name="advanced_ad[output][position]"
 							id="<?php echo esc_attr( $input_id ); ?>"
 							value="<?php echo esc_attr( $option_name ); ?>"
+							aria-label="<?php echo esc_attr( $group['title'] . ( isset( $option['label'] ) ? ': ' . $option['label'] : '' ) ); ?>"
 							<?php checked( $option_name, $positioning ); ?>
 						>
 

@@ -66,11 +66,7 @@ class Compatibility implements Integration_Interface {
 	}
 
 	/**
-	 * Display an ad or ad group in a newsletter created by MailPoet.
-	 *
-	 * Usage:
-	 *   [custom:ad:123] to display ad with the ID 123
-	 *   [custom:ad_group:345] to display ad group with the ID 345
+	 * Display an ad or ad group in a newsletter created by MailPoet. Usage: `[custom:ad:123]` to display ad with the ID 123, `[custom:ad_group:345]` to display ad group with the ID 345.
 	 *
 	 * @param string $shortcode Shortcode that placed the ad.
 	 *
@@ -110,8 +106,7 @@ class Compatibility implements Integration_Interface {
 	}
 
 	/**
-	 * Modify xPath expression for Elementor plugin.
-	 * The plugin does not wrap newly created text in 'p' tags.
+	 * Modify xPath expression for Elementor plugin — the plugin does not wrap newly created text in 'p' tags.
 	 *
 	 * @param string $tag Xpath tag.
 	 *
@@ -143,6 +138,8 @@ class Compatibility implements Integration_Interface {
 
 	/**
 	 * Thrive Theme Builder Check if placements of type other than `header` can be injected during `wp_head` action.
+	 *
+	 * @return bool
 	 */
 	public static function can_inject_during_wp_head() {
 		if ( did_action( 'before_theme_builder_template_render' ) && ! did_action( 'after_theme_builder_template_render' ) ) {
@@ -153,10 +150,7 @@ class Compatibility implements Integration_Interface {
 	}
 
 	/**
-	 * Check if Adsense Auto ads code is added by the Borlabs Cookie plugin.
-	 *
-	 * This allows to prevent the "Only one 'enable_page_level_ads' allowed per page" error
-	 * that makes impossible to close the "Privacy Preference" window created by the "Borlabs Cookie" plugin.
+	 * Check if Adsense Auto ads code is added by the Borlabs Cookie plugin — this allows to prevent the "Only one 'enable_page_level_ads' allowed per page" error that makes impossible to close the "Privacy Preference" window created by the "Borlabs Cookie" plugin.
 	 *
 	 * @return bool
 	 */

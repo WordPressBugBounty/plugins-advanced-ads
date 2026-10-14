@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,51 +11,64 @@ import { store as noticesStore } from '@wordpress/notices';
 import { dispatch, useSelect, useDispatch } from '@wordpress/data';
 
 export function removeAllNotices() {
-	dispatch(noticesStore).removeAllNotices();
+	dispatch( noticesStore ).removeAllNotices();
 }
 
-export function noticeSuccess(message, options) {
-	dispatch(noticesStore).createSuccessNotice(message, options);
+export function noticeSuccess( message, options ) {
+	dispatch( noticesStore ).createSuccessNotice( message, options );
 }
 
-export function noticeError(message, options) {
-	dispatch(noticesStore).createErrorNotice(message, options);
+export function noticeError( message, options ) {
+	dispatch( noticesStore ).createErrorNotice( message, options );
 }
 
-function Notice({ status, isDismissible, actions, onRemove, children, type }) {
-	const wrapperClasses = classnames(
+function Notice( {
+	status,
+	isDismissible,
+	actions,
+	onRemove,
+	children,
+	type,
+} ) {
+	const wrapperClasses = clsx(
 		'flex items-center justify-between notice notice-alt !px-3',
-		`notice-${status}`,
+		`notice-${ status }`,
 		{ 'is-dismissible': isDismissible }
 	);
 
-	useEffect(() => {
-		if ('timeout' !== type) {
+	useEffect( () => {
+		if ( 'timeout' !== type ) {
 			return;
 		}
 
-		const timeId = setTimeout(() => {
+		const timeId = setTimeout( () => {
 			onRemove();
-		}, 5000);
+		}, 5000 );
 
 		// Cleanup function to clear the timeout
-		return () => clearTimeout(timeId);
-	}, []); // Empty array means it will only run on mount
+		return () => clearTimeout( timeId );
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount.
+	}, [] );
 
 	return (
-		<div className={wrapperClasses}>
-			<div className="py-3" dangerouslySetInnerHTML={{ __html: children }} />
-			{actions.map((action, index) => {
+		<div className={ wrapperClasses }>
+			<div
+				className="py-3"
+				dangerouslySetInnerHTML={ { __html: children } }
+			/>
+			{ actions.map( ( action, index ) => {
 				return (
 					<button
-						key={index}
+						key={ index }
 						className="button button-primary !ml-auto !mr-2"
-						onClick={(event) => action.onClick(event, onRemove)}
+						onClick={ ( event ) =>
+							action.onClick( event, onRemove )
+						}
 					>
-						{action.label}
+						{ action.label }
 					</button>
-				)
-			})}
+				);
+			} ) }
 			{ isDismissible && (
 				<button
 					className="button-link !no-underline"
@@ -65,7 +78,7 @@ function Notice({ status, isDismissible, actions, onRemove, children, type }) {
 				</button>
 			) }
 		</div>
-	)
+	);
 }
 /**
  * Renders the notices
@@ -81,13 +94,17 @@ export default function Notices() {
 
 	return (
 		<>
-			{notices.map( ( notice ) => {
+			{ notices.map( ( notice ) => {
 				return (
-					<Notice key={notice.id} onRemove={() => removeNotice(notice.id)} {...notice}>
-						{notice.content}
+					<Notice
+						key={ notice.id }
+						onRemove={ () => removeNotice( notice.id ) }
+						{ ...notice }
+					>
+						{ notice.content }
 					</Notice>
-				)
-			})}
+				);
+			} ) }
 		</>
 	);
 }

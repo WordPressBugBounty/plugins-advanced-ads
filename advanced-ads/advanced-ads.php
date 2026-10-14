@@ -10,7 +10,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Advanced Ads
- * Version:           2.0.26
+ * Version:           2.0.29
  * Description:       Manage and optimize your ads in WordPress
  * Plugin URI:        https://wpadvancedads.com
  * Author:            Advanced Ads
@@ -21,7 +21,7 @@
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.txt
  *
  * @requires
- * Requires at least: 5.7
+ * Requires at least: 5.9
  * Requires PHP:      7.4
  */
 
@@ -37,7 +37,7 @@ if ( defined( 'ADVADS_FILE' ) ) {
 }
 
 define( 'ADVADS_FILE', __FILE__ );
-define( 'ADVADS_VERSION', '2.0.26' );
+define( 'ADVADS_VERSION', '2.0.29' );
 
 // Load the autoloader.
 require_once __DIR__ . '/includes/class-autoloader.php';
@@ -47,13 +47,6 @@ require_once __DIR__ . '/includes/class-autoloader.php';
 $action_scheduler = __DIR__ . '/packages/woocommerce/action-scheduler/action-scheduler.php';
 if ( ! class_exists( 'ActionScheduler' ) && file_exists( $action_scheduler ) ) {
 	require_once $action_scheduler;
-}
-
-/**
- * Compatibility check for addons for 2.0.0 release.
- */
-if ( version_compare( ADVADS_VERSION, '2.0.0', '>=' ) ) {
-	( new \AdvancedAds\Installation\Compatibility() )->hooks();
 }
 
 if ( ! function_exists( 'wp_advads' ) ) {

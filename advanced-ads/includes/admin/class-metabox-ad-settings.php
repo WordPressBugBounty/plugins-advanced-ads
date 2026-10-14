@@ -15,6 +15,7 @@ use AdvancedAds\Utilities\Validation;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 

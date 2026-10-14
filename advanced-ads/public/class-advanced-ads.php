@@ -15,7 +15,7 @@ use AdvancedAds\Content_Injector;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Installation\Capabilities;
 use AdvancedAds\Utilities\Conditional;
-use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Utilities\Sanitize;
 
 /**
  * Plugin class. This class should ideally be used to work with the
@@ -42,14 +42,14 @@ class Advanced_Ads {
 	/**
 	 * Plugin options
 	 *
-	 * @var array<string, mixed> $options
+	 * @var array<string, mixed>|null $options
 	 */
 	protected $options;
 
 	/**
 	 * Interal plugin options – set by the plugin
 	 *
-	 * @var     array<string, mixed> $internal_options
+	 * @var     array<string, mixed>|null $internal_options
 	 */
 	protected $internal_options;
 
@@ -114,6 +114,8 @@ class Advanced_Ads {
 	/**
 	 * Initialize the plugin by setting localization and loading public scripts
 	 * and styles.
+	 *
+	 * @return void
 	 */
 	public function wp_plugins_loaded() {
 		// register hooks and filters for auto ad injection.
@@ -141,6 +143,8 @@ class Advanced_Ads {
 
 	/**
 	 *  Allow add-ons to hook
+	 *
+	 * @return void
 	 */
 	public function advanced_ads_loaded() {
 		do_action( 'advanced-ads-plugin-loaded' );
@@ -148,6 +152,8 @@ class Advanced_Ads {
 
 	/**
 	 * Load filters to inject ads into various sections of our site
+	 *
+	 * @return void
 	 */
 	public function init_injection() {
 		add_filter( 'the_content', [ $this, 'inject_content' ], $this->get_content_injection_priority() );
@@ -158,6 +164,8 @@ class Advanced_Ads {
 	 *
 	 * @param string $message error message.
 	 * @link http://www.smashingmagazine.com/2011/03/08/ten-things-every-wordpress-plugin-developer-should-know/
+	 *
+	 * @return void
 	 */
 	public static function log( $message ) {
 		if ( true === WP_DEBUG ) {
@@ -187,25 +195,6 @@ class Advanced_Ads {
 		$this->options = apply_filters( 'advanced-ads-options', $this->options );
 
 		return $this->options;
-	}
-
-	/**
-	 * Compat method
-	 *
-	 * @return array<string, mixed> with adblocker options
-	 */
-	public function get_adblocker_options() {
-		// we can’t store options if WPML String Translations is enabled, or it would not translate the "Ad Label" option.
-		if ( ! isset( $this->adblocker_options ) || class_exists( 'WPML_ST_String' ) ) {
-			$this->adblocker_options = wp_parse_args(
-				get_option( ADVADS_SETTINGS_ADBLOCKER, [] ),
-				[
-					'method' => false,
-				]
-			);
-		}
-
-		return $this->adblocker_options;
 	}
 
 	/**
@@ -249,10 +238,8 @@ class Advanced_Ads {
 	 */
 	public function inject_content( $content = '' ) {
 		// Only inject on singular posts/pages.
-		if (
-			! $this->can_inject_into_content() &&
-			( ! is_singular() || ! $this->in_the_loop() || ! $this->is_main_query()  || ! $this->can_inject_into_content() )
-		) {
+		$invalid_context = ! is_singular() || ! $this->in_the_loop() || ! $this->is_main_query();
+		if ( ! $this->can_inject_into_content() && $invalid_context ) {
 			return $content;
 		}
 
@@ -386,13 +373,18 @@ class Advanced_Ads {
 		);
 
 		// Check if admin allows injection in all places.
-		$injection_enabled = $options['content-injection-enabled'] ?? 'off';
+		$injection_enabled  = $options['content-injection-enabled'] ?? 'off';
+		$injection_disabled = 'off' === $injection_enabled || 0 === $archive_injection_count;
+		$injection_context  = ! is_singular( $public_post_types ) || ( ! Conditional::is_amp() && ! $this->in_the_loop() && ! $this->was_in_the_loop );
 
-		if ( ( $injection_enabled === 'off' || 0 === $archive_injection_count ) && ( ! is_singular( $public_post_types ) || ( ! Conditional::is_amp() && ! $this->in_the_loop() && ! $this->was_in_the_loop ) ) ) {
+		if ( $injection_disabled && $injection_context ) {
 			return false;
 		}
 
-		if ( is_main_query() && ! empty( $options ) && 'true' !== $archive_injection_count && isset( $wp_query->current_post ) && $wp_query->current_post >= $archive_injection_count ) {
+		$should_skip       = ! empty( $options ) && 'true' !== $archive_injection_count;
+		$has_limit_reached = is_main_query() && isset( $wp_query->current_post ) && $wp_query->current_post >= $archive_injection_count;
+
+		if ( $should_skip && $has_limit_reached ) {
 			return false;
 		}
 
@@ -434,6 +426,8 @@ class Advanced_Ads {
 
 	/**
 	 * Add meta robots noindex, nofollow to images, which are part of 'Image ad' ad type
+	 *
+	 * @return void
 	 */
 	public function noindex_attachment_images() {
 		global $post;
@@ -452,6 +446,8 @@ class Advanced_Ads {
 
 	/**
 	 * Show custom CSS in the header
+	 *
+	 * @return void
 	 */
 	public function custom_header_code(){
 		if ( ! defined( 'ADVANCED_ADS_DISABLE_EDIT_BAR' ) && Conditional::user_can( 'advanced_ads_edit_ads' ) ) {
@@ -481,6 +477,8 @@ class Advanced_Ads {
 	 *
 	 * @param WP_Post  $post The Post object (passed by reference).
 	 * @param WP_Query $query The current Query object (passed by reference).
+	 *
+	 * @return void
 	 */
 	public function set_query_type( $post, $query = null ) {
 		if ( $query instanceof WP_Query ) {
@@ -504,6 +502,8 @@ class Advanced_Ads {
 
 	/**
 	 * Sets whether the loop has started.
+	 *
+	 * @return void
 	 */
 	public function set_loop_start() {
 		$this->in_the_loop = true;
@@ -511,6 +511,8 @@ class Advanced_Ads {
 
 	/**
 	 * Sets whether the loop has ended.
+	 *
+	 * @return void
 	 */
 	public function set_loop_end() {
 		$this->in_the_loop = false;
@@ -567,70 +569,17 @@ class Advanced_Ads {
 			return '';
 		}
 
-		$label        = $advads_options['custom-label']['text'] ?? _x( 'Advertisements', 'label above ads', 'advanced-ads' );
-		$allowed_tags = [
-			'a'          => [
-				'href'  => true,
-				'title' => true,
-			],
-			'b'          => [],
-			'blockquote' => [
-				'cite' => true,
-			],
-			'cite'       => [],
-			'code'       => [],
-			'del'        => [
-				'datetime' => true,
-			],
-			'em'         => [],
-			'i'          => [],
-			'q'          => [
-				'cite' => true,
-			],
-			's'          => [],
-			'span'       => [
-				'style' => true,
-			],
-			'strike'     => [],
-			'br'         => [],
-			'strong'     => [],
-		];
+		$label = $advads_options['custom-label']['text'] ?? _x( 'Advertisements', 'label above ads', 'advanced-ads' );
 
 		// ad level label
 		if ( ! empty( $item->get_prop( 'ad_label' ) ) ) {
 			$label = $item->get_prop( 'ad_label' );
 		}
 
-		$label    = ! empty( $advads_options['custom-label']['html_enabled'] ) ? wp_kses( $label, $allowed_tags ) : esc_html( $label );
+		$label = ! empty( $advads_options['custom-label']['html_enabled'] ) ? Sanitize::ad_label( $label ) : esc_html( $label );
 		$template = sprintf( '<div class="%s">%s</div>', wp_advads()->get_frontend_prefix() . 'adlabel', $label );
 
 		return apply_filters( 'advanced-ads-custom-label', $template, $label );
-	}
-
-	/**
-	 * Get the array with ad placements
-	 *
-	 * @deprecated 2.0.0 wp_advads_get_placements()
-	 *
-	 * @return array<string, mixed> $ad_placements
-	 */
-	public static function get_ad_placements_array() {
-		return wp_advads_get_placements();
-	}
-
-	/**
-	 * Return the Advanced_Ads_Model responsible for loading ads, groups and placements into the frontend
-	 *
-	 * @deprecated 2.0.0 use new entity functions.
-	 *
-	 * @return mixed
-	 */
-	public function get_model() {
-		if ( ! isset( $this->model ) ) {
-			$this->model = new Advanced_Ads_Model();
-		}
-
-		return $this->model;
 	}
 
 	/**
@@ -657,8 +606,10 @@ class Advanced_Ads {
 
 	/**
 	 * Listen to URL parameters for debugging
+	 *
+	 * @return void
 	 */
-	private function debug_parameter() {
+	private function debug_parameter(): void {
 		$referer = Params::server( 'HTTP_REFERER' );
 		if ( wp_doing_ajax() && $referer ) {
 			$query_string = wp_parse_url( $referer, PHP_URL_QUERY );
@@ -704,6 +655,8 @@ class Advanced_Ads {
 
 	/**
 	 * Get priority used for injection inside content
+	 *
+	 * @return int
 	 */
 	public function get_content_injection_priority() {
 		$options = $this->options();
@@ -715,6 +668,8 @@ class Advanced_Ads {
 	 * Update internal plugin options
 	 *
 	 * @param array<string, mixed> $options new internal options.
+	 *
+	 * @return void
 	 */
 	public function update_internal_options( array $options ) {
 		// do not allow to clear options.
@@ -732,6 +687,8 @@ class Advanced_Ads {
 	 * @param string  $new_status New post status.
 	 * @param string  $old_status Old post status.
 	 * @param WP_Post $post       Post object.
+	 *
+	 * @return void
 	 */
 	public function transition_ad_status( $new_status, $old_status, $post ) {
 		if ( ! isset( $post->post_type ) || Constants::POST_TYPE_AD !== $post->post_type || ! isset( $post->ID ) ) {

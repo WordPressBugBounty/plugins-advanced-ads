@@ -9,6 +9,8 @@
  * @var Ad_Type $ad_type Ad type instance.
  */
 
+use AdvancedAds\Interfaces\Ad_Type;
+
 // don’t show sizes for Google Ad Manager ads.
 if ( 'gam' === $ad_type->get_id() ) {
 	return;

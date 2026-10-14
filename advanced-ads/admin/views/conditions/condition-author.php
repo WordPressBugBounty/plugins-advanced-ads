@@ -22,7 +22,8 @@
 						$author_name = $_author->display_name;
 						$field_id    = 'advads-conditions-' . absint( $_author->ID ) . $rand;
 						?>
-						<label class="button advads-button advads-ui-state-active">
+						<?php /* translators: %s: name of the selected item. */ ?>
+						<label class="button advads-button advads-ui-state-active" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s', 'advanced-ads' ), $author_name ) ); ?>">
 							<span class="advads-button-text">
 								<?php echo esc_attr( $author_name ); ?>
 								<input type="hidden"
@@ -35,9 +36,9 @@
 				endforeach;
 				?>
 			</div>
-			<span class="advads-conditions-authors-show-search button" title="<?php echo esc_html_x( 'add more authors', 'display the authors search field on ad edit page', 'advanced-ads' ); ?>">
+			<button type="button" class="advads-conditions-authors-show-search button" title="<?php echo esc_attr_x( 'add more authors', 'display the authors search field on ad edit page', 'advanced-ads' ); ?>" aria-label="<?php echo esc_attr_x( 'add more authors', 'display the authors search field on ad edit page', 'advanced-ads' ); ?>">
 			+
-			</span>
+			</button>
 			<br/>
 			<input type="text" class="advads-conditions-authors-search"
 			data-input-name="<?php echo esc_attr( $name ); ?>[value][]"

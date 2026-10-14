@@ -9,6 +9,8 @@
  * @var Ad $ad Ad instance.
  */
 
+use AdvancedAds\Abstracts\Ad;
+
 $ad_type = $ad->get_type_object();
 
 do_action( "advanced-ads-ad-params-before-{$ad->get_type()}", $ad );

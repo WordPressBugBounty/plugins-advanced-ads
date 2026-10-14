@@ -9,6 +9,8 @@
  * @var Group $group Group instance.
  */
 
+use AdvancedAds\Abstracts\Group;
+
 $group_type = $group->get_type_object();
 ?>
 <div class="advads-form-type">

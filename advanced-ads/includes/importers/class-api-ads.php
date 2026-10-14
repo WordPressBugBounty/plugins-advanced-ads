@@ -100,11 +100,13 @@ class Api_Ads extends Importer implements Interface_Importer {
 
 		// Final import create ads.
 		$ads = Helpers::get_ads_from_config();
-		$ads = $this->normalize_ads( $ads );
+		$ads = $ads ? $this->normalize_ads( $ads ) : [];
 		if ( $ads ) {
 			$this->rollback_preview();
 			return $this->create_ads( $ads );
 		}
+
+		return '';
 	}
 
 	/**
@@ -147,7 +149,7 @@ class Api_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Get ads from sheet by device
 	 *
-	 * @param array<int, \AdvancedAds\Abstracts\Ad> $ads Ads selected by user.
+	 * @param array<int, array<string, mixed>> $ads Ads selected by user.
 	 *
 	 * @return string
 	 */
@@ -208,8 +210,8 @@ class Api_Ads extends Importer implements Interface_Importer {
 		$importers = wp_advads()->importers ?? new Manager();
 		$importers->add_session_history( $this->get_id(), $history_key, $count );
 
-		/* translators: 1: counts 2: Importer title */
-		return sprintf( __( '%1$d ads migrated from %2$s', 'advanced-ads' ), $count, $this->get_title() );
+		/* translators: 1: Number of migrated ads, 2: Importer title. */
+		return sprintf( esc_html__( '%1$d ads migrated from %2$s', 'advanced-ads' ), $count, $this->get_title() );
 	}
 
 	/**
@@ -300,9 +302,9 @@ class Api_Ads extends Importer implements Interface_Importer {
 	/**
 	 * Normalize ads
 	 *
-	 * @param array<int, \AdvancedAds\Abstracts\Ad> $ads Ads from api.
+	 * @param array<int|string, array<string, mixed>> $ads Ads from api.
 	 *
-	 * @return array<string, mixed>
+	 * @return array<int, array<string, mixed>>
 	 */
 	public function normalize_ads( $ads ): array {
 		$normalized = [];
@@ -348,9 +350,7 @@ class Api_Ads extends Importer implements Interface_Importer {
 	}
 
 	/**
-	 * Maps the placement type to a corresponding value.
-	 *
-	 * This function takes a placement type as input and returns the corresponding value based on a predefined mapping.
+	 * Maps the placement type to a corresponding value — takes a placement type as input and returns the corresponding value based on a predefined mapping.
 	 *
 	 * @param string $type The placement type to be mapped.
 	 *
@@ -363,6 +363,7 @@ class Api_Ads extends Importer implements Interface_Importer {
 			'beforecontent' => 'post_top',
 			'in_content_1'  => 'post_content',
 			'in_content_2'  => 'post_content',
+			'in-content'    => 'post_content',
 			'incontent'     => 'post_content',
 			'sidebar'       => 'sidebar_widget',
 			'header'        => 'header',
@@ -371,7 +372,7 @@ class Api_Ads extends Importer implements Interface_Importer {
 		];
 
 		foreach ( $hash as $key => $value ) {
-			if ( Str::contains( $type, $key ) ) {
+			if ( Str::contains( $key, $type ) ) {
 				return $value;
 			}
 		}
@@ -384,7 +385,7 @@ class Api_Ads extends Importer implements Interface_Importer {
 	 *
 	 * @param array<int, mixed>|string $terms Dictionary term.
 	 *
-	 * @return array<string, mixed>|null
+	 * @return array<int, mixed>
 	 */
 	private function parse_display_conditions( $terms ) {
 		// Return for debugging.

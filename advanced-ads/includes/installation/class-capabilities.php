@@ -124,19 +124,9 @@ class Capabilities {
 	}
 
 	/**
-	 * Reset capabilities.
-	 *
-	 * @return void
-	 */
-	public function reset_capabilities(): void {
-		$this->remove_capabilities();
-		$this->create_capabilities();
-	}
-
-	/**
 	 * Get roles names
 	 *
-	 * @return array<string, mixed>
+	 * @return array<int, string>
 	 */
 	private function get_roles(): array {
 		$roles = wp_roles();

@@ -8,7 +8,7 @@
 global $wp_list_table;
 
 use AdvancedAds\Entities;
-use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Admin\Upsell;
 use AdvancedAds\Utilities\Conditional;
 
 $group_types = wp_advads_get_group_types();
@@ -65,7 +65,7 @@ if ( empty( $wp_list_table->items ) ) : ?>
 		</div>
 		<div class="clear"></div>
 		<h4>
-			<?php Upgrades::upgrade_link( __( 'Get all group types with All Access', 'advanced-ads' ), 'https://wpadvancedads.com/add-ons/all-access/', 'upgrades-pro-groups' ); ?>
+			<?php Upsell::upgrade_link( __( 'Get all group types with All Access', 'advanced-ads' ), 'https://wpadvancedads.com/add-ons/all-access/', 'upgrades-pro-groups' ); ?>
 		</h4>
 	<?php endif; ?>
 	<div class="clear"></div>

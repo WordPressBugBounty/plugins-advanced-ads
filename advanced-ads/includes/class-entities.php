@@ -9,6 +9,7 @@
 
 namespace AdvancedAds;
 
+use AdvancedAds\Framework\Interfaces\Initializer_Interface;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 
 defined( 'ABSPATH' ) || exit;
@@ -16,14 +17,23 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Entities.
  */
-class Entities implements Integration_Interface {
+class Entities implements Initializer_Interface {
 
 	/**
-	 * Hook into WordPress.
+	 * Runs this initializer.
 	 *
 	 * @return void
 	 */
-	public function hooks(): void {
+	public function initialize(): void {
+		add_action( 'init', [ $this, 'init' ], -100 );
+	}
+
+	/**
+	 * Initialize the entities.
+	 *
+	 * @return void
+	 */
+	public function init(): void {
 		$this->register_ad_post_type();
 		$this->register_placement_post_type();
 		$this->register_group_taxonomy();

@@ -11,6 +11,8 @@ namespace AdvancedAds\Importers;
 
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Interfaces\Importer as Interface_Importer;
+use AdvancedAds\Abstracts\Placement;
+use AdvancedAds\Utilities\WordPress;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -27,9 +29,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	private $ai_options = null;
 
 	/**
-	 * Mapping of Ad Inserter alignment types to Advanced Ads output settings.
-	 *
-	 * AI Types: 1=Left, 2=Right, 3=Center, 4=Float Left, 5=Float Right
+	 * Mapping of Ad Inserter alignment types to Advanced Ads output settings — AI Types: 1=Left, 2=Right, 3=Center, 4=Float Left, 5=Float Right.
 	 */
 	private const ALIGNMENT_MAP = [
 		0 => [ 'position' => 'default', 'float' => 0 ],
@@ -40,9 +40,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	];
 
 	/**
-	 *  Mapping of Ad Inserter special placement settings.
-	 *
-	 * AI uses special keys for global header, footer, and manual code blocks: [h], [f], and [a] respectively.
+	 * Mapping of Ad Inserter special placement settings — AI uses special keys for global header, footer, and manual code blocks: [h], [f], and [a] respectively.
 	 */
 	private const SPECIAL_PLACEMENT_MAP = [
 		'h' => [ 'title' => 'Global Header', 'type' => 'header' ],
@@ -51,9 +49,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	];
 
 	/**
-	 * Mapping of Ad Inserter placement types to Advanced Ads output settings.
-	 *
-	 * AI Types: 1=Post Top, 2=Post Bottom, 3=Post Top (after title), 4=Post Bottom (before meta), 5=Paragraph (before), 6=Paragraph (after)
+	 * Mapping of Ad Inserter placement types to Advanced Ads output settings — AI Types: 1=Post Top, 2=Post Bottom, 3=Post Top (after title), 4=Post Bottom (before meta), 5=Paragraph (before), 6=Paragraph (after).
 	 */
 	private const PLACEMENT_TYPE_MAP = [
 		1 => [ 'type' => 'post_top' ],
@@ -174,8 +170,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	}
 
 	/**
-	 * Import all global options from Ad Inserter to Advanced Ads.
-	 * Maps data across 4 different Advanced Ads option tables.
+	 * Import all global options from Ad Inserter to Advanced Ads — maps data across 4 different Advanced Ads option tables.
 	 *
 	 * @param string $history_key Session key for rollback.
 	 * @return void
@@ -281,8 +276,10 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	 *
 	 * @param array<string, mixed> $ai_options ad inserter options.
 	 * @param string               $history_key Session key for rollback.
+	 *
+	 * @return void
 	 */
-	private function import_special_ai_blocks( $ai_options, $history_key ) {
+	private function import_special_ai_blocks( $ai_options, $history_key ): void {
 		$dummy_count = 0;
 		foreach ( self::SPECIAL_PLACEMENT_MAP as $key => $meta ) {
 			if ( ! empty( $ai_options[ $key ]['code'] ) ) {
@@ -311,8 +308,9 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 		}
 
 		if ( is_string( $this->ai_options ) && substr( $this->ai_options, 0, 4 ) === ':AI:' ) {
-			$this->ai_options = unserialize( base64_decode( substr( $this->ai_options, 4 ), true ) ); // phpcs:ignore
-			$this->ai_options = array_filter( $this->ai_options );
+			// Ad Inserter stores its settings as ":AI:" followed by a base64-encoded serialized array; objects are not restored.
+			$decoded          = WordPress::maybe_unserialize( (string) base64_decode( substr( $this->ai_options, 4 ), true ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- the other plugin's own storage format.
+			$this->ai_options = is_array( $decoded ) ? array_filter( $decoded ) : [];
 		}
 
 		return $this->ai_options;
@@ -448,7 +446,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	 * @param string               $history_key The unique session key for history tracking and rollbacks.
 	 * @param string               $forced_type Optional custom placement type (e.g., 'head', 'footer').
 	 *
-	 * @return \AdvancedAds\Framework\Objects\Placement|null
+	 * @return Placement
 	 */
 	private function create_placement( $ad_id, $name, $block, $history_key, $forced_type = '' ) {
 
@@ -459,7 +457,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 		if ( ! empty( $forced_type ) ) {
 			$type = $forced_type;
 		} else {
-			$ai_type = (int) $block['display_type'] ?? 0;
+			$ai_type = (int) ( $block['display_type'] ?? 0 );
 			if ( isset( self::PLACEMENT_TYPE_MAP[ $ai_type ] ) ) {
 				$config = self::PLACEMENT_TYPE_MAP[ $ai_type ];
 				$type   = $config['type'];
@@ -498,7 +496,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	 *
 	 * @param array<string, mixed> $block configuration settings.
 	 *
-	 * @return array<string, mixed> visitor condition settings
+	 * @return array<int, mixed> visitor condition settings
 	 */
 	private function parse_visitor_conditions( $block ): array {
 		$devices = [];
@@ -529,7 +527,7 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	 * Map Ad Inserter page visibility settings to Advanced Ads display conditions.
 	 *
 	 * @param  array<string, mixed> $block block configuration.
-	 * @return array<string, mixed> 'general' display condition.
+	 * @return array<int, mixed> 'general' display condition.
 	 */
 	private function parse_display_conditions( $block ): array {
 		$enabled = [];
@@ -561,8 +559,10 @@ class Ad_Inserter extends Importer implements Interface_Importer {
 	 * @param string               $history_key    Session key for rollback.
 	 * @param int                  $count          migrated ads count.
 	 * @param string               $forced_type    Optional custom placement type (e.g., 'head', 'footer').
+	 *
+	 * @return void
 	 */
-	private function create_ad( $block, $ai_options, $history_key, &$count, $forced_type = '' ) {
+	private function create_ad( $block, $ai_options, $history_key, &$count, $forced_type = '' ): void {
 		$ad_code = trim( $block['code'] );
 		$ad_type = $this->detect_ad_type( $ad_code );
 		$ad      = wp_advads_create_new_ad( $ad_type );

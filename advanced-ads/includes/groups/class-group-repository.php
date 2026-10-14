@@ -15,6 +15,7 @@ use AdvancedAds\Framework\Utilities\Formatting;
 use AdvancedAds\Traits\Repository_Helpers;
 use AdvancedAds\Utilities\Cache;
 use Exception;
+use AdvancedAds\Abstracts\Ad;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -143,7 +144,7 @@ class Group_Repository {
 	 *
 	 * @return void
 	 */
-	public function delete( &$group, $force_delete = false ): void {
+	public function delete( &$group, $force_delete = false ): void { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- same signature as the other repositories.
 		// Early bail!!
 		if ( ! $group || ! $group->get_id() ) {
 			return;
@@ -156,17 +157,6 @@ class Group_Repository {
 	}
 
 	/* Finder Methods ------------------- */
-
-	/**
-	 * Get all groups object.
-	 *
-	 * @deprecated 2.0.24 Use get_group_summaries() or get_groups_by_ids() instead.
-	 *
-	 * @return Group[]
-	 */
-	public function get_all_groups(): array {
-		return $this->hydrate_groups( array_keys( $this->get_group_summaries() ) );
-	}
 
 	/**
 	 * Get lightweight group summaries for list UIs (cached cross-request).

@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
  */
 class Upgrades extends Updates implements Initializer_Interface {
 
-	const DB_VERSION = '2.1.0';
+	const DB_VERSION = '2.1.1';
 
 	/**
 	 * Get updates that need to run.
@@ -37,6 +37,7 @@ class Upgrades extends Updates implements Initializer_Interface {
 			'2.0.8'  => 'upgrade-2.0.8.php',
 			'2.0.9'  => 'upgrade-2.0.9.php',
 			'2.1.0'  => 'upgrade-2.1.0.php',
+			'2.1.1'  => 'upgrade-2.1.1.php',
 		];
 	}
 

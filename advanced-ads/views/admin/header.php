@@ -12,6 +12,8 @@
  * @var Screen    $current_screen      Current screen.
  */
 
+use AdvancedAds\Abstracts\Screen;
+
 ?>
 <div id="advads-header" class="relative z-10">
 	<div class="inner-wrap flex items-center -ml-5 gap-x-4 p-5 bg-white shadow-md">
@@ -28,7 +30,7 @@
 				<span class="dashicons dashicons-star-filled"></span>
 			</a>
 			<?php endif; ?>
-			<a href="<?php echo esc_url( $manual_url ); ?>" target="_blank" class="advads-header-manual-link">
+			<a href="<?php echo esc_url( $manual_url ); ?>" target="_blank" class="advads-header-manual-link" aria-label="<?php esc_attr_e( 'Manual', 'advanced-ads' ); ?>">
 				<span class="dashicons dashicons-editor-help"></span>
 			</a>
 		</div>

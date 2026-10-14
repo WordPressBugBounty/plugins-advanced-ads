@@ -102,7 +102,7 @@ class Plain implements Ad_Type {
 	public function render_parameters( $ad ): void {
 		$content = $ad->get_content() ?? '';
 		?>
-		<p class="description">
+		<p class="description" id="advads-ad-content-plain-description">
 			<?php esc_html_e( 'Insert plain text or code into this field.', 'advanced-ads' ); ?>
 		</p>
 		<?php $this->error_unfiltered_html( $ad ); ?>
@@ -111,6 +111,8 @@ class Plain implements Ad_Type {
 			cols="40"
 			rows="10"
 			name="advanced_ad[content]"
+			aria-label="<?php esc_attr_e( 'Ad code', 'advanced-ads' ); ?>"
+			aria-describedby="advads-ad-content-plain-description"
 		><?php echo esc_textarea( $content ); ?></textarea>
 		<?php
 		include ADVADS_ABSPATH . 'views/admin/metaboxes/ads/ad-info-after-textarea.php';
@@ -194,8 +196,7 @@ class Plain implements Ad_Type {
 	}
 
 	/**
-	 * Check if we're on an ad edit screen, if yes and the user does not have `unfiltered_html` permissions,
-	 * show an admin notice.
+	 * Check if we're on an ad edit screen, if yes and the user does not have `unfiltered_html` permissions, show an admin notice.
 	 *
 	 * @param Ad_Plain $ad Ad instance.
 	 *

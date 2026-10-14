@@ -11,6 +11,7 @@
 
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Abstracts\Placement;
 
 $placement_type = $placement->get_type_object();
 ?>

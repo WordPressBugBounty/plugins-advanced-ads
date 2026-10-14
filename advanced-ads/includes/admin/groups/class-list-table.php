@@ -10,7 +10,7 @@
 namespace AdvancedAds\Admin\Groups;
 
 use AdvancedAds\Abstracts\Group;
-use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Admin\Upsell;
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Modal;
@@ -200,6 +200,8 @@ class List_Table extends WP_Terms_List_Table {
 	 * @since 3.1.0
 	 *
 	 * @param string $which The location: 'top' or 'bottom'.
+	 *
+	 * @return void
 	 */
 	protected function extra_tablenav( $which ) {
 		if ( 'top' === $which ) {
@@ -256,6 +258,21 @@ class List_Table extends WP_Terms_List_Table {
 		];
 	}
 
+	/**
+	 * Return the group name for the primary column's aria-label.
+	 *
+	 * Core WP_Terms_List_Table::get_primary_column_aria_label() reads
+	 * $term->name directly, which triggers an "Undefined property" warning on
+	 * PHP 8+ because Group objects expose the name via get_name(), not a public
+	 * property.
+	 *
+	 * @param Group|\WP_Term|object $term Group or term object.
+	 *
+	 * @return string
+	 */
+	protected function get_primary_column_aria_label( $term ): string {
+		return $term instanceof Group ? $term->get_name() : $term->name;
+	}
 
 	/**
 	 * Render single row.
@@ -392,7 +409,7 @@ class List_Table extends WP_Terms_List_Table {
 
 			if ( ! defined( 'AAP_VERSION' ) ) {
 				if ( null === $this->duplicate_upgrade_link ) {
-					$this->duplicate_upgrade_link = ( new Upgrades() )->create_duplicate_link();
+					$this->duplicate_upgrade_link = ( new Upsell() )->create_duplicate_link();
 				}
 				$actions['duplicate-group'] = $this->duplicate_upgrade_link;
 			}

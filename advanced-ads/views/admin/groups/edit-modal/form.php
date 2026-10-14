@@ -5,11 +5,13 @@
  * @package AdvancedAds
  * @author  Advanced Ads <info@wpadvancedads.com>
  *
- * @var AdvancedAds\Abstracts\Group $group Group instance.
- * @var string                      $this  ->type_error Contains an error message if the group type is missing.
+ * @var Group      $group Group instance.
+ * @var List_Table $this  List table; its type_error holds an error message if the group type is missing.
  */
 
-use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Abstracts\Group;
+use AdvancedAds\Admin\Groups\List_Table;
+use AdvancedAds\Admin\Upsell;
 use AdvancedAds\Utilities\WordPress;
 
 $group_types = wp_advads_get_group_types();
@@ -66,7 +68,7 @@ $group_id    = $group->get_id();
 
 			<?php if ( wp_advads()->groups->types->has_premium() ) : ?>
 				<label>
-					<?php Upgrades::upgrade_link( __( 'Get all group types with All Access', 'advanced-ads' ), 'https://wpadvancedads.com/add-ons/all-access/', 'upgrades-pro-groups' ); ?>
+					<?php Upsell::upgrade_link( __( 'Get all group types with All Access', 'advanced-ads' ), 'https://wpadvancedads.com/add-ons/all-access/', 'upgrades-pro-groups' ); ?>
 				</label>
 			<?php endif; ?>
 		</div>

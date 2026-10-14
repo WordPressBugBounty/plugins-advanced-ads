@@ -37,7 +37,7 @@ class XML_Encoder
 	private $dom;
 
 	/**
-	 * @var XML_Encoder
+	 * @var XML_Encoder|null
 	 */
 	private static $instance;
 
@@ -56,6 +56,16 @@ class XML_Encoder
 	}
 
 
+	/**
+	 * Encode data as XML.
+	 *
+	 * @param mixed                $data    Data to encode.
+	 * @param array<string, mixed> $options Encoder options.
+	 *
+	 * @throws Exception If the simplexml extension is missing.
+	 *
+	 * @return string|false
+	 */
 	public function encode( $data, $options = []) {
 		if ( ! extension_loaded( 'simplexml' ) ) {
 			throw new Exception( sprintf( __( 'The %s extension(s) is not loaded', 'advanced-ads' ), 'simplexml' ) );
@@ -90,8 +100,13 @@ class XML_Encoder
 
 	/**
 	 * Parse the data and convert it to DOMElements.
+	 *
+	 * @param DOMNode $parentNode Node the data is added to.
+	 * @param mixed   $data       Data to convert.
+	 *
+	 * @return bool
 	 */
-	private function buildXml(DOMNode $parentNode, $data ) {
+	private function buildXml(DOMNode $parentNode, $data ): bool {
 		$append = true;
 
 		foreach ($data as $key => $data) {
@@ -151,14 +166,30 @@ class XML_Encoder
 		return $appendNode;
 	}
 
-	final protected function appendText(DOMNode $node, $val) {
+	/**
+	 * Append a text node.
+	 *
+	 * @param DOMNode $node Node to append to.
+	 * @param string  $val  Text.
+	 *
+	 * @return bool
+	 */
+	final protected function appendText(DOMNode $node, $val): bool {
 		$nodeText = $this->dom->createTextNode($val);
 		$node->appendChild($nodeText);
 
 		return true;
 	}
 
-	final protected function appendCData(DOMNode $node, $val) {
+	/**
+	 * Append a CDATA section.
+	 *
+	 * @param DOMNode $node Node to append to.
+	 * @param string  $val  Text.
+	 *
+	 * @return bool
+	 */
+	final protected function appendCData(DOMNode $node, $val): bool {
 		$nodeText = $this->dom->createCDATASection($val);
 		$node->appendChild($nodeText);
 
@@ -253,6 +284,8 @@ class XML_Encoder
 		if ($rootNode->hasChildNodes()) {
 			return $this->parseXml($rootNode);
 		}
+
+		return [];
 	}
 
 	/**
@@ -336,10 +369,18 @@ class XML_Encoder
 		return $data;
 	}
 
+	/**
+	 * Cast a text value to the type the export recorded for it.
+	 *
+	 * @param mixed  $text Value.
+	 * @param string $type Type name.
+	 *
+	 * @return mixed
+	 */
 	private function changeType( $text, $type ) {
 		if ( $type === 'string' ) return (string) $text;
 		if ( $type === 'numeric' ) return 0 + $text;
-		if ( $type === 'boolean' ) return (boolean) $text;
+		if ( $type === 'boolean' ) return (bool) $text;
 		if ( $type === 'array' && $text=== '' ) return [];
 		if ( $type === 'null' ) return 'null';
 		return $text;

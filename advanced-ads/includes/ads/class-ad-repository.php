@@ -137,14 +137,7 @@ class Ad_Repository {
 			];
 
 			/**
-			 * When updating this object, to prevent infinite loops, use $wpdb
-			 * to update data, since wp_update_post spawns more calls to the
-			 * save_post action.
-			 *
-			 * This ensures hooks are fired by either WP itself (admin screen save), or an update purely from CRUD.
-			 *
-			 * Use direct DB update for user-input ads to preserve literal content.
-			 * Use wp_update_post for other ad types to maintain WordPress security standards.
+			 * When updating this object, to prevent infinite loops, use $wpdb to update data, since wp_update_post spawns more calls to the save_post action — this ensures hooks are fired by either WP itself (admin screen save) or an update purely from CRUD; use direct DB update for user-input ads to preserve literal content, and wp_update_post for other ad types to maintain WordPress security standards.
 			 */
 			if ( doing_action( 'save_post' ) || $is_text_ad ) {
 				$GLOBALS['wpdb']->update( $GLOBALS['wpdb']->posts, $post_data, [ 'ID' => $ad->get_id() ] );
@@ -269,10 +262,7 @@ class Ad_Repository {
 	}
 
 	/**
-	 * Get all ads object.
-	 *
-	 * Prefer get_ad_summaries() for admin lists that only need id, title, type,
-	 * status, or author — avoids constructing a full Ad instance per row.
+	 * Get all ads object — prefer get_ad_summaries() for admin lists that only need id, title, type, status, or author, since it avoids constructing a full Ad instance per row.
 	 *
 	 * @return Ad[]
 	 */
@@ -297,11 +287,7 @@ class Ad_Repository {
 	}
 
 	/**
-	 * Get ad summaries for every registered ad post status, including trash.
-	 *
-	 * Uses get_post_stati() because WordPress post_status "any" excludes trash.
-	 *
-	 * Cached separately from get_ad_summaries().
+	 * Get ad summaries for every registered ad post status, including trash — uses get_post_stati() because WordPress post_status "any" excludes trash, and is cached separately from get_ad_summaries().
 	 *
 	 * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
 	 */
@@ -328,7 +314,7 @@ class Ad_Repository {
 	/**
 	 * Query lightweight ad summaries without hydrating Ad objects.
 	 *
-	 * @param array<int, string>|string|null $post_status Post status query arg, or null for repository default.
+	 * @param array<int|string, string>|string|null $post_status Post status query arg, or null for repository default.
 	 *
 	 * @return array<int, array{id: int, title: string, type: string, status: string, author_id: int, expiry_date: int}>
 	 */

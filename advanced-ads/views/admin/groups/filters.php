@@ -9,6 +9,7 @@
 
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Admin\Groups\List_Table as Groups_List_Table;
 
 $group_type     = Params::request( 'group_type' );
 $group_taxonomy = get_taxonomy( Constants::TAXONOMY_GROUP );

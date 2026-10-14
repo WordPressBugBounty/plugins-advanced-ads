@@ -13,6 +13,7 @@ use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
 use AdvancedAds\Framework\Utilities\Params;
 use stdClass;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -56,8 +57,7 @@ class Post_Types implements Integration_Interface {
 		}
 
 		/**
-		 * Images uploaded to an image ad type get the `_advanced-ads_parent_id` meta key from WordPress automatically
-		 * the following SQL query removes that meta data from any attachment when the ad is removed.
+		 * Images uploaded to an image ad type get the `_advanced-ads_parent_id` meta key from WordPress automatically — the following SQL query removes that meta data from any attachment when the ad is removed.
 		 */
 		$wpdb->query( $wpdb->prepare( "DELETE FROM $wpdb->postmeta WHERE meta_key = %s AND meta_value = %d", '_advanced-ads_parent_id', $post_id ) ); // phpcs:ignore
 

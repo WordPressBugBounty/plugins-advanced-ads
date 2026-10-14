@@ -7,8 +7,6 @@
  * @since   1.x.x
  */
 
-use AdvancedAds\Abstracts\Ad;
-use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Conditional;
 use AdvancedAds\Utilities\WordPress;
 
@@ -28,7 +26,7 @@ class Advanced_Ads_Admin_Notices {
 	/**
 	 * Options
 	 *
-	 * @var array<string, mixed>
+	 * @var array<string, mixed>|null
 	 */
 	protected $options;
 
@@ -78,6 +76,8 @@ class Advanced_Ads_Admin_Notices {
 
 	/**
 	 * Load admin notices
+	 *
+	 * @return void
 	 */
 	public function load_notices() {
 		$options        = $this->options();
@@ -93,9 +93,6 @@ class Advanced_Ads_Admin_Notices {
 		// check wizard notice.
 		$this->register_wizard_notice();
 
-		// check non org plugins update.
-		$this->check_non_org_plugins();
-
 		// don’t check non-critical notices if they are disabled.
 		if ( ! isset( $plugin_options['disable-notices'] ) ) {
 			// check other notices.
@@ -110,6 +107,8 @@ class Advanced_Ads_Admin_Notices {
 
 	/**
 	 * Check various notices conditions
+	 *
+	 * @return void
 	 */
 	public function check_notices() {
 		$internal_options = Advanced_Ads::get_instance()->internal_options();
@@ -136,14 +135,15 @@ class Advanced_Ads_Admin_Notices {
 			// no need to catch anything since we just use TRY/CATCH to prevent an issue caused by another plugin.
 		}
 
-		// ask for a review after 2 days and when 3 ads were created and when not paused.
-		if (
-			! in_array( 'review', $queue, true )
+		// Ask for a review after 2 days and when 3 ads were created and when not paused.
+		$now = time();
+
+		$review_available  = ! in_array( 'review', $queue, true )
 			&& ! isset( $closed['review'] )
-			&& ( ! isset( $paused['review'] ) || $paused['review'] <= time() )
-			&& 172800 < ( time() - $activation )
-			&& 3 <= $number_of_ads
-		) {
+			&& ( ! isset( $paused['review'] ) || $paused['review'] <= $now );
+		$review_activation = 172800 < ( $now - $activation );
+
+		if ( $review_available && $review_activation && 3 <= $number_of_ads ) {
 			$this->notices[] = 'review';
 		} elseif ( in_array( 'review', $queue, true ) && 3 > $number_of_ads ) {
 			$review_key = array_search( 'review', $this->notices, true );
@@ -155,6 +155,8 @@ class Advanced_Ads_Admin_Notices {
 
 	/**
 	 * Register license key notices
+	 *
+	 * @return void
 	 */
 	public function register_license_notices() {
 
@@ -177,6 +179,8 @@ class Advanced_Ads_Admin_Notices {
 
 	/**
 	 * Register wizard notice.
+	 *
+	 * @return void
 	 */
 	public function register_wizard_notice() {
 		if ( ! Conditional::is_screen_advanced_ads() ) {
@@ -196,43 +200,13 @@ class Advanced_Ads_Admin_Notices {
 	}
 
 	/**
-	 * Check for updates of non wp.org plugins
-	 */
-	public function check_non_org_plugins() {
-		if ( ! Conditional::is_screen_advanced_ads() ) {
-			return;
-		}
-
-		$addons  = \AdvancedAds\Constants::ADDONS_NON_COMPATIBLE_VERSIONS;
-		$plugins = Addons::get_plugins_by_text_domain( true );
-		$options = $this->options();
-		$queue   = isset( $options['queue'] ) ? $options['queue'] : [];
-		$closed  = isset( $options['closed'] ) ? $options['closed'] : [];
-
-		foreach ( $addons as $version => $slug ) {
-			$addon = $plugins[ $slug ] ?? null;
-			if ( ! $addon ) {
-				continue;
-			}
-
-			$notice = $slug . '_upgrade';
-
-			if ( version_compare( $addon['version'], $version, '<=' ) ) {
-				if ( ! in_array( $notice, $queue, true ) && ! array_key_exists( $notice, $closed ) ) {
-					$this->notices[] = $notice;
-				}
-			} else {
-				$this->remove_from_queue( $notice );
-			}
-		}
-	}
-
-	/**
 	 * Add update notices to the queue of all notices that still needs to be closed
 	 *
 	 * @param mixed $notices one or more notices to be added to the queue.
 	 *
 	 * @since 1.5.3
+	 *
+	 * @return void
 	 */
 	public function add_to_queue( $notices = 0 ) {
 		if ( ! $notices ) {
@@ -264,6 +238,8 @@ class Advanced_Ads_Admin_Notices {
 	 * @param string $notice notice to be removed from the queue.
 	 *
 	 * @since 1.5.3
+	 *
+	 * @return void
 	 */
 	public function remove_from_queue( $notice ) {
 		if ( ! isset( $notice ) ) {
@@ -312,6 +288,8 @@ class Advanced_Ads_Admin_Notices {
 	 *  move notice into "paused" with notice as key and timestamp as value
 	 *
 	 * @param string $notice notice to be paused.
+	 *
+	 * @return void
 	 */
 	public function hide_notice( $notice ) {
 		if ( ! isset( $notice ) ) {
@@ -351,6 +329,8 @@ class Advanced_Ads_Admin_Notices {
 
 	/**
 	 * Display notices
+	 *
+	 * @return void
 	 */
 	public function display_notices() {
 		if ( wp_doing_ajax() ) {
@@ -374,7 +354,7 @@ class Advanced_Ads_Admin_Notices {
 
 		include_once ADVADS_ABSPATH . '/admin/includes/notices.php';
 
-		// Register Conflict Plugins notice
+		// Register Conflict Plugins notice.
 		$this->register_plugin_conflict_notices( $plugin_conflicts );
 
 		// Iterate through notices.
@@ -437,6 +417,8 @@ class Advanced_Ads_Admin_Notices {
 	 * Update notices options
 	 *
 	 * @param array<string, mixed> $options New options.
+	 *
+	 * @return void
 	 */
 	public function update_options( array $options ) {
 		// do not allow to clear options.
@@ -452,23 +434,25 @@ class Advanced_Ads_Admin_Notices {
 	 * Subscribe to newsletter and autoresponder
 	 *
 	 * @param string $notice slug of the subscription notice to send the correct reply.
+	 * @param string $email  Optional. Email to subscribe. Defaults to the current user's email.
 	 *
 	 * @return string
 	 */
-	public function subscribe( $notice ) {
+	public function subscribe( $notice, $email = '' ) {
 		if ( ! isset( $notice ) ) {
 			return '';
 		}
 
-		$user = wp_get_current_user();
+		$user  = wp_get_current_user();
+		$email = is_email( $email ) ? $email : $user->user_email;
 
-		if ( '' === $user->user_email ) {
+		if ( '' === $email ) {
 			/* translators: %s: is a URL. */
 			return sprintf( __( 'You don’t seem to have an email address. Please use <a href="%s" target="_blank">this form</a> to sign up.', 'advanced-ads' ), 'http://eepurl.com/bk4z4P' );
 		}
 
 		$data = [
-			'email'  => $user->user_email,
+			'email'  => $email,
 			'notice' => $notice,
 		];
 
@@ -493,15 +477,17 @@ class Advanced_Ads_Admin_Notices {
 		$this->remove_from_queue( $notice );
 
 		/* translators: the first %s is an email address, the seconds %s is a URL. */
-		return sprintf( __( 'Please check your email (%1$s) for the confirmation message. If you didn’t receive one or want to use another email address then please use <a href="%2$s" target="_blank">this form</a> to sign up.', 'advanced-ads' ), $user->user_email, 'http://eepurl.com/bk4z4P' );
+		return sprintf( __( 'Please check your email (%1$s) for the confirmation message. If you didn’t receive one or want to use another email address then please use <a href="%2$s" target="_blank">this form</a> to sign up.', 'advanced-ads' ), $email, 'http://eepurl.com/bk4z4P' );
 	}
 
 	/**
 	 * Update information that the current user is subscribed
 	 *
 	 * @param string $notice notice slug.
+	 *
+	 * @return void
 	 */
-	private function mark_as_subscribed( $notice ) {
+	private function mark_as_subscribed( $notice ): void {
 		// Early bail!!
 		if ( empty( $notice ) || ! Conditional::user_can_subscribe( $notice ) ) {
 			return;
@@ -535,33 +521,11 @@ class Advanced_Ads_Admin_Notices {
 	}
 
 	/**
-	 * Add AdSense tutorial notice
-	 *
-	 * @param Ad $ad ad object.
-	 */
-	public function adsense_tutorial( $ad ) {
-		$options = $this->options();
-		$_notice = 'nl_adsense';
-
-		if ( 'adsense' !== $ad->get_type() || isset( $options['closed'][ $_notice ] ) ) {
-			return;
-		}
-
-		include ADVADS_ABSPATH . '/admin/includes/notices.php';
-
-		if ( ! isset( $advanced_ads_admin_notices[ $_notice ] ) ) {
-			return;
-		}
-
-		$notice = $advanced_ads_admin_notices[ $_notice ];
-		$text   = $notice['text'];
-		include ADVADS_ABSPATH . '/admin/views/notices/inline.php';
-	}
-
-	/**
 	 * Register plugin conflict notices already defined in notices.php
 	 *
 	 * @param array<string, string> $plugin_conflicts Plugin basename => display name map.
+	 *
+	 * @return void
 	 */
 	public function register_plugin_conflict_notices( $plugin_conflicts ) {
 		// Early Bail !

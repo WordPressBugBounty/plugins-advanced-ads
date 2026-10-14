@@ -7,6 +7,8 @@
  * @since   1.48.2
  */
 
+use AdvancedAds\Modules\AdSense\Utils;
+
 /**
  * Retrieve report data from Google.
  */
@@ -53,7 +55,7 @@ class Advanced_Ads_AdSense_Report_Api {
 	 * @param string $type report type.
 	 */
 	public function __construct( $type ) {
-		$publisher_id       = Advanced_Ads_AdSense_Data::get_instance()->get_adsense_id();
+		$publisher_id       = Utils::get_adsense_id();
 		$this->type         = $type;
 		$this->access_token = Advanced_Ads_AdSense_MAPI::get_access_token( $publisher_id );
 		$this->publisher_id = $publisher_id;

@@ -23,7 +23,7 @@ class Google_Sheet extends Importer implements Interface_Importer {
 	/**
 	 * Ads from sheets
 	 *
-	 * @var array<string, mixed>
+	 * @var array<int, array<string, mixed>>|null
 	 */
 	private $sheet_ads = null;
 
@@ -155,6 +155,9 @@ class Google_Sheet extends Importer implements Interface_Importer {
 		}
 
 		$this->sheet_ads = $sheet_ads;
+
+		// Nothing to report yet: the ads found are shown for confirmation first.
+		return '';
 	}
 
 	/**
@@ -177,7 +180,7 @@ class Google_Sheet extends Importer implements Interface_Importer {
 	 * @param string $sheet_id   The ID of the Google Sheet.
 	 * @param string $sheet_name The name of the sheet within the Google Sheet.
 	 *
-	 * @return array<string, mixed>|WP_Error An array of ads retrieved from the Google Sheet or error if any
+	 * @return array<int, array<string, mixed>>|WP_Error An array of ads retrieved from the Google Sheet or error if any
 	 */
 	private function get_ads( $sheet_id, $sheet_name ) {
 		$ads           = [];
@@ -276,14 +279,12 @@ class Google_Sheet extends Importer implements Interface_Importer {
 
 		wp_advads()->importers->add_session_history( $this->get_id(), $history_key, $count );
 
-		/* translators: 1: counts 2: Importer title */
-		return sprintf( __( '%1$d ads migrated from %2$s', 'advanced-ads' ), $count, $this->get_title() );
+		/* translators: 1: Number of migrated ads, 2: Importer title. */
+		return sprintf( esc_html__( '%1$d ads migrated from %2$s', 'advanced-ads' ), $count, $this->get_title() );
 	}
 
 	/**
-	 * Maps the placement type to a corresponding value.
-	 *
-	 * This function takes a placement type as input and returns the corresponding value based on a predefined mapping.
+	 * Maps the placement type to a corresponding value — takes a placement type as input and returns the corresponding value based on a predefined mapping.
 	 *
 	 * @param string $type The placement type to be mapped.
 	 *
@@ -361,5 +362,7 @@ class Google_Sheet extends Importer implements Interface_Importer {
 				'value' => [ 'is_archive' ],
 			];
 		}
+
+		return null;
 	}
 }

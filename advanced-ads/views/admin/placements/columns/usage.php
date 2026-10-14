@@ -9,6 +9,8 @@
  * @var Placement $placement Placement instance.
  */
 
+use AdvancedAds\Abstracts\Placement;
+
 ?>
 <div class="advads-usage advads-placement-usage-modal">
 	<h2>

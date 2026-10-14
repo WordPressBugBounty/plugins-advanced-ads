@@ -10,11 +10,16 @@
 namespace AdvancedAds\Importers;
 
 use AdvancedAds\Constants;
+use AdvancedAds\Abstracts\Ad;
+use AdvancedAds\Abstracts\Placement;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * Importers Base.
+ *
+ * @method string get_id() Importer id; every importer defines it.
+ * @method bool   detect() Whether there is something to import; every importer defines it.
  */
 abstract class Importer {
 

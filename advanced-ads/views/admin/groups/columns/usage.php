@@ -9,6 +9,8 @@
  * @var Group $group Group instance.
  */
 
+use AdvancedAds\Abstracts\Group;
+
 ?>
 <div class="advads-usage">
 	<strong><?php esc_html_e( 'shortcode', 'advanced-ads' ); ?></strong>

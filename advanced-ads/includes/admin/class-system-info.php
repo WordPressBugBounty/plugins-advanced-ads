@@ -243,7 +243,6 @@ class System_Info {
 		$data .= $this->get_it_spaced( 'Memory Limit', ini_get( 'memory_limit' ), 13 );
 		$data .= $this->get_it_spaced( 'Upload Max Size', ini_get( 'upload_max_filesize' ), 10 );
 		$data .= $this->get_it_spaced( 'Post Max Size', ini_get( 'post_max_size' ), 12 );
-		$data .= $this->get_it_spaced( 'Upload Max Filesize', ini_get( 'upload_max_filesize' ), 6 );
 		$data .= $this->get_it_spaced( 'Time Limit', ini_get( 'max_execution_time' ), 15 );
 		$data .= $this->get_it_spaced( 'Max Input Vars', ini_get( 'max_input_vars' ), 11 );
 		$data .= $this->get_it_spaced( 'Display Errors', ( ini_get( 'display_errors' ) ? 'On (' . ini_get( 'display_errors' ) . ')' : 'N/A' ), 11 );
@@ -252,21 +251,6 @@ class System_Info {
 		$data .= "\n" . '-- PHP Extensions' . "\n\n";
 		$data .= $this->get_it_spaced( 'cURL', function_exists( 'curl_init' ) ? 'Supported' : 'Not Supported', 21 );
 		$data .= $this->get_it_spaced( 'fsockopen', function_exists( 'fsockopen' ) ? 'Supported' : 'Not Supported', 16 );
-		$data .= $this->get_it_spaced( 'SOAP Client', class_exists( 'SoapClient', false ) ? 'Installed' : 'Not Installed', 14 );
-		$data .= $this->get_it_spaced( 'Suhosin', extension_loaded( 'suhosin' ) ? 'Installed' : 'Not Installed', 18 );
-
-		// Session stuff.
-		$data .= "\n" . '-- Session Configuration' . "\n\n";
-		$data .= $this->get_it_spaced( 'Session', isset( $_SESSION ) ? 'Enabled' : 'Disabled', 18 );
-
-		// The rest of this is only relevant if session is enabled.
-		if ( isset( $_SESSION ) ) {
-			$data .= $this->get_it_spaced( 'Session Name', esc_html( ini_get( 'session.name' ) ), 13 );
-			$data .= $this->get_it_spaced( 'Cookie Path', esc_html( ini_get( 'session.cookie_path' ) ), 14 );
-			$data .= $this->get_it_spaced( 'Save Path', esc_html( ini_get( 'session.save_path' ) ), 16 );
-			$data .= $this->get_it_spaced( 'Use Cookies', ( ini_get( 'session.use_cookies' ) ? 'On' : 'Off' ), 14 );
-			$data .= $this->get_it_spaced( 'Use Only Cookies', ( ini_get( 'session.use_only_cookies' ) ? 'On' : 'Off' ), 9 );
-		}
 
 		return $data;
 	}

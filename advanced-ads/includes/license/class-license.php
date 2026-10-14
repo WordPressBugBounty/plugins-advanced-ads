@@ -1,7 +1,6 @@
 <?php
 /**
- * License class.
- * Handles license management for Advanced Ads add-ons.
+ * License class — handles license management for Advanced Ads add-ons.
  *
  * @since   2.0.17
  * @package AdvancedAds
@@ -10,7 +9,7 @@
 
 namespace AdvancedAds\License;
 
-use AdvancedAds\Admin\Plugin_Installer;
+use AdvancedAds\Updater\Installer;
 use AdvancedAds\Crons\Licenses as License_Cron;
 use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Data;
@@ -19,10 +18,7 @@ use WP_Error;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * License persistence, shop sync, and add-on install/activation on this site.
- *
- * Shop HTTP → {@see License_Shop_Client}. Site activation list → {@see License_Site_Activation}.
- * Call those directly; this class orchestrates install + All-Access rules.
+ * License persistence, shop sync, and add-on install/activation on this site — shop HTTP → {@see License_Shop_Client}, site activation list → {@see License_Site_Activation}; call those directly, this class orchestrates install + All-Access rules.
  */
 class License {
 
@@ -41,8 +37,7 @@ class License {
 	private static $addon_key_map_cache = null;
 
 	/**
-	 * Site activation list option (`[{ license, status }, …]`).
-	 * Option key reused from the retired addon⇒key flat map.
+	 * Site activation list option (`[{ license, status }, …]`) — option key reused from the retired addon⇒key flat map.
 	 */
 	public const OPTION_SITE_ACTIVATION = 'advanced-ads-licenses';
 
@@ -120,29 +115,6 @@ class License {
 	}
 
 	/**
-	 * Whether advanced-ads-licenses already has addon => key entries.
-	 *
-	 * @return bool
-	 */
-	public static function has_stored_legacy_license_map(): bool {
-		if ( self::is_flat_map_retired() ) {
-			return false;
-		}
-
-		$legacy = get_option( self::OPTION_SITE_ACTIVATION, false );
-
-		if ( false === $legacy || ! is_array( $legacy ) ) {
-			return false;
-		}
-
-		if ( License_Utils::is_site_activation_list_storage( $legacy ) ) {
-			return false;
-		}
-
-		return [] !== License_Utils::normalize_legacy_map( $legacy );
-	}
-
-	/**
 	 * Whether this site already had license data before an exchange merge.
 	 *
 	 * @return bool
@@ -160,20 +132,6 @@ class License {
 	 */
 	public static function should_run_shop_auto_activate( bool $requested ): bool {
 		return $requested;
-	}
-
-	/**
-	 * Whether incoming exchange/checkout rows include license keys not already stored.
-	 *
-	 * Used after upgrade or additional purchase: EDD issues a new key while the legacy
-	 * addon map still exists, so normal auto-activate is skipped without this check.
-	 *
-	 * @param array<int, array<string, mixed>> $existing Stored licenses.
-	 * @param array<int, array<string, mixed>> $incoming New or updated licenses.
-	 * @return bool
-	 */
-	public static function has_new_incoming_license_keys( array $existing, array $incoming ): bool {
-		return self::classify_incoming_keys( $existing, $incoming )['has_new_keys'];
 	}
 
 	/**
@@ -264,9 +222,17 @@ class License {
 				$match_key = '' !== $license_key && (string) ( $row['licenseKey'] ?? '' ) === $license_key;
 
 				if ( $match_id || $match_key ) {
-					$kept_status    = $row['status'] ?? null;
-					$merged[ $idx ] = array_merge( $row, $license );
-					if ( null !== $kept_status ) {
+					$kept_status     = $row['status'] ?? null;
+					$incoming_status = $license['status'] ?? null;
+					$merged[ $idx ]  = array_merge( $row, $license );
+
+					$shop_authoritative = in_array(
+						$incoming_status ?? '',
+						[ 'active', 'inactive', 'valid' ],
+						true
+					);
+
+					if ( null !== $kept_status && ! $shop_authoritative ) {
 						$merged[ $idx ]['status'] = $kept_status;
 					}
 					$updated = true;
@@ -283,9 +249,7 @@ class License {
 	}
 
 	/**
-	 * Exchange each unique legacy license key with the shop and merge rich rows.
-	 *
-	 * Shop exchange returns one row per key; legacy maps may contain several keys.
+	 * Exchange each unique legacy license key with the shop and merge rich rows — shop exchange returns one row per key; legacy maps may contain several keys.
 	 *
 	 * @param array<string, string>            $map           Normalized legacy addon => key map.
 	 * @param array<int, array<string, mixed>> $existing_rich Existing rich rows to merge into.
@@ -344,10 +308,7 @@ class License {
 	}
 
 	/**
-	 * Finish legacy migration: patch rich from shop if needed, then retire flat map.
-	 *
-	 * Always retires locally after a best-effort exchange, even when the shop fails
-	 * or rich still does not cover every legacy key.
+	 * Finish legacy migration: patch rich from shop if needed, then retire flat map — always retires locally after a best-effort exchange, even when the shop fails or rich still does not cover every legacy key.
 	 *
 	 * @return void
 	 */
@@ -384,9 +345,7 @@ class License {
 	}
 
 	/**
-	 * Whether the license grants add-on access (active, or inactive with a valid subscription).
-	 *
-	 * Shop `inactive` means not activated on this site yet — not subscription expired.
+	 * Whether the license grants add-on access (active, or inactive with a valid subscription) — shop `inactive` means not activated on this site yet, not subscription expired.
 	 *
 	 * @param array<string, mixed> $row Rich license row.
 	 * @return bool
@@ -481,9 +440,7 @@ class License {
 	}
 
 	/**
-	 * When the user picks one license on this site:
-	 * - All Access: remove this site from every other license row (including singles).
-	 * - Single product: remove this site from All Access only (Pro + Tracking may coexist).
+	 * When the user picks one license on this site — All Access: remove this site from every other license row (including singles); single product: remove this site from All Access only (Pro + Tracking may coexist).
 	 *
 	 * @param array<int, array<string, mixed>> $rich        Rich license list.
 	 * @param string                           $license_key License key the user activated.
@@ -494,9 +451,7 @@ class License {
 	}
 
 	/**
-	 * Add this site to a license row without stripping single-product slots under All Access.
-	 *
-	 * Used when healing sitesActivated from the site-activation list or activating an AA add-on.
+	 * Add this site to a license row without stripping single-product slots under All Access — used when healing sitesActivated from the site-activation list or activating an AA add-on.
 	 *
 	 * @param array<int, array<string, mixed>> $rich        Rich license list.
 	 * @param string                           $license_key License key.
@@ -797,59 +752,6 @@ class License {
 	}
 
 	/**
-	 * Deactivate the license for one add-on on this site (e.g. on add-on uninstall).
-	 *
-	 * @param string $addon_id Short add-on id (e.g. tracking).
-	 * @return true|int|string True or 1 on success, error message on failure.
-	 */
-	public static function deactivate_license_for_addon( string $addon_id ) {
-		$addon_id = sanitize_key( trim( $addon_id ) );
-		if ( '' === $addon_id ) {
-			return __( 'Error while trying to disable the license. Please contact support.', 'advanced-ads' );
-		}
-
-		$map         = self::get_addon_key_map();
-		$license_key = trim( (string) ( $map[ $addon_id ] ?? '' ) );
-
-		if ( '' === $license_key ) {
-			return 1;
-		}
-
-		$shared_with = array_filter(
-			$map,
-			static function ( $key, $id ) use ( $license_key ) {
-				if ( trim( (string) $key ) !== $license_key ) {
-					return false;
-				}
-
-				$options_slug = License_Utils::options_slug_for_addon_id( (string) $id );
-
-				return (bool) self::get_mirror_status_for_options_slug( $options_slug );
-			},
-			ARRAY_FILTER_USE_BOTH
-		);
-
-		if ( count( $shared_with ) > 1 ) {
-			self::remove_aa_activated_addon_id( $addon_id );
-
-			return 1;
-		}
-
-		$result = self::save_licenses(
-			self::get_licenses(),
-			[
-				'deactivating_license_key' => $license_key,
-			]
-		);
-
-		if ( is_wp_error( $result ) ) {
-			return $result->get_error_message();
-		}
-
-		return 1;
-	}
-
-	/**
 	 * Activate licenses on the shop when this site is not registered yet.
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
@@ -920,10 +822,7 @@ class License {
 	}
 
 	/**
-	 * After shop auto-activate, persist sitesActivated for licenses that grant add-ons on this site.
-	 *
-	 * Exchange/activate responses may omit activation rows while EDD already has the site and
-	 * legacy assignment still mirrors add-ons — the Licenses UI then shows "0 of N used".
+	 * After shop auto-activate, persist sitesActivated for licenses that grant add-ons on this site — exchange/activate responses may omit activation rows while EDD already has the site and legacy assignment still mirrors add-ons, so the Licenses UI then shows "0 of N used".
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @return array<int, array<string, mixed>>
@@ -976,10 +875,7 @@ class License {
 	}
 
 	/**
-	 * After upgrade, move this site's slot from a predecessor row to the entitled successor.
-	 *
-	 * Updates local sitesActivated and syncs the successor key on the shop so EDD SL
-	 * activation counts match the plugin UI.
+	 * After upgrade, move this site's slot from a predecessor row to the entitled successor — updates local sitesActivated and syncs the successor key on the shop so EDD SL activation counts match the plugin UI.
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @return array<int, array<string, mixed>>
@@ -1354,7 +1250,7 @@ class License {
 			$expires     = ! empty( $row['expiryDate'] ) ? (string) $row['expiryDate'] : false;
 			$aa_on_site  = self::find_all_access_row( $rich, 'on_site' );
 
-			$mirror_aa = in_array( $addon_id, self::get_aa_activated_addon_ids(), true );
+			$mirror_aa = in_array( $addon_id, self::get_aa_activated_addon_ids(), true ) || self::is_addon_plugin_active( $addon_id );
 			if ( ! $mirror_aa && '' !== $install_only_addon_id && $install_only_addon_id === $addon_id && ! $install_only ) {
 				self::add_aa_activated_addon_id( $addon_id );
 				$mirror_aa = true;
@@ -1397,7 +1293,7 @@ class License {
 			return array_values(
 				array_filter(
 					array_keys( self::get_addon_plugin_catalog() ),
-					static fn( string $id ): bool => 'slider-ads' !== $id
+					[ Addons::class, 'is_all_access_addon' ]
 				)
 			);
 		}
@@ -1527,9 +1423,7 @@ class License {
 	}
 
 	/**
-	 * Ensure the license is activated on the shop and return a row with fresh package URLs.
-	 *
-	 * Package downloads are validated by EDD SL on the shop. Local sitesActivated rows alone are not enough.
+	 * Ensure the license is activated on the shop and return a row with fresh package URLs — package downloads are validated by EDD SL on the shop, local sitesActivated rows alone are not enough.
 	 *
 	 * @param array<string, mixed> $row License row containing licenseKey.
 	 * @return array<string, mixed>|WP_Error Updated row or error.
@@ -1644,10 +1538,7 @@ class License {
 	}
 
 	/**
-	 * Download add-on zip from license row, install into wp-content/plugins, activate when valid.
-	 *
-	 * Target path comes from the static add-on catalog ($addon_id), not from get_plugins().
-	 * get_plugins() is only used to see whether that path already exists on disk.
+	 * Download add-on zip from license row, install into wp-content/plugins, activate when valid — target path comes from the static add-on catalog ($addon_id), not from get_plugins(), which is only used to see whether that path already exists on disk.
 	 *
 	 * @param array<string, mixed> $row             License row (download_url from shop).
 	 * @param string               $addon_id        Short add-on id from sync loop.
@@ -1803,7 +1694,7 @@ class License {
 	 * @return true|WP_Error
 	 */
 	private static function run_package_install( string $download_url, string $addon_id ) {
-		$result = Plugin_Installer::install_from_url( $download_url, true );
+		$result = Installer::install_from_url( $download_url, true );
 
 		if ( is_wp_error( $result ) ) {
 			return $result;
@@ -2350,10 +2241,7 @@ class License {
 	}
 
 	/**
-	 * Keep site slots aligned with advanced-ads-licenses and one winner per product line.
-	 *
-	 * When the flat map is empty, no license is active on this site locally.
-	 * When the map has keys, only mapped keys may keep the site slot; at most one row per product line.
+	 * Keep site slots aligned with advanced-ads-licenses and one winner per product line — when the flat map is empty, no license is active on this site locally; when the map has keys, only mapped keys may keep the site slot, at most one row per product line.
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @return array<int, array<string, mixed>>
@@ -2495,10 +2383,7 @@ class License {
 	}
 
 	/**
-	 * Legacy addon map to persist: All Access only includes user-activated add-ons.
-	 *
-	 * Pure derive — does not write options. Call {@see sync_aa_activated_addon_ids_with_assignments()}
-	 * on write paths before persisting the map.
+	 * Legacy addon map to persist: All Access only includes user-activated add-ons and add-ons whose plugin is active — pure derive, does not write options; call {@see sync_aa_activated_addon_ids_with_assignments()} on write paths before persisting the map.
 	 *
 	 * @param array<int, array<string, mixed>> $rich Rich license list.
 	 * @return array<string, string>
@@ -2525,7 +2410,24 @@ class License {
 			$map[ $addon_id ] = $aa_key;
 		}
 
+		// Active add-on plugins are covered without the per-add-on step, unless a license of their own won.
+		foreach ( $full as $addon_id => $key ) {
+			if ( $key === $aa_key && self::is_addon_plugin_active( $addon_id ) ) {
+				$map[ $addon_id ] = $aa_key;
+			}
+		}
+
 		return $map;
+	}
+
+	/**
+	 * Whether the plugin of an add-on is installed and active on this site.
+	 *
+	 * @param string $addon_id Short add-on id.
+	 * @return bool
+	 */
+	private static function is_addon_plugin_active( string $addon_id ): bool {
+		return ! empty( self::get_addon_install_states()[ $addon_id ]['active'] );
 	}
 
 	/**
@@ -2559,7 +2461,7 @@ class License {
 					$active = true;
 				}
 
-				// Case 2: canonical path (advanced-ads-tracking/tracking.php, etc.).
+				// Case 2: canonical path (advanced-ads-tracking/advanced-ads-tracking.php, etc.).
 				if ( ! $active && is_plugin_active( $canonical_file ) ) {
 					$active = true;
 				}
@@ -2781,8 +2683,8 @@ class License {
 	/**
 	 * Addon id => licenseKey for active/valid rich licenses only.
 	 *
-	 * @param array<int, array<string, mixed>> $rich Rich license list.
-	 * @param array<int, array<string, mixed>> $addons addons list.
+	 * @param array<int, array<string, mixed>>                                                                                $rich   Rich license list.
+	 * @param array<string, array{id: string, name: string, options_slug: string, path: string, aliases?: list<string>}>|null $addons Optional; defaults to Data::get_addons().
 	 * @return array<string, string>
 	 */
 	public static function get_active_addon_key_map_from_rich( array $rich, ?array $addons = null ): array {
@@ -2820,6 +2722,22 @@ class License {
 	}
 
 	/**
+	 * Whether this site has explicitly, locally deactivated a license key — distinguishes "we just turned this off on this site" from "never touched": a key with no entry yet (fresh checkout, not yet activated) must still be eligible for the entitlement-only fallback in resolve_addon_license_assignments(), while a key this site deliberately deactivated must not be silently re-assigned by that same fallback just because no row anywhere currently carries site-activation data.
+	 *
+	 * @param string $license_key License key.
+	 * @return bool
+	 */
+	private static function is_locally_deactivated_on_this_site( string $license_key ): bool {
+		foreach ( License_Site_Activation::get_list() as $entry ) {
+			if ( trim( (string) ( $entry['license'] ?? '' ) ) === $license_key ) {
+				return 'inactive' === ( $entry['status'] ?? '' );
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Pick the best license per addon when several rich rows overlap.
 	 *
 	 * @param array<int, array<string, mixed>>                                                                                $rich   Records from app/exchange.
@@ -2838,7 +2756,7 @@ class License {
 				$score = self::license_priority_score( $all_access_on_site, true );
 
 				foreach ( $addons as $addon_row ) {
-					if ( empty( $addon_row['id'] ) || 'slider-ads' === $addon_row['id'] ) {
+					if ( empty( $addon_row['id'] ) || ! Addons::is_all_access_addon( (string) $addon_row['id'] ) ) {
 						continue;
 					}
 					self::offer_addon_license_candidate(
@@ -2899,12 +2817,12 @@ class License {
 		}
 
 		$all_access = self::find_all_access_row( $rich, 'entitled' );
-		if ( null !== $all_access ) {
+		if ( null !== $all_access && ! self::is_locally_deactivated_on_this_site( (string) $all_access['licenseKey'] ) ) {
 			$key   = (string) $all_access['licenseKey'];
 			$score = self::license_priority_score( $all_access, true );
 
 			foreach ( $addons as $addon_row ) {
-				if ( empty( $addon_row['id'] ) || 'slider-ads' === $addon_row['id'] ) {
+				if ( empty( $addon_row['id'] ) || ! Addons::is_all_access_addon( (string) $addon_row['id'] ) ) {
 					continue;
 				}
 				self::offer_addon_license_candidate(
@@ -2931,6 +2849,10 @@ class License {
 				continue;
 			}
 
+			if ( self::is_locally_deactivated_on_this_site( $key ) ) {
+				continue;
+			}
+
 			$addon_id = License_Product_Map::addon_id_from_product_name( $name, $addons );
 			if ( null === $addon_id ) {
 				continue;
@@ -2946,11 +2868,11 @@ class License {
 	/**
 	 * Activating addon priority
 	 *
-	 * @param array<string, array{object}> $candidates Candidates by addon id.
-	 * @param string                       $addon_id   Addon id.
-	 * @param string                       $key        License key.
-	 * @param int                          $score      Priority score.
-	 * @param array<string, mixed>         $row        Rich license row.
+	 * @param array<string, array{licenseKey: string, row: array<string, mixed>, score: int}> $candidates Candidates by addon id.
+	 * @param string                                                                          $addon_id   Addon id.
+	 * @param string                                                                          $key        License key.
+	 * @param int                                                                             $score      Priority score.
+	 * @param array<string, mixed>                                                            $row        Rich license row.
 	 * @return void
 	 */
 	private static function offer_addon_license_candidate(
@@ -2974,9 +2896,7 @@ class License {
 	}
 
 	/**
-	 * Effective addon_id => license_key map for admin and EDD persistence.
-	 *
-	 * Request-local cache keyed by rich + activation options (no writes).
+	 * Effective addon_id => license_key map for admin and EDD persistence — request-local cache keyed by rich + activation options (no writes).
 	 *
 	 * @return array<string, string>
 	 */
@@ -3144,6 +3064,47 @@ class License {
 	}
 
 	/**
+	 * Whether any installed add-on has a valid license — gates Pro-only information such as the direct support link.
+	 *
+	 * @return bool
+	 */
+	public static function has_valid_license(): bool {
+		foreach ( Addons::get_installed_addons() as $add_on ) {
+			if ( 'slider-ads' === $add_on['id'] ) {
+				continue;
+			}
+
+			if ( 'valid' === self::get_mirror_status_for_options_slug( $add_on['options_slug'] ) ) {
+				return true;
+			}
+
+			$expires = self::get_mirror_expires_for_options_slug( $add_on['options_slug'] );
+			if ( 'lifetime' === $expires || ( $expires && strtotime( $expires ) > time() ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Whether two or more add-ons share the same license key, which indicates an All Access customer.
+	 *
+	 * @return bool
+	 */
+	public static function is_probably_all_access(): bool {
+		$licensed = array_filter(
+			self::get_addon_key_map(),
+			static function ( $addon_id ) {
+				return self::get_mirror_status_for_options_slug( License_Utils::options_slug_for_addon_id( (string) $addon_id ) );
+			},
+			ARRAY_FILTER_USE_KEY
+		);
+
+		return [] !== $licensed && max( array_count_values( $licensed ) ) > 1;
+	}
+
+	/**
 	 * Rich license row used for EDD mirror status/expiry for one add-on.
 	 *
 	 * @param string $addon_id Short add-on id.
@@ -3184,8 +3145,7 @@ class License {
 	}
 
 	/**
-	 * Ensure license keys from an addon⇒key map exist in the site-activation list.
-	 * Listing uses advanced-ads-app-licenses only — do not merge map rows into rich list.
+	 * Ensure license keys from an addon⇒key map exist in the site-activation list — listing uses advanced-ads-app-licenses only, do not merge map rows into rich list.
 	 *
 	 * @param array<string, string> $map Addon id => key.
 	 * @return void

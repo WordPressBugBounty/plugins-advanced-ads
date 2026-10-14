@@ -50,7 +50,7 @@ jQuery(document).ready(function ($) {
 					if ('or' === conditions_connector_default) {
 						// as used for display conditions.
 						var connector =
-							'<input style="display:none;" type="checkbox" name="' +
+							'<input type="checkbox" name="' +
 							conditions_form_name +
 							'[' +
 							condition_index +
@@ -74,7 +74,9 @@ jQuery(document).ready(function ($) {
 							condition_title +
 							'</td><td>' +
 							r +
-							'</td><td><button type="button" class="advads-conditions-remove button">x</button></td></tr>';
+							'</td><td><button type="button" class="advads-conditions-remove button" aria-label="' +
+							advadstxt.remove_item.replace('%s', condition_title) +
+							'">x</button></td></tr>';
 					} else {
 						// as used for visitor conditions.
 						var connector =
@@ -102,7 +104,9 @@ jQuery(document).ready(function ($) {
 							condition_title +
 							'</td><td>' +
 							r +
-							'</td><td><button type="button" class="advads-conditions-remove button">x</button></td></tr>';
+							'</td><td><button type="button" class="advads-conditions-remove button" aria-label="' +
+							advadstxt.remove_item.replace('%s', condition_title) +
+							'">x</button></td></tr>';
 					}
 					condition_list_target.find('tbody').append(newline);
 					condition_list_target
@@ -179,7 +183,9 @@ jQuery(document).ready(function ($) {
 			select(event, ui) {
 				// append new line with input fields.
 				$(
-					'<label class="button advads-button advads-ui-state-active"><span class="advads-button-text">' +
+					'<label class="button advads-button advads-ui-state-active" role="button" tabindex="0" aria-label="' +
+						advadstxt.remove_item.replace('%s', ui.item.label) +
+						'"><span class="advads-button-text">' +
 						ui.item.label +
 						'<input type="hidden" name="' +
 						self.data('inputName') +
@@ -240,7 +246,9 @@ jQuery(document).ready(function ($) {
 			select(event, ui) {
 				// append new line with input fields.
 				$(
-					'<label class="button advads-button advads-ui-state-active"><span class="advads-button-text">' +
+					'<label class="button advads-button advads-ui-state-active" role="button" tabindex="0" aria-label="' +
+						advadstxt.remove_item.replace('%s', ui.item.label) +
+						'"><span class="advads-button-text">' +
 						ui.item.label +
 						'<input type="hidden" name="' +
 						self.data('inputName') +
@@ -265,7 +273,8 @@ jQuery(document).ready(function ($) {
 			$(this)
 				.next()
 				.find('.advads-display-conditions-individual-post')
-				.show();
+				.show()
+				.trigger('focus');
 			//$( '.advads-conditions-postids-search-line .description' ).hide();
 			$(this).hide();
 		}
@@ -293,7 +302,7 @@ jQuery(document).ready(function ($) {
 						select(event, ui) {
 							// append new line with input fields
 							const newline = $(
-								`<label class="button advads-button advads-ui-state-active"><span class="advads-button-text">${ui.item.label}</span></label>`
+								`<label class="button advads-button advads-ui-state-active" role="button" tabindex="0" aria-label="${advadstxt.remove_item.replace('%s', ui.item.label)}"><span class="advads-button-text">${ui.item.label}</span></label>`
 							);
 							$(
 								`<input type="hidden" name="${self.dataset.fieldName}[value][]" value="${ui.item.value}"/>`
@@ -335,6 +344,26 @@ jQuery(document).ready(function ($) {
 		// eslint-disable-next-line no-unused-vars
 		function (e) {
 			$(this).remove();
+		}
+	);
+	// remove a selected term, author or post with Enter or Space, then move focus to what is next to it.
+	$(document).on(
+		'keydown',
+		'.advads-conditions-terms-buttons .button, .advads-conditions-authors-buttons .button, .advads-conditions-postid-buttons label.button',
+		function (e) {
+			if ('Enter' !== e.key && ' ' !== e.key) {
+				return;
+			}
+			e.preventDefault();
+			const chip = $(this);
+			const next = chip
+				.nextAll('label.button, button:visible, :text:visible')
+				.add(chip.prevAll('label.button'))
+				.add(chip.parent().nextAll('button:visible, :text:visible'))
+				.add(chip.parent().find(':text:visible'))
+				.first();
+			chip.trigger('click');
+			next.trigger('focus');
 		}
 	);
 	// display/hide error message if no option was selected
@@ -481,8 +510,8 @@ function advadsAuthorSearch(field, callback) {
 			if (r) {
 				r.map(function (element, index) {
 					results[index] = {
-						value: element.data.ID,
-						label: element.data.display_name,
+						value: element.ID,
+						label: element.display_name,
 					};
 				});
 			}

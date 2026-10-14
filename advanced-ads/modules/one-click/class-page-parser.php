@@ -54,15 +54,6 @@ class Page_Parser implements Integration_Interface {
 	}
 
 	/**
-	 * Get page
-	 *
-	 * @return string
-	 */
-	public function get_page() {
-		return $this->page;
-	}
-
-	/**
 	 * Start of buffer.
 	 *
 	 * @return void

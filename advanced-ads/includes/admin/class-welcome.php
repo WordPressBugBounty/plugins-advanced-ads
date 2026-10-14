@@ -25,9 +25,7 @@ class Welcome {
 	const USER_META = 'advanced-ads-welcome';
 
 	/**
-	 * Main instance
-	 *
-	 * Ensure only one instance is loaded or can be loaded.
+	 * Main instance — ensures only one instance is loaded or can be loaded.
 	 *
 	 * @return Welcome
 	 */

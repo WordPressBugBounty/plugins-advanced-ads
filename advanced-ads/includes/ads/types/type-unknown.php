@@ -11,6 +11,7 @@ namespace AdvancedAds\Ads\Types;
 
 use AdvancedAds\Ads\Ad_Dummy;
 use AdvancedAds\Interfaces\Ad_Type;
+use AdvancedAds\Abstracts\Ad;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -41,7 +41,8 @@
 						<?php call_user_func( [ $metabox[0], $metabox[1] ], $_options, $i ++, $form_name ); // phpcs:ignore ?>
 					</td>
 					<td>
-						<button type="button" class="advads-conditions-remove button">x</button>
+						<?php /* translators: %s: name of the selected item. */ ?>
+						<button type="button" class="advads-conditions-remove button" aria-label="<?php echo esc_attr( sprintf( __( 'Remove %s', 'advanced-ads' ), $conditions[ $_options['type'] ]['label'] ) ); ?>">x</button>
 					</td>
 				</tr>
 				<?php

@@ -138,9 +138,7 @@ class Cache_Invalidator implements Integration_Interface {
 	}
 
 	/**
-	 * Invalidate ad caches when post cache is cleaned outside save_post.
-	 *
-	 * Covers text-ad $wpdb updates that call clean_post_cache() without firing save_post.
+	 * Invalidate ad caches when post cache is cleaned outside save_post — covers text-ad $wpdb updates that call clean_post_cache() without firing save_post.
 	 *
 	 * @param int          $post_id Post ID.
 	 * @param WP_Post|null $post    Post object when provided by core.

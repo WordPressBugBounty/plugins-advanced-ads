@@ -6,7 +6,7 @@
  * TODO: move the array somewhere else.
  */
 
-use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Admin\Upsell;
 
 $pro_placements = [
 	// ad injection on random position.
@@ -92,5 +92,5 @@ if ( is_array( $pro_placements ) ) :
 		</div>
 		<?php endforeach; ?>
 	<div class="clear"></div>
-	<h4><?php Upgrades::upgrade_link( __( 'Get all placements with All Access', 'advanced-ads' ), 'https://wpadvancedads.com/add-ons/all-access/', 'upgrades-pro-placements' ); ?></h4>
+	<h4><?php Upsell::upgrade_link( __( 'Get all placements with All Access', 'advanced-ads' ), 'https://wpadvancedads.com/add-ons/all-access/', 'upgrades-pro-placements' ); ?></h4>
 <?php endif; ?>

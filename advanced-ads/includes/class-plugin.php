@@ -9,7 +9,6 @@
 
 namespace AdvancedAds;
 
-use Advanced_Ads_Admin_Licenses;
 use AdvancedAds\Ads\Ads;
 use AdvancedAds\Groups\Groups;
 use AdvancedAds\Installation\Install;
@@ -19,17 +18,18 @@ use AdvancedAds\Rest\Licenses;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Plugin.
+ * Plugin. Containers:
  *
- * Containers:
- *
- * @property Shortcodes           $shortcodes Shortcodes handler.
- * @property Assets_Registry      $registry   Assets registry.
- * @property Framework\JSON       $json       JSON handler.
- * @property Admin\Admin_Menu     $screens    Admin screens.
- * @property Frontend\Ad_Renderer $renderer   Ads renderer.
- * @property Frontend\Manager     $frontend   Frontend manager.
- * @property Importers\Manager    $importers  Importers manager.
+ * @property Shortcodes           $shortcodes        Shortcodes handler.
+ * @property Assets_Registry      $registry          Assets registry.
+ * @property Framework\JSON       $json              JSON handler.
+ * @property Admin\Admin_Menu     $screens           Admin screens.
+ * @property Admin\List_Filters   $list_filters      Filters of the ad list.
+ * @property Frontend\Ad_Renderer $renderer          Ads renderer.
+ * @property Frontend\Manager     $frontend          Frontend manager.
+ * @property Importers\Manager    $importers         Importers manager.
+ * @property Settings\Registry    $settings_registry Settings field registry (tabs/sections/fields schema).
+ * @property Modules\Registry     $module_registry   Module registry (Modules tab cards + conditional module loading).
  */
 class Plugin extends Framework\Loader {
 
@@ -57,16 +57,14 @@ class Plugin extends Framework\Loader {
 	public $placements = null;
 
 	/**
-	 * Modules manager
+	 * The module registry
 	 *
-	 * @var Modules
+	 * @var Modules\Registry
 	 */
-	public $modules = null;
+	public $module_registry = null;
 
 	/**
-	 * Main instance
-	 *
-	 * Ensure only one instance is loaded or can be loaded.
+	 * Main instance — ensures only one instance is loaded or can be loaded.
 	 *
 	 * @return Plugin
 	 */
@@ -97,6 +95,7 @@ class Plugin extends Framework\Loader {
 	 */
 	private function setup(): void {
 		$this->define_constants();
+
 		$this->includes_functions();
 		$this->includes();
 		$this->includes_rest();
@@ -104,24 +103,13 @@ class Plugin extends Framework\Loader {
 		$this->includes_frontend();
 		$this->includes_deprecated();
 
-		/**
-		 * Old loading strategy
-		 *
-		 * TODO: need to remove it in future.
-		 */
 		// Public-Facing and Core Functionality.
 		\Advanced_Ads::get_instance();
-		\Advanced_Ads_ModuleLoader::loadModules( ADVADS_ABSPATH . 'modules/', [ 'disabled' => [ 'pef' => true ] ] ); // enable modules, requires base class.
-
-		if ( is_admin() ) {
-			Advanced_Ads_Admin_Licenses::get_instance();
-		}
 
 		add_action( 'plugins_loaded', [ $this, 'on_plugins_loaded' ], -1 );
 		add_action( 'widgets_init', [ $this, 'register_widgets' ] );
 
 		// Load it all.
-		$this->modules->initialize();
 		$this->load();
 	}
 
@@ -160,30 +148,16 @@ class Plugin extends Framework\Loader {
 		$this->define( 'ADVADS_PLUGIN_BASENAME', plugin_basename( ADVADS_FILE ) );
 		$this->define( 'ADVADS_BASE_URL', plugin_dir_url( ADVADS_FILE ) );
 		$this->define( 'ADVADS_SLUG', 'advanced-ads' );
-		// name for group & option in settings.
-		$this->define( 'ADVADS_SETTINGS_ADBLOCKER', 'advanced-ads-adblocker' );
+		// Shared with wpadvancedads.com Feedback\Rest. Override in wp-config.php for local/staging.
+		$this->define( 'ADVADS_DEACTIVATION_FEEDBACK_TOKEN', 'advads-dfb-7c4e9a2b8f1d6e0c3a5b9d2e4f8a1c6b' );
 
 		// Deprecated Constants.
-		/**
-		 * ADVADS_BASE
-		 *
-		 * @deprecated 1.47.0 use ADVADS_PLUGIN_BASENAME now.
-		 */
-		define( 'ADVADS_BASE', ADVADS_PLUGIN_BASENAME );
-
 		/**
 		 * ADVADS_BASE_PATH
 		 *
 		 * @deprecated 1.47.0 use ADVADS_ABSPATH now.
 		 */
 		define( 'ADVADS_BASE_PATH', ADVADS_ABSPATH );
-
-		/**
-		 * ADVADS_BASE_DIR
-		 *
-		 * @deprecated 1.47.0 Avoid global declaration of the constant used exclusively in `load_text_domain` function; use localized declaration instead.
-		 */
-		define( 'ADVADS_BASE_DIR', dirname( ADVADS_PLUGIN_BASENAME ) );
 
 		/**
 		 * ADVADS_URL
@@ -199,14 +173,16 @@ class Plugin extends Framework\Loader {
 	 * @return void
 	 */
 	private function includes(): void {
-		$this->ads        = new Ads();
-		$this->groups     = new Groups();
-		$this->placements = new Placements();
-		$this->modules    = new Modules();
+		$this->ads             = new Ads();
+		$this->groups          = new Groups();
+		$this->placements      = new Placements();
+		$this->module_registry = new Modules\Registry();
+		$this->module_registry->initialize();
 
 		// Common.
 		$this->register_initializer( Install::class );
-		$this->register_integration( Entities::class );
+		$this->register_initializer( Settings\Registry::class, 'settings_registry' );
+		$this->register_initializer( Entities::class );
 		$this->register_integration( Assets_Registry::class, 'registry' );
 		$this->register_integration( Framework\JSON::class, 'json', [ 'advancedAds' ] );
 		$this->register_integration( Compatibility\Compatibility::class );
@@ -217,6 +193,9 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Cache_Invalidator::class );
 		$this->register_integration( Crons\Ads::class );
 		$this->register_integration( Crons\Licenses::class );
+		$this->register_integration( Crons\Data_Usage::class );
+		$this->register_integration( Updater\Addon_Updater::class );
+		$this->register_integration( Updater\Update_Guard::class );
 		$this->register_integration( Shortcodes::class, 'shortcodes' );
 		$this->register_integration( Frontend\Debug_Ads::class );
 	}
@@ -260,13 +239,13 @@ class Plugin extends Framework\Loader {
 		// Placements.
 		$this->register_integration( Admin\Placements\Ajax::class );
 		$this->register_integration( Admin\Placements\Bulk_Edit::class );
-		$this->register_integration( Admin\Placements\Quick_Edit::class );
 
 		// Entities.
 		$this->register_integration( Admin\Page_Quick_Edit::class );
 		$this->register_integration( Compatibility\Capability_Manager::class );
 		$this->register_initializer( Upgrades::class );
-		$this->register_integration( Admin\Action_Links::class );
+		$this->register_integration( Admin\Plugins\Screen::class );
+		$this->register_integration( Admin\Plugins\Deactivation_Feedback::class );
 		$this->register_integration( Admin\Admin_Menu::class, 'screens' );
 		$this->register_integration( Admin\Admin_Notices::class );
 		$this->register_integration( Admin\Assets::class );
@@ -278,14 +257,11 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Admin\WordPress_Dashboard::class );
 		$this->register_integration( Importers\Manager::class, 'importers' );
 		$this->register_integration( Admin\AJAX::class );
-		$this->register_integration( Admin\Plugin_Auto_Update::class );
-		$this->register_integration( Admin\Version_Control::class );
-		$this->register_integration( Admin\Upgrades::class );
+		$this->register_integration( Updater\Rollback::class );
+		$this->register_integration( Admin\Upsell::class );
 		$this->register_integration( Admin\Authors::class );
-		$this->register_integration( Admin\Settings::class );
 		$this->register_integration( Admin\Misc::class );
 		$this->register_integration( Admin\Post_List::class );
-		$this->register_integration( Admin\Addon_Updater::class );
 
 		if ( ! wp_doing_ajax() ) {
 			$this->register_integration( Admin\List_Filters::class, 'list_filters' );
@@ -302,9 +278,11 @@ class Plugin extends Framework\Loader {
 		$this->register_route( Rest\Licenses::class );
 		$this->register_route( Rest\Page_Quick_Edit::class );
 		$this->register_route( Rest\Placements::class );
-		$this->register_route( Rest\OnBoarding::class );
 		$this->register_route( Rest\Utilities::class );
+		$this->register_route( Rest\Whats_New::class );
 		$this->register_route( Licenses::class );
+		$this->register_route( Settings\Routes::class );
+		$this->register_route( Wizard\Routes::class );
 	}
 
 	/**
@@ -320,7 +298,6 @@ class Plugin extends Framework\Loader {
 		require_once ADVADS_ABSPATH . 'includes/functions-group.php';
 		require_once ADVADS_ABSPATH . 'includes/functions-placement.php';
 		require_once ADVADS_ABSPATH . 'includes/default-hooks.php';
-		require_once ADVADS_ABSPATH . 'includes/functions-components.php';
 	}
 
 	/**
@@ -329,25 +306,10 @@ class Plugin extends Framework\Loader {
 	 * @return void
 	 */
 	private function includes_deprecated(): void {
-		require_once ADVADS_ABSPATH . 'deprecated/ad_group.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad_placements.php';
-		require_once ADVADS_ABSPATH . 'deprecated/Ad_Repository.php';
 		require_once ADVADS_ABSPATH . 'deprecated/ad_type_abstract.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad_type_content.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad_type_dummy.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad_type_group.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad_type_image.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad_type_plain.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad-ajax.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad-debug.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad-expiration.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad-model.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad-select.php';
-		require_once ADVADS_ABSPATH . 'deprecated/ad.php';
-		require_once ADVADS_ABSPATH . 'deprecated/gadsense-dummy.php';
-		require_once ADVADS_ABSPATH . 'deprecated/Group_Repository.php';
-		require_once ADVADS_ABSPATH . 'deprecated/class-admin.php';
-		require_once ADVADS_ABSPATH . 'deprecated/class-advanced-ads-plugin.php';
 		require_once ADVADS_ABSPATH . 'deprecated/in-content-injector.php';
+		require_once ADVADS_ABSPATH . 'deprecated/admin-licenses.php';
+		require_once ADVADS_ABSPATH . 'deprecated/filesystem.php';
+		require_once ADVADS_ABSPATH . 'deprecated/load_modules.php';
 	}
 }

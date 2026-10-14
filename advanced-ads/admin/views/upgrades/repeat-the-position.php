@@ -5,9 +5,9 @@
  * @package Advanced_Ads
  */
 
-use AdvancedAds\Admin\Upgrades;
+use AdvancedAds\Admin\Upsell;
 
 ?>
 <p><label><input type="checkbox" disabled="disabled"/><?php esc_html_e( 'repeat the position', 'advanced-ads' ); ?></label>
-	<?php Upgrades::upgrade_link( null, 'https://wpadvancedads.com/add-ons/advanced-ads-pro/', 'upgrade-content-repeat' ); ?>
+	<?php Upsell::upgrade_link( null, 'https://wpadvancedads.com/add-ons/advanced-ads-pro/', 'upgrade-content-repeat' ); ?>
 </p>

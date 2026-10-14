@@ -11,6 +11,7 @@ namespace AdvancedAds\Admin;
 
 use AdvancedAds\Constants;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 

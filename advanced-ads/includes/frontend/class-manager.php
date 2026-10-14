@@ -16,6 +16,8 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Frontend Manager.
+ *
+ * @mixin Ad_Display_Condition
  */
 class Manager implements Integration_Interface {
 

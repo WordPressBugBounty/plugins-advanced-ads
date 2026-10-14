@@ -9,11 +9,11 @@
 
 namespace AdvancedAds\Admin;
 
-use WP_Post;
-use Exception;
 use AdvancedAds\Constants;
-use AdvancedAds\Framework\Utilities\Params;
 use AdvancedAds\Framework\Interfaces\Integration_Interface;
+use AdvancedAds\Framework\Utilities\Params;
+use WP_Post;
+use WP_Query;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -88,19 +88,12 @@ class List_Filters implements Integration_Interface {
 			return;
 		}
 
-		$groups_to_check = $this->ads_in_groups;
+		foreach ( $this->all_groups as $group_id => $group ) {
+			$all_filters['all_groups'][ $group_id ] = $group['name'];
+		}
 
 		foreach ( $posts as $post ) {
 			$ad_option = $this->all_ads_options[ $post->ID ];
-
-			foreach ( $groups_to_check as $key => $ads ) {
-				if ( ! isset( $all_filters['all_groups'][ $key ] ) // skip if this group is already known.
-					&& isset( $this->all_groups[ $key ] ) ) {
-					$all_filters['all_groups'][ $key ] = $this->all_groups[ $key ]['name'];
-					// remove groups that are already selected for the filter to reduce loop items next time.
-					unset( $groups_to_check[ $key ] );
-				}
-			}
 
 			if ( isset( $ad_option['width'], $ad_option['height'] ) && $ad_option['width'] && $ad_option['height'] ) {
 				if ( ! array_key_exists( $ad_option['width'] . 'x' . $ad_option['height'], $all_filters['all_sizes'] ) ) {
@@ -109,19 +102,16 @@ class List_Filters implements Integration_Interface {
 			}
 
 			if ( isset( $ad_option['type'] ) && 'adsense' === $ad_option['type'] ) {
-				$content = $this->all_ads[ array_search( $post->ID, wp_list_pluck( $this->all_ads, 'ID' ), true ) ]->post_content;
-				try {
-					$adsense_obj = json_decode( $content, true );
-				} catch ( Exception $e ) {
-					$adsense_obj = false;
-				}
+				$content     = $this->all_ads[ array_search( $post->ID, wp_list_pluck( $this->all_ads, 'ID' ), true ) ]->post_content;
+				$adsense_obj = is_string( $content ) ? json_decode( $content, true ) : null;
 
-				if ( $adsense_obj ) {
-					if ( ! empty( $adsense_obj['unitType'] ) && 'responsive' === $adsense_obj['unitType'] ) {
-						if ( ! array_key_exists( 'responsive', $all_filters['all_sizes'] ) ) {
-							$all_filters['all_sizes']['responsive'] = __( 'Responsive', 'advanced-ads' );
-						}
-					}
+				if (
+					is_array( $adsense_obj )
+					&& ! empty( $adsense_obj['unitType'] )
+					&& 'responsive' === $adsense_obj['unitType']
+					&& ! array_key_exists( 'responsive', $all_filters['all_sizes'] )
+				) {
+					$all_filters['all_sizes']['responsive'] = __( 'Responsive', 'advanced-ads' );
 				}
 			}
 
@@ -143,6 +133,8 @@ class List_Filters implements Integration_Interface {
 	 * Collects all ads data.
 	 *
 	 * @param WP_Post[] $posts array of ads.
+	 *
+	 * @return void
 	 */
 	public function collect_all_ads( $posts ) {
 		$ad_summaries = wp_advads_get_ad_summaries();
@@ -154,13 +146,15 @@ class List_Filters implements Integration_Interface {
 
 		foreach ( $posts as $post ) {
 			$this->all_ads_options[ $post->ID ] = get_post_meta( $post->ID, 'advanced_ads_ad_options', true );
-			if ( empty( $this->all_ads_options[ $post->ID ] ) ) {
+
+			// Handle invalid or legacy meta values.
+			if ( ! is_array( $this->all_ads_options[ $post->ID ] ) ) {
 				$this->all_ads_options[ $post->ID ] = [];
 			}
 
 			if ( isset( $ad_summaries[ $post->ID ] ) ) {
-				$this->all_ads_options[ $post->ID ]['type']        = $ad_summaries[ $post->ID ]['type'];
-				$this->all_ads_options[ $post->ID ]['expiry_date'] = $ad_summaries[ $post->ID ]['expiry_date'];
+				$this->all_ads_options[ $post->ID ]['type']        = $ad_summaries[ $post->ID ]['type'] ?? '';
+				$this->all_ads_options[ $post->ID ]['expiry_date'] = $ad_summaries[ $post->ID ]['expiry_date'] ?? '';
 			}
 		}
 
@@ -169,8 +163,10 @@ class List_Filters implements Integration_Interface {
 
 	/**
 	 * Collects all ads groups, fills the $all_groups class property.
+	 *
+	 * @return void
 	 */
-	private function collect_all_groups() {
+	private function collect_all_groups(): void {
 		$groups = [];
 
 		foreach ( wp_advads_get_group_summaries() as $group_id => $summary ) {
@@ -192,6 +188,8 @@ class List_Filters implements Integration_Interface {
 
 	/**
 	 * Retrieve the stored ads list.
+	 *
+	 * @return array<int|string, mixed>
 	 */
 	public function get_all_ads() {
 		return $this->all_ads;
@@ -199,6 +197,8 @@ class List_Filters implements Integration_Interface {
 
 	/**
 	 * Retrieve all filters that can be applied.
+	 *
+	 * @return array<int|string, mixed>
 	 */
 	public function get_all_filters() {
 		return $this->all_filters;
@@ -207,23 +207,16 @@ class List_Filters implements Integration_Interface {
 	/**
 	 * Remove limits because we need to get all ads.
 	 *
-	 * @param string   $limits The LIMIT clause of the query.
-	 * @param WP_Query $the_query the current WP_Query object.
+	 * @param string    $limits    The LIMIT clause of the query.
+	 * @param \WP_Query $the_query The current WP_Query object.
 	 * @return string $limits The LIMIT clause of the query.
 	 */
 	public function limit_filter( $limits, $the_query ) {
-		// Execute only in the main query.
-		if ( ! $the_query->is_main_query() ) {
+		if ( ! $this->is_ad_list_main_query( $the_query ) ) {
 			return $limits;
 		}
 
-		if ( ! function_exists( 'get_current_screen' ) ) {
-			return $limits;
-		}
-
-		$screen = get_current_screen();
-		// Execute only in the ad list page.
-		if ( ! $screen || 'edit-advanced_ads' !== $screen->id ) {
+		if ( ! $this->needs_unpaginated_results() ) {
 			return $limits;
 		}
 
@@ -239,14 +232,7 @@ class List_Filters implements Integration_Interface {
 	 * @return array<int, \WP_Post> with posts
 	 */
 	public function post_results( $posts, $the_query ): array {
-		// Execute only in the main query.
-		if ( ! function_exists( 'get_current_screen' ) || ! $the_query->is_main_query() ) {
-			return $posts;
-		}
-
-		$screen = get_current_screen();
-		// Execute only in the ad list page.
-		if ( ! $screen || 'edit-advanced_ads' !== $screen->id ) {
+		if ( ! $this->is_ad_list_main_query( $the_query ) ) {
 			return $posts;
 		}
 
@@ -278,6 +264,15 @@ class List_Filters implements Integration_Interface {
 		$this->collect_all_ads( $posts );
 		$this->collect_all_groups();
 
+		// DB pagination: skip PHP filter/slice when no Advanced Ads–specific filters are active.
+		if ( ! $this->needs_unpaginated_results() ) {
+			$this->collect_filters_from_catalog();
+			$posts            = apply_filters( 'advanced-ads-ad-list-filter', $posts, $this->all_ads_options );
+			$the_query->posts = $posts;
+
+			return $posts;
+		}
+
 		$new_posts = Params::request( 'post_status' ) === 'trash'
 			? $posts
 			: $this->ad_filters( $this->all_ads, $the_query );
@@ -296,6 +291,128 @@ class List_Filters implements Integration_Interface {
 		$the_query->posts = $new_posts;
 
 		return $new_posts;
+	}
+
+	/**
+	 * Whether the query is the main ads list table query.
+	 *
+	 * @param \WP_Query $the_query Query object.
+	 * @return bool
+	 */
+	private function is_ad_list_main_query( $the_query ): bool {
+		if ( ! $the_query->is_main_query() || ! function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+
+		$screen = get_current_screen();
+
+		return $screen && 'edit-advanced_ads' === $screen->id;
+	}
+
+	/**
+	 * Whether custom list filters require loading every ad into PHP — author / post_status / search are left to WP_Query, but add-ons that filter in `advanced-ads-ad-list-filter` and need the full set can force this via `advanced-ads-ad-list-needs-unpaginated-results`.
+	 *
+	 * @return bool
+	 */
+	private function needs_unpaginated_results(): bool {
+		$request = wp_unslash( $_REQUEST ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		foreach ( [ 'adgroup', 'adtype', 'adsize', 'addate' ] as $key ) {
+			if ( isset( $request[ $key ] ) && '' !== (string) $request[ $key ] ) {
+				return true;
+			}
+		}
+
+		foreach ( [ 'ad_debugmode', 'ad_displayonce', 'ad_privacyignore' ] as $key ) {
+			if ( Params::request( $key, false ) ) {
+				return true;
+			}
+		}
+
+		if (
+			isset( $request['taxonomy'], $request['term'] )
+			&& Constants::TAXONOMY_GROUP === $request['taxonomy']
+			&& '' !== (string) $request['term']
+		) {
+			return true;
+		}
+
+		/**
+		 * Force the load-all / PHP-filter path for the ads list.
+		 *
+		 * @param bool  $needed  Whether unpaginated results are required.
+		 * @param array $request Request parameters.
+		 */
+		return (bool) apply_filters( 'advanced-ads-ad-list-needs-unpaginated-results', false, $request );
+	}
+
+	/**
+	 * Build filter dropdown data without iterating every list-table post.
+	 *
+	 * @return void
+	 */
+	private function collect_filters_from_catalog(): void {
+		$all_filters = [
+			'all_sizes'   => [],
+			'all_types'   => [],
+			'all_dates'   => [],
+			'all_groups'  => [],
+			'all_authors' => $this->collect_authors(),
+		];
+
+		if ( Params::request( 'post_status' ) === 'trash' ) {
+			$this->all_filters = $all_filters;
+			return;
+		}
+
+		foreach ( $this->all_groups as $group_id => $group ) {
+			$all_filters['all_groups'][ $group_id ] = $group['name'];
+		}
+
+		$summaries = wp_advads_get_ad_summaries();
+		$post_ids  = array_keys( $summaries );
+
+		if ( ! empty( $post_ids ) ) {
+			update_meta_cache( 'post', $post_ids );
+		}
+
+		foreach ( $summaries as $ad_id => $summary ) {
+			$type = $summary['type'] ?? '';
+			if (
+				'' !== $type
+				&& ! array_key_exists( $type, $all_filters['all_types'] )
+				&& wp_advads_has_ad_type( $type )
+			) {
+				$all_filters['all_types'][ $type ] = wp_advads_get_ad_type( $type )->get_title();
+			}
+
+			$ad_option = get_post_meta( (int) $ad_id, 'advanced_ads_ad_options', true );
+			if ( ! is_array( $ad_option ) ) {
+				$ad_option = [];
+			}
+
+			if ( ! empty( $ad_option['width'] ) && ! empty( $ad_option['height'] ) ) {
+				$size_key = $ad_option['width'] . 'x' . $ad_option['height'];
+				if ( ! array_key_exists( $size_key, $all_filters['all_sizes'] ) ) {
+					$all_filters['all_sizes'][ $size_key ] = $ad_option['width'] . ' x ' . $ad_option['height'];
+				}
+			}
+
+			if ( 'adsense' === $type && ! array_key_exists( 'responsive', $all_filters['all_sizes'] ) ) {
+				$content = get_post_field( 'post_content', (int) $ad_id );
+				$decoded = is_string( $content ) ? json_decode( $content, true ) : null;
+				if ( is_array( $decoded ) && ! empty( $decoded['unitType'] ) && 'responsive' === $decoded['unitType'] ) {
+					$all_filters['all_sizes']['responsive'] = __( 'Responsive', 'advanced-ads' );
+				}
+			}
+		}
+
+		foreach ( $this->all_ads as $post ) {
+			$ad_option   = $this->all_ads_options[ $post->ID ] ?? [];
+			$all_filters = apply_filters( 'advanced-ads-ad-list-column-filter', $all_filters, $post, $ad_option );
+		}
+
+		$this->all_filters = $all_filters;
 	}
 
 	/**
@@ -397,53 +514,25 @@ class List_Filters implements Integration_Interface {
 			$using_original         = false;
 		}
 
-		/**
-		 * Filter debug mode
-		 */
-		$debugmode = Params::request( 'ad_debugmode', false );
-		if ( $debugmode ) {
-			$posts = array_filter(
-				$using_original ? $this->all_ads : $posts,
-				function ( $post ) use ( $debugmode ) {
-					$option = $this->all_ads_options[ $post->ID ]['debugmode'] ?? '';
-					return ( 'yes' === $debugmode && ! empty( $option ) ) || ( 'no' === $debugmode && empty( $option ) );
-				}
-			);
+		$bool_option_filters = [
+			'ad_debugmode'     => static function ( $options ) {
+				return $options['debugmode'] ?? '';
+			},
+			'ad_displayonce'   => static function ( $options ) {
+				return $options['once_per_page'] ?? '';
+			},
+			'ad_privacyignore' => static function ( $options ) {
+				return $options['privacy']['ignore-consent'] ?? '';
+			},
+		];
 
-			$the_query->found_posts = count( $posts );
-			$using_original         = false;
-		}
+		foreach ( $bool_option_filters as $request_key => $get_option ) {
+			$filtered = $this->filter_posts_by_bool_option( $posts, $using_original, $request_key, $get_option );
+			if ( null === $filtered ) {
+				continue;
+			}
 
-		/**
-		 * Filter displayonce
-		 */
-		$displayonce = Params::request( 'ad_displayonce', false );
-		if ( $displayonce ) {
-			$posts = array_filter(
-				$using_original ? $this->all_ads : $posts,
-				function ( $post ) use ( $displayonce ) {
-					$option = $this->all_ads_options[ $post->ID ]['once_per_page'] ?? '';
-					return ( 'yes' === $displayonce && ! empty( $option ) ) || ( 'no' === $displayonce && empty( $option ) );
-				}
-			);
-
-			$the_query->found_posts = count( $posts );
-			$using_original         = false;
-		}
-
-		/**
-		 * Filter privacyignore
-		 */
-		$privacyignore = Params::request( 'ad_privacyignore', false );
-		if ( $privacyignore ) {
-			$posts = array_filter(
-				$using_original ? $this->all_ads : $posts,
-				function ( $post ) use ( $privacyignore ) {
-					$option = $this->all_ads_options[ $post->ID ]['privacy']['ignore-consent'] ?? '';
-					return ( 'yes' === $privacyignore && ! empty( $option ) ) || ( 'no' === $privacyignore && empty( $option ) );
-				}
-			);
-
+			$posts                  = $filtered;
 			$the_query->found_posts = count( $posts );
 			$using_original         = false;
 		}
@@ -458,13 +547,8 @@ class List_Filters implements Integration_Interface {
 				$option = $this->all_ads_options[ $post->ID ];
 				if ( 'responsive' === $request['adsize'] ) {
 					if ( isset( $option['type'] ) && 'adsense' === $option['type'] ) {
-						$content = false;
-						try {
-							$content = json_decode( $post->post_content, true );
-						} catch ( Exception $e ) {
-							$content = false;
-						}
-						if ( $content && 'responsive' === $content['unitType'] ) {
+						$content = json_decode( $post->post_content, true );
+						if ( is_array( $content ) && isset( $content['unitType'] ) && 'responsive' === $content['unitType'] ) {
 							$new_posts[] = $post;
 						}
 					}
@@ -494,6 +578,32 @@ class List_Filters implements Integration_Interface {
 		$this->collect_filters( $posts );
 
 		return $posts;
+	}
+
+	/**
+	 * Filter posts by a yes/no request flag against an ad option value.
+	 *
+	 * @param array    $posts          Current post list.
+	 * @param bool     $using_original Whether to filter from the full ads list.
+	 * @param string   $request_key    Request parameter name.
+	 * @param callable $get_option     Receives ad options array; returns the compared value.
+	 *
+	 * @return array|null Filtered posts, or null when the request filter is inactive.
+	 */
+	private function filter_posts_by_bool_option( array $posts, bool $using_original, string $request_key, callable $get_option ): ?array {
+		$flag = Params::request( $request_key, false );
+		if ( ! $flag ) {
+			return null;
+		}
+
+		return array_filter(
+			$using_original ? $this->all_ads : $posts,
+			function ( $post ) use ( $flag, $get_option ) {
+				$option = $get_option( $this->all_ads_options[ $post->ID ] ?? [] );
+
+				return ( 'yes' === $flag && ! empty( $option ) ) || ( 'no' === $flag && empty( $option ) );
+			}
+		);
 	}
 
 	/**

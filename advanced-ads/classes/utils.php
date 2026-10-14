@@ -58,9 +58,9 @@ class Advanced_Ads_Utils {
 				$_style_values_string = '';
 				foreach ( $_values as $_style_attr => $_style_values ) {
 					if ( is_array( $_style_values ) ) {
-						$_style_values_string .= $_style_attr . ': ' . implode( ' ', array_filter( $_style_values ) ) . ';';
+						$_style_values_string .= esc_attr( $_style_attr ) . ': ' . esc_attr( implode( ' ', array_filter( $_style_values ) ) ) . ';';
 					} else {
-						$_style_values_string .= $_style_attr . ': ' . $_style_values . ';';
+						$_style_values_string .= esc_attr( $_style_attr ) . ': ' . esc_attr( $_style_values ) . ';';
 					}
 				}
 				$result .= " style=\"$_style_values_string\"";
@@ -102,8 +102,8 @@ class Advanced_Ads_Utils {
 	/**
 	 * Get nested ads of an ad or a group.
 	 *
-	 * @param string $id Id.
-	 * @param string $type Type (placement, ad or group).
+	 * @param int|string $id Id.
+	 * @param string     $type Type (placement, ad or group).
 	 *
 	 * @return array<int, \AdvancedAds\Abstracts\Ad> of Ad objects.
 	 */
@@ -141,7 +141,10 @@ class Advanced_Ads_Utils {
 				break;
 			case 'group':
 				$group = wp_advads_get_group( $id );
-				$ads   = $group->get_ads();
+				if ( ! $group ) {
+					break;
+				}
+				$ads = $group->get_ads();
 				foreach ( $ads as $ad ) {
 					$result = array_merge( $result, self::get_nested_ads( $ad->get_id(), 'ad' ) );
 				}
@@ -154,7 +157,7 @@ class Advanced_Ads_Utils {
 	/**
 	 * Maybe translate a capability to a set of roles.
 	 *
-	 * @param string/array $roles_or_caps A set of roles or capabilities.
+	 * @param string|array $roles_or_caps A set of roles or capabilities.
 	 * @return array<int, string> $roles A list of roles.
 	 */
 	public static function maybe_translate_cap_to_role( $roles_or_caps ) {
@@ -177,70 +180,6 @@ class Advanced_Ads_Utils {
 		}
 
 		return array_unique( $roles );
-	}
-
-	/**
-	 * Check if the page is loaded in an iframe.
-	 *
-	 * @return bool
-	 */
-	public static function is_iframe() {
-		if ( is_customize_preview() ) {
-			return true;
-		}
-
-		if ( self::is_elementor_preview_or_edit() ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Check if the Elementor preview mode is used.
-	 *
-	 * @deprecated
-	 *
-	 * @return bool
-	 */
-	private static function is_elementor_preview_or_edit() {
-		if ( class_exists( '\Elementor\Plugin' ) ) {
-			try {
-				$refl_plugin = new ReflectionClass( '\Elementor\Plugin' );
-
-				if ( $refl_plugin->hasMethod( 'instance' ) ) {
-					$refl_instance_method = $refl_plugin->getMethod( 'instance' );
-
-					if ( $refl_instance_method->isPublic() && $refl_instance_method->isStatic() ) {
-
-						if ( class_exists( '\Elementor\Preview' ) && $refl_plugin->hasProperty( 'preview' ) ) {
-							$preview_property = new ReflectionProperty( '\Elementor\Plugin', 'preview' );
-
-							if ( $preview_property->isPublic() && ! $preview_property->isStatic() ) {
-								if ( method_exists( '\Elementor\Preview', 'is_preview_mode' )
-									&& \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
-									return true;
-								}
-							}
-						}
-
-						if ( class_exists( '\Elementor\Editor' ) && $refl_plugin->hasProperty( 'editor' ) ) {
-							$editor_property = new ReflectionProperty( '\Elementor\Plugin', 'editor' );
-
-							if ( $editor_property->isPublic() && ! $editor_property->isStatic() ) {
-								if ( method_exists( '\Elementor\Editor', 'is_edit_mode' )
-									&& \Elementor\Plugin::$instance->editor->is_edit_mode() ) {
-									return true;
-								}
-							}
-						}
-					}
-				}
-			} catch ( Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-				// not much we can do here.
-			}
-		}
-		return false;
 	}
 
 	/**

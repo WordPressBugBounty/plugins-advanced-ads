@@ -52,8 +52,7 @@ trait Extras {
 			$frontend_prefix = $options['front-prefix'];
 		}
 		/**
-		 * Applying the filter here makes sure that it is the same frontend prefix for all
-		 * calls on this page impression
+		 * Applying the filter here makes sure that it is the same frontend prefix for all calls on this page impression.
 		 *
 		 * @param string $frontend_prefix
 		 */

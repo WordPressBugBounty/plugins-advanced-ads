@@ -159,6 +159,8 @@ class Shortcode_Creator implements Integration_Interface {
 	 * @return void
 	 */
 	public function get_content_for_shortcode_creator(): void {
+		check_ajax_referer( 'advanced-ads-admin-ajax-nonce', 'nonce' );
+
 		if ( ! ( current_user_can( 'edit_posts' ) || current_user_can( 'edit_pages' ) ) ) {
 			return;
 		}
@@ -170,7 +172,7 @@ class Shortcode_Creator implements Integration_Interface {
 	/**
 	 * Check if needed actions have not been removed by a plugin.
 	 *
-	 * @return array<int, string>
+	 * @return bool
 	 */
 	private function hooks_exist() {
 		if (

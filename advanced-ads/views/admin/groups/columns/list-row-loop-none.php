@@ -8,6 +8,8 @@
  * @var Group $group Group instance.
  */
 
+use AdvancedAds\Abstracts\Group;
+
 esc_html_e( 'No ads assigned', 'advanced-ads' );
 ?>
 <br/>

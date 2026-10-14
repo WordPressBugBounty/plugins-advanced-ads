@@ -18,10 +18,10 @@ if ( ! Conditional::is_amp() ) :
 		echo Advanced_Ads_Utils::get_inline_asset( ob_get_clean() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 endif;
 ?>
-<div id="<?php echo esc_attr( $wrapper_id ); ?>" style="<?php echo esc_attr( $style ); ?>">
+<div id="<?php echo esc_attr( $wrapper_id ); ?>" style="<?php echo esc_attr( $style ); ?>" tabindex="0" role="region" aria-label="<?php esc_attr_e( 'Ad debug output', 'advanced-ads' ); ?>">
 	<strong><?php esc_html_e( 'Ad debug output', 'advanced-ads' ); ?></strong>
 	<br><br>
 	<?php echo implode( '<br><br>', $content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	<br><br>
-	<a style="color: green;" href="https://wpadvancedads.com/manual/ad-debug-mode/?utm_source=advanced-ads&utm_medium=link&utm_campaign=ad-debug-mode" target="_blank" rel="nofollow"><?php esc_html_e( 'Find solutions in the manual', 'advanced-ads' ); ?></a>
+	<a style="color: #006400;" href="https://wpadvancedads.com/manual/ad-debug-mode/?utm_source=advanced-ads&utm_medium=link&utm_campaign=ad-debug-mode" target="_blank" rel="nofollow"><?php esc_html_e( 'Find solutions in the manual', 'advanced-ads' ); ?></a>
 </div>

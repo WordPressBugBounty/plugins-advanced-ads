@@ -20,6 +20,7 @@ use AdvancedAds\Interfaces\Group_Type;
 use AdvancedAds\Traits;
 use AdvancedAds\Utilities\Addons;
 use AdvancedAds\Utilities\Conditional;
+use WP_Term;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -64,14 +65,14 @@ class Group extends Data implements Entity_Interface {
 	/**
 	 * Hold ads within the group
 	 *
-	 * @var Ad[]
+	 * @var Ad[]|null
 	 */
 	private $ads = null;
 
 	/**
 	 * Hold sorted ads within the group
 	 *
-	 * @var Ad[]
+	 * @var array<int, array<string, int|string>>|null
 	 */
 	private $sorted_ads = null;
 
@@ -203,8 +204,7 @@ class Group extends Data implements Entity_Interface {
 		if ( defined( 'ICL_SITEPRESS_VERSION' ) && $sitepress ) {
 			foreach ( $weights as $ad_id => $weight ) {
 				/**
-				 * Deliver the translated version of an ad if set up with WPML.
-				 * If an ad is not translated, show the ad in the original language when this is the selected option in the WPML settings.
+				 * Deliver the translated version of an ad if set up with WPML — if an ad is not translated, show the ad in the original language when this is the selected option in the WPML settings.
 				 *
 				 * @source https://wpml.org/wpml-hook/wpml_object_id/
 				 * @source https://wpml.org/forums/topic/backend-custom-post-types-page-overview-with-translation-options/
@@ -543,18 +543,9 @@ class Group extends Data implements Entity_Interface {
 	}
 
 	/**
-	 * Get ads ids attached to the group
-	 *
-	 * @return array<int, int>
-	 */
-	public function get_ads_ids(): array {
-		return array_keys( $this->get_ad_weights() );
-	}
-
-	/**
 	 * Order the ad list by weight first and then by title.
 	 *
-	 * @return array<int, int>
+	 * @return array<int, array<string, int|string>>
 	 */
 	public function get_sorted_ads(): array {
 		if ( null !== $this->sorted_ads ) {

@@ -10,6 +10,7 @@
 namespace AdvancedAds;
 
 use AdvancedAds\Framework\Utilities\Arr;
+use AdvancedAds\Utilities\Sanitize;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -84,9 +85,7 @@ class Options {
 	}
 
 	/**
-	 * Sets the value of a specific option.
-	 *
-	 * It checks if the method to set the option exists in the instance of the class and calls it if it does.
+	 * Sets the value of a specific option — checks if the method to set the option exists in the instance of the class and calls it if it does.
 	 *
 	 * @param string               $key    Option suffix (advanced-ads-XXX).
 	 * @param array<string, mixed> $value  The value to set.
@@ -184,29 +183,10 @@ class Options {
 		foreach ( $options as $key => $value ) {
 			$option[ $key ] = is_array( $value )
 				? $this->normalize_option( $value )
-				: $this->normalize_value( $value );
+				: Sanitize::normalize_value( $value );
 		}
 
 		return $option;
-	}
-
-	/**
-	 * Normalizes a given value.
-	 *
-	 * @param mixed $value Value to be normalized.
-	 *
-	 * @return mixed The normalized value.
-	 */
-	private function normalize_value( $value ) {
-		if ( 'true' === $value || 'on' === $value ) {
-			$value = true;
-		} elseif ( 'false' === $value || 'off' === $value ) {
-			$value = false;
-		} elseif ( '0' === $value || '1' === $value ) {
-			$value = intval( $value );
-		}
-
-		return $value;
 	}
 
 	/**
@@ -214,7 +194,7 @@ class Options {
 	 *
 	 * @param string $key Key to be normalized.
 	 *
-	 * @return array<string, mixed> The normalized key as an array.
+	 * @return array<int, string> The normalized key as an array.
 	 */
 	private function normalize_key( $key ) {
 		$key = trim( $key, '.' );

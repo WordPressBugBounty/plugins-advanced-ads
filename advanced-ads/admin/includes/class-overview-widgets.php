@@ -1,6 +1,7 @@
 <?php // phpcs:ignore WordPress.Files.FileName.InvalidClassFileName
 
 use AdvancedAds\Admin\Translation_Promo;
+use AdvancedAds\Modules\AdSense\Utils;
 use AdvancedAds\Utilities\WordPress;
 
 /**
@@ -30,6 +31,8 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 
 	/**
 	 * Register the plugin overview widgets
+	 *
+	 * @return void
 	 */
 	public static function setup_overview_widgets() {
 
@@ -62,11 +65,8 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 			'render_support'
 		);
 
-		if (
-			Advanced_Ads_AdSense_Data::get_instance()->is_setup() &&
-			! Advanced_Ads_AdSense_Data::get_instance()->is_hide_stats()
-		) {
-			$disable_link_markup = '<span class="advads-hndlelinks hndle"><a href="' . esc_url( admin_url( 'admin.php?page=advanced-ads-settings#top#adsense' ) ) . '" target="_blank">' . esc_attr__( 'Disable', 'advanced-ads' ) . '</a></span>';
+		if ( Utils::can_show_stats() ) {
+			$disable_link_markup = '<span class="advads-hndlelinks hndle"><a href="' . esc_url( admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=adsense' ) ) . '" target="_blank">' . esc_attr__( 'Disable', 'advanced-ads' ) . '</a></span>';
 
 			self::add_meta_box(
 				'advads_overview_adsense_stats',
@@ -85,10 +85,12 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 	/**
 	 * Loads a meta box into output
 	 *
-	 * @param string   $id meta box ID.
-	 * @param string   $title title of the meta box.
-	 * @param string   $position context in which to show the box.
-	 * @param callable $callback function that fills the box with the desired content.
+	 * @param string $id meta box ID.
+	 * @param string $title title of the meta box.
+	 * @param string $position context in which to show the box.
+	 * @param string $callback name of the method in Advanced_Ads_Overview_Widgets_Callbacks that fills the box.
+	 *
+	 * @return void
 	 */
 	public static function add_meta_box( $id, $title, $position, $callback ) {
 		ob_start();
@@ -101,6 +103,8 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 
 	/**
 	 * Render Ad Health notices widget
+	 *
+	 * @return void
 	 */
 	public static function render_notices() {
 		Advanced_Ads_Ad_Health_Notices::get_instance()->render_widget();
@@ -111,6 +115,8 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 
 	/**
 	 * Render next steps widget
+	 *
+	 * @return void
 	 */
 	public static function render_next_steps() {
 		include ADVADS_ABSPATH . 'views/admin/widgets/aa-dashboard/next-steps/widget.php';
@@ -118,6 +124,8 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 
 	/**
 	 * Support widget
+	 *
+	 * @return void
 	 */
 	public static function render_support() {
 		include ADVADS_ABSPATH . 'views/admin/widgets/aa-dashboard/support.php';
@@ -126,6 +134,8 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 
 	/**
 	 * Adsense stats widget
+	 *
+	 * @return void
 	 */
 	public static function render_adsense_stats() {
 		$report_type   = 'domain';
@@ -147,7 +157,7 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 	 *
 	 * @param string $pub_id AdSense publisher ID.
 	 *
-	 * @return string
+	 * @return void
 	 * @todo move to JS file.
 	 */
 	final public static function adsense_stats_js( $pub_id ) {
@@ -181,6 +191,8 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 	/**
 	 * This method is called when the dashboard data is requested via ajax
 	 * it prints the relevant data as json, then dies.
+	 *
+	 * @return void
 	 */
 	public static function ajax_gadsense_dashboard() {
 		$post_data = wp_unslash( $_POST );
@@ -207,30 +219,6 @@ class Advanced_Ads_Overview_Widgets_Callbacks {
 		$error_message = $report->get_last_api_error();
 		// Send markup with error info.
 		wp_send_json_success( [ 'html' => '<div class="error"><p>' . wp_kses_post( $error_message ) . '</p></div>' ] );
-	}
-
-	/**
-	 * Render stats box
-	 *
-	 * @param string $title title of the box.
-	 * @param string $main main content.
-	 * @param string $footer footer content.
-	 *
-	 * @deprecated ?
-	 */
-	final public static function render_stats_box( $title, $main, $footer ) {
-		?>
-		<div class="advanced-ads-stats-box flex1">
-			<?php echo $title; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<div class="advanced-ads-stats-box-main">
-				<?php
-				// phpcs:ignore
-				echo $main;
-				?>
-			</div>
-			<?php echo $footer; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		</div>
-		<?php
 	}
 
 	/**

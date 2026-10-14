@@ -10,11 +10,11 @@
 namespace AdvancedAds\Abstracts;
 
 use AdvancedAds\Constants;
-use AdvancedAds\Framework\Utilities\Formatting;
 use AdvancedAds\Frontend\Stats;
 use AdvancedAds\Interfaces\Entity_Interface;
 use AdvancedAds\Traits;
 use RuntimeException;
+use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -149,7 +149,7 @@ class Placement extends Data implements Entity_Interface {
 	/**
 	 * Set display conditions.
 	 *
-	 * @param string $conditions Placement conditions.
+	 * @param array<int|string, mixed> $conditions Placement conditions.
 	 *
 	 * @return void
 	 */
@@ -160,7 +160,7 @@ class Placement extends Data implements Entity_Interface {
 	/**
 	 * Set conditions.
 	 *
-	 * @param string $conditions Placement conditions.
+	 * @param array<int|string, mixed> $conditions Placement conditions.
 	 *
 	 * @return void
 	 */
@@ -171,37 +171,12 @@ class Placement extends Data implements Entity_Interface {
 	/* Conditional ------------------- */
 
 	/**
-	 * Check if placement item is allowed
-	 *
-	 * @return bool
-	 */
-	public function is_item_allowed(): bool {
-		$item_object = $this->get_item_object();
-		if ( empty( $item_object ) ) {
-			return false;
-		}
-
-		return $this->get_type_object()
-			->is_entity_allowed( $item_object->get_type(), $this->get_item_type() );
-	}
-
-	/**
 	 * Determines whether the placement can be displayed.
 	 *
 	 * @return bool True if the placement can be displayed, false otherwise.
 	 */
 	public function can_display(): bool {
 		return apply_filters( 'advanced-ads-can-display-placement', true, $this->get_id(), $this );
-	}
-
-	/**
-	 * Determines whether the placement has cache busting enabled.
-	 *
-	 * @return bool
-	 */
-	public function has_cache_busting(): bool {
-		$value = $this->get_prop( 'cache-busting' );
-		return 'auto' === $value || Formatting::string_to_bool( $value );
 	}
 
 	/* Additional Methods ------------------- */
@@ -262,7 +237,7 @@ class Placement extends Data implements Entity_Interface {
 	/**
 	 * Prepares the output for the placement.
 	 *
-	 * @return mixed The prepared output or the overridden return value.
+	 * @return string The prepared output or the overridden return value.
 	 */
 	public function prepare_output(): string {
 		// Early bail!!
@@ -368,10 +343,9 @@ class Placement extends Data implements Entity_Interface {
 
 		list( 'type' => $item_type, 'id' => $item_id ) = $this->get_item_parts( $this->get_item() );
 
-		if ( Constants::ENTITY_AD === $item_type && defined( 'ICL_SITEPRESS_VERSION' ) ) {
+		if ( Constants::ENTITY_AD === $item_type && defined( 'ICL_SITEPRESS_VERSION' ) && $sitepress ) {
 			/**
-			 * Deliver the translated version of an ad if set up with WPML.
-			 * If an ad is not translated, show the ad in the original language when this is the selected option in the WPML settings.
+			 * Deliver the translated version of an ad if set up with WPML — if an ad is not translated, show the ad in the original language when this is the selected option in the WPML settings.
 			 *
 			 * @source https://wpml.org/wpml-hook/wpml_object_id/
 			 * @source https://wpml.org/forums/topic/backend-custom-post-types-page-overview-with-translation-options/
@@ -412,7 +386,7 @@ class Placement extends Data implements Entity_Interface {
 	 *
 	 * @param string $item Placement item.
 	 *
-	 * @return array<int, string>
+	 * @return array{type: string, id: int}
 	 */
 	private function get_item_parts( $item ): array {
 		$item_parts = explode( '_', $item );

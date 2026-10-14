@@ -31,14 +31,14 @@ $close_validation_object = [
 		<?php endif; ?>
 	} );
 </script>
-<dialog id="modal-<?php echo esc_attr( $modal_slug ); ?>" class="advads-modal" data-modal-id="<?php echo esc_attr( $modal_slug ); ?>" autofocus>
-	<a href="#close" class="advads-modal-close-background">Close</a>
+<dialog id="modal-<?php echo esc_attr( $modal_slug ); ?>" class="advads-modal" data-modal-id="<?php echo esc_attr( $modal_slug ); ?>" aria-labelledby="modal-<?php echo esc_attr( $modal_slug ); ?>-title" autofocus>
+	<a href="#close" class="advads-modal-close-background" tabindex="-1" aria-hidden="true">Close</a>
 	<div class="advads-modal-content">
 		<div class="advads-modal-header">
-			<h2>
+			<h2 id="modal-<?php echo esc_attr( $modal_slug ); ?>-title">
 				<?php echo esc_html( $modal_title ); ?>
 			</h2>
-			<a href="#close" class="advads-modal-close" title="<?php esc_html_e( 'Cancel', 'advanced-ads' ); ?>">
+			<a href="#close" class="advads-modal-close" title="<?php esc_attr_e( 'Cancel', 'advanced-ads' ); ?>" aria-label="<?php esc_attr_e( 'Cancel', 'advanced-ads' ); ?>">
 				<span class="dashicons dashicons-no-alt"></span>
 			</a>
 		</div>

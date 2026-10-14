@@ -8,28 +8,24 @@
  *
  * Content:
  *   1. Template
- *   2. Repositories functions
- *   3. CRUD functions
- *   4. Conditional functions
- *   5. Getter functions
- *   6. Finder functions
+ *   2. CRUD functions
+ *   3. Conditional functions
+ *   4. Getter functions
+ *   5. Finder functions
  */
 
 use AdvancedAds\Abstracts\Placement;
 use AdvancedAds\Constants;
 use AdvancedAds\Interfaces\Placement_Type;
-use AdvancedAds\Placements\Placement_Factory;
-use AdvancedAds\Placements\Placement_Repository;
-use AdvancedAds\Placements\Placement_Types;
 
 /* 1. Template ------------------- */
 
 /**
  * Get the placement object.
  *
- * @param Placement|WP_Post|int|bool $placement_id Placement instance, post instance, numeric or false to use global $post.
- * @param string                     $new_type     Change type of placement.
- * @param array<string, mixed>       $args         Additional arguments.
+ * @param Placement|WP_Post|int|string|bool $placement_id Placement instance, post instance, numeric or false to use global $post.
+ * @param string                            $new_type     Change type of placement.
+ * @param array<string, mixed>              $args         Additional arguments.
  *
  * @return string|mixed placement output string or an entity.
  */
@@ -66,8 +62,8 @@ function get_the_placement( $placement_id = 0, $new_type = '', $args = [] ) {
  *
  * @since 1.1.0
  *
- * @param Placement|WP_Post|int|bool $placement_id Placement instance, post instance, numeric or false to use global $post.
- * @param array<string, mixed>       $args         Additional arguments.
+ * @param Placement|WP_Post|int|string|bool $placement_id Placement instance, post instance, numeric or false to use global $post.
+ * @param array<string, mixed>              $args         Additional arguments.
  *
  * @return void
  */
@@ -75,42 +71,7 @@ function the_ad_placement( $placement_id = '', $args = [] ): void {
 	echo get_the_placement( $placement_id, '', $args ); // phpcs:ignore
 }
 
-/* 2. Repositories ------------------- */
-
-/**
- * Get Placement Factory
- *
- * @deprecated 2.0.24 Use wp_advads()->placements->factory instead.
- *
- * @return Placement_Factory
- */
-function wp_advads_get_placement_factory(): Placement_Factory {
-	return wp_advads()->placements->factory;
-}
-
-/**
- * Get Placement Repository
- *
- * @deprecated 2.0.24 Use wp_advads()->placements->repository instead.
- *
- * @return Placement_Repository
- */
-function wp_advads_get_placement_repository(): Placement_Repository {
-	return wp_advads()->placements->repository;
-}
-
-/**
- * Get Placement Types
- *
- * @deprecated 2.0.24 Use wp_advads()->placements->types instead.
- *
- * @return Placement_Types
- */
-function wp_advads_get_placement_type_manager(): Placement_Types {
-	return wp_advads()->placements->types;
-}
-
-/* 3. CRUD ------------------- */
+/* 2. CRUD ------------------- */
 
 /**
  * Create an empty placement object
@@ -129,6 +90,8 @@ function wp_advads_create_new_placement( $type = 'default' ) {
  * @param int|Placement $placement    Placement object or id.
  * @param bool          $force_delete Whether to bypass Trash and force deletion. Default false.
  *
+ * @param-out Placement|bool $placement The placement object, or false when no placement has that id.
+ *
  * @return void
  */
 function wp_advads_delete_placement( &$placement, $force_delete = false ): void {
@@ -136,7 +99,9 @@ function wp_advads_delete_placement( &$placement, $force_delete = false ): void 
 		$placement = wp_advads_get_placement( $placement );
 	}
 
-	$placement->delete( $force_delete );
+	if ( $placement ) {
+		$placement->delete( $force_delete );
+	}
 }
 
 /**
@@ -150,18 +115,7 @@ function wp_advads_create_placement_type( $type ): void {
 	wp_advads()->placements->types->create_missing( $type );
 }
 
-/**
- * Register custom placement type.
- *
- * @param string $classname Type class name.
- *
- * @return void
- */
-function wp_advads_register_placement_type( $classname ): void {
-	wp_advads()->placements->types->register_type( $classname );
-}
-
-/* 4. Conditional ------------------- */
+/* 3. Conditional ------------------- */
 
 /**
  * Has placement type.
@@ -185,7 +139,7 @@ function is_a_placement( $thing ): bool {
 	return $thing instanceof Placement;
 }
 
-/* 5. Getter ------------------- */
+/* 4. Getter ------------------- */
 
 /**
  * Get array of placements.
@@ -258,7 +212,7 @@ function wp_advads_get_placement_types( $with_unknown = true ): array {
 	return wp_advads()->placements->types->get_types( $with_unknown );
 }
 
-/* 6. Finder ------------------- */
+/* 5. Finder ------------------- */
 
 /**
  * Get the placement object.
@@ -327,13 +281,7 @@ function wp_advads_get_placement_by_slug( $slug, $new_type = '' ) {
 }
 
 /**
- * Find placement by item id.
- *
- * Example: Find all placements that are connected to a specific ad.
- *          In this case $item_id = "ad_1234"
- *
- * Example: Find all placements that are connected to a specific group.
- *          In this case $item_id = "group_1234"
+ * Find placement by item id — e.g. find all placements connected to a specific ad (`$item_id = "ad_1234"`) or a specific group (`$item_id = "group_1234"`).
  *
  * @param string $item_id Item id to search for.
  *
@@ -344,9 +292,7 @@ function wp_advads_placements_by_item_id( $item_id ): array {
 }
 
 /**
- * Retrieves placements by type.
- *
- * Filters cached placement summaries by type and hydrates matches.
+ * Retrieves placements by type — filters cached placement summaries by type and hydrates matches.
  *
  * @param string|array<int, string> $types Placement types to query.
  * @param string                    $output         The required return type. One of OBJECT or ids,

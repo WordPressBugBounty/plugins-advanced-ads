@@ -63,7 +63,7 @@ class Tools extends Screen {
 					'label'    => __( 'Version Control', 'advanced-ads' ),
 					'filename' => ADVADS_ABSPATH . 'views/admin/tools/tab-version.php',
 				],
-				'status'   => [
+				'status'    => [
 					'label'    => __( 'System Status', 'advanced-ads' ),
 					'filename' => ADVADS_ABSPATH . 'views/admin/tools/tab-status.php',
 				],

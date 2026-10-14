@@ -45,7 +45,7 @@ if ( $placement_item_type ) :
 	endswitch;
 	if ( $link_to_item ) {
 		?>
-		<a href="<?php echo esc_url( $link_to_item ); ?>"><span class="dashicons dashicons-external"></span></span></a>
+		<a href="<?php echo esc_url( $link_to_item ); ?>" aria-label="<?php esc_attr_e( 'Edit item', 'advanced-ads' ); ?>"><span class="dashicons dashicons-external"></span></span></a>
 		<?php
 	} elseif ( 'ad' === $placement_item_type && defined( 'ICL_LANGUAGE_NAME' ) ) {
 		// translation missing notice.

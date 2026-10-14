@@ -121,12 +121,65 @@ jQuery(document).ready(function () {
 			advads_ad_health_reload_number_in_menu();
 			// update show button
 			advads_ad_health_reload_show_link();
+			// If no visible items remain, hide the "Dismiss notices" button wrapper
+			if (jQuery('#advads_overview_notices .advads-ad-health-notices > li:visible').length === 0) {
+                jQuery('.advads-ad-health-notice-hide-all').closest('.advads-widget-buttons').hide();
+            }
 			// remove the fixed height
 			jQuery('#advads_overview_notices').css('height', '');
 			// remove loader
 			notice_box.find('.advads-loader').hide();
 		});
 	});
+
+	// dismiss all notices button
+	jQuery(document).on('click', '.advads-ad-health-notice-hide-all', function () {
+		const $button = jQuery(this);
+		const notice_box = jQuery('#advads_overview_notices');
+
+		// disable the button immediately to prevent double-clicks
+		$button.prop('disabled', true);
+
+		// show loader
+		notice_box.find('.advads-loader').show();
+
+		const query = {
+			action: 'advads-ad-health-notice-hide-all',
+			nonce: advadsglobal.ajax_nonce,
+		};
+
+		jQuery.post(ajaxurl, query, function () {
+			// Evaluate and hide/remove each notice individually based on its properties
+			notice_box.find('.advads-ad-health-notices > li').each(function () {
+				const $li = jQuery(this);
+				const $hideBtn = $li.find('.advads-ad-health-notice-hide');
+
+				// If there's no dismiss button, leave it visible
+				if ($hideBtn.length === 0) {
+					return;
+				}
+
+				// If it's a permanent removal notice, remove it from the DOM. Otherwise, hide it.
+				if ($hideBtn.hasClass('remove')) {
+					$li.remove();
+				} else {
+					$li.hide();
+				}
+			});
+
+			// hide list fragments if last item was hidden/removed
+			advads_ad_health_maybe_remove_list();
+			// update the sidebar menu counter
+			advads_ad_health_reload_number_in_menu();
+			// update the "show hidden" link
+			advads_ad_health_reload_show_link();
+			// hide the button itself since dismissible items are processed
+			$button.closest('.advads-widget-buttons').hide();
+			// hide loader
+			notice_box.find('.advads-loader').hide();
+		});
+	});
+
 	// show all hidden notices
 	jQuery(document).on(
 		'click',
@@ -136,129 +189,16 @@ jQuery(document).ready(function () {
 		}
 	);
 
-	/**
-	 * DEACTIVATION FEEDBACK FORM
-	 */
-	// show overlay when clicked on "deactivate"
-	const advads_deactivate_link = jQuery(
-		'.wp-admin.plugins-php tr[data-slug="advanced-ads"] .row-actions .deactivate a'
-	);
-
-	const advads_deactivate_link_url = advads_deactivate_link.attr('href');
-	advads_deactivate_link.on('click', function (e) {
-		e.preventDefault();
-		// only show feedback form once per 30 days
-		const c_value = advads_admin_get_cookie(
-			'advanced_ads_hide_deactivate_feedback'
-		);
-		if (c_value === undefined) {
-			jQuery('#advanced-ads-feedback-overlay').show();
-		} else {
-			// click on the link
-			window.location.href = advads_deactivate_link_url;
-		}
-	});
-	// show text fields
-	jQuery('#advanced-ads-feedback-content input[type="radio"]').on(
-		'click',
-		function () {
-			// show text field if there is one
-			jQuery(this)
-				.parents('li')
-				.next('li')
-				.children('input[type="text"], textarea')
-				.show();
-		}
-	);
-	// handle technical issue feedback in particular
-	jQuery('#advanced-ads-feedback-content .advanced_ads_disable_help_text').on(
-		'focus',
-		function () {
-			// show text field if there is one
-			jQuery(this)
-				.parents('li')
-				.siblings('.advanced_ads_disable_reply')
-				.show();
-		}
-	);
-	// send form or close it
-	jQuery('#advanced-ads-feedback-content .button').on('click', function (e) {
-		e.preventDefault();
-		const self = jQuery(this);
-		// set cookie for 30 days
-		advads_store_feedback_cookie();
-		// save if plugin should be disabled
-		const disable_plugin = self.hasClass(
-			'advanced-ads-feedback-not-deactivate'
-		)
-			? false
-			: true;
-
-		// hide the content of the feedback form
-		jQuery('#advanced-ads-feedback-content form').hide();
-		if (self.hasClass('advanced-ads-feedback-submit')) {
-			// show feedback message
-			jQuery('#advanced-ads-feedback-after-submit-waiting').show();
-			if (disable_plugin) {
-				jQuery(
-					'#advanced-ads-feedback-after-submit-disabling-plugin'
-				).show();
+	// Keyboard users open the help with Tab and close it with Escape.
+	jQuery('.advads-help')
+		.attr({ tabindex: 0, role: 'note' })
+		.on('keydown', function (event) {
+			if (event.key === 'Escape') {
+				this.blur();
 			}
-			jQuery.ajax({
-				type: 'POST',
-				url: ajaxurl,
-				dataType: 'json',
-				data: {
-					action: 'advads_send_feedback',
-					feedback: self.hasClass(
-						'advanced-ads-feedback-not-deactivate'
-					)
-						? true
-						: false,
-					formdata: jQuery(
-						'#advanced-ads-feedback-content form'
-					).serialize(),
-				},
-				complete(MLHttpRequest, textStatus, errorThrown) {
-					// deactivate the plugin and close the popup with a timeout
-					setTimeout(function () {
-						jQuery('#advanced-ads-feedback-overlay').remove();
-					}, 2000);
-					if (disable_plugin) {
-						window.location.href = advads_deactivate_link_url;
-					}
-				},
-			});
-		} else {
-			// currently not reachable
-			jQuery('#advanced-ads-feedback-overlay').remove();
-			window.location.href = advads_deactivate_link_url;
-		}
-	});
-	// close form and disable the plugin without doing anything
-	jQuery('.advanced-ads-feedback-only-deactivate').on('click', function () {
-		// hide the content of the feedback form
-		jQuery('#advanced-ads-feedback-content form').hide();
-		// show feedback message
-		jQuery('#advanced-ads-feedback-after-submit-goodbye').show();
-		jQuery('#advanced-ads-feedback-after-submit-disabling-plugin').show();
-		// set cookie for 30 days
-		advads_store_feedback_cookie();
-		// wait one second
-		setTimeout(function () {
-			jQuery('#advanced-ads-feedback-overlay').hide();
-			window.location.href = advads_deactivate_link_url;
-		}, 1000);
-	});
-	// close button for feedback form
-	jQuery('#advanced-ads-feedback-overlay-close-button').on(
-		'click',
-		function () {
-			jQuery('#advanced-ads-feedback-overlay').hide();
-		}
-	);
+		});
 
-	jQuery('.advads-help').on('mouseenter', function (event) {
+	jQuery('.advads-help').on('mouseenter focus', function (event) {
 		const tooltip = jQuery(event.target).children('.advads-tooltip')[0];
 		if (typeof tooltip === 'undefined') {
 			return;
@@ -303,32 +243,6 @@ jQuery(document).ready(function () {
 jQuery(window).on('load', function () {
 	jQuery('a.notice-dismiss').next('button.notice-dismiss').remove();
 });
-
-function advads_admin_get_cookie(name) {
-	let i, x, y;
-	const ADVcookies = document.cookie.split(';');
-	for (i = 0; i < ADVcookies.length; i++) {
-		x = ADVcookies[i].substr(0, ADVcookies[i].indexOf('='));
-		y = ADVcookies[i].substr(ADVcookies[i].indexOf('=') + 1);
-		x = x.replace(/^\s+|\s+$/g, '');
-		if (x === name) {
-			return unescape(y);
-		}
-	}
-}
-
-/**
- * Store a cookie for 30 days
- * The cookie prevents the feedback form from showing multiple times
- */
-function advads_store_feedback_cookie() {
-	const exdate = new Date();
-	exdate.setSeconds(exdate.getSeconds() + 2592000);
-	document.cookie =
-		'advanced_ads_hide_deactivate_feedback=1; expires=' +
-		exdate.toUTCString() +
-		'; path=/';
-}
 
 /**
  * Ad Health Notices in backend
@@ -383,6 +297,11 @@ function advads_ad_health_show_hidden() {
 		.show();
 	// show loader
 	notice_box.find('.advads-loader').show();
+	// show the "Dismiss all" button again
+    jQuery('.advads-ad-health-notice-hide-all')
+		.prop('disabled', false)
+		.closest('.advads-widget-buttons')
+		.show();
 	// update the button
 	advads_ad_health_reload_show_link();
 	advads_ad_health_maybe_remove_list();

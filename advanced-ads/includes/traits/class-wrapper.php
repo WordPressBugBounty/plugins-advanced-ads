@@ -101,7 +101,7 @@ trait Wrapper {
 			$margin = $this->get_margin();
 			foreach ( $margin as $key => $value ) {
 				if ( ! empty( $value ) ) {
-					$wrapper['style'][ 'margin-' . $key ] = $value . 'px';
+					$wrapper['style'][ 'margin-' . $key ] = intval( $value ) . 'px';
 				}
 			}
 		}
@@ -139,7 +139,8 @@ trait Wrapper {
 
 		if ( method_exists( $this, 'is_space_reserved' ) && $this->is_space_reserved() ) {
 			if ( method_exists( $this, 'get_width' ) && ! empty( $this->get_width() ) ) {
-				$wrapper['style']['width'] = $this->get_width() . 'px';
+				$wrapper['style']['width']     = $this->get_width() . 'px';
+				$wrapper['style']['max-width'] = '100%';
 			}
 
 			if ( method_exists( $this, 'get_height' ) && ! empty( $this->get_height() ) ) {

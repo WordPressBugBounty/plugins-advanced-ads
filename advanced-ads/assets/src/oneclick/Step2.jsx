@@ -19,68 +19,68 @@ function Loader() {
 
 	return (
 		<div className="mt-6 mb-8">
-			<p>{step2.loading}</p>
+			<p>{ step2.loading }</p>
 			<p>
-				<img src={advancedAds.oneclick.spinner} alt="" />
+				<img src={ advancedAds.oneclick.spinner } alt="" />
 			</p>
 		</div>
 	);
 }
 
-function DomainNotFound({ domain, onCancel, setDomain, setFetched }) {
+function DomainNotFound( { domain, onCancel, setDomain, setFetched } ) {
 	const { step2 } = advancedAds.oneclick;
 
 	return (
 		<div className="mt-6 mb-8">
 			<p className="step-error">
-				{String.format(
-					decodeEntities(step2.notRegistered),
+				{ String.format(
+					decodeEntities( step2.notRegistered ),
 					advancedAds.oneclick.siteDomain
-				)}
+				) }
 			</p>
-			<p dangerouslySetInnerHTML={{ __html: step2.content }}></p>
+			<p dangerouslySetInnerHTML={ { __html: step2.content } }></p>
 			<p>
-				<strong>{step2.inputLabel}</strong>{' '}
+				<strong>{ step2.inputLabel }</strong>{ ' ' }
 				<input
 					type="text"
-					value={domain}
-					onChange={(event) => setDomain(event.target.value)}
+					value={ domain }
+					onChange={ ( event ) => setDomain( event.target.value ) }
 				/>
 			</p>
 			<p className="buttons-set">
 				<button
 					className="button button-primary"
-					disabled={'' === domain}
-					onClick={() => setFetched(false)}
+					disabled={ '' === domain }
+					onClick={ () => setFetched( false ) }
 				>
-					{advancedAds.oneclick.btnContinue}
+					{ advancedAds.oneclick.btnContinue }
 				</button>
-				<button className="button" onClick={onCancel}>
-					{advancedAds.oneclick.btnCancel}
+				<button className="button" onClick={ onCancel }>
+					{ advancedAds.oneclick.btnCancel }
 				</button>
 			</p>
 		</div>
 	);
 }
 
-function ServerError({ error, onCancel, setFetched }) {
+function ServerError( { error, onCancel, setFetched } ) {
 	const { step2 } = advancedAds.oneclick;
 
 	return (
 		<div className="mt-6 mb-8">
 			<p className="step-error">
-				{String.format(decodeEntities(step2.serverError), error)}
+				{ String.format( decodeEntities( step2.serverError ), error ) }
 			</p>
-			<p dangerouslySetInnerHTML={{ __html: step2.serverContent }}></p>
+			<p dangerouslySetInnerHTML={ { __html: step2.serverContent } }></p>
 			<p className="buttons-set">
 				<button
 					className="button button-primary"
-					onClick={() => setFetched(false)}
+					onClick={ () => setFetched( false ) }
 				>
-					{advancedAds.oneclick.btnRetry}
+					{ advancedAds.oneclick.btnRetry }
 				</button>
-				<button className="button" onClick={onCancel}>
-					{advancedAds.oneclick.btnCancel}
+				<button className="button" onClick={ onCancel }>
+					{ advancedAds.oneclick.btnCancel }
 				</button>
 			</p>
 		</div>
@@ -88,22 +88,22 @@ function ServerError({ error, onCancel, setFetched }) {
 }
 
 export default function Step2() {
-	const [fetched, setFetched] = useState(false);
-	const [domain, setDomain] = useState('');
-	const [error, setError] = useState('');
-	const { setStep, toggleMetabox, connected } = useContext(OneClickContext);
+	const [ fetched, setFetched ] = useState( false );
+	const [ domain, setDomain ] = useState( '' );
+	const [ error, setError ] = useState( '' );
+	const { setStep, toggleMetabox, connected } = useContext( OneClickContext );
 
 	const onCancel = () => {
-		setDomain('');
-		setFetched(false);
-		toggleMetabox(false);
-		setStep(1);
+		setDomain( '' );
+		setFetched( false );
+		toggleMetabox( false );
+		setStep( 1 );
 	};
 
-	useEffect(() => {
-		if (!fetched) {
+	useEffect( () => {
+		if ( ! fetched ) {
 			jQuery
-				.ajax({
+				.ajax( {
 					type: 'POST',
 					url: ajaxurl,
 					data: {
@@ -112,16 +112,16 @@ export default function Step2() {
 						testDomain: domain,
 					},
 					dataType: 'json',
-				})
-				.done(function (response) {
-					if (!response.success) {
-						if ('connect_error' === response.code) {
-							setFetched('server-error');
-							setError(response.message);
+				} )
+				.done( function ( response ) {
+					if ( ! response.success ) {
+						if ( 'connect_error' === response.code ) {
+							setFetched( 'server-error' );
+							setError( response.message );
 						}
 
-						if ('domain_not_found' === response.code) {
-							setFetched('error');
+						if ( 'domain_not_found' === response.code ) {
+							setFetched( 'error' );
 						}
 
 						return;
@@ -132,35 +132,36 @@ export default function Step2() {
 							? domain
 							: advancedAds.oneclick.siteDomain;
 					connected();
-				})
-				.fail(function (jqXHR) {
-					setFetched('server-error');
-					setError(jqXHR.statusText);
-				});
+				} )
+				.fail( function ( jqXHR ) {
+					setFetched( 'server-error' );
+					setError( jqXHR.statusText );
+				} );
 		}
-	}, [fetched]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the fetch is (re)triggered via `fetched`.
+	}, [ fetched ] );
 
-	if (!fetched) {
+	if ( ! fetched ) {
 		return <Loader />;
 	}
 
-	if (fetched === 'error') {
+	if ( fetched === 'error' ) {
 		return (
 			<DomainNotFound
-				domain={domain}
-				onCancel={onCancel}
-				setDomain={setDomain}
-				setFetched={setFetched}
+				domain={ domain }
+				onCancel={ onCancel }
+				setDomain={ setDomain }
+				setFetched={ setFetched }
 			/>
 		);
 	}
 
-	if (fetched === 'server-error') {
+	if ( fetched === 'server-error' ) {
 		return (
 			<ServerError
-				error={error}
-				onCancel={onCancel}
-				setFetched={setFetched}
+				error={ error }
+				onCancel={ onCancel }
+				setFetched={ setFetched }
 			/>
 		);
 	}

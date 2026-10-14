@@ -22,12 +22,18 @@ use AdvancedAds\Utilities\Data;
 			<?php
 			printf(
 				/* translators: %s is the number of hidden notices. */
-				esc_html__( '%s hidden notifications', 'advanced-ads' ),
+				esc_html( _n( '%s hidden notification', '%s hidden notifications', absint( $ignored_count ), 'advanced-ads' ) ),
 				'<span class="count">' . absint( $ignored_count ) . '</span>'
 			);
 			?>
 		</div>
 		<div class="advads-loader" style="display: none;"></div>
+
+		<div class="advads-widget-buttons mt-4" <?php echo count( Advanced_Ads_Ad_Health_Notices::get_instance()->notices ) <= $ignored_count ? 'style="display: none;"' : ''; ?>>
+            <button type="button" class="advads-btn_primary advads-ad-health-notice-hide-all">
+                <?php esc_html_e( 'Dismiss notices', 'advanced-ads' ); ?>
+            </button>
+        </div>
 	<?php endif; ?>
 </div>
 

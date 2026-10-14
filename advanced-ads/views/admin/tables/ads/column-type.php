@@ -11,6 +11,7 @@
  */
 
 use AdvancedAds\Framework\Utilities\Params;
+use AdvancedAds\Abstracts\Ad;
 
 $type_object = $ad->get_type_object();
 ?>

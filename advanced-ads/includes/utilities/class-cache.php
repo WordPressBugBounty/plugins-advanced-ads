@@ -12,10 +12,7 @@ namespace AdvancedAds\Utilities;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Cache.
- *
- * Wraps wp_cache_* with versioned keys per prefix so flush_group() can invalidate
- * a whole namespace without deleting individual entries (Redis-friendly).
+ * Cache — wraps wp_cache_* with versioned keys per prefix so flush_group() can invalidate a whole namespace without deleting individual entries (Redis-friendly).
  */
 class Cache {
 
@@ -87,9 +84,7 @@ class Cache {
 	];
 
 	/**
-	 * Read a cached value.
-	 *
-	 * Returns null on cache miss. Callers should build the value and store it with set().
+	 * Read a cached value. Returns null on cache miss. Callers should build the value and store it with set().
 	 *
 	 * @param string $prefix Namespace prefix (e.g. self::PREFIX_ADS).
 	 * @param string $key    Logical cache key (e.g. self::KEY_SUMMARIES).

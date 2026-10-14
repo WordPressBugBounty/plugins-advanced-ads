@@ -149,7 +149,7 @@ class Advanced_Ads_AdSense_Report {
 			$earning_cells .= $this->get_earning_cell( $sum, $index );
 		}
 
-		require_once GADSENSE_BASE_PATH . '/admin/views/adsense-report.php';
+		require_once ADVADS_ABSPATH . 'modules/gadsense/views/adsense-report.php';
 		return ob_get_clean();
 	}
 

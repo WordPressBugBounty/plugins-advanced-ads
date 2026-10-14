@@ -4,9 +4,13 @@
  *
  * @package AdvancedAds
  *
- * @var Ad                                  $ad         Ad instance.
- * @var array<string, array<string, mixed>> $placements Placements array.
+ * @var Ad                    $ad         Ad instance.
+ * @var array<int, Placement> $placements Placements array.
  */
+
+use AdvancedAds\Modules\AdSense\Utils;
+use AdvancedAds\Abstracts\Ad;
+use AdvancedAds\Abstracts\Placement;
 
 // show quick injection options.
 // check if the ad code contains the AdSense verification and Auto ads code.
@@ -17,14 +21,14 @@ $is_page_level_ad_in_code_field = $ad->is_type( 'plain' ) && strpos( $ad->get_co
 	<div id="advads-ad-injection-message-placement-created" class="hidden">
 	<p><?php esc_html_e( 'Congratulations! Your ad is now visible in the frontend.', 'advanced-ads' ); ?></p>
 	<?php if ( empty( $ad->get_display_conditions() ) && ! empty( $latest_post ) ) : ?>
-		<a class="button button-primary" target="_blank" href="<?php echo esc_url( get_permalink( $latest_post['ID'] ) ); ?>"><?php esc_html_e( 'Take a look at your ad', 'advanced-ads' ); ?></a>
+		<a class="button button-primary" target="_blank" href="<?php echo esc_url( get_permalink( $latest_post->ID ) ); ?>"><?php esc_html_e( 'Take a look at your ad', 'advanced-ads' ); ?></a>
 	<?php endif; ?>
 	<p class="hide-server-placement">
 		<?php
 		printf(
 			wp_kses(
 				/* translators: %s is a URL. */
-				__( 'Ad not showing up? Take a look <a href="%s" target="_blank">here</a>', 'advanced-ads' ),
+				__( 'Ad not showing up? <a href="%s" target="_blank">Read why an ad might not show up</a>', 'advanced-ads' ),
 				[
 					'a' => [
 						'href'   => [],
@@ -52,7 +56,7 @@ $is_page_level_ad_in_code_field = $ad->is_type( 'plain' ) && strpos( $ad->get_co
 						<?php
 						// show different placements if this is the AdSense Auto ads code.
 						if ( $is_page_level_ad_in_code_field ) :
-							if ( Advanced_Ads_AdSense_Data::get_instance()->is_page_level_enabled() ) :
+							if ( Utils::is_page_level_enabled() ) :
 								?>
 				<p>
 								<?php
@@ -66,7 +70,7 @@ $is_page_level_ad_in_code_field = $ad->is_type( 'plain' ) && strpos( $ad->get_co
 											],
 										]
 									),
-									admin_url( 'admin.php?page=advanced-ads-settings#top#adsense' )
+									admin_url( 'admin.php?page=advanced-ads-app&path=/settings&tab=adsense' )
 								);
 								?>
 								</p><p>

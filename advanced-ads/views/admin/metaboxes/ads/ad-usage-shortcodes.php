@@ -9,6 +9,8 @@
  * @var Ad $ad Ad instance.
  */
 
+use AdvancedAds\Abstracts\Ad;
+
 ?>
 <label class="label" for="advads-usage-shortcode"><?php esc_html_e( 'Shortcode', 'advanced-ads' ); ?></label>
 <div class="advads-usage">

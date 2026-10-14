@@ -20,13 +20,13 @@
 				<?php esc_html_e( "Let's unlock your advertising potential and gain your income.", 'advanced-ads' ); ?>
 			</p>
 			<div id="cta">
-				<span><a href="<?php echo esc_url( admin_url( 'admin.php?page=advanced-ads-onboarding' ) ); ?>" id="launch-wizard"><?php esc_html_e( 'Launch the Setup Wizard', 'advanced-ads' ); ?></a></span>
+				<span><a href="<?php echo esc_url( admin_url( 'admin.php?page=advanced-ads-app&path=/wizard' ) ); ?>" id="launch-wizard"><?php esc_html_e( 'Launch the Setup Wizard', 'advanced-ads' ); ?></a></span>
 				<span><a href="https://wpadvancedads.com/manual/first-ad/" id="first-step" target="_blank"><?php esc_html_e( 'Read the First Steps', 'advanced-ads' ); ?></a></span>
 			</div>
 		</div>
 		<div>
 			<a href="https://www.youtube.com/watch?v=nfybYz8ayXQ" id="welcome-thumbnail" target="_blank">
-				<img alt="" src="<?php echo esc_url( plugin_dir_url( ADVADS_FILE ) . '/admin/assets/img/welcome/video-thumbnail.jpg' ); ?>"/>
+				<img alt="<?php esc_attr_e( 'Watch the introduction video', 'advanced-ads' ); ?>" src="<?php echo esc_url( plugin_dir_url( ADVADS_FILE ) . '/admin/assets/img/welcome/video-thumbnail.jpg' ); ?>"/>
 			</a>
 		</div>
 	</div>

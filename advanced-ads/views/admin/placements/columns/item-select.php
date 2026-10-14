@@ -8,6 +8,8 @@
  *
  * @var Placement $placement Placement instance.
  */
+
+use AdvancedAds\Abstracts\Placement;
 ?>
 <select
 	id="advads-placements-item-<?php echo esc_attr( $placement->get_id() ); ?>"

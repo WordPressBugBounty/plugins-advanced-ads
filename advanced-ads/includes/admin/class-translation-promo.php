@@ -23,7 +23,7 @@ class Translation_Promo {
 	/**
 	 * Your translation site's logo.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	private $glotpress_logo;
 
@@ -33,13 +33,6 @@ class Translation_Promo {
 	 * @var string
 	 */
 	private $glotpress_name;
-
-	/**
-	 * Your translation site's URL.
-	 *
-	 * @var string
-	 */
-	private $glotpress_url;
 
 	/**
 	 * The URL to actually do the API request to.
@@ -75,7 +68,7 @@ class Translation_Promo {
 	 * Will contain the percentage translated for the plugin translation project in the locale.
 	 *
 	 * @access private
-	 * @var int
+	 * @var int|string
 	 */
 	private $percent_translated;
 
@@ -124,9 +117,7 @@ class Translation_Promo {
 	private $translation_loaded;
 
 	/**
-	 * Constructs the i18n module for wordpress.org.
-	 *
-	 * Required fields are the 'textdomain', 'plugin_name' and 'hook'.
+	 * Constructs the i18n module for wordpress.org — required fields are the 'textdomain', 'plugin_name' and 'hook'.
 	 *
 	 * @param array<string, mixed> $args The settings for the i18n module.
 	 * @param bool                 $show_translation_box Whether the translation box should be shown.
@@ -137,8 +128,8 @@ class Translation_Promo {
 		}
 
 		$args         = $this->set_defaults( $args );
-		$this->locale = $this->get_admin_locale();
-		if ( $this->is_default_language( $this->locale ) ) {
+		$this->locale = get_user_locale();
+		if ( 'en_US' === $this->locale ) {
 			return;
 		}
 
@@ -148,37 +139,7 @@ class Translation_Promo {
 			add_action( $this->hook, [ $this, 'promo' ] );
 		}
 
-		$this->set_api_url( $args['textdomain'] );
-	}
-
-	/**
-	 * Returns whether the language is en_US.
-	 *
-	 * @param string $language The language to check.
-	 *
-	 * @return bool Returns true if the language is en_US.
-	 */
-	protected function is_default_language( $language ) {
-		return 'en_US' === $language;
-	}
-
-	/**
-	 * Returns the locale used in the admin.
-	 *
-	 * WordPress 4.7 introduced the ability for users to specify an Admin language
-	 * different from the language used on the front end. This checks if the feature
-	 * is available and returns the user's language, with a fallback to the site's language.
-	 * Can be removed when support for WordPress 4.6 will be dropped, in favor
-	 * of WordPress get_user_locale() that already fallbacks to the site’s locale.
-	 *
-	 * @returns string The locale.
-	 */
-	private function get_admin_locale() {
-		if ( function_exists( 'get_user_locale' ) ) {
-			return get_user_locale();
-		}
-
-		return get_locale();
+		$this->api_url = 'https://translate.wordpress.org/api/projects/wp-plugins/' . $args['textdomain'] . '/stable/';
 	}
 
 	/**
@@ -187,8 +148,10 @@ class Translation_Promo {
 	 * @access private
 	 *
 	 * @param array<string, mixed> $args Contains the settings for the class.
+	 *
+	 * @return void
 	 */
-	private function init( $args ) {
+	private function init( $args ): void {
 		foreach ( $args as $key => $arg ) {
 			$this->$key = $arg;
 		}
@@ -221,7 +184,7 @@ class Translation_Promo {
 	 * @return string The i18n promo message.
 	 */
 	public function get_promo_message() {
-		if ( ! $this->is_default_language( $this->locale ) && ! $this->hide_promo() ) {
+		if ( 'en_US' !== $this->locale && ! $this->hide_promo() ) {
 			return $this->promo_message();
 		}
 
@@ -233,7 +196,7 @@ class Translation_Promo {
 	 *
 	 * @access private
 	 *
-	 * @return bool|string $message
+	 * @return string $message
 	 */
 	private function promo_message() {
 
@@ -274,22 +237,6 @@ class Translation_Promo {
 	}
 
 	/**
-	 * Returns a button that can be used to dismiss the i18n-message.
-	 *
-	 * @access private
-	 *
-	 * @return string
-	 */
-	public function get_dismiss_i18n_message_button() {
-		return sprintf(
-			/* translators: %1$s is the notification dismissal link start tag, %2$s is the link closing tag. */
-			esc_html__( '%1$sPlease don\'t show me this notification anymore%2$s', $this->textdomain ),
-			'<a class="button" href="' . esc_url( add_query_arg( [ 'remove_i18n_promo' => '1' ] ) ) . '">',
-			'</a>'
-		);
-	}
-
-	/**
 	 * Sets the default values for wordpress.org
 	 *
 	 * @param array<string, mixed> $args The arguments to set defaults for.
@@ -321,6 +268,8 @@ class Translation_Promo {
 	 * Outputs a promo box.
 	 *
 	 * @access public
+	 *
+	 * @return void
 	 */
 	public function promo() {
 		$message = $this->get_promo_message();
@@ -364,8 +313,10 @@ class Translation_Promo {
 	 * Try to get translation details from cache, otherwise retrieve them, then parse them.
 	 *
 	 * @access private
+	 *
+	 * @return void
 	 */
-	private function translation_details() {
+	private function translation_details(): void {
 		$set = $this->find_or_initialize_translation_details();
 
 		$this->translation_exists = ! is_null( $set );
@@ -375,38 +326,14 @@ class Translation_Promo {
 	}
 
 	/**
-	 * Set the API URL on the i18n object.
-	 *
-	 * @param string $textdomain The textdomain to use for the API URL.
-	 */
-	private function set_api_url( $textdomain ) {
-		$this->api_url = 'https://translate.wordpress.org/api/projects/wp-plugins/' . $textdomain . '/stable/';
-	}
-
-	/**
-	 * Returns the API URL to use when requesting translation information.
-	 *
-	 * @return string
-	 */
-	private function get_api_url() {
-		if ( empty( $this->api_url ) ) {
-			$this->api_url = trailingslashit( $this->glotpress_url ) . 'api/projects/' . $this->project_slug;
-		}
-
-		return $this->api_url;
-	}
-
-	/**
-	 * Retrieve the translation details from Yoast Translate.
+	 * Retrieve the translation details from WordPress.org Translate.
 	 *
 	 * @access private
 	 *
 	 * @return object|null
 	 */
 	private function retrieve_translation_details() {
-		$api_url = $this->get_api_url();
-
-		$resp = wp_remote_get( $api_url );
+		$resp = wp_remote_get( $this->api_url );
 		if ( is_wp_error( $resp ) || wp_remote_retrieve_response_code( $resp ) !== 200 ) {
 			return null;
 		}
@@ -443,8 +370,10 @@ class Translation_Promo {
 	 * @param object $set The translation set.
 	 *
 	 * @access private
+	 *
+	 * @return void
 	 */
-	private function parse_translation_set( $set ) {
+	private function parse_translation_set( $set ): void {
 		$this->locale_name        = '';
 		$this->percent_translated = '';
 

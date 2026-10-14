@@ -9,12 +9,12 @@
 
 namespace AdvancedAds\Admin\Pages;
 
-use WP_Screen;
-use AdvancedAds\Constants;
 use AdvancedAds\Abstracts\Screen;
 use AdvancedAds\Admin\Ads\List_Table;
-use AdvancedAds\Utilities\WordPress;
+use AdvancedAds\Constants;
 use AdvancedAds\Utilities\Conditional;
+use AdvancedAds\Utilities\WordPress;
+use WP_Screen;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -50,7 +50,7 @@ class Ads extends Screen {
 		);
 
 		$this->set_hook( 'edit-' . Constants::POST_TYPE_AD );
-		add_action( 'current_screen', [ $this, 'load_placement_ui' ] );
+		add_action( 'current_screen', [ $this, 'load_list_table' ] );
 	}
 
 	/**
@@ -70,7 +70,7 @@ class Ads extends Screen {
 	 *
 	 * @return void
 	 */
-	public function load_placement_ui( WP_Screen $screen ): void {
+	public function load_list_table( WP_Screen $screen ): void {
 		if ( 'edit-' . Constants::POST_TYPE_AD === $screen->id ) {
 			( new List_Table() )->hooks();
 		}
@@ -94,7 +94,7 @@ class Ads extends Screen {
 	 * @return void
 	 */
 	public function header_actions(): void {
-		$url = admin_url( 'post-new.php?post_type=advanced_ads' );
+		$url = admin_url( 'post-new.php?post_type=' . Constants::POST_TYPE_AD );
 		?>
 		<a href="<?php echo esc_url( $url ); ?>" class="button button-primary advads-button">
 			<span class="dashicons dashicons-plus -ml-1.5 leading-6"></span>

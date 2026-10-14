@@ -1,8 +1,6 @@
 <?php
 /**
- * Post Data.
- *
- * Standardize certain post data on save.
+ * Post Data — standardize certain post data on save.
  *
  * @package AdvancedAds
  * @author  Advanced Ads <info@wpadvancedads.com>

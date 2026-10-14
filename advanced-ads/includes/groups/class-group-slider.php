@@ -21,17 +21,6 @@ defined( 'ABSPATH' ) || exit;
 class Group_Slider extends Group implements Group_Interface {
 
 	/**
-	 * Get delay.
-	 *
-	 * @param string $context What the value is for. Valid values are view and edit.
-	 *
-	 * @return int
-	 */
-	public function get_delay( $context = 'view' ): int {
-		return $this->get_prop( 'delay', $context );
-	}
-
-	/**
 	 * Is grid display random.
 	 *
 	 * @param string $context What the value is for. Valid values are view and edit.
@@ -45,7 +34,7 @@ class Group_Slider extends Group implements Group_Interface {
 	/**
 	 * Get ordered ids of the ads that belong to the group
 	 *
-	 * @return array<string, mixed>
+	 * @return array<int, int>
 	 */
 	public function get_ordered_ad_ids() {
 		$ordered_ad_ids = [];

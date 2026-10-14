@@ -1,5 +1,7 @@
 <?php // phpcs:ignore WordPress.Files.FileName
 
+use AdvancedAds\Abstracts\Ad;
+
 /**
  * Visitor conditions under which to (not) show an ad
  *
@@ -91,6 +93,8 @@ class Advanced_Ads_Visitor_Conditions {
 	 * Get the conditions array alphabetically by label
 	 *
 	 * @since 1.8.12
+	 *
+	 * @return array<string, mixed>
 	 */
 	public function get_conditions() {
 		uasort(
@@ -113,6 +117,8 @@ class Advanced_Ads_Visitor_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function mobile_is_or_not( $options, $index = 0, $form_name = '' ) {
 
@@ -156,6 +162,8 @@ class Advanced_Ads_Visitor_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_is_or_not( $options, $index = 0, $form_name = '' ) {
 		if ( ! isset( $options['type'] ) || '' === $options['type'] ) {
@@ -180,6 +188,8 @@ class Advanced_Ads_Visitor_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_number( $options, $index = 0, $form_name = '' ) {
 
@@ -209,6 +219,8 @@ class Advanced_Ads_Visitor_Conditions {
 	 * @param array<string, mixed> $options Options of the condition.
 	 * @param int                  $index index of the condition.
 	 * @param string               $form_name name of the form, falls back to class constant.
+	 *
+	 * @return void
 	 */
 	public static function metabox_string( $options, $index = 0, $form_name = '' ) {
 
@@ -263,6 +275,8 @@ class Advanced_Ads_Visitor_Conditions {
 	 * @param array<int, array<string, mixed>> $set_conditions Array of existing conditions.
 	 * @param string                           $list_target ID of the list with the conditions.
 	 * @param string                           $form_name prefix of the form.
+	 *
+	 * @return void
 	 */
 	public static function render_condition_list( array $set_conditions, $list_target = '', $form_name = '' ) {
 
