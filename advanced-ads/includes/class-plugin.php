@@ -250,6 +250,7 @@ class Plugin extends Framework\Loader {
 		$this->register_integration( Admin\Admin_Notices::class );
 		$this->register_integration( Admin\Assets::class );
 		$this->register_integration( Admin\Marketing::class );
+		$this->register_integration( Admin\Promotion_Banner::class );
 		$this->register_integration( Admin\Post_Types::class );
 		$this->register_integration( Admin\Screen_Options::class );
 		$this->register_integration( Admin\Shortcode_Creator::class );

@@ -78,6 +78,7 @@ class ComposerStaticInit_AdvancedAds
         'AdvancedAds\\Admin\\Plugins\\Screen' => __DIR__ . '/../..' . '/includes/admin/plugins/class-screen.php',
         'AdvancedAds\\Admin\\Post_List' => __DIR__ . '/../..' . '/includes/admin/class-post-list.php',
         'AdvancedAds\\Admin\\Post_Types' => __DIR__ . '/../..' . '/includes/admin/class-post-types.php',
+        'AdvancedAds\\Admin\\Promotion_Banner' => __DIR__ . '/../..' . '/includes/admin/class-promotion-banner.php',
         'AdvancedAds\\Admin\\Screen_Options' => __DIR__ . '/../..' . '/includes/admin/class-screen-options.php',
         'AdvancedAds\\Admin\\Shortcode_Creator' => __DIR__ . '/../..' . '/includes/admin/class-shortcode-creator.php',
         'AdvancedAds\\Admin\\System_Info' => __DIR__ . '/../..' . '/includes/admin/class-system-info.php',

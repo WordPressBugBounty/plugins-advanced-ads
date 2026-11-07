@@ -51,6 +51,7 @@ return array(
     'AdvancedAds\\Admin\\Plugins\\Screen' => $baseDir . '/includes/admin/plugins/class-screen.php',
     'AdvancedAds\\Admin\\Post_List' => $baseDir . '/includes/admin/class-post-list.php',
     'AdvancedAds\\Admin\\Post_Types' => $baseDir . '/includes/admin/class-post-types.php',
+    'AdvancedAds\\Admin\\Promotion_Banner' => $baseDir . '/includes/admin/class-promotion-banner.php',
     'AdvancedAds\\Admin\\Screen_Options' => $baseDir . '/includes/admin/class-screen-options.php',
     'AdvancedAds\\Admin\\Shortcode_Creator' => $baseDir . '/includes/admin/class-shortcode-creator.php',
     'AdvancedAds\\Admin\\System_Info' => $baseDir . '/includes/admin/class-system-info.php',
